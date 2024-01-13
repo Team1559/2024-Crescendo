@@ -72,8 +72,8 @@ public class Module {
 
     // On first cycle, reset relative turn encoder
     // Wait until absolute angle is nonzero in case it wasn't initialized yet
-    if (turnRelativeOffset == null && inputs.turnAbsolutePosition.getRadians() != 0.0) {
-      turnRelativeOffset = inputs.turnAbsolutePosition.minus(inputs.turnPosition);
+    if (turnRelativeOffset == null && inputs.cancoderAbsolutePosition.getRadians() != 0.0) {
+      turnRelativeOffset = inputs.cancoderAbsolutePosition.minus(inputs.steerMotorPosition);
     }
 
     // Run closed loop turn control
@@ -95,7 +95,7 @@ public class Module {
         double velocityRadPerSec = adjustSpeedSetpoint / WHEEL_RADIUS;
         io.setDriveVoltage(
             driveFeedforward.calculate(velocityRadPerSec)
-                + driveFeedback.calculate(inputs.driveVelocityRadPerSec, velocityRadPerSec));
+                + driveFeedback.calculate(inputs.driveMotorVelocityRadPerSec, velocityRadPerSec));
       }
     }
   }
@@ -104,6 +104,7 @@ public class Module {
   public SwerveModuleState runSetpoint(SwerveModuleState state) {
     // Optimize state based on current angle
     // Controllers run in "periodic" when the setpoint is not null
+
     var optimizedState = SwerveModuleState.optimize(state, getAngle());
 
     // Update setpoints, controllers run in "periodic"
@@ -144,23 +145,26 @@ public class Module {
     if (turnRelativeOffset == null) {
       return new Rotation2d();
     } else {
-      return inputs.turnPosition.plus(turnRelativeOffset);
+      Rotation2d angle = inputs.steerMotorPosition.plus(turnRelativeOffset);
+      // if (index == 0) {
+      //   System.out.println("cancoderAbsolutePosition: " + inputs.cancoderAbsolutePosition);
+      //   System.out.println("steerMotorPosition: " + inputs.steerMotorPosition);
+      //   System.out.println("turnRelativeOffset: " + turnRelativeOffset);
+      //   System.out.println("Get Angle: " + angle);
+      //   try{Thread.sleep(200);} catch(Exception e) {}
+      // }
+      return angle;
     }
   }
 
   /** Returns the current drive position of the module in meters. */
   public double getPositionMeters() {
-    return inputs.drivePositionRad * WHEEL_RADIUS;
+    return inputs.driveMotorPositionRad * WHEEL_RADIUS;
   }
 
   /** Returns the current drive velocity of the module in meters per second. */
   public double getVelocityMetersPerSec() {
-    return inputs.driveVelocityRadPerSec * WHEEL_RADIUS;
-  }
-
-  /** Returns the module position (turn angle and drive position). */
-  public SwerveModulePosition getPosition() {
-    return new SwerveModulePosition(getPositionMeters(), getAngle());
+    return inputs.driveMotorVelocityRadPerSec * WHEEL_RADIUS;
   }
 
   /** Returns the module position delta since the last call to this method. */
@@ -177,6 +181,6 @@ public class Module {
 
   /** Returns the drive velocity in radians/sec. */
   public double getCharacterizationVelocity() {
-    return inputs.driveVelocityRadPerSec;
+    return inputs.driveMotorVelocityRadPerSec;
   }
 }
