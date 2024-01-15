@@ -1,4 +1,4 @@
-// Copyright 2021-2023 FRC 6328
+// Copyright 2021-2024 FRC 6328
 // http://github.com/Mechanical-Advantage
 //
 // This program is free software; you can redistribute it and/or
@@ -19,16 +19,16 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ModuleIO {
   @AutoLog
   public static class ModuleIOInputs {
-    public double drivePositionRad = 0.0;
-    public double driveVelocityRadPerSec = 0.0;
-    public double driveAppliedVolts = 0.0;
-    public double[] driveCurrentAmps = new double[] {};
+    public double driveMotorPositionRad = 0.0;
+    public double driveMotorVelocityRadPerSec = 0.0;
+    public double driveMotorAppliedVolts = 0.0;
+    public double driveMotorCurrentAmps = 0;
 
-    public Rotation2d turnAbsolutePosition = new Rotation2d();
-    public Rotation2d turnPosition = new Rotation2d();
-    public double turnVelocityRadPerSec = 0.0;
-    public double turnAppliedVolts = 0.0;
-    public double[] turnCurrentAmps = new double[] {};
+    public Rotation2d cancoderAbsolutePosition = new Rotation2d();
+    public Rotation2d steerMotorPosition = new Rotation2d();
+    public double steerMotorVelocityRadPerSec = 0.0;
+    public double steerMotorAppliedVolts = 0.0;
+    public double steerMotorCurrentAmps = 0;
   }
 
   /** Updates the set of loggable inputs. */

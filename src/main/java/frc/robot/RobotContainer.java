@@ -1,4 +1,4 @@
-// Copyright 2021-2023 FRC 6328
+// Copyright 2021-2024 FRC 6328
 // http://github.com/Mechanical-Advantage
 //
 // This program is free software; you can redistribute it and/or
@@ -29,11 +29,8 @@ import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOTalonFX;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
-
+import frc.robot.subsystems.drive.ModuleIOTalonFX;
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -56,11 +53,11 @@ public class RobotContainer {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         drive = new Drive(
-        new GyroIOPigeon2(),
-        new ModuleIOTalonFX(0),
-        new ModuleIOTalonFX(1),
-        new ModuleIOTalonFX(2),
-        new ModuleIOTalonFX(3));
+          new GyroIOPigeon2(),
+          new ModuleIOTalonFX(0),
+          new ModuleIOTalonFX(1),
+          new ModuleIOTalonFX(2),
+          new ModuleIOTalonFX(3));
         break;
 
       case SIM:
@@ -89,7 +86,7 @@ public class RobotContainer {
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
-    // Set up FF characterization routines
+    // Set up feedforward characterization
     autoChooser.addOption(
         "Drive FF Characterization",
         new FeedForwardCharacterization(
@@ -111,7 +108,8 @@ public class RobotContainer {
             drive,
             () -> -controller.getLeftY(),
             () -> controller.getLeftX(),
-            () -> -controller.getRightX()));
+            //() -> 0, // Zero out strafing, for testing purposes.
+            () -> controller.getRightX()));
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
     controller
         .b()
