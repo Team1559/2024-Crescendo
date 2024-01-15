@@ -66,33 +66,30 @@ public class ModuleIOTalonFX implements ModuleIO {
   public ModuleIOTalonFX(int index) {
     switch (index) {
       case 0: // Front, Left
+        driveMotor = new TalonFX(0);
+        steerMotor = new TalonFX(1);
+        cancoder = new CANcoder(2);
+        absoluteEncoderOffset = new Rotation2d(2.26); // MUST BE CALIBRATED
+        break;
+      case 1: // Front, Right
         driveMotor = new TalonFX(3);
         steerMotor = new TalonFX(4);
         cancoder = new CANcoder(5);
         absoluteEncoderOffset = new Rotation2d(0.35); // MUST BE CALIBRATED
         break;
-      case 1: // Front, Right
-       driveMotor = new TalonFX(0);
-        steerMotor = new TalonFX(1);
-        cancoder = new CANcoder(2);
-        absoluteEncoderOffset = new Rotation2d(2.26); // MUST BE CALIBRATED
-       
-        break;
       case 2: // Back, Left 
-       
-         driveMotor = new TalonFX(6);
-        steerMotor = new TalonFX(7);
-        cancoder = new CANcoder(8);
-        absoluteEncoderOffset = new Rotation2d(3.0236); // MUST BE CALIBRATED
-        //Flipped by 360 to change the direction the wheels spun.
-        break;
-      case 3: // Back, Right
-      driveMotor = new TalonFX(9);
+        driveMotor = new TalonFX(9);
         steerMotor = new TalonFX(10);
         cancoder = new CANcoder(11);
         absoluteEncoderOffset = new Rotation2d(-3.114); // MUST BE CALIBRATED
         //Flipped by 360 to change the direction the wheels spun.
-       
+        break;
+      case 3: // Back, Right
+        driveMotor = new TalonFX(6);
+        steerMotor = new TalonFX(7);
+        cancoder = new CANcoder(8);
+        absoluteEncoderOffset = new Rotation2d(3.0236); // MUST BE CALIBRATED
+        //Flipped by 360 to change the direction the wheels spun.
         break;
       default:
         throw new RuntimeException("Invalid module index");
