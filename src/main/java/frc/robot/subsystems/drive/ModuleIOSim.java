@@ -21,8 +21,11 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 /**
  * Physics sim implementation of module IO.
  *
- * <p>Uses two flywheel sims for the drive and turn motors, with the absolute position initialized
- * to a random value. The flywheel sims are not physically accurate, but provide a decent
+ * <p>
+ * Uses two flywheel sims for the drive and turn motors, with the absolute
+ * position initialized
+ * to a random value. The flywheel sims are not physically accurate, but provide
+ * a decent
  * approximation for the behavior of the module.
  */
 public class ModuleIOSim implements ModuleIO {
@@ -45,8 +48,7 @@ public class ModuleIOSim implements ModuleIO {
     inputs.driveMotorAppliedVolts = driveAppliedVolts;
     inputs.driveMotorCurrentAmps = Math.abs(driveSim.getCurrentDrawAmps());
 
-    inputs.cancoderAbsolutePosition =
-        new Rotation2d(turnSim.getAngularPositionRad()).plus(turnAbsoluteInitPosition);
+    inputs.cancoderAbsolutePosition = new Rotation2d(turnSim.getAngularPositionRad()).plus(turnAbsoluteInitPosition);
     inputs.steerMotorPosition = new Rotation2d(turnSim.getAngularPositionRad());
     inputs.steerMotorVelocityRadPerSec = turnSim.getAngularVelocityRadPerSec();
     inputs.steerMotorAppliedVolts = turnAppliedVolts;

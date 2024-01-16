@@ -13,8 +13,9 @@
 
 package frc.robot.subsystems.drive;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
+
+import edu.wpi.first.math.geometry.Rotation2d;
 
 public interface GyroIO {
   @AutoLog
@@ -24,5 +25,6 @@ public interface GyroIO {
     public double yawVelocityRadPerSec = 0.0;
   }
 
-  public default void updateInputs(GyroIOInputs inputs) {}
+  public default void updateInputs(GyroIOInputs inputs) {
+  }
 }

@@ -109,7 +109,7 @@ public class Module {
 
     // Update setpoints, controllers run in "periodic"
     angleSetpoint = optimizedState.angle;
-    speedSetpoint = optimizedState.speedMetersPerSecond;
+    speedSetpoint = -optimizedState.speedMetersPerSecond;
 
     return optimizedState;
   }
