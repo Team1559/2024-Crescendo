@@ -108,9 +108,9 @@ public class RobotContainer {
         DriveCommands.joystickDrive(
             drive,
             () -> -controller.getLeftY(),
-            () -> controller.getLeftX(),
+            () -> -controller.getLeftX(),
             //() -> 0, // Zero out strafing, for testing purposes.
-            () -> controller.getRightX()));
+            () -> -controller.getRightX()));
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
     controller
         .b()
