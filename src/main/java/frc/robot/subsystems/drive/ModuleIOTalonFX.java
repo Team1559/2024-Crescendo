@@ -27,6 +27,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import frc.robot.Constants;
 
 /**
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn
@@ -73,33 +74,31 @@ public class ModuleIOTalonFX implements ModuleIO {
   public ModuleIOTalonFX(int index) {
     switch (index) {
       case 0: // Front, Left
-        driveMotor = new TalonFX(3);
-        steerMotor = new TalonFX(4);
-        cancoder = new CANcoder(5);
+        driveMotor = new TalonFX(3, Constants.CANIVORE_BUS_ID);
+        steerMotor = new TalonFX(4, Constants.CANIVORE_BUS_ID);
+        cancoder = new CANcoder(5, Constants.CANIVORE_BUS_ID);
         absoluteEncoderOffset = new Rotation2d(0.35).plus(Rotation2d.fromDegrees(180)); // MUST BE CALIBRATED
         break;
       case 1: // Front, Right
-        driveMotor = new TalonFX(0);
-        steerMotor = new TalonFX(1);
-        cancoder = new CANcoder(2);
+        driveMotor = new TalonFX(0, Constants.CANIVORE_BUS_ID);
+        steerMotor = new TalonFX(1, Constants.CANIVORE_BUS_ID);
+        cancoder = new CANcoder(2, Constants.CANIVORE_BUS_ID);
         absoluteEncoderOffset = new Rotation2d(2.26).plus(Rotation2d.fromDegrees(180)); // MUST BE CALIBRATED
 
         break;
       case 2: // Back, Left
-
-        driveMotor = new TalonFX(6);
-        steerMotor = new TalonFX(7);
-        cancoder = new CANcoder(8);
+        driveMotor = new TalonFX(6, Constants.CANIVORE_BUS_ID);
+        steerMotor = new TalonFX(7, Constants.CANIVORE_BUS_ID);
+        cancoder = new CANcoder(8, Constants.CANIVORE_BUS_ID);
         absoluteEncoderOffset = new Rotation2d(3.0236).plus(Rotation2d.fromDegrees(180)); // MUST BE CALIBRATED
         // Flipped by 360 to change the direction the wheels spun.
         break;
       case 3: // Back, Right
-        driveMotor = new TalonFX(9);
-        steerMotor = new TalonFX(10);
-        cancoder = new CANcoder(11);
+        driveMotor = new TalonFX(9, Constants.CANIVORE_BUS_ID);
+        steerMotor = new TalonFX(10, Constants.CANIVORE_BUS_ID);
+        cancoder = new CANcoder(11, Constants.CANIVORE_BUS_ID);
         absoluteEncoderOffset = new Rotation2d(-3.114).plus(Rotation2d.fromDegrees(180)); // MUST BE CALIBRATED
         // Flipped by 360 to change the direction the wheels spun.
-
         break;
       default:
         throw new RuntimeException("Invalid module index");
