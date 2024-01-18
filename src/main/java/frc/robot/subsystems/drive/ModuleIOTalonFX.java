@@ -158,7 +158,7 @@ public class ModuleIOTalonFX implements ModuleIO {
         steerMotorAppliedVolts,
         steerMotorStatorCurrent);
 
-    inputs.driveMotorPositionRad = Units.rotationsToRadians(driveMotorPosition.getValueAsDouble()) / DRIVE_GEAR_RATIO;
+    inputs.driveMotorPositionRad = Units.rotationsToRadians(-driveMotorPosition.getValueAsDouble()) / DRIVE_GEAR_RATIO;
     inputs.driveMotorVelocityRadPerSec = Units.rotationsToRadians(driveMotorVelocity.getValueAsDouble())
         / DRIVE_GEAR_RATIO;
     inputs.driveMotorAppliedVolts = driveMotorAppliedVolts.getValueAsDouble();
@@ -186,7 +186,8 @@ public class ModuleIOTalonFX implements ModuleIO {
   @Override
   public void setDriveBrakeMode(boolean enable) {
     var config = new MotorOutputConfigs();
-    config.Inverted = InvertedValue.CounterClockwise_Positive;
+    // config.Inverted = InvertedValue.CounterClockwise_Positive;
+    config.Inverted = InvertedValue.Clockwise_Positive;
     config.NeutralMode = enable ? NeutralModeValue.Brake : NeutralModeValue.Coast;
     driveMotor.getConfigurator().apply(config);
   }
