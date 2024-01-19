@@ -24,7 +24,7 @@ import frc.robot.subsystems.gyro.GyroIo;
 import frc.robot.subsystems.gyro.GyroIoInputsAutoLogged;
 import frc.robot.subsystems.swerve.IndexedSwerveModule;
 import frc.robot.subsystems.swerve.SwerveModuleIo;
-import frc.robot.util.LocalADStarAK;
+import frc.robot.util.LocalAdStarAk;
 
 public class DriveBase extends SubsystemBase {
   private static final double DRIVE_BASE_RADIUS = Math.hypot(Constants.TRACK_WIDTH_X / 2.0, Constants.TRACK_WIDTH_Y / 2.0);
@@ -77,7 +77,7 @@ public class DriveBase extends SubsystemBase {
          // Flips path if aliance is on red side.
         () -> Constants.FLIP_PATH_IF_ALLIANCE_IS_NOT_DEFAULT && DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() != Constants.DEFAULT_ALLIANCE,
         this);
-    Pathfinding.setPathfinder(new LocalADStarAK());
+    Pathfinding.setPathfinder(new LocalAdStarAk());
     PathPlannerLogging.setLogActivePathCallback(
         activePath -> Logger.recordOutput("Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]))
         );
