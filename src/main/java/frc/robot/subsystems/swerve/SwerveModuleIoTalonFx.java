@@ -61,25 +61,25 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         driveMotor = new TalonFX(Constants.FRONT_LEFT_DRIVE_MOTOR_ID, Constants.CANIVORE_BUS_ID);
         steerMotor = new TalonFX(Constants.FRONT_LEFT_STEER_MOTOR_ID, Constants.CANIVORE_BUS_ID);
         cancoder = new CANcoder(Constants.FRONT_LEFT_CANCODER_ID, Constants.CANIVORE_BUS_ID);
-        absoluteEncoderOffset = new Rotation2d(-2.26); // TODO
+        absoluteEncoderOffset = Constants.FRONT_LEFT_ABSOLUTE_ENCODER_OFFSET;
         break;
       case FRONT_RIGHT:
       driveMotor = new TalonFX(Constants.FRONT_RIGHT_DRIVE_MOTOR_ID, Constants.CANIVORE_BUS_ID);
       steerMotor = new TalonFX(Constants.FRONT_RIGHT_STEER_MOTOR_ID, Constants.CANIVORE_BUS_ID);
       cancoder = new CANcoder(Constants.FRONT_RIGHT_CANCODER_ID, Constants.CANIVORE_BUS_ID);
-        absoluteEncoderOffset = new Rotation2d(-0.35); // TODO
+        absoluteEncoderOffset = Constants.FRONT_RIGHT_ABSOLUTE_ENCODER_OFFSET;
         break;
       case BACK_LEFT:
       driveMotor = new TalonFX(Constants.BACK_LEFT_DRIVE_MOTOR_ID, Constants.CANIVORE_BUS_ID);
       steerMotor = new TalonFX(Constants.BACK_LEFT_STEER_MOTOR_ID, Constants.CANIVORE_BUS_ID);
       cancoder = new CANcoder(Constants.BACK_LEFT_CANCODER_ID, Constants.CANIVORE_BUS_ID);
-        absoluteEncoderOffset = new Rotation2d(3.114); // TODO
+        absoluteEncoderOffset = Constants.BACK_LEFT_ABSOLUTE_ENCODER_OFFSET;
         break;
       case BACK_RIGHT:
       driveMotor = new TalonFX(Constants.BACK_RIGHT_DRIVE_MOTOR_ID, Constants.CANIVORE_BUS_ID);
       steerMotor = new TalonFX(Constants.BACK_RIGHT_STEER_MOTOR_ID, Constants.CANIVORE_BUS_ID);
       cancoder = new CANcoder(Constants.BACK_RIGHT_CANCODER_ID, Constants.CANIVORE_BUS_ID);
-        absoluteEncoderOffset = new Rotation2d(-3.0236); // TODO
+        absoluteEncoderOffset = Constants.BACK_RIGHT_ABSOLUTE_ENCODER_OFFSET;
         break;
       default:
         throw new RuntimeException("Invalid module index: " + index);

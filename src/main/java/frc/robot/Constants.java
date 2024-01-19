@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
@@ -41,8 +42,12 @@ public final class Constants {
   public static final double WHEEL_DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
   public static final double WHEEL_TURN_GEAR_RATIO = 12.8;
 
-  // ---------- Wheel Rotation Offsets ----------
-  // TODO
+  // ---------- Wheel Rotation Offsets ---------- TODO
+  // Note: Chaning the Offset by Pie (180 degrees) will invert the direction the wheel spins.
+  public static final Rotation2d FRONT_LEFT_ABSOLUTE_ENCODER_OFFSET = new Rotation2d(-2.26);
+  public static final Rotation2d FRONT_RIGHT_ABSOLUTE_ENCODER_OFFSET = new Rotation2d(-0.35);
+  public static final Rotation2d BACK_LEFT_ABSOLUTE_ENCODER_OFFSET = new Rotation2d(3.114);
+  public static final Rotation2d BACK_RIGHT_ABSOLUTE_ENCODER_OFFSET = new Rotation2d(-3.0236);
 
   // ---------- Hardware Ids ----------
   public static final String CANIVORE_BUS_ID = "1559Canivore";
