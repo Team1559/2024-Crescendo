@@ -157,21 +157,6 @@ public class DriveBase extends SubsystemBase {
     runVelocity(new ChassisSpeeds());
   }
 
-  /**
-   * Stops the drive and turns the modules to an X arrangement to resist movement.
-   * The modules will
-   * return to their normal orientations the next time a nonzero velocity is
-   * requested.
-   */
-  public void stopWithX() {
-    Rotation2d[] headings = new Rotation2d[4];
-    for (int i = 0; i < 4; i++) {
-      headings[i] = getModuleTranslations()[i].getAngle();
-    }
-    kinematics.resetHeadings(headings);
-    stop();
-  }
-
   /** Runs forwards at the commanded voltage. */
   public void runCharacterizationVolts(double volts) {
     for (int i = 0; i < 4; i++) {

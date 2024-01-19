@@ -22,6 +22,18 @@
           "data": {
             "pathName": "Path Right"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Path Backwards"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Path Left"
+          }
         }
       ]
     }

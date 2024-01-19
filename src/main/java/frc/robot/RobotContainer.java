@@ -4,13 +4,10 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.FeedForwardCharacterization;
+
 import frc.robot.subsystems.base.DriveBase;
 import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
 import frc.robot.subsystems.gyro.GyroIoPigeon2;
@@ -76,16 +73,18 @@ public class RobotContainer {
       () -> -controller.getLeftX(),
       () -> -controller.getRightX()
     ));
-    controller.x().onTrue(Commands.runOnce(driveBase::stopWithX, driveBase)); // TODO
-    controller.b().onTrue(Commands.runOnce(() -> driveBase.setPose(new Pose2d(driveBase.getPose().getTranslation(), new Rotation2d())), driveBase)
-      .ignoringDisable(true)); // TODO
+  
+    // TODO: Drive Forward.
+    //controller.povUp().onTrue(Commands.run());
+    // TODO: Drive Backwards.
+    //controller.povDown().onTrue(Commands.run());
+    // TODO: Drive Right.
+    //controller.povRight().onTrue(Commands.run());
+    // TODO: Drive Left.
+    //controller.povLeft().onTrue(Commands.run());
 
     // ---------- Set-up Autonomous Choices ----------
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
-    // Set up feedforward characterization
-    autoChooser.addOption("Drive FF Characterization", // TODO
-        new FeedForwardCharacterization(driveBase, driveBase::runCharacterizationVolts, driveBase::getCharacterizationVelocity));
   }
 
   /**
