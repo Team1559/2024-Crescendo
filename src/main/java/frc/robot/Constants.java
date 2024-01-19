@@ -1,17 +1,9 @@
-// Copyright 2021-2023 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-
 package frc.robot;
+
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -22,17 +14,35 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final Mode currentMode = Mode.REAL;
 
-  public static enum Mode {
-    /** Running on a real robot. */
-    REAL,
+  // ========================= CONSTANTS ======================================
+  // ---------- Primitives ----------
+  public static final boolean FLIP_PATH_IF_ALLIANCE_IS_NOT_DEFAULT = true;
+  public static final boolean FIELD_RELATIVE = false;
+  public static final double JOYSTICK_DEADBAND = 0.2;
+  public static final double MAX_LINEAR_SPEED = Units.feetToMeters(3.0);
+  // Middle of front wheel to middle of back wheel.
+  public static final double TRACK_WIDTH_X = Units.inchesToMeters(24.0);
+  // Middle of left wheel to middle of right wheel.
+  public static final double TRACK_WIDTH_Y = Units.inchesToMeters(24.0);
+  public static final double WHEEL_DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0); // TODO
+  public static final double WHEEL_RADIUS = Units.inchesToMeters(2.0); // TODO
+  public static final double WHEEL_TURN_GEAR_RATIO = 12.8;
 
-    /** Running a physics simulator. */
-    SIM,
+  // ---------- Objects ----------
+  // This is the side of the field that the aumation path are made for.
+  public static final Alliance DEFAULT_ALLIANCE = Alliance.Blue;
+  public static final OperatingMode CURRENT_OPERATING_MODE = OperatingMode.REAL_WORLD;
+  public static final NeutralModeValue WHEEL_BRAKE_MODE = NeutralModeValue.Brake ;
+  public static final String CANIVORE_BUS_ID = "1559Canivore";
 
-    /** Replaying from a log file. */
-    REPLAY
+  // ========================= Enums ==========================================
+  public static enum OperatingMode {
+    REAL_WORLD,
+    SIMULATION,
+    LOG_REPLAY
   }
-  public static final String CANIVORE_BUS_ID="1559Canivore";
+
+  // ========================= Constructors ===================================
+  private Constants() {}
 }

@@ -1,16 +1,3 @@
-// Copyright 2021-2024 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -22,6 +9,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class FeedForwardCharacterization extends Command {
+  
   private static final double START_DELAY_SECS = 2.0;
   private static final double RAMP_VOLTS_PER_SEC = 0.1;
 
@@ -85,7 +73,7 @@ public class FeedForwardCharacterization extends Command {
     }
 
     public void print() {
-      if (velocityData.size() == 0 || voltageData.size() == 0) {
+      if (velocityData.isEmpty() || voltageData.isEmpty()) {
         return;
       }
 

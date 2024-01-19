@@ -1,16 +1,3 @@
-// Copyright 2021-2024 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
@@ -21,13 +8,14 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.drive.Drive;
+import frc.robot.Constants;
+import frc.robot.subsystems.base.DriveBase;
+
 import java.util.function.DoubleSupplier;
 
 public class DriveCommands {
-  private static final boolean FIELD_RELETIVE = false;
-  private static final double DEADBAND = 0.2;
 
+  /** Makes this class non-instantiable.*/
   private DriveCommands() {
   }
 
@@ -35,20 +23,19 @@ public class DriveCommands {
    * Field relative drive command using two joysticks (controlling linear and
    * angular velocities).
    */
-  public static Command joystickDrive(
-      Drive drive,
+  public static Command joystickDrive(DriveBase drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       DoubleSupplier omegaSupplier) {
+
     return Commands.run(
         () -> {
           // Apply deadband
           double linearMagnitude = MathUtil.applyDeadband(
               Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
-              DEADBAND);
-          Rotation2d linearDirection = new Rotation2d(xSupplier.getAsDouble(),
-              ySupplier.getAsDouble());
-          double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+              Constants.JOYSTICK_DEADBAND);
+          Rotation2d linearDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+          double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), Constants.JOYSTICK_DEADBAND);
 
           // Square values
           linearMagnitude = linearMagnitude * linearMagnitude;
@@ -56,27 +43,22 @@ public class DriveCommands {
 
           // Calcaulate new linear velocity
           Translation2d linearVelocity = new Pose2d(new Translation2d(), linearDirection)
-              .transformBy(new Transform2d(linearMagnitude, 0.0,
-                  new Rotation2d()))
+              .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
               .getTranslation();
 
-          if (FIELD_RELETIVE) {
+          if (Constants.FIELD_RELATIVE) {
             // Convert to field relative speeds & send command
             drive.runVelocity(
                 ChassisSpeeds.fromFieldRelativeSpeeds(
-                    linearVelocity.getX() * drive
-                        .getMaxLinearSpeedMetersPerSec(),
-                    linearVelocity.getY() * drive
-                        .getMaxLinearSpeedMetersPerSec(),
+                    linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                    linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                     omega * drive.getMaxAngularSpeedRadPerSec(),
                     drive.getRotation()));
           } else {
             drive.runVelocity(
                 new ChassisSpeeds(
-                    linearVelocity.getX() * drive
-                        .getMaxLinearSpeedMetersPerSec(),
-                    linearVelocity.getY() * drive
-                        .getMaxLinearSpeedMetersPerSec(),
+                    linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                    linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                     omega * drive.getMaxAngularSpeedRadPerSec()));
           }
         },

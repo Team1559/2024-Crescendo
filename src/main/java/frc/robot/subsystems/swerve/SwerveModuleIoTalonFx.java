@@ -1,17 +1,4 @@
-// Copyright 2021-2024 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-
-package frc.robot.subsystems.drive;
+package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -22,12 +9,11 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
+import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
 
 /**
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn
@@ -48,7 +34,8 @@ import frc.robot.Constants;
  * absolute encoders using AdvantageScope. These values are logged under
  * "/Drive/ModuleX/TurnAbsolutePositionRad"
  */
-public class ModuleIOTalonFX implements ModuleIO {
+public class SwerveModuleIoTalonFx implements SwerveModuleIo {
+
   private final TalonFX driveMotor;
   private final TalonFX steerMotor;
   private final CANcoder cancoder;
@@ -64,61 +51,71 @@ public class ModuleIOTalonFX implements ModuleIO {
   private final StatusSignal<Double> steerMotorAppliedVolts;
   private final StatusSignal<Double> steerMotorStatorCurrent;
 
-  // Gear ratios for SDS MK4i L2, adjust as necessary
-  private final double DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
-  private final double TURN_GEAR_RATIO = 12.8;
-
-  private final boolean isTurnMotorInverted = false;
   private final Rotation2d absoluteEncoderOffset;
 
-  public ModuleIOTalonFX(int index) {
+  public SwerveModuleIoTalonFx(WheelModuleIndex index) {
+    
+    // Assign Motor and Encoder Ids and configue wheel offset.
     switch (index) {
-      case 0: // Front, Left
+      case FRONT_LEFT:
         driveMotor = new TalonFX(0, Constants.CANIVORE_BUS_ID);
         steerMotor = new TalonFX(1, Constants.CANIVORE_BUS_ID);
         cancoder = new CANcoder(2, Constants.CANIVORE_BUS_ID);
-        absoluteEncoderOffset = new Rotation2d(-2.26); // MUST BE CALIBRATED
+        absoluteEncoderOffset = new Rotation2d(-2.26); // TODO
         break;
-      case 1: // Front, Right
+      case FRONT_RIGHT:
         driveMotor = new TalonFX(3, Constants.CANIVORE_BUS_ID);
         steerMotor = new TalonFX(4, Constants.CANIVORE_BUS_ID);
         cancoder = new CANcoder(5, Constants.CANIVORE_BUS_ID);
-        absoluteEncoderOffset = new Rotation2d(-0.35); // MUST BE CALIBRATED
+        absoluteEncoderOffset = new Rotation2d(-0.35); // TODO
         break;
-      case 2: // Back, Left
+      case BACK_LEFT:
         driveMotor = new TalonFX(9, Constants.CANIVORE_BUS_ID);
         steerMotor = new TalonFX(10, Constants.CANIVORE_BUS_ID);
         cancoder = new CANcoder(11, Constants.CANIVORE_BUS_ID);
-        absoluteEncoderOffset = new Rotation2d(3.114); // MUST BE CALIBRATED
+        absoluteEncoderOffset = new Rotation2d(3.114); // TODO
         break;
-      case 3: // Back, Right
+      case BACK_RIGHT:
         driveMotor = new TalonFX(6, Constants.CANIVORE_BUS_ID);
         steerMotor = new TalonFX(7, Constants.CANIVORE_BUS_ID);
         cancoder = new CANcoder(8, Constants.CANIVORE_BUS_ID);
-        absoluteEncoderOffset = new Rotation2d(-3.0236); // MUST BE CALIBRATED
+        absoluteEncoderOffset = new Rotation2d(-3.0236); // TODO
         break;
       default:
-        throw new RuntimeException("Invalid module index");
+        throw new RuntimeException("Invalid module index: " + index);
     }
 
-    var driveMotorConfig = new TalonFXConfiguration();
-    driveMotorConfig.CurrentLimits.StatorCurrentLimit = 40.0;
-    driveMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    driveMotor.getConfigurator().apply(driveMotorConfig);
-    setDriveBrakeMode(true);
+    // Set Drive TalonFXConfiguration.
+    var driveTalonFXConfiguration = new TalonFXConfiguration();
+    driveTalonFXConfiguration.CurrentLimits.StatorCurrentLimit = 40.0;
+    driveTalonFXConfiguration.CurrentLimits.StatorCurrentLimitEnable = true;
+    driveMotor.getConfigurator().apply(driveTalonFXConfiguration);
+    
+    // Set Drive TalonFXConfiguration.
+    var driveMotorOutputConfigs = new MotorOutputConfigs();
+    driveMotorOutputConfigs.NeutralMode = Constants.WHEEL_BRAKE_MODE;
+     // Inverted to match our Swerve Drive Module Gear Box & Motors.
+    driveMotorOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
+    driveMotor.getConfigurator().apply(driveMotorOutputConfigs);
 
-    var steerMotorConfig = new TalonFXConfiguration();
-    steerMotorConfig.CurrentLimits.StatorCurrentLimit = 30.0;
-    steerMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    steerMotor.getConfigurator().apply(steerMotorConfig);
-    setTurnBrakeMode(true);
+    // Set Steer MotorOutputConfigs.
+    var steerTalonFXConfiguration = new TalonFXConfiguration();
+    steerTalonFXConfiguration.CurrentLimits.StatorCurrentLimit = 30.0;
+    steerTalonFXConfiguration.CurrentLimits.StatorCurrentLimitEnable = true;
+    steerMotor.getConfigurator().apply(steerTalonFXConfiguration);
+    
+    // Set Steer MotorOutputConfigs.
+    var steerMotorOutputConfigs = new MotorOutputConfigs();
+    steerMotorOutputConfigs.NeutralMode = Constants.WHEEL_BRAKE_MODE;
+     // Inverted to match our Swerve Drive Module Gear Box & Motors.
+    steerMotorOutputConfigs.Inverted = InvertedValue.CounterClockwise_Positive;
+    steerMotor.getConfigurator().apply(steerMotorOutputConfigs);
 
-    CANcoderConfiguration caNcoderConfiguration = new CANcoderConfiguration();
-    // caNcoderConfiguration.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-    // Updated clockwise positive so that the cannon coder and the motor coder had
-    // the same polarity.
-    cancoder.getConfigurator().apply(caNcoderConfiguration);
+    // Set CAN Coder Configs.
+    CANcoderConfiguration canCoderConfiguration = new CANcoderConfiguration();
+    cancoder.getConfigurator().apply(canCoderConfiguration);
 
+    // Get current state.
     driveMotorPosition = driveMotor.getPosition();
     driveMotorVelocity = driveMotor.getVelocity();
     driveMotorAppliedVolts = driveMotor.getMotorVoltage();
@@ -130,6 +127,7 @@ public class ModuleIOTalonFX implements ModuleIO {
     steerMotorAppliedVolts = steerMotor.getMotorVoltage();
     steerMotorStatorCurrent = steerMotor.getStatorCurrent();
 
+    // Set Update frequency.
     BaseStatusSignal.setUpdateFrequencyForAll(
         100.0, driveMotorPosition, steerMotorPosition); // Required for odometry, use faster rate
     BaseStatusSignal.setUpdateFrequencyForAll(
@@ -146,7 +144,17 @@ public class ModuleIOTalonFX implements ModuleIO {
   }
 
   @Override
-  public void updateInputs(ModuleIOInputs inputs) {
+  public void setDriveVoltage(double volts) {
+    driveMotor.setControl(new VoltageOut(volts));
+  }
+
+  @Override
+  public void setTurnVoltage(double volts) {
+    steerMotor.setControl(new VoltageOut(volts));
+  }
+
+  @Override
+  public void updateInputs(SwerveModuleIoInputs inputs) {
     BaseStatusSignal.refreshAll(
         driveMotorPosition,
         driveMotorVelocity,
@@ -158,47 +166,16 @@ public class ModuleIOTalonFX implements ModuleIO {
         steerMotorAppliedVolts,
         steerMotorStatorCurrent);
 
-    inputs.driveMotorPositionRad = Units.rotationsToRadians(-driveMotorPosition.getValueAsDouble()) / DRIVE_GEAR_RATIO;
-    inputs.driveMotorVelocityRadPerSec = Units.rotationsToRadians(driveMotorVelocity.getValueAsDouble())
-        / DRIVE_GEAR_RATIO;
+    // Inverted driveMotorPosition so that sutonomous sees the robot moving in the correct direction.
+    inputs.driveMotorPositionRad = Units.rotationsToRadians(-driveMotorPosition.getValueAsDouble()) / Constants.WHEEL_DRIVE_GEAR_RATIO;
+    inputs.driveMotorVelocityRadPerSec = Units.rotationsToRadians(driveMotorVelocity.getValueAsDouble()) / Constants.WHEEL_DRIVE_GEAR_RATIO;
     inputs.driveMotorAppliedVolts = driveMotorAppliedVolts.getValueAsDouble();
     inputs.driveMotorCurrentAmps = driveMotorCurrent.getValueAsDouble();
 
-    inputs.cancoderAbsolutePosition = Rotation2d.fromRotations(cancoderAbsolutePosition.getValueAsDouble())
-        .minus(absoluteEncoderOffset);
-    inputs.steerMotorPosition = Rotation2d.fromRotations(steerMotorPosition.getValueAsDouble() / TURN_GEAR_RATIO);
-    inputs.steerMotorVelocityRadPerSec = Units.rotationsToRadians(steerMotorVelocity.getValueAsDouble())
-        / TURN_GEAR_RATIO;
+    inputs.cancoderAbsolutePosition = Rotation2d.fromRotations(cancoderAbsolutePosition.getValueAsDouble()).minus(absoluteEncoderOffset);
+    inputs.steerMotorPosition = Rotation2d.fromRotations(steerMotorPosition.getValueAsDouble() / Constants.WHEEL_TURN_GEAR_RATIO);
+    inputs.steerMotorVelocityRadPerSec = Units.rotationsToRadians(steerMotorVelocity.getValueAsDouble()) / Constants.WHEEL_TURN_GEAR_RATIO;
     inputs.steerMotorAppliedVolts = steerMotorAppliedVolts.getValueAsDouble();
     inputs.steerMotorCurrentAmps = steerMotorStatorCurrent.getValueAsDouble();
-  }
-
-  @Override
-  public void setDriveVoltage(double volts) {
-    driveMotor.setControl(new VoltageOut(volts));
-  }
-
-  @Override
-  public void setTurnVoltage(double volts) {
-    steerMotor.setControl(new VoltageOut(volts));
-  }
-
-  @Override
-  public void setDriveBrakeMode(boolean enable) {
-    var config = new MotorOutputConfigs();
-    // config.Inverted = InvertedValue.CounterClockwise_Positive;
-    config.Inverted = InvertedValue.Clockwise_Positive;
-    config.NeutralMode = enable ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-    driveMotor.getConfigurator().apply(config);
-  }
-
-  @Override
-  public void setTurnBrakeMode(boolean enable) {
-    var config = new MotorOutputConfigs();
-    config.Inverted = isTurnMotorInverted
-        ? InvertedValue.Clockwise_Positive
-        : InvertedValue.CounterClockwise_Positive;
-    config.NeutralMode = enable ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-    steerMotor.getConfigurator().apply(config);
   }
 }
