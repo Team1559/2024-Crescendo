@@ -35,12 +35,30 @@ public final class Constants {
   public static final double TRACK_WIDTH_X = Units.inchesToMeters(24.0);
   // Middle of left wheel to middle of right wheel.
   public static final double TRACK_WIDTH_Y = Units.inchesToMeters(24.0);
-  public static final double WHEEL_DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
+  
+  // ---------- Wheel & GHear Measurements ----------
   public static final double WHEEL_RADIUS = Units.inchesToMeters(2);
+  public static final double WHEEL_DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
   public static final double WHEEL_TURN_GEAR_RATIO = 12.8;
 
-  // ---------- Ids ----------
+  // ---------- Wheel Rotation Offsets ----------
+  // TODO
+
+  // ---------- Hardware Ids ----------
   public static final String CANIVORE_BUS_ID = "1559Canivore";
+  public static final int BASE_GYRO_ID = 12;
+  public static final int FRONT_LEFT_DRIVE_MOTOR_ID = 0;
+  public static final int FRONT_LEFT_STEER_MOTOR_ID = 1;
+  public static final int FRONT_LEFT_CANCODER_ID = 2;
+  public static final int FRONT_RIGHT_DRIVE_MOTOR_ID = 3;
+  public static final int FRONT_RIGHT_STEER_MOTOR_ID = 4;
+  public static final int FRONT_RIGHT_CANCODER_ID = 5;
+  public static final int BACK_LEFT_DRIVE_MOTOR_ID = 9;
+  public static final int BACK_LEFT_STEER_MOTOR_ID = 10;
+  public static final int BACK_LEFT_CANCODER_ID = 11;
+  public static final int BACK_RIGHT_DRIVE_MOTOR_ID = 6;
+  public static final int BACK_RIGHT_STEER_MOTOR_ID = 7;
+  public static final int BACK_RIGHT_CANCODER_ID = 8;
 
   // ========================= Enums ==========================================
   public static enum OperatingMode {

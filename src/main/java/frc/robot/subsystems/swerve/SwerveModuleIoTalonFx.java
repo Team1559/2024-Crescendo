@@ -58,27 +58,27 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
     // Assign Motor and Encoder Ids and configue wheel offset.
     switch (index) {
       case FRONT_LEFT:
-        driveMotor = new TalonFX(0, Constants.CANIVORE_BUS_ID);
-        steerMotor = new TalonFX(1, Constants.CANIVORE_BUS_ID);
-        cancoder = new CANcoder(2, Constants.CANIVORE_BUS_ID);
+        driveMotor = new TalonFX(Constants.FRONT_LEFT_DRIVE_MOTOR_ID, Constants.CANIVORE_BUS_ID);
+        steerMotor = new TalonFX(Constants.FRONT_LEFT_STEER_MOTOR_ID, Constants.CANIVORE_BUS_ID);
+        cancoder = new CANcoder(Constants.FRONT_LEFT_CANCODER_ID, Constants.CANIVORE_BUS_ID);
         absoluteEncoderOffset = new Rotation2d(-2.26); // TODO
         break;
       case FRONT_RIGHT:
-        driveMotor = new TalonFX(3, Constants.CANIVORE_BUS_ID);
-        steerMotor = new TalonFX(4, Constants.CANIVORE_BUS_ID);
-        cancoder = new CANcoder(5, Constants.CANIVORE_BUS_ID);
+      driveMotor = new TalonFX(Constants.FRONT_RIGHT_DRIVE_MOTOR_ID, Constants.CANIVORE_BUS_ID);
+      steerMotor = new TalonFX(Constants.FRONT_RIGHT_STEER_MOTOR_ID, Constants.CANIVORE_BUS_ID);
+      cancoder = new CANcoder(Constants.FRONT_RIGHT_CANCODER_ID, Constants.CANIVORE_BUS_ID);
         absoluteEncoderOffset = new Rotation2d(-0.35); // TODO
         break;
       case BACK_LEFT:
-        driveMotor = new TalonFX(9, Constants.CANIVORE_BUS_ID);
-        steerMotor = new TalonFX(10, Constants.CANIVORE_BUS_ID);
-        cancoder = new CANcoder(11, Constants.CANIVORE_BUS_ID);
+      driveMotor = new TalonFX(Constants.BACK_LEFT_DRIVE_MOTOR_ID, Constants.CANIVORE_BUS_ID);
+      steerMotor = new TalonFX(Constants.BACK_LEFT_STEER_MOTOR_ID, Constants.CANIVORE_BUS_ID);
+      cancoder = new CANcoder(Constants.BACK_LEFT_CANCODER_ID, Constants.CANIVORE_BUS_ID);
         absoluteEncoderOffset = new Rotation2d(3.114); // TODO
         break;
       case BACK_RIGHT:
-        driveMotor = new TalonFX(6, Constants.CANIVORE_BUS_ID);
-        steerMotor = new TalonFX(7, Constants.CANIVORE_BUS_ID);
-        cancoder = new CANcoder(8, Constants.CANIVORE_BUS_ID);
+      driveMotor = new TalonFX(Constants.BACK_RIGHT_DRIVE_MOTOR_ID, Constants.CANIVORE_BUS_ID);
+      steerMotor = new TalonFX(Constants.BACK_RIGHT_STEER_MOTOR_ID, Constants.CANIVORE_BUS_ID);
+      cancoder = new CANcoder(Constants.BACK_RIGHT_CANCODER_ID, Constants.CANIVORE_BUS_ID);
         absoluteEncoderOffset = new Rotation2d(-3.0236); // TODO
         break;
       default:
