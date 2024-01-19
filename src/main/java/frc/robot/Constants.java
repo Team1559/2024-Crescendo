@@ -50,5 +50,6 @@ public final class Constants {
   }
 
   // ========================= Constructors ===================================
+  /** Makes this class non-instantiable.*/
   private Constants() {}
 }

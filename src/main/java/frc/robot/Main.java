@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.RobotBase;
  */
 public final class Main {
   
+  /** Makes this class non-instantiable.*/
   private Main() {}
 
   /**

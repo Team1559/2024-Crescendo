@@ -16,8 +16,7 @@ import java.util.function.DoubleSupplier;
 public class DriveCommands {
 
   /** Makes this class non-instantiable.*/
-  private DriveCommands() {
-  }
+  private DriveCommands() {}
 
   /**
    * Field relative drive command using two joysticks (controlling linear and
