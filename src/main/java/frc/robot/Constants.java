@@ -42,7 +42,7 @@ public final class Constants {
   public static final double WHEEL_DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
   public static final double WHEEL_TURN_GEAR_RATIO = 12.8;
 
-  // ---------- Wheel Rotation Offsets ---------- TODO
+  // ---------- Wheel Rotation Offsets ---------- 
   // Note: Chaning the Offset by Pie (180 degrees) will invert the direction the wheel spins.
   public static final Rotation2d FRONT_LEFT_ABSOLUTE_ENCODER_OFFSET = new Rotation2d(-2.26);
   public static final Rotation2d FRONT_RIGHT_ABSOLUTE_ENCODER_OFFSET = new Rotation2d(-0.35);

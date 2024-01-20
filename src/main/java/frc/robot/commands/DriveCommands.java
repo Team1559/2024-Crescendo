@@ -83,24 +83,44 @@ public class DriveCommands {
 
     Command spinCommand = new Command() {
 
+      private boolean crossedResetAngle = false;
+      private Rotation2d startingRotation, targetRotation;
+
       @Override
       public void initialize() {
-
+       startingRotation=driveBase.getRotation();
+       targetRotation=startingRotation.plus(Rotation2d.fromDegrees(degrees));
       }
 
       @Override
       public void execute() {
-
-      }
-
-      @Override
-      public void end(boolean interrupted) {
-
+        driveBase.runVelocity(new ChassisSpeeds(0,0,velocity));
       }
 
       @Override
       public boolean isFinished() {
-        return false;
+        double startRotationInDegrees = startingRotation.getDegrees()+180;
+        double targetRotationInDegrees = targetRotation.getDegrees()+180;
+        double currentRotationInDegrees = driveBase.getRotation().getDegrees()+180;
+        System.out.println(currentRotationInDegrees + " : " + targetRotationInDegrees);
+        if(startRotationInDegrees < targetRotationInDegrees) {
+          return currentRotationInDegrees >= targetRotationInDegrees
+            || currentRotationInDegrees < startRotationInDegrees;
+        }
+        else {
+          if(crossedResetAngle) {
+            return currentRotationInDegrees >= targetRotationInDegrees;
+          }
+          else {
+            crossedResetAngle = currentRotationInDegrees < startRotationInDegrees;
+            return false;
+          }
+        }
+      }
+
+      @Override
+      public void end(boolean interrupted) {
+        driveBase.stop();
       }
     };
 

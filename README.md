@@ -1,11 +1,15 @@
 # Constants Class
-TODO
+
+Physcial things declared and tuning and ID's with firmware are all identified. 
+
 
 # Tele-Op
-TODO
+
+Using the controller we made the joystick go forward, backward, left and right, along with being able to spin in place to the right or left. Using the D-Pad the robot can precisely move forward, backward and left and right. Everything is correct and well caliberatted. Right joystick is spin in place and left joystick is forward, backward, left and right. 
 
 # Autonomous
-TODO
+
+The robot can move in a good sqaure, and it can be used for testing your callibrations. The name of this routine is Sqare Auto. Each side of the square is 1 meter.
 
 # Steps to Fork for New Season
 ## On or After January 1st

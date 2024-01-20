@@ -3,7 +3,9 @@ package frc.robot;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -76,22 +78,24 @@ public class RobotContainer {
       () -> -controller.getRightX()
     ));
   
-    // TODO: Drive Forward.
+    //  Drive Forward.
     controller.povUp().whileTrue(Commands.run(
       () -> {driveBase.runVelocity(new ChassisSpeeds(1, 0, 0));},
       driveBase));
-    // TODO: Drive Backwards.
+    //  Drive Backwards.
 
     controller.povDown().whileTrue(Commands.run( () -> {driveBase.runVelocity(new ChassisSpeeds(-1, 0, 0));},
       driveBase));
-    // TODO: Drive Right.
+    //  Drive Right.
     controller.povRight().whileTrue(Commands.run( () -> {driveBase.runVelocity(new ChassisSpeeds(0, -1, 0));},
       driveBase));
-    // TODO: Drive Left.
+    //  Drive Left.
 
-    controller.povLeft().whileTrue(Commands.run(() -> {driveBase.runVelocity(new ChassisSpeeds(0, 1, 0));},
+    controller.povLeft().onTrue(Commands.run(() -> {driveBase.runVelocity(new ChassisSpeeds(0, 1, 0));},
       driveBase));
 
+
+      NamedCommands.registerCommand("spin 180",DriveCommands.spinCommand(driveBase, 400, 1)); 
     // ---------- Set-up Autonomous Choices ----------
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
   }
