@@ -4,7 +4,9 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 
@@ -75,13 +77,20 @@ public class RobotContainer {
     ));
   
     // TODO: Drive Forward.
-    //controller.povUp().onTrue(Commands.run());
+    controller.povUp().whileTrue(Commands.run(
+      () -> {driveBase.runVelocity(new ChassisSpeeds(1, 0, 0));},
+      driveBase));
     // TODO: Drive Backwards.
-    //controller.povDown().onTrue(Commands.run());
+
+    controller.povDown().whileTrue(Commands.run( () -> {driveBase.runVelocity(new ChassisSpeeds(-1, 0, 0));},
+      driveBase));
     // TODO: Drive Right.
-    //controller.povRight().onTrue(Commands.run());
+    controller.povRight().whileTrue(Commands.run( () -> {driveBase.runVelocity(new ChassisSpeeds(0, -1, 0));},
+      driveBase));
     // TODO: Drive Left.
-    //controller.povLeft().onTrue(Commands.run());
+
+    controller.povLeft().whileTrue(Commands.run(() -> {driveBase.runVelocity(new ChassisSpeeds(0, 1, 0));},
+      driveBase));
 
     // ---------- Set-up Autonomous Choices ----------
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
