@@ -19,19 +19,25 @@ import frc.robot.subsystems.gyro.GyroIoSimAndReplay;
 import frc.robot.subsystems.swerve.SwerveModuleIoReplay;
 import frc.robot.subsystems.swerve.SwerveModuleIoSim;
 import frc.robot.subsystems.swerve.SwerveModuleIoTalonFx;
+
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  
+
   private final CommandXboxController controller = new CommandXboxController(0);
   private final DriveBase driveBase;
   private final LoggedDashboardChooser<Command> autoChooser;
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
   public RobotContainer() {
 
     // ---------- Initialize the Drive Base ----------
@@ -40,31 +46,37 @@ public class RobotContainer {
       case REAL_WORLD:
         // Real robot, instantiate hardware IO implementations
         driveBase = new DriveBase(
-          new GyroIoPigeon2(),
-          new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_LEFT),
-          new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_RIGHT),
-          new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_LEFT),
-          new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
+            new GyroIoPigeon2(),
+            new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_LEFT),
+            new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_RIGHT),
+            new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_LEFT),
+            new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
         break;
 
       case SIMULATION:
         // Sim robot, instantiate physics sim IO implementations
         driveBase = new DriveBase(
-          new GyroIoSimAndReplay() {},
-          new SwerveModuleIoSim(),
-          new SwerveModuleIoSim(),
-          new SwerveModuleIoSim(),
-          new SwerveModuleIoSim());
+            new GyroIoSimAndReplay() {
+            },
+            new SwerveModuleIoSim(),
+            new SwerveModuleIoSim(),
+            new SwerveModuleIoSim(),
+            new SwerveModuleIoSim());
         break;
 
       case LOG_REPLAY:
         // Replayed robot, disable IO implementations
         driveBase = new DriveBase(
-          new GyroIoSimAndReplay() {},
-          new SwerveModuleIoReplay() {},
-          new SwerveModuleIoReplay() {},
-          new SwerveModuleIoReplay() {},
-          new SwerveModuleIoReplay() {});
+            new GyroIoSimAndReplay() {
+            },
+            new SwerveModuleIoReplay() {
+            },
+            new SwerveModuleIoReplay() {
+            },
+            new SwerveModuleIoReplay() {
+            },
+            new SwerveModuleIoReplay() {
+            });
         break;
 
       default:
@@ -73,31 +85,67 @@ public class RobotContainer {
 
     // ---------- Configure Joystick for Tele-Op ----------
     driveBase.setDefaultCommand(DriveCommands.joystickDrive(driveBase,
-      () -> -controller.getLeftY(),
-      () -> -controller.getLeftX(),
-      () -> -controller.getRightX()
-    ));
-  
-    //  Drive Forward.
+        () -> -controller.getLeftY(),
+        () -> -controller.getLeftX(),
+        () -> -controller.getRightX()));
+
+    // Drive Forward.
     controller.povUp().whileTrue(Commands.run(
-      () -> {driveBase.runVelocity(new ChassisSpeeds(1, 0, 0));},
-      driveBase));
-    //  Drive Backwards.
+        () -> {
+          driveBase.runVelocity(new ChassisSpeeds(1, 0, 0));
+        },
+        driveBase));
+    // Drive Backwards.
 
-    controller.povDown().whileTrue(Commands.run( () -> {driveBase.runVelocity(new ChassisSpeeds(-1, 0, 0));},
-      driveBase));
-    //  Drive Right.
-    controller.povRight().whileTrue(Commands.run( () -> {driveBase.runVelocity(new ChassisSpeeds(0, -1, 0));},
-      driveBase));
-    //  Drive Left.
+    controller.povDown().whileTrue(Commands.run(() -> {
+      driveBase.runVelocity(new ChassisSpeeds(-1, 0, 0));
+    },
+        driveBase));
+    // Drive Right.
+    controller.povRight().whileTrue(Commands.run(() -> {
+      driveBase.runVelocity(new ChassisSpeeds(0, -1, 0));
+    },
+        driveBase));
+    // Drive Left.
 
-    controller.povLeft().onTrue(Commands.run(() -> {driveBase.runVelocity(new ChassisSpeeds(0, 1, 0));},
-      driveBase));
+    controller.povLeft().onTrue(Commands.run(() -> {
+      driveBase.runVelocity(new ChassisSpeeds(0, 1, 0));
+    },
+        driveBase));
 
-
-      NamedCommands.registerCommand("spin 180",DriveCommands.spinCommand(driveBase, 400, 1)); 
+    NamedCommands.registerCommand("spin 180", DriveCommands.spinCommand(driveBase, 400, 1));
     // ---------- Set-up Autonomous Choices ----------
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+
+    // Configure the button bindings
+    configureButtonBindings();
+  }
+
+  /**
+   * Use this method to define your button->command mappings. Buttons can be
+   * created by
+   * instantiating a {@link GenericHID} or one of its subclasses ({@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
+   * it to a {@link
+   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   */
+  private void configureButtonBindings() {
+    drive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+            drive,
+            () -> -controller.getLeftY(),
+            () -> -controller.getLeftX(),
+            // () -> 0, // Zero out strafing, for testing purposes.
+            () -> -controller.getRightX()));
+    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    controller
+        .b()
+        .onTrue(
+            Commands.runOnce(
+                () -> drive.setPose(
+                    new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+                drive)
+                .ignoringDisable(true));
   }
 
   /**

@@ -27,8 +27,9 @@ import frc.robot.subsystems.swerve.SwerveModuleIo;
 import frc.robot.util.LocalAdStarAk;
 
 public class DriveBase extends SubsystemBase {
-  
-  private static final double DRIVE_BASE_RADIUS = Math.hypot(Constants.TRACK_WIDTH_X / 2.0, Constants.TRACK_WIDTH_Y / 2.0);
+
+  private static final double DRIVE_BASE_RADIUS = Math.hypot(Constants.TRACK_WIDTH_X / 2.0,
+      Constants.TRACK_WIDTH_Y / 2.0);
   private static final double MAX_ANGULAR_SPEED = Constants.MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
 
   private final GyroIo gyroIO;
@@ -56,15 +57,16 @@ public class DriveBase extends SubsystemBase {
     }
   }
 
-  public DriveBase( GyroIo gyroIO,
-    SwerveModuleIo flModuleIO,
-    SwerveModuleIo frModuleIO,
-    SwerveModuleIo blModuleIO,
-    SwerveModuleIo brModuleIO) {
+  public DriveBase(GyroIo gyroIO,
+      SwerveModuleIo flModuleIO,
+      SwerveModuleIo frModuleIO,
+      SwerveModuleIo blModuleIO,
+      SwerveModuleIo brModuleIO) {
 
     this.gyroIO = gyroIO;
     modules[WheelModuleIndex.FRONT_LEFT.value] = new IndexedSwerveModule(flModuleIO, WheelModuleIndex.FRONT_LEFT.value);
-    modules[WheelModuleIndex.FRONT_RIGHT.value] = new IndexedSwerveModule(frModuleIO, WheelModuleIndex.FRONT_RIGHT.value);
+    modules[WheelModuleIndex.FRONT_RIGHT.value] = new IndexedSwerveModule(frModuleIO,
+        WheelModuleIndex.FRONT_RIGHT.value);
     modules[WheelModuleIndex.BACK_LEFT.value] = new IndexedSwerveModule(blModuleIO, WheelModuleIndex.BACK_LEFT.value);
     modules[WheelModuleIndex.BACK_RIGHT.value] = new IndexedSwerveModule(brModuleIO, WheelModuleIndex.BACK_RIGHT.value);
 
@@ -75,16 +77,15 @@ public class DriveBase extends SubsystemBase {
         () -> kinematics.toChassisSpeeds(getModuleStates()),
         this::runVelocity,
         new HolonomicPathFollowerConfig(Constants.MAX_LINEAR_SPEED, DRIVE_BASE_RADIUS, new ReplanningConfig()),
-         // Flips path if aliance is on red side.
-        () -> Constants.FLIP_PATH_IF_ALLIANCE_IS_NOT_DEFAULT && DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() != Constants.DEFAULT_ALLIANCE,
+        // Flips path if aliance is on red side.
+        () -> Constants.FLIP_PATH_IF_ALLIANCE_IS_NOT_DEFAULT && DriverStation.getAlliance().isPresent()
+            && DriverStation.getAlliance().get() != Constants.DEFAULT_ALLIANCE,
         this);
     Pathfinding.setPathfinder(new LocalAdStarAk());
     PathPlannerLogging.setLogActivePathCallback(
-        activePath -> Logger.recordOutput("Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]))
-        );
+        activePath -> Logger.recordOutput("Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()])));
     PathPlannerLogging.setLogTargetPoseCallback(
-        targetPose -> Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose)
-        );
+        targetPose -> Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose));
   }
 
   @Override
@@ -115,7 +116,7 @@ public class DriveBase extends SubsystemBase {
     for (int i = 0; i < 4; i++) {
       wheelDeltas[i] = modules[i].getPositionDelta();
     }
-    
+
     // The twist represents the motion of the robot since the last
     // loop cycle in x, y, and theta based only on the modules,
     // without the gyro. The gyro is always disconnected in simulation.
