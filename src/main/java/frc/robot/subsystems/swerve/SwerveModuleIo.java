@@ -4,9 +4,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface SwerveModuleIo {
-  
+
   @AutoLog
-  public static class SwerveModuleIoInputs {
+  static class SwerveModuleIoInputs {
     public double driveMotorPositionRad;
     public double driveMotorVelocityRadPerSec;
     public double driveMotorAppliedVolts;
