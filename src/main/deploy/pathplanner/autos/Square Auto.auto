@@ -1,0 +1,49 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 3.0,
+      "y": 7.0
+    },
+    "rotation": 0.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Path Forward"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Path Right"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Path Backwards"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Path Left"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "spin 180"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

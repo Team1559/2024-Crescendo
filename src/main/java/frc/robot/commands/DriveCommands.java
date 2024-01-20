@@ -1,16 +1,3 @@
-// Copyright 2021-2024 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
@@ -21,60 +8,124 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.drive.Drive;
+import frc.robot.Constants;
+import frc.robot.subsystems.base.DriveBase;
+
 import java.util.function.DoubleSupplier;
 
 public class DriveCommands {
-    private static final boolean FIELD_RELETIVE = false;
-    private static final double DEADBAND = 0.2;
 
-    private DriveCommands() {
+  /** Makes this class non-instantiable.*/
+  private DriveCommands() {}
+
+  /**
+   * Field relative drive command using two joysticks (controlling linear and
+   * angular velocities).
+   */
+  public static Command joystickDrive(DriveBase drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier) {
+
+    return Commands.run(
+        () -> {
+          // Apply deadband
+          double linearMagnitude = MathUtil.applyDeadband(
+              Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
+              Constants.JOYSTICK_DEADBAND);
+          Rotation2d linearDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+          double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), Constants.JOYSTICK_DEADBAND);
+
+          // Square values
+          linearMagnitude = linearMagnitude * linearMagnitude;
+          omega = Math.copySign(omega * omega, omega);
+
+          // Calcaulate new linear velocity
+          Translation2d linearVelocity = new Pose2d(new Translation2d(), linearDirection)
+              .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
+              .getTranslation();
+
+          if (Constants.FIELD_RELATIVE) {
+            // Convert to field relative speeds & send command
+            drive.runVelocity(
+                ChassisSpeeds.fromFieldRelativeSpeeds(
+                    linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                    linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                    omega * drive.getMaxAngularSpeedRadPerSec(),
+                    drive.getRotation()));
+          } else {
+            drive.runVelocity(
+                new ChassisSpeeds(
+                    linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                    linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                    omega * drive.getMaxAngularSpeedRadPerSec()));
+          }
+        },
+        drive);
+  }
+
+  /**
+   * This method will create a command to spin the robot the specified number of degrees at the specified velocity.
+   * 
+   * @param driveBase The robot to spin.
+   * @param degrees The number of degrees to spin (must be a positive number).
+   * @param velocity The velocity to spin at. (must be a positive number).
+   * @return The created command.
+   */
+  public static Command spinCommand(DriveBase driveBase, double degrees, double velocity) {
+
+    if(degrees <= 0) {
+      throw new RuntimeException("Spin Degrees is not a posotive number: " + degrees);
+    }
+    if(velocity <= 0) {
+      throw new RuntimeException("Spin Velocity is not a posotive number: " + velocity);
     }
 
-    /**
-     * Field relative drive command using two joysticks (controlling linear and
-     * angular velocities).
-     */
-    public static Command joystickDrive(
-            Drive drive,
-            DoubleSupplier xSupplier,
-            DoubleSupplier ySupplier,
-            DoubleSupplier omegaSupplier) {
-        return Commands.run(
-                () -> {
-                    // Apply deadband
-                    double linearMagnitude = MathUtil.applyDeadband(
-                            Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()), DEADBAND);
-                    Rotation2d linearDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
-                    double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+    Command spinCommand = new Command() {
 
-                    // Square values
-                    linearMagnitude = linearMagnitude * linearMagnitude;
-                    omega = Math.copySign(omega * omega, omega);
+      private boolean crossedResetAngle = false;
+      private Rotation2d startingRotation, targetRotation;
 
-                    // Calcaulate new linear velocity
-                    Translation2d linearVelocity = new Pose2d(new Translation2d(), linearDirection)
-                            .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
-                            .getTranslation();
+      @Override
+      public void initialize() {
+       startingRotation=driveBase.getRotation();
+       targetRotation=startingRotation.plus(Rotation2d.fromDegrees(degrees));
+      }
 
-                    if(FIELD_RELETIVE) {
-                        //Convert to field relative speeds & send command
-                        drive.runVelocity(
-                                ChassisSpeeds.fromFieldRelativeSpeeds(
-                                        linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                                        linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                                        omega * drive.getMaxAngularSpeedRadPerSec(),
-                                        drive.getRotation()));
-                    }
-                    else
-                    {
-                        drive.runVelocity(
-                                new ChassisSpeeds(
-                                        linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                                        linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                                        omega * drive.getMaxAngularSpeedRadPerSec()));
-                    }
-                },
-                drive);
-    }
+      @Override
+      public void execute() {
+        driveBase.runVelocity(new ChassisSpeeds(0,0,velocity));
+      }
+
+      @Override
+      public boolean isFinished() {
+        double startRotationInDegrees = startingRotation.getDegrees()+180;
+        double targetRotationInDegrees = targetRotation.getDegrees()+180;
+        double currentRotationInDegrees = driveBase.getRotation().getDegrees()+180;
+        System.out.println(currentRotationInDegrees + " : " + targetRotationInDegrees);
+        if(startRotationInDegrees < targetRotationInDegrees) {
+          return currentRotationInDegrees >= targetRotationInDegrees
+            || currentRotationInDegrees < startRotationInDegrees;
+        }
+        else {
+          if(crossedResetAngle) {
+            return currentRotationInDegrees >= targetRotationInDegrees;
+          }
+          else {
+            crossedResetAngle = currentRotationInDegrees < startRotationInDegrees;
+            return false;
+          }
+        }
+      }
+
+      @Override
+      public void end(boolean interrupted) {
+        driveBase.stop();
+      }
+    };
+
+    spinCommand.addRequirements(driveBase);
+    
+    return spinCommand;
+  }
 }
