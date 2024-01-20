@@ -33,7 +33,6 @@ public class DriveBase extends SubsystemBase {
       Constants.TRACK_WIDTH_Y / 2.0);
   private static final double MAX_ANGULAR_SPEED = Constants.MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
   private static final double ENCODER_STDDEV = 0.01;
-  private static final double VISION_STDEV = 2.0;
 
   private final GyroIo gyroIO;
   private final GyroIoInputsAutoLogged gyroInputs = new GyroIoInputsAutoLogged();
@@ -81,7 +80,7 @@ public class DriveBase extends SubsystemBase {
         kinematics, gyroInputs.yawPosition, modulePositions,
         new Pose2d(0, 0, gyroInputs.yawPosition),
         VecBuilder.fill(ENCODER_STDDEV, ENCODER_STDDEV, ENCODER_STDDEV),
-        VecBuilder.fill(VISION_STDEV, VISION_STDEV, VISION_STDEV));
+        VecBuilder.fill(1, 1, 1)); // placeholder, will be filled in by vision
 
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configureHolonomic(
