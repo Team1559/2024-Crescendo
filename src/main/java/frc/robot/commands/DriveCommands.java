@@ -63,4 +63,49 @@ public class DriveCommands {
         },
         drive);
   }
+
+  /**
+   * This method will create a command to spin the robot the specified number of degrees at the specified velocity.
+   * 
+   * @param driveBase The robot to spin.
+   * @param degrees The number of degrees to spin (must be a positive number).
+   * @param velocity The velocity to spin at. (must be a positive number).
+   * @return The created command.
+   */
+  public static Command spinCommand(DriveBase driveBase, double degrees, double velocity) {
+
+    if(degrees <= 0) {
+      throw new RuntimeException("Spin Degrees is not a posotive number: " + degrees);
+    }
+    if(velocity <= 0) {
+      throw new RuntimeException("Spin Velocity is not a posotive number: " + velocity);
+    }
+
+    Command spinCommand = new Command() {
+
+      @Override
+      public void initialize() {
+
+      }
+
+      @Override
+      public void execute() {
+
+      }
+
+      @Override
+      public void end(boolean interrupted) {
+
+      }
+
+      @Override
+      public boolean isFinished() {
+        return false;
+      }
+    };
+
+    spinCommand.addRequirements(driveBase);
+    
+    return spinCommand;
+  }
 }
