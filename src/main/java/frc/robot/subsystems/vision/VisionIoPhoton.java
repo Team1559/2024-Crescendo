@@ -1,0 +1,83 @@
+package frc.robot.subsystems.vision;
+
+import java.io.IOException;
+
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Transform3d;
+import frc.robot.subsystems.vision.Vision.VisionInputs;
+
+public class VisionIoPhoton implements VisionIo {
+    private final AprilTagFieldLayout aprilTagFieldLayout;
+    private final PhotonCamera camera;
+    private final PhotonPoseEstimator poseEstimator;
+    private final PoseStrategy POSE_STRATEGY = PoseStrategy.LOWEST_AMBIGUITY;
+    private final double AMBIGUITY_THRESHOLD = 0.2;
+    private final double MAX_DISTANCE = 9.0;
+
+    public VisionIoPhoton(String cameraName, Transform3d cameraToRobot) {
+        try {
+            aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(
+                    AprilTagFields.k2024Crescendo.m_resourceFile);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+        this.camera = new PhotonCamera(cameraName);
+        this.poseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, POSE_STRATEGY,
+                this.camera, cameraToRobot);
+
+    }
+
+    public String name() {
+        return this.camera.getName();
+    }
+
+    public void updateInputs(VisionInputs inputs) {
+        inputs.havePose = false;
+        inputs.pose = new Pose2d();
+        inputs.timestamp = 0;
+
+        var optionalPoseEstimate = poseEstimator.update();
+        if (!optionalPoseEstimate.isPresent()) {
+            return;
+        }
+        var poseEstimate = optionalPoseEstimate.get();
+
+        var cameraResult = camera.getLatestResult();
+        if (!cameraResult.hasTargets()) {
+            return;
+        }
+
+        var target = cameraResult.getBestTarget();
+        if (target == null) {
+            return;
+        }
+
+        if (target.getPoseAmbiguity() > AMBIGUITY_THRESHOLD) {
+            return;
+        }
+
+        double distanceToTarget = target
+                .getBestCameraToTarget()
+                .getTranslation()
+                .toTranslation2d()
+                .getNorm();
+
+        if (distanceToTarget > MAX_DISTANCE) {
+            return;
+        }
+        // This strategy is from 2023: trust more distant targets less.
+        // (maybe this should be a function of distance instead of the distance?)
+        double[] stdevs = { distanceToTarget, distanceToTarget, distanceToTarget };
+
+        inputs.havePose = true;
+        inputs.pose = poseEstimate.estimatedPose.toPose2d();
+        inputs.estimateStdDevs = stdevs;
+        inputs.timestamp = poseEstimate.timestampSeconds;
+    }
+}

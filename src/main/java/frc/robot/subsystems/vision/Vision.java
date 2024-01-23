@@ -33,8 +33,7 @@ public class Vision extends SubsystemBase {
             if (inputs.havePose) {
                 var sd = inputs.estimateStdDevs;
                 var sdVector = VecBuilder.fill(sd[0], sd[1], sd[2]);
-                poseEstimator.setVisionMeasurementStdDevs(sdVector);
-                poseEstimator.addVisionMeasurement(inputs.pose, inputs.timestamp);
+                poseEstimator.addVisionMeasurement(inputs.pose, inputs.timestamp, sdVector);
             }
         }
     }
