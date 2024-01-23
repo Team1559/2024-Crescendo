@@ -1,22 +1,21 @@
 package frc.robot.subsystems.vision;
 
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.vision.Vision.VisionInputs;
 
 public class VisionIoLimelight implements VisionIo {
-    private final static double X_STDEV = 1.0;
-    private final static double Y_STDEV = 1.0;
-    private final static double R_STDEV = 2.0;
+    private final double[] STD_DEVS = { 1.0, 1.0, 2.0 };
     private String cameraName;
 
     public VisionIoLimelight(String cameraName) {
         this.cameraName = cameraName;
+    }
+
+    public String name() {
+        return this.cameraName;
     }
 
     public void updateInputs(VisionInputs inputs) {
@@ -33,11 +32,8 @@ public class VisionIoLimelight implements VisionIo {
 
             inputs.havePose = true;
             inputs.pose = new Pose2d(t, r);
+            inputs.estimateStdDevs = STD_DEVS;
             inputs.timestamp = Timer.getFPGATimestamp() - data[6] / 1000.0;
         }
-    }
-
-    public Vector<N3> getEstimateStdDevs() {
-        return VecBuilder.fill(X_STDEV, Y_STDEV, R_STDEV);
     }
 }

@@ -191,6 +191,10 @@ public class DriveBase extends SubsystemBase {
     return states;
   }
 
+  public SwerveDrivePoseEstimator getPoseEstimator() {
+    return poseEstimator;
+  }
+
   /** Returns the current odometry pose. */
   @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {

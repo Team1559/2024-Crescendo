@@ -21,6 +21,9 @@ import frc.robot.subsystems.gyro.GyroIoSimAndReplay;
 import frc.robot.subsystems.swerve.SwerveModuleIoReplay;
 import frc.robot.subsystems.swerve.SwerveModuleIoSim;
 import frc.robot.subsystems.swerve.SwerveModuleIoTalonFx;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIoLimelight;
+import frc.robot.subsystems.vision.VisionIoSimAndReplay;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -35,6 +38,7 @@ public class RobotContainer {
 
   private final CommandXboxController controller = new CommandXboxController(0);
   private final DriveBase driveBase;
+  private final Vision vision;
   private final LoggedDashboardChooser<Command> autoChooser;
 
   /**
@@ -53,32 +57,38 @@ public class RobotContainer {
             new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_RIGHT),
             new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_LEFT),
             new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
+
+        vision = new Vision(
+            driveBase.getPoseEstimator(),
+            new VisionIoLimelight("front"));
         break;
 
       case SIMULATION:
         // Sim robot, instantiate physics sim IO implementations
         driveBase = new DriveBase(
-            new GyroIoSimAndReplay() {
-            },
+            new GyroIoSimAndReplay(),
             new SwerveModuleIoSim(),
             new SwerveModuleIoSim(),
             new SwerveModuleIoSim(),
             new SwerveModuleIoSim());
+
+        vision = new Vision(
+            driveBase.getPoseEstimator(),
+            new VisionIoSimAndReplay());
         break;
 
       case LOG_REPLAY:
         // Replayed robot, disable IO implementations
         driveBase = new DriveBase(
-            new GyroIoSimAndReplay() {
-            },
-            new SwerveModuleIoReplay() {
-            },
-            new SwerveModuleIoReplay() {
-            },
-            new SwerveModuleIoReplay() {
-            },
-            new SwerveModuleIoReplay() {
-            });
+            new GyroIoSimAndReplay(),
+            new SwerveModuleIoReplay(),
+            new SwerveModuleIoReplay(),
+            new SwerveModuleIoReplay(),
+            new SwerveModuleIoReplay());
+
+        vision = new Vision(
+            driveBase.getPoseEstimator(),
+            new VisionIoSimAndReplay());
         break;
 
       default:
