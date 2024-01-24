@@ -28,8 +28,7 @@ import frc.robot.util.LocalAdStarAk;
 
 public class DriveBase extends SubsystemBase {
 
-  private static final double DRIVE_BASE_RADIUS = Math.hypot(Constants.TRACK_WIDTH_X / 2.0,
-      Constants.TRACK_WIDTH_Y / 2.0);
+  private static final double DRIVE_BASE_RADIUS = Math.hypot(Constants.TRACK_WIDTH_X / 2.0, Constants.TRACK_WIDTH_Y / 2.0);
   private static final double MAX_ANGULAR_SPEED = Constants.MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
 
   private final GyroIo gyroIO;

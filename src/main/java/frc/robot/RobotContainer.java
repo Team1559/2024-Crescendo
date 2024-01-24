@@ -91,8 +91,7 @@ public class RobotContainer {
         () -> -controller.getRightX()));
 
     // ---------- Configure D-PAD for Tele-Op ----------
-    controller.povUp().whileTrue(Commands.run(
-      () -> {
+    controller.povUp().whileTrue(Commands.run(() -> {
         driveBase.runVelocity(new ChassisSpeeds(1, 0, 0));
       },
       driveBase));
