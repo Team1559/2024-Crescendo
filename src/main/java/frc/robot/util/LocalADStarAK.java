@@ -19,7 +19,7 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Translation2d;
 
 // NOTE: This file is available at: https://gist.github.com/mjansen4857/a8024b55eb427184dbd10ae8923bd57d
-public class LocalAdStarAk implements Pathfinder {
+public class LocalADStarAK implements Pathfinder {
 
   private final AdStarIo io = new AdStarIo();
 

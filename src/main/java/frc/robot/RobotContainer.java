@@ -93,9 +93,10 @@ public class RobotContainer {
 
     controller.povLeft().onTrue(Commands.run(() -> {driveBase.runVelocity(new ChassisSpeeds(0, 1, 0));},
       driveBase));
+                                        
 
-
-      NamedCommands.registerCommand("spin 180",DriveCommands.spinCommand(driveBase, 400, 1)); 
+      NamedCommands.registerCommand("spin 180",DriveCommands.spinCommand(driveBase, 180, 1));
+       NamedCommands.registerCommand("spin -180",DriveCommands.spinCommand(driveBase, -180, -1));  
     // ---------- Set-up Autonomous Choices ----------
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
   }

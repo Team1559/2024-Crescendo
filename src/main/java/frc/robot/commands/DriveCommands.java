@@ -15,8 +15,9 @@ import java.util.function.DoubleSupplier;
 
 public class DriveCommands {
 
-  /** Makes this class non-instantiable.*/
-  private DriveCommands() {}
+  /** Makes this class non-instantiable. */
+  private DriveCommands() {
+  }
 
   /**
    * Field relative drive command using two joysticks (controlling linear and
@@ -65,54 +66,60 @@ public class DriveCommands {
   }
 
   /**
-   * This method will create a command to spin the robot the specified number of degrees at the specified velocity.
+   * This method will create a command to spin the robot the specified number of
+   * degrees at the specified velocity.
    * 
    * @param driveBase The robot to spin.
-   * @param degrees The number of degrees to spin (must be a positive number).
-   * @param velocity The velocity to spin at. (must be a positive number).
+   * @param degrees   The number of degrees to spin (must be a positive number).
+   * @param velocity  The velocity to spin at. (must be a positive number).
    * @return The created command.
    */
   public static Command spinCommand(DriveBase driveBase, double degrees, double velocity) {
 
-    if(degrees <= 0) {
-      throw new RuntimeException("Spin Degrees is not a posotive number: " + degrees);
+    if (degrees > 180 || degrees < -180) {
+      throw new RuntimeException("Spin Degrees has exceeded 180 or -180: " + degrees);
     }
-    if(velocity <= 0) {
-      throw new RuntimeException("Spin Velocity is not a posotive number: " + velocity);
+    if (velocity == 0) {
+      throw new RuntimeException("Robot cannot spin because velocity is:  " + velocity);
     }
+    System.out.println("Spin robot: " + degrees + "and" + velocity);
 
     Command spinCommand = new Command() {
 
       private boolean crossedResetAngle = false;
       private Rotation2d startingRotation, targetRotation;
-
+      private boolean isStartSignPositive; 
       @Override
       public void initialize() {
-       startingRotation=driveBase.getRotation();
-       targetRotation=startingRotation.plus(Rotation2d.fromDegrees(degrees));
+        startingRotation = driveBase.getRotation();
+        isStartSignPositive = startingRotation.getDegrees() >= 0;
+        targetRotation = startingRotation.plus(Rotation2d.fromDegrees(degrees));
+        System.out.println("Spin robot after intialize.");
       }
 
       @Override
       public void execute() {
-        driveBase.runVelocity(new ChassisSpeeds(0,0,velocity));
+        System.out.println("Spin robot execute ");
+        driveBase.runVelocity(new ChassisSpeeds(0, 0, velocity));
+
       }
 
       @Override
       public boolean isFinished() {
-        double startRotationInDegrees = startingRotation.getDegrees()+180;
-        double targetRotationInDegrees = targetRotation.getDegrees()+180;
-        double currentRotationInDegrees = driveBase.getRotation().getDegrees()+180;
+        double startRotationInDegrees = startingRotation.getDegrees() + 180;
+        double targetRotationInDegrees = targetRotation.getDegrees() + 180;
+        double currentRotationInDegrees = driveBase.getRotation().getDegrees() + 180;
         System.out.println(currentRotationInDegrees + " : " + targetRotationInDegrees);
-        if(startRotationInDegrees < targetRotationInDegrees) {
+        
+        //if start + distance is beyond degrees of circle we crossed the barrier
+        if (startRotationInDegrees < targetRotationInDegrees) {
           return currentRotationInDegrees >= targetRotationInDegrees
-            || currentRotationInDegrees < startRotationInDegrees;
-        }
-        else {
-          if(crossedResetAngle) {
+              || currentRotationInDegrees < startRotationInDegrees - 1;
+        } else {
+          if (crossedResetAngle) {
             return currentRotationInDegrees >= targetRotationInDegrees;
-          }
-          else {
-            crossedResetAngle = currentRotationInDegrees < startRotationInDegrees;
+          } else {
+            crossedResetAngle = (driveBase.getRotation().getDegrees() >= 0) != isStartSignPositive;
             return false;
           }
         }
@@ -125,7 +132,7 @@ public class DriveCommands {
     };
 
     spinCommand.addRequirements(driveBase);
-    
+
     return spinCommand;
   }
 }
