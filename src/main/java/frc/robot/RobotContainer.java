@@ -37,7 +37,7 @@ import frc.robot.subsystems.swerve.SwerveModuleIoTalonFx;
 public class RobotContainer {
 
   private final CommandXboxController controller = new CommandXboxController(0);
-  private final LightsSubsystem m_LightsSubsystem = new LightsSubsystem();
+  private final LightsSubsystem lightsSubsystem = new LightsSubsystem();
   private final DriveBase driveBase;
   private final LoggedDashboardChooser<Command> autoChooser;
 
@@ -62,8 +62,7 @@ public class RobotContainer {
       case SIMULATION:
         // Sim robot, instantiate physics sim IO implementations
         driveBase = new DriveBase(
-            new GyroIoSimAndReplay() {
-            },
+            new GyroIoSimAndReplay(),
             new SwerveModuleIoSim(),
             new SwerveModuleIoSim(),
             new SwerveModuleIoSim(),
@@ -73,88 +72,55 @@ public class RobotContainer {
       case LOG_REPLAY:
         // Replayed robot, disable IO implementations
         driveBase = new DriveBase(
-            new GyroIoSimAndReplay() {
-            },
-            new SwerveModuleIoReplay() {
-            },
-            new SwerveModuleIoReplay() {
-            },
-            new SwerveModuleIoReplay() {
-            },
-            new SwerveModuleIoReplay() {
-            });
+            new GyroIoSimAndReplay(),
+            new SwerveModuleIoReplay(),
+            new SwerveModuleIoReplay(),
+            new SwerveModuleIoReplay(),
+            new SwerveModuleIoReplay());
         break;
 
       default:
         throw new RuntimeException("Unknown Run Mode: " + Constants.CURRENT_OPERATING_MODE);
     }
 
+    // ========================= Tele-Op =========================
     // ---------- Configure Joystick for Tele-Op ----------
     driveBase.setDefaultCommand(DriveCommands.joystickDrive(driveBase,
         () -> -controller.getLeftY(),
         () -> -controller.getLeftX(),
         () -> -controller.getRightX()));
 
-    // Drive Forward.
+    // ---------- Configure D-PAD for Tele-Op ----------
     controller.povUp().whileTrue(Commands.run(
-        () -> {
-          driveBase.runVelocity(new ChassisSpeeds(1, 0, 0));
-        },
-        driveBase));
-    // Drive Backwards.
-
+      () -> {
+        driveBase.runVelocity(new ChassisSpeeds(1, 0, 0));
+      },
+      driveBase));
     controller.povDown().whileTrue(Commands.run(() -> {
-      driveBase.runVelocity(new ChassisSpeeds(-1, 0, 0));
-    },
-        driveBase));
-    // Drive Right.
+        driveBase.runVelocity(new ChassisSpeeds(-1, 0, 0));
+      },
+      driveBase));
     controller.povRight().whileTrue(Commands.run(() -> {
-      driveBase.runVelocity(new ChassisSpeeds(0, -1, 0));
-    },
-        driveBase));
-    // Drive Left.
-
+        driveBase.runVelocity(new ChassisSpeeds(0, -1, 0));
+      },
+      driveBase));
     controller.povLeft().onTrue(Commands.run(() -> {
-      driveBase.runVelocity(new ChassisSpeeds(0, 1, 0));
-    },
-        driveBase));
+        driveBase.runVelocity(new ChassisSpeeds(0, 1, 0));
+      },
+      driveBase));
 
+    // ---------- Configure Light Buttons ----------
+    controller.a().whileTrue(new LightsCommands(lightsSubsystem, new Color(0,255,0)));
+    controller.b().whileTrue(new LightsCommands(lightsSubsystem, new Color(255,0,0)));
+    controller.x().whileTrue(new LightsCommands(lightsSubsystem, new Color(0,0, 255)));
+    controller.y().whileTrue(new LightsCommands(lightsSubsystem, new Color(255,255,0)));
+
+    // ========================= Autonomous =========================
+    // ---------- Create Named Commands for use by Pathe Planner ----------
     NamedCommands.registerCommand("spin 180", DriveCommands.spinCommand(driveBase, 400, 1));
+
     // ---------- Set-up Autonomous Choices ----------
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
-    // Configure the button bindings
-    configureButtonBindings();
-  }
-
-  /**
-   * Use this method to define your button->command mappings. Buttons can be
-   * created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
-   * it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
-  private void configureButtonBindings() {
-    driveBase.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            driveBase,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            // () -> 0, // Zero out strafing, for testing purposes.
-            () -> -controller.getRightX()));
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                () -> driveBase.setPose(
-                    new Pose2d(driveBase.getPose().getTranslation(), new Rotation2d())),
-                driveBase)
-                .ignoringDisable(true));
-    controller.a().whileTrue(new LightsCommands(m_LightsSubsystem, new Color(0,255,0)));
-    controller.b().whileTrue(new LightsCommands(m_LightsSubsystem, new Color(255,0,0)));
-    controller.x().whileTrue(new LightsCommands(m_LightsSubsystem, new Color(0,0, 255)));
-    controller.y().whileTrue(new LightsCommands(m_LightsSubsystem, new Color(255,255,0)));
   }
 
   /**
