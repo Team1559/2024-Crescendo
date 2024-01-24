@@ -20,10 +20,10 @@ public class VisionIoPhoton implements VisionIo {
     private final double AMBIGUITY_THRESHOLD = 0.2;
     private final double MAX_DISTANCE = 9.0;
 
-    public VisionIoPhoton(String cameraName, Transform3d cameraToRobot) {
+    public VisionIoPhoton(String cameraName, String fieldName, Transform3d cameraToRobot) {
         try {
             aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(
-                    AprilTagFields.k2024Crescendo.m_resourceFile);
+                    AprilTagFields.kDefaultField.m_resourceFile);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
