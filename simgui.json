@@ -1,6 +1,11 @@
 {
   "HALProvider": {
     "Addressable LEDs": {
+      "0": {
+        "columns": 1
+      }
+    },
+    "PWM Outputs": {
       "window": {
         "visible": true
       }

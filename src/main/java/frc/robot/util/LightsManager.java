@@ -18,6 +18,7 @@ public class LightsManager extends AddressableLED {
     public void setColor(Color color) {
         for (int i = 0; i < buffer.getLength(); i++) {
             buffer.setLED(i, color);
+            System.out.println("Setting Color" + i + ", " + color);
         }
         this.setData(buffer);
     }

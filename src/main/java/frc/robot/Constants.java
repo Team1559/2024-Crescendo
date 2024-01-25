@@ -65,6 +65,9 @@ public final class Constants {
   public static final int BACK_RIGHT_STEER_MOTOR_ID = 7;
   public static final int BACK_RIGHT_CANCODER_ID = 8;
 
+  // ---------- Adressable LEDs ----------
+  public static final int ADDRESSABLE_LED_PORT = 0;
+  public static final int ADDRESSABLE_LED_LENGTH = 144;
   // ========================= Enums ==========================================
   public static enum OperatingMode {
     REAL_WORLD,

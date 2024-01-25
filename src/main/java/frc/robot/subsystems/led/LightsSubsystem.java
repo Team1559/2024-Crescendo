@@ -1,8 +1,9 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.led;
 
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.util.LightsManager;
 
 public class LightsSubsystem extends SubsystemBase {
@@ -11,13 +12,10 @@ public class LightsSubsystem extends SubsystemBase {
     public LightsSubsystem() {
     }
 
-    private LightsManager manager = new LightsManager(9,144);    
+    private LightsManager manager = new LightsManager(Constants.ADDRESSABLE_LED_PORT,Constants.ADDRESSABLE_LED_LENGTH);    
 
     public void setStaticColor(Color color){
-        for (var i = 0; i < manager.getLength(); i++) {
-            manager.setColor(color);
-            System.out.println("Setting Color" + i);
-        }
+        manager.setColor(color);
     }
     public void clear(){
 

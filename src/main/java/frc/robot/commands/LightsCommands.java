@@ -1,9 +1,7 @@
 package frc.robot.commands;
 
-import frc.robot.subsystems.LightsSubsystem;
-
 import edu.wpi.first.wpilibj2.command.Command;
-
+import frc.robot.subsystems.led.LightsSubsystem;
 import edu.wpi.first.wpilibj.util.Color;;
 
 /** An example command that uses an example subsystem. */
