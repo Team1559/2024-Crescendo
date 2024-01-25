@@ -116,7 +116,7 @@ public class RobotContainer {
 
     // ========================= Autonomous =========================
     // ---------- Create Named Commands for use by Pathe Planner ----------
-    NamedCommands.registerCommand("spin 180", DriveCommands.spinCommand(driveBase, 400, 1));
+    NamedCommands.registerCommand("spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
 
     // ---------- Set-up Autonomous Choices ----------
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
