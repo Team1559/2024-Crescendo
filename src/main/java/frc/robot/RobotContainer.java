@@ -109,11 +109,14 @@ public class RobotContainer {
       driveBase));
 
     // ---------- Configure Light Buttons ----------
-    controller.a().whileTrue(new LightsCommands(lightsSubsystem, new Color(0,255,0)));
-    controller.b().whileTrue(new LightsCommands(lightsSubsystem, new Color(255,0,0)));
-    controller.x().whileTrue(new LightsCommands(lightsSubsystem, new Color(0,0, 255)));
-    controller.y().whileTrue(new LightsCommands(lightsSubsystem, new Color(255,255,0)));
-    controller.a().and(controller.b()).whileTrue(new LightsCommands(lightsSubsystem, Constants.CLEAR_LIGHTS));
+    controller.a().onTrue(LightsCommands.setColor(lightsSubsystem, Color.kGreen));
+    controller.b().onTrue(LightsCommands.setColor(lightsSubsystem, Color.kRed));
+    controller.x().onTrue(LightsCommands.setColor(lightsSubsystem, Color.kBlue));
+    controller.y().onTrue(LightsCommands.setColor(lightsSubsystem, Color.kYellow));
+    controller.a().and(controller.b()).onTrue(LightsCommands.setColor(lightsSubsystem, Color.kBlack));
+    controller.rightBumper().onTrue(LightsCommands.changeBrightness(lightsSubsystem, false));
+    controller.leftBumper().onTrue(LightsCommands.changeBrightness(lightsSubsystem, true));
+    
 
     // ========================= Autonomous =========================
     // ---------- Create Named Commands for use by Pathe Planner ----------

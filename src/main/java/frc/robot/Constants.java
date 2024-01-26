@@ -69,7 +69,7 @@ public final class Constants {
   // ---------- Adressable LEDs ----------
   public static final int ADDRESSABLE_LED_PORT = 0;
   public static final int ADDRESSABLE_LED_LENGTH = 144;
-  public static final Color CLEAR_LIGHTS = new Color().fromHSV(0, 0, 0);
+
   // ========================= Enums ==========================================
   public static enum OperatingMode {
     REAL_WORLD,
