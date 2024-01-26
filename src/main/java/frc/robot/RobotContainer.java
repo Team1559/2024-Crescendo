@@ -92,27 +92,27 @@ public class RobotContainer {
 
     // ---------- Configure D-PAD for Tele-Op ----------
     controller.povUp().whileTrue(Commands.run(() -> {
-        driveBase.runVelocity(new ChassisSpeeds(1, 0, 0));
-      },
-      driveBase));
+      driveBase.runVelocity(new ChassisSpeeds(1, 0, 0));
+    },
+        driveBase));
     controller.povDown().whileTrue(Commands.run(() -> {
-        driveBase.runVelocity(new ChassisSpeeds(-1, 0, 0));
-      },
-      driveBase));
+      driveBase.runVelocity(new ChassisSpeeds(-1, 0, 0));
+    },
+        driveBase));
     controller.povRight().whileTrue(Commands.run(() -> {
-        driveBase.runVelocity(new ChassisSpeeds(0, -1, 0));
-      },
-      driveBase));
+      driveBase.runVelocity(new ChassisSpeeds(0, -1, 0));
+    },
+        driveBase));
     controller.povLeft().onTrue(Commands.run(() -> {
-        driveBase.runVelocity(new ChassisSpeeds(0, 1, 0));
-      },
-      driveBase));
+      driveBase.runVelocity(new ChassisSpeeds(0, 1, 0));
+    },
+        driveBase));
 
     // ---------- Configure Light Buttons ----------
-    controller.a().whileTrue(new LightsCommands(lightsSubsystem, new Color(0,255,0)));
-    controller.b().whileTrue(new LightsCommands(lightsSubsystem, new Color(255,0,0)));
-    controller.x().whileTrue(new LightsCommands(lightsSubsystem, new Color(0,0, 255)));
-    controller.y().whileTrue(new LightsCommands(lightsSubsystem, new Color(255,255,0)));
+    controller.a().whileTrue(new LightsCommands(lightsSubsystem, new Color(0, 255, 0)));
+    controller.b().whileTrue(new LightsCommands(lightsSubsystem, new Color(255, 0, 0)));
+    controller.x().whileTrue(new LightsCommands(lightsSubsystem, new Color(0, 0, 255)));
+    controller.y().whileTrue(new LightsCommands(lightsSubsystem, new Color(255, 255, 0)));
 
     // ========================= Autonomous =========================
     // ---------- Create Named Commands for use by Pathe Planner ----------
