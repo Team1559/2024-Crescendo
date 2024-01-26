@@ -39,6 +39,5 @@ public class LightsCommands extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    lightSubsystem.clear();
   }
 }

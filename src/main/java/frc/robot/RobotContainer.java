@@ -113,6 +113,7 @@ public class RobotContainer {
     controller.b().whileTrue(new LightsCommands(lightsSubsystem, new Color(255,0,0)));
     controller.x().whileTrue(new LightsCommands(lightsSubsystem, new Color(0,0, 255)));
     controller.y().whileTrue(new LightsCommands(lightsSubsystem, new Color(255,255,0)));
+    controller.a().and(controller.b()).whileTrue(new LightsCommands(lightsSubsystem, Constants.CLEAR_LIGHTS));
 
     // ========================= Autonomous =========================
     // ---------- Create Named Commands for use by Pathe Planner ----------

@@ -1,24 +1,32 @@
 package frc.robot.subsystems.led;
 
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.util.LightsManager;
 
 public class LightsSubsystem extends SubsystemBase {
+    
+    private AddressableLED addressableLED;
+    private AddressableLEDBuffer ledBuffer;
 
-    /** Creates a new ExampleSubsystem. */
     public LightsSubsystem() {
+        addressableLED = new AddressableLED(Constants.ADDRESSABLE_LED_PORT);
+        ledBuffer = new AddressableLEDBuffer(Constants.ADDRESSABLE_LED_LENGTH);
+        addressableLED.setLength(ledBuffer.getLength());
+        addressableLED.start();
     }
 
-    private LightsManager manager = new LightsManager(Constants.ADDRESSABLE_LED_PORT,Constants.ADDRESSABLE_LED_LENGTH);    
+    
+
 
     public void setStaticColor(Color color){
-        manager.setColor(color);
-    }
-    public void clear(){
-
+        for(int i = 0; i < ledBuffer.getLength(); i++){
+            ledBuffer.setLED(i, color);
+        }
+        addressableLED.setData(ledBuffer);
     }
     /**
      * Example command factory method.
