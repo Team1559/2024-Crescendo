@@ -92,31 +92,33 @@ public class RobotContainer {
 
     // ---------- Configure D-PAD for Tele-Op ----------
     controller.povUp().whileTrue(Commands.run(() -> {
-        driveBase.runVelocity(new ChassisSpeeds(1, 0, 0));
-      },
-      driveBase));
+      driveBase.runVelocity(new ChassisSpeeds(1, 0, 0));
+    },
+        driveBase));
     controller.povDown().whileTrue(Commands.run(() -> {
-        driveBase.runVelocity(new ChassisSpeeds(-1, 0, 0));
-      },
-      driveBase));
+      driveBase.runVelocity(new ChassisSpeeds(-1, 0, 0));
+    },
+        driveBase));
     controller.povRight().whileTrue(Commands.run(() -> {
-        driveBase.runVelocity(new ChassisSpeeds(0, -1, 0));
-      },
-      driveBase));
+      driveBase.runVelocity(new ChassisSpeeds(0, -1, 0));
+    },
+        driveBase));
     controller.povLeft().onTrue(Commands.run(() -> {
-        driveBase.runVelocity(new ChassisSpeeds(0, 1, 0));
-      },
-      driveBase));
+      driveBase.runVelocity(new ChassisSpeeds(0, 1, 0));
+    },
+        driveBase));
 
     // ---------- Configure Light Buttons ----------
-    controller.a().onTrue(LightsCommands.setColor(lightsSubsystem, Color.kGreen));
+    controller.a().onTrue(LightsCommands.setStaticPattern(lightsSubsystem,
+        new Color[] { Color.kDarkGreen, Color.kDarkGreen, Color.kDarkGreen, Color.kLime }));
     controller.b().onTrue(LightsCommands.setColor(lightsSubsystem, Color.kRed));
-    controller.x().onTrue(LightsCommands.setColor(lightsSubsystem, Color.kBlue));
-    controller.y().onTrue(LightsCommands.setColor(lightsSubsystem, Color.kYellow));
+    controller.x().onTrue(LightsCommands.setDynamicPattern(lightsSubsystem,
+        new Color[] { Color.kAliceBlue, Color.kAliceBlue, Color.kDarkBlue, Color.kAliceBlue, Color.kDarkBlue }, true));
+    controller.y().onTrue(LightsCommands.setDynamicPattern(lightsSubsystem,
+        new Color[] { Color.kYellow, Color.kOrange, Color.kBeige, Color.kBisque }, false));
     controller.a().and(controller.b()).onTrue(LightsCommands.setColor(lightsSubsystem, Color.kBlack));
     controller.rightBumper().onTrue(LightsCommands.changeBrightness(lightsSubsystem, false));
     controller.leftBumper().onTrue(LightsCommands.changeBrightness(lightsSubsystem, true));
-    
 
     // ========================= Autonomous =========================
     // ---------- Create Named Commands for use by Pathe Planner ----------
