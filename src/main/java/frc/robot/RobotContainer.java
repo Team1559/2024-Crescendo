@@ -131,7 +131,7 @@ public class RobotContainer {
       driveBase.runVelocity(new ChassisSpeeds(0, -1, 0));
     },
         driveBase));
-    controller.povLeft().onTrue(Commands.run(() -> {
+    controller.povLeft().whileTrue(Commands.run(() -> {
       driveBase.runVelocity(new ChassisSpeeds(0, 1, 0));
     },
         driveBase));
