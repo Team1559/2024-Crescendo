@@ -15,6 +15,9 @@ public class Vision extends SubsystemBase {
 
     @AutoLog
     public static class VisionInputs {
+        public VisionInputs() {
+            estimateStdDevs = new double[3];
+        }
         public boolean havePose = false;
         public Pose2d pose = new Pose2d();
         public double timestamp;
