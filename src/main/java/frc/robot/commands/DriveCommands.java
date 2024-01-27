@@ -16,8 +16,7 @@ import java.util.function.DoubleSupplier;
 public class DriveCommands {
 
   /** Makes this class non-instantiable. */
-  private DriveCommands() {
-  }
+  private DriveCommands() {}
 
   /**
    * Field relative drive command using two joysticks (controlling linear and
@@ -81,12 +80,10 @@ public class DriveCommands {
     if (speed <= 0) {
       throw new RuntimeException("Robot cannot spin because velocity is negative or zero:  " + speed);
     }
-    System.out.println("Spin robot: " + rotationAmount + "and" + speed);
 
     Command spinCommand = new Command() {
 
       private Rotation2d startingRotation, targetRotation;
-      private boolean isStartSignPositive;
 
       @Override
       public void initialize() {
@@ -112,6 +109,40 @@ public class DriveCommands {
       @Override
       public void end(boolean interrupted) {
         driveBase.stop();
+      }
+    };
+
+    spinCommand.addRequirements(driveBase);
+
+    return spinCommand;
+  }
+
+  public static Command turnToTargetCommand(DriveBase driveBase, Translation2d target, double speed) {
+
+    Command spinCommand = new Command() {
+
+    private Command spinCommand;
+
+      @Override
+      public void initialize() {
+        Rotation2d rotation = driveBase.getRotationToTarget(target);
+        spinCommand = spinCommand(driveBase, rotation, speed);
+        spinCommand.initialize();
+      }
+
+      @Override
+      public void execute() {
+        spinCommand.execute();
+      }
+
+      @Override
+      public boolean isFinished() {
+        return spinCommand.isFinished();
+      }
+
+      @Override
+      public void end(boolean interrupted) {
+        spinCommand.end(interrupted);
       }
     };
 

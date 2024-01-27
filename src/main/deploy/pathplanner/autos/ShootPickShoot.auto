@@ -14,7 +14,7 @@
         {
           "type": "named",
           "data": {
-            "name": "ShootNote"
+            "name": "Turn to Speaker"
           }
         },
         {
@@ -32,7 +32,7 @@
         {
           "type": "named",
           "data": {
-            "name": "ShootNote"
+            "name": "Turn to Speaker"
           }
         }
       ]

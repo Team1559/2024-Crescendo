@@ -5,14 +5,11 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -66,10 +63,7 @@ public class RobotContainer {
             new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_RIGHT),
             new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_LEFT),
             new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
-
-        vision = new Vision(
-            driveBase.getPoseEstimator(),
-            new VisionIoLimelight("front"));
+        vision = new Vision(driveBase.getPoseEstimator(),  new VisionIoLimelight(Constants.CAMERA_1_NAME));
         break;
 
       case SIMULATION:
@@ -80,10 +74,7 @@ public class RobotContainer {
             new SwerveModuleIoSim(),
             new SwerveModuleIoSim(),
             new SwerveModuleIoSim());
-
-        vision = new Vision(
-            driveBase.getPoseEstimator(),
-            new VisionIoSimAndReplay());
+        vision = new Vision(driveBase.getPoseEstimator(),new VisionIoSimAndReplay());
         break;
 
       case LOG_REPLAY:
@@ -94,22 +85,25 @@ public class RobotContainer {
             new SwerveModuleIoReplay(),
             new SwerveModuleIoReplay(),
             new SwerveModuleIoReplay());
-
-        vision = new Vision(
-            driveBase.getPoseEstimator(),
-            new VisionIoSimAndReplay());
+        vision = new Vision(driveBase.getPoseEstimator(),new VisionIoSimAndReplay());
         break;
-
       default:
         throw new RuntimeException("Unknown Run Mode: " + Constants.CURRENT_OPERATING_MODE);
     }
-    // ========================= Auto =========================
-    Command blueSpeaker = driveBase.turnToTargetCommand(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42));
-    Command redSpeaker = driveBase.turnToTargetCommand(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42));
-    Command aimAtSpeaker = new ConditionalCommand(blueSpeaker, redSpeaker, this::isBlueAlliance);
 
-    NamedCommands.registerCommand("ShootNote", aimAtSpeaker);
+    // ========================= Autonomous =========================
+    // ---------- Create Named Commands for use by Pathe Planner ----------
+    NamedCommands.registerCommand("Spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
     NamedCommands.registerCommand("StartIntake", new PrintCommand("StartIntake working"));
+    NamedCommands.registerCommand("Turn to Speaker", new ConditionalCommand(
+      // Turn to Blue Speaker.
+      DriveCommands.turnToTargetCommand(driveBase, new Translation2d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42)), 5),
+      // Turn to Red Speaker.
+      DriveCommands.turnToTargetCommand(driveBase, new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42)), 5),
+      () -> DriverStation.getAlliance().get() == DriverStation.Alliance.Blue));
+
+    // ---------- Set-up Autonomous Choices ----------
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // ========================= Tele-Op =========================
     // ---------- Configure Joystick for Tele-Op ----------
@@ -119,45 +113,26 @@ public class RobotContainer {
         () -> -controller.getRightX()));
 
     // ---------- Configure D-PAD for Tele-Op ----------
-    controller.povUp().whileTrue(Commands.run(() -> {
-      driveBase.runVelocity(new ChassisSpeeds(1, 0, 0));
-    },
+    controller.povUp().whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(1, 0, 0)),
         driveBase));
-    controller.povDown().whileTrue(Commands.run(() -> {
-      driveBase.runVelocity(new ChassisSpeeds(-1, 0, 0));
-    },
+    controller.povDown().whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(-1, 0, 0)),
         driveBase));
-    controller.povRight().whileTrue(Commands.run(() -> {
-      driveBase.runVelocity(new ChassisSpeeds(0, -1, 0));
-    },
+    controller.povRight().whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(0, -1, 0)),
         driveBase));
-    controller.povLeft().onTrue(Commands.run(() -> {
-      driveBase.runVelocity(new ChassisSpeeds(0, 1, 0));
-    },
+    controller.povLeft().whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(0, 1, 0)),
         driveBase));
 
     // ---------- Configure Light Buttons ----------
-    controller.a().whileTrue(new LightsCommands(lightsSubsystem, new Color(0, 255, 0)));
-    controller.b().whileTrue(new LightsCommands(lightsSubsystem, new Color(255, 0, 0)));
-    controller.x().whileTrue(new LightsCommands(lightsSubsystem, new Color(0, 0, 255)));
-    controller.y().whileTrue(new LightsCommands(lightsSubsystem, new Color(255, 255, 0)));
-
-    // ========================= Autonomous =========================
-    // ---------- Create Named Commands for use by Pathe Planner ----------
-    NamedCommands.registerCommand("spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
-
-    // ---------- Set-up Autonomous Choices ----------
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-  }
-
-  private boolean isBlueAlliance() {
-    var Alliance = DriverStation.getAlliance();
-    if (Alliance.isEmpty()) {
-      System.out.println("Error, no alliance");
-      return false;
-    }
-    return Alliance.get() == DriverStation.Alliance.Blue;
-
+    controller.a().onTrue(LightsCommands.setStaticPattern(lightsSubsystem,
+        new Color[] { Color.kDarkGreen, Color.kDarkGreen, Color.kLime, Color.kLime}));
+    controller.b().onTrue(LightsCommands.setColor(lightsSubsystem, Color.kRed));
+    controller.x().onTrue(LightsCommands.setDynamicPattern(lightsSubsystem,
+        new Color[] { Color.kAliceBlue, Color.kAliceBlue, Color.kDarkBlue, Color.kDarkBlue}, true));
+    controller.y().onTrue(LightsCommands.setDynamicPattern(lightsSubsystem,
+        new Color[] { Color.kYellow, Color.kOrange, Color.kBeige, Color.kBisque }, false));
+    controller.a().and(controller.b()).onTrue(LightsCommands.setColor(lightsSubsystem, Color.kBlack));
+    controller.rightBumper().onTrue(LightsCommands.changeBrightness(lightsSubsystem, false));
+    controller.leftBumper().onTrue(LightsCommands.changeBrightness(lightsSubsystem, true));
   }
 
   /**
