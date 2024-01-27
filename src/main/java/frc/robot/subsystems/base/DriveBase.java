@@ -33,9 +33,25 @@ public class DriveBase extends SubsystemBase {
 
   // ========================= Class Level =========================
 
-  private static final double DRIVE_BASE_RADIUS = Math.hypot(Constants.TRACK_WIDTH_X / 2.0,
-      Constants.TRACK_WIDTH_Y / 2.0);
-  private static final double MAX_ANGULAR_SPEED = Constants.MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
+  public enum WheelModuleIndex {
+    /** 0 */
+    FRONT_LEFT(0),
+    /** 1 */
+    FRONT_RIGHT(1),
+    /** 2 */
+    BACK_LEFT(2),
+    /** 3 */
+    BACK_RIGHT(3);
+
+    public final int value;
+
+    private WheelModuleIndex(int value) {
+      this.value = value;
+    }
+  }
+
+  private static final double DRIVE_BASE_RADIUS = Math.hypot(Constants.TRACK_WIDTH_X / 2.0, Constants.TRACK_WIDTH_Y / 2.0);
+  private static final double MAX_ANGULAR_SPEED = Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND / DRIVE_BASE_RADIUS;
   private static final double ENCODER_STDDEV = 0.01;
 
   /** Returns an array of module translations. */
@@ -58,23 +74,6 @@ public class DriveBase extends SubsystemBase {
   private final SwerveDrivePoseEstimator poseEstimator;
   private final SwerveModulePosition[] modulePositions;
 
-  public enum WheelModuleIndex {
-    /** 0 */
-    FRONT_LEFT(0),
-    /** 1 */
-    FRONT_RIGHT(1),
-    /** 2 */
-    BACK_LEFT(2),
-    /** 3 */
-    BACK_RIGHT(3);
-
-    public final int value;
-
-    private WheelModuleIndex(int value) {
-      this.value = value;
-    }
-  }
-
   public DriveBase(GyroIo gyroIO,
       SwerveModuleIo flModuleIO,
       SwerveModuleIo frModuleIO,
@@ -83,8 +82,7 @@ public class DriveBase extends SubsystemBase {
 
     this.gyroIO = gyroIO;
     modules[WheelModuleIndex.FRONT_LEFT.value] = new IndexedSwerveModule(flModuleIO, WheelModuleIndex.FRONT_LEFT.value);
-    modules[WheelModuleIndex.FRONT_RIGHT.value] = new IndexedSwerveModule(frModuleIO,
-        WheelModuleIndex.FRONT_RIGHT.value);
+    modules[WheelModuleIndex.FRONT_RIGHT.value] = new IndexedSwerveModule(frModuleIO,  WheelModuleIndex.FRONT_RIGHT.value);
     modules[WheelModuleIndex.BACK_LEFT.value] = new IndexedSwerveModule(blModuleIO, WheelModuleIndex.BACK_LEFT.value);
     modules[WheelModuleIndex.BACK_RIGHT.value] = new IndexedSwerveModule(brModuleIO, WheelModuleIndex.BACK_RIGHT.value);
 
@@ -104,7 +102,7 @@ public class DriveBase extends SubsystemBase {
         this::setPose,
         () -> kinematics.toChassisSpeeds(getModuleStates()),
         this::runVelocity,
-        new HolonomicPathFollowerConfig(Constants.MAX_LINEAR_SPEED, DRIVE_BASE_RADIUS, new ReplanningConfig()),
+        new HolonomicPathFollowerConfig(Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND, DRIVE_BASE_RADIUS, new ReplanningConfig()),
         // Flips path if aliance is on red side.
         () -> Constants.FLIP_PATH_IF_ALLIANCE_IS_NOT_DEFAULT && DriverStation.getAlliance().isPresent()
             && DriverStation.getAlliance().get() != Constants.DEFAULT_ALLIANCE,
@@ -116,20 +114,58 @@ public class DriveBase extends SubsystemBase {
         targetPose -> Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose));
   }
 
-  private void updateModulePositions() {
-    for (int i = 0; i < modules.length; i++) {
-      modulePositions[i] = modules[i].getPosition();
+  /** Returns the average drive velocity in radians/sec. */
+  public double getCharacterizationVelocity() {
+    double driveVelocityAverage = 0.0;
+    for (var module : modules) {
+      driveVelocityAverage += module.getCharacterizationVelocity();
     }
+    return driveVelocityAverage / 4.0;
   }
 
-  public Command turnToTargetCommand(double tx, double ty) {
-    Pose2d pose = getPose();
-    double DX = tx - pose.getX();
-    double DY = ty - pose.getY();
-    Translation2d T = new Translation2d(DX, DY);
-    Rotation2d A = T.getAngle();
-    Rotation2d DA = A.minus(pose.getRotation());
-    return DriveCommands.spinCommand(this, DA, 5);
+  /** Returns the maximum angular speed in radians per sec. */
+  public double getMaxAngularSpeedRadPerSec() {
+    return MAX_ANGULAR_SPEED;
+  }
+
+  /** Returns the maximum linear speed in meters per sec. */
+  public double getMaxLinearSpeedMetersPerSec() {
+    return Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND;
+  }
+
+  /**
+   * Returns the module states (turn angles and drive velocities) for all of the
+   * modules.
+   */
+  @AutoLogOutput(key = "SwerveStates/Measured")
+  private SwerveModuleState[] getModuleStates() {
+    SwerveModuleState[] states = new SwerveModuleState[4];
+    for (int i = 0; i < 4; i++) {
+      states[i] = modules[i].getState();
+    }
+    return states;
+  }
+
+  /** Returns the current odometry pose. */
+  @AutoLogOutput(key = "Odometry/Robot")
+  public Pose2d getPose() {
+    return poseEstimator.getEstimatedPosition();
+  }
+
+  public SwerveDrivePoseEstimator getPoseEstimator() {
+    return poseEstimator;
+  }
+
+  /** Returns the current odometry rotation. */
+  public Rotation2d getRotation() {
+    return poseEstimator.getEstimatedPosition().getRotation();
+  }
+
+  public Rotation2d getRotationToTarget(Translation2d target) {
+    Pose2d currentPose = getPose();
+    Translation2d deltaTranslation = target.minus(currentPose.getTranslation());
+    Rotation2d deltaAngle = deltaTranslation.getAngle();
+    return deltaAngle.minus(currentPose.getRotation());
   }
 
   @Override
@@ -160,6 +196,13 @@ public class DriveBase extends SubsystemBase {
     poseEstimator.update(gyroInputs.yawPosition, modulePositions);
   }
 
+  /** Runs forwards at the commanded voltage. */
+  public void runCharacterizationVolts(double volts) {
+    for (int i = 0; i < 4; i++) {
+      modules[i].runCharacterization(volts);
+    }
+  }
+
   /**
    * Runs the drive at the desired velocity.
    *
@@ -169,7 +212,7 @@ public class DriveBase extends SubsystemBase {
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, Constants.MAX_LINEAR_SPEED);
+    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND);
 
     // Send setpoints to modules
     SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
@@ -183,67 +226,19 @@ public class DriveBase extends SubsystemBase {
     Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
   }
 
-  /** Stops the drive. */
-  public void stop() {
-    runVelocity(new ChassisSpeeds());
-  }
-
-  /** Runs forwards at the commanded voltage. */
-  public void runCharacterizationVolts(double volts) {
-    for (int i = 0; i < 4; i++) {
-      modules[i].runCharacterization(volts);
-    }
-  }
-
-  /** Returns the average drive velocity in radians/sec. */
-  public double getCharacterizationVelocity() {
-    double driveVelocityAverage = 0.0;
-    for (var module : modules) {
-      driveVelocityAverage += module.getCharacterizationVelocity();
-    }
-    return driveVelocityAverage / 4.0;
-  }
-
-  /**
-   * Returns the module states (turn angles and drive velocities) for all of the
-   * modules.
-   */
-  @AutoLogOutput(key = "SwerveStates/Measured")
-  private SwerveModuleState[] getModuleStates() {
-    SwerveModuleState[] states = new SwerveModuleState[4];
-    for (int i = 0; i < 4; i++) {
-      states[i] = modules[i].getState();
-    }
-    return states;
-  }
-
-  public SwerveDrivePoseEstimator getPoseEstimator() {
-    return poseEstimator;
-  }
-
-  /** Returns the current odometry pose. */
-  @AutoLogOutput(key = "Odometry/Robot")
-  public Pose2d getPose() {
-    return poseEstimator.getEstimatedPosition();
-  }
-
-  /** Returns the current odometry rotation. */
-  public Rotation2d getRotation() {
-    return poseEstimator.getEstimatedPosition().getRotation();
-  }
-
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
     poseEstimator.resetPosition(gyroInputs.yawPosition, modulePositions, pose);
   }
 
-  /** Returns the maximum linear speed in meters per sec. */
-  public double getMaxLinearSpeedMetersPerSec() {
-    return Constants.MAX_LINEAR_SPEED;
+  /** Stops the drive. */
+  public void stop() {
+    runVelocity(new ChassisSpeeds());
   }
 
-  /** Returns the maximum angular speed in radians per sec. */
-  public double getMaxAngularSpeedRadPerSec() {
-    return MAX_ANGULAR_SPEED;
+  private void updateModulePositions() {
+    for (int i = 0; i < modules.length; i++) {
+      modulePositions[i] = modules[i].getPosition();
+    }
   }
 }

@@ -29,7 +29,7 @@ public final class Constants {
 
   // ---------- Driving Config ----------
   public static final double JOYSTICK_DEADBAND = 0.2;
-  public static final double MAX_LINEAR_SPEED = 3.0;// Units.feetToMeters(3.0);
+  public static final double MAX_LINEAR_SPEED_IN_METERS_PER_SECOND = 3.0;
 
   // ---------- Robot Measurements ----------
   // Middle of front wheel to middle of back wheel.
@@ -52,6 +52,7 @@ public final class Constants {
 
   // ---------- Hardware Ids ----------
   public static final String CANIVORE_BUS_ID = "1559Canivore";
+  public static final String CAMERA_1_NAME = "front";
   public static final int BASE_GYRO_ID = 12;
   public static final int FRONT_LEFT_DRIVE_MOTOR_ID = 0;
   public static final int FRONT_LEFT_STEER_MOTOR_ID = 1;

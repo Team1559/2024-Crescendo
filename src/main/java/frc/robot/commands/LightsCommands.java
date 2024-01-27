@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.util.Color;;
 
 public class LightsCommands {
 
-  // Private to prevent instantiation.
+  /** Private to prevent instantiation. */
   private LightsCommands() {}
 
   public static Command changeBrightness(LightsSubsystem subsystem, boolean isDimming) {

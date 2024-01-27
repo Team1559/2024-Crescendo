@@ -8,7 +8,7 @@ import frc.robot.Constants;
 
 public class LightsSubsystem extends SubsystemBase {
 
-    // ========================= Static Level =========================
+  // ========================= Class Level =========================
     /**
      * Takes dynamic pattern and scrolls colors by 1.
      * 
