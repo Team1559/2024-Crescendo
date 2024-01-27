@@ -14,13 +14,13 @@
         {
           "type": "named",
           "data": {
-            "name": "spin 180"
+            "name": "Spin 180"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "spin -180"
+            "name": "Spin -180"
           }
         }
       ]
