@@ -19,8 +19,10 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.gyro.GyroIo;
 import frc.robot.subsystems.gyro.GyroIoInputsAutoLogged;
 import frc.robot.subsystems.swerve.IndexedSwerveModule;
@@ -29,10 +31,24 @@ import frc.robot.util.LocalAdStarAk;
 
 public class DriveBase extends SubsystemBase {
 
+  // ========================= Class Level =========================
+
   private static final double DRIVE_BASE_RADIUS = Math.hypot(Constants.TRACK_WIDTH_X / 2.0,
       Constants.TRACK_WIDTH_Y / 2.0);
   private static final double MAX_ANGULAR_SPEED = Constants.MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
   private static final double ENCODER_STDDEV = 0.01;
+
+  /** Returns an array of module translations. */
+  public static Translation2d[] getModuleTranslations() {
+    return new Translation2d[] {
+        new Translation2d(Constants.TRACK_WIDTH_X / 2.0, Constants.TRACK_WIDTH_Y / 2.0),
+        new Translation2d(Constants.TRACK_WIDTH_X / 2.0, -Constants.TRACK_WIDTH_Y / 2.0),
+        new Translation2d(-Constants.TRACK_WIDTH_X / 2.0, Constants.TRACK_WIDTH_Y / 2.0),
+        new Translation2d(-Constants.TRACK_WIDTH_X / 2.0, -Constants.TRACK_WIDTH_Y / 2.0)
+    };
+  }
+
+  // ========================= Object Level =========================
 
   private final GyroIo gyroIO;
   private final GyroIoInputsAutoLogged gyroInputs = new GyroIoInputsAutoLogged();
@@ -104,6 +120,16 @@ public class DriveBase extends SubsystemBase {
     for (int i = 0; i < modules.length; i++) {
       modulePositions[i] = modules[i].getPosition();
     }
+  }
+
+  public Command turnToTargetCommand(double tx, double ty) {
+    Pose2d pose = getPose();
+    double DX = tx - pose.getX();
+    double DY = ty - pose.getY();
+    Translation2d T = new Translation2d(DX, DY);
+    Rotation2d A = T.getAngle();
+    Rotation2d DA = A.minus(pose.getRotation());
+    return DriveCommands.spinCommand(this, DA, 5);
   }
 
   @Override
@@ -219,15 +245,5 @@ public class DriveBase extends SubsystemBase {
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
     return MAX_ANGULAR_SPEED;
-  }
-
-  /** Returns an array of module translations. */
-  public static Translation2d[] getModuleTranslations() {
-    return new Translation2d[] {
-        new Translation2d(Constants.TRACK_WIDTH_X / 2.0, Constants.TRACK_WIDTH_Y / 2.0),
-        new Translation2d(Constants.TRACK_WIDTH_X / 2.0, -Constants.TRACK_WIDTH_Y / 2.0),
-        new Translation2d(-Constants.TRACK_WIDTH_X / 2.0, Constants.TRACK_WIDTH_Y / 2.0),
-        new Translation2d(-Constants.TRACK_WIDTH_X / 2.0, -Constants.TRACK_WIDTH_Y / 2.0)
-    };
   }
 }

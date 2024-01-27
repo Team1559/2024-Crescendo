@@ -9,16 +9,23 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.LightsCommands;
 import frc.robot.subsystems.base.DriveBase;
 import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
 import frc.robot.subsystems.gyro.GyroIoPigeon2;
 import frc.robot.subsystems.gyro.GyroIoSimAndReplay;
+import frc.robot.subsystems.led.LightsSubsystem;
 import frc.robot.subsystems.swerve.SwerveModuleIoReplay;
 import frc.robot.subsystems.swerve.SwerveModuleIoSim;
 import frc.robot.subsystems.swerve.SwerveModuleIoTalonFx;
@@ -38,6 +45,7 @@ import frc.robot.subsystems.vision.VisionIoSimAndReplay;
 public class RobotContainer {
 
   private final CommandXboxController controller = new CommandXboxController(0);
+  private final LightsSubsystem lightsSubsystem = new LightsSubsystem();
   private final DriveBase driveBase;
   private final Vision vision;
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -95,69 +103,61 @@ public class RobotContainer {
       default:
         throw new RuntimeException("Unknown Run Mode: " + Constants.CURRENT_OPERATING_MODE);
     }
+    // ========================= Auto =========================
+    Command blueSpeaker = driveBase.turnToTargetCommand(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42));
+    Command redSpeaker = driveBase.turnToTargetCommand(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42));
+    Command aimAtSpeaker = new ConditionalCommand(blueSpeaker, redSpeaker, this::isBlueAlliance);
 
+    NamedCommands.registerCommand("ShootNote", aimAtSpeaker);
+    NamedCommands.registerCommand("StartIntake", new PrintCommand("StartIntake working"));
+
+    // ========================= Tele-Op =========================
     // ---------- Configure Joystick for Tele-Op ----------
     driveBase.setDefaultCommand(DriveCommands.joystickDrive(driveBase,
         () -> -controller.getLeftY(),
         () -> -controller.getLeftX(),
         () -> -controller.getRightX()));
 
-    // Drive Forward.
-    controller.povUp().whileTrue(Commands.run(
-        () -> {
-          driveBase.runVelocity(new ChassisSpeeds(1, 0, 0));
-        },
+    // ---------- Configure D-PAD for Tele-Op ----------
+    controller.povUp().whileTrue(Commands.run(() -> {
+      driveBase.runVelocity(new ChassisSpeeds(1, 0, 0));
+    },
         driveBase));
-    // Drive Backwards.
-
     controller.povDown().whileTrue(Commands.run(() -> {
       driveBase.runVelocity(new ChassisSpeeds(-1, 0, 0));
     },
         driveBase));
-    // Drive Right.
     controller.povRight().whileTrue(Commands.run(() -> {
       driveBase.runVelocity(new ChassisSpeeds(0, -1, 0));
     },
         driveBase));
-    // Drive Left.
-
     controller.povLeft().onTrue(Commands.run(() -> {
       driveBase.runVelocity(new ChassisSpeeds(0, 1, 0));
     },
         driveBase));
 
-    NamedCommands.registerCommand("spin 180", DriveCommands.spinCommand(driveBase, 400, 1));
+    // ---------- Configure Light Buttons ----------
+    controller.a().whileTrue(new LightsCommands(lightsSubsystem, new Color(0, 255, 0)));
+    controller.b().whileTrue(new LightsCommands(lightsSubsystem, new Color(255, 0, 0)));
+    controller.x().whileTrue(new LightsCommands(lightsSubsystem, new Color(0, 0, 255)));
+    controller.y().whileTrue(new LightsCommands(lightsSubsystem, new Color(255, 255, 0)));
+
+    // ========================= Autonomous =========================
+    // ---------- Create Named Commands for use by Pathe Planner ----------
+    NamedCommands.registerCommand("spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
+
     // ---------- Set-up Autonomous Choices ----------
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
-    // Configure the button bindings
-    configureButtonBindings();
   }
 
-  /**
-   * Use this method to define your button->command mappings. Buttons can be
-   * created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
-   * it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
-  private void configureButtonBindings() {
-    driveBase.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            driveBase,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            // () -> 0, // Zero out strafing, for testing purposes.
-            () -> -controller.getRightX()));
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                () -> driveBase.setPose(
-                    new Pose2d(driveBase.getPose().getTranslation(), new Rotation2d())),
-                driveBase)
-                .ignoringDisable(true));
+  private boolean isBlueAlliance() {
+    var Alliance = DriverStation.getAlliance();
+    if (Alliance.isEmpty()) {
+      System.out.println("Error, no alliance");
+      return false;
+    }
+    return Alliance.get() == DriverStation.Alliance.Blue;
+
   }
 
   /**
