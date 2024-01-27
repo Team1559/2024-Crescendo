@@ -29,7 +29,7 @@ public final class Constants {
 
   // ---------- Driving Config ----------
   public static final double JOYSTICK_DEADBAND = 0.2;
-  public static final double MAX_LINEAR_SPEED = Units.feetToMeters(3.0);
+  public static final double MAX_LINEAR_SPEED = 3.0;// Units.feetToMeters(3.0);
 
   // ---------- Robot Measurements ----------
   // Middle of front wheel to middle of back wheel.
@@ -39,7 +39,8 @@ public final class Constants {
   
   // ---------- Wheel & GHear Measurements ----------
   public static final double WHEEL_RADIUS = Units.inchesToMeters(2);
-  public static final double WHEEL_DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
+  //public static final double WHEEL_DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);  //L2 Gear ratio
+  public static final double WHEEL_DRIVE_GEAR_RATIO = 6.12;  //L3 Gear ratio
   public static final double WHEEL_TURN_GEAR_RATIO = 12.8;
 
   // ---------- Wheel Rotation Offsets ---------- 
@@ -65,6 +66,9 @@ public final class Constants {
   public static final int BACK_RIGHT_STEER_MOTOR_ID = 7;
   public static final int BACK_RIGHT_CANCODER_ID = 8;
 
+  // ---------- Adressable LEDs ----------
+  public static final int ADDRESSABLE_LED_PORT = 0;
+  public static final int ADDRESSABLE_LED_LENGTH = 144;
   // ========================= Enums ==========================================
   public static enum OperatingMode {
     REAL_WORLD,
