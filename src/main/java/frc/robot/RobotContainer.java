@@ -7,6 +7,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -28,6 +29,9 @@ import frc.robot.subsystems.led.LightsSubsystem;
 import frc.robot.subsystems.swerve.SwerveModuleIoReplay;
 import frc.robot.subsystems.swerve.SwerveModuleIoSim;
 import frc.robot.subsystems.swerve.SwerveModuleIoTalonFx;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIoLimelight;
+import frc.robot.subsystems.vision.VisionIoSimAndReplay;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -43,6 +47,7 @@ public class RobotContainer {
   private final CommandXboxController controller = new CommandXboxController(0);
   private final LightsSubsystem lightsSubsystem = new LightsSubsystem();
   private final DriveBase driveBase;
+  private final Vision vision;
   private final LoggedDashboardChooser<Command> autoChooser;
 
   /**
@@ -61,6 +66,10 @@ public class RobotContainer {
             new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_RIGHT),
             new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_LEFT),
             new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
+
+        vision = new Vision(
+            driveBase.getPoseEstimator(),
+            new VisionIoLimelight("front"));
         break;
 
       case SIMULATION:
@@ -71,6 +80,10 @@ public class RobotContainer {
             new SwerveModuleIoSim(),
             new SwerveModuleIoSim(),
             new SwerveModuleIoSim());
+
+        vision = new Vision(
+            driveBase.getPoseEstimator(),
+            new VisionIoSimAndReplay());
         break;
 
       case LOG_REPLAY:
@@ -81,6 +94,10 @@ public class RobotContainer {
             new SwerveModuleIoReplay(),
             new SwerveModuleIoReplay(),
             new SwerveModuleIoReplay());
+
+        vision = new Vision(
+            driveBase.getPoseEstimator(),
+            new VisionIoSimAndReplay());
         break;
 
       default:
