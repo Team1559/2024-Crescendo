@@ -127,6 +127,7 @@ public class DriveCommands {
       public void initialize() {
         Rotation2d rotation = driveBase.getRotationToTarget(target);
         spinCommand = spinCommand(driveBase, rotation, speed);
+        spinCommand.initialize();
       }
 
       @Override
