@@ -116,4 +116,37 @@ public class DriveCommands {
 
     return spinCommand;
   }
+
+  public static Command turnToTargetCommand(DriveBase driveBase, Translation2d target, double speed) {
+
+    Command spinCommand = new Command() {
+
+    private Command spinCommand;
+
+      @Override
+      public void initialize() {
+        Rotation2d rotation = driveBase.getRotationToTarget(target);
+        spinCommand = spinCommand(driveBase, rotation, speed);
+      }
+
+      @Override
+      public void execute() {
+        spinCommand.execute();
+      }
+
+      @Override
+      public boolean isFinished() {
+        return spinCommand.isFinished();
+      }
+
+      @Override
+      public void end(boolean interrupted) {
+        spinCommand.end(interrupted);
+      }
+    };
+
+    spinCommand.addRequirements(driveBase);
+
+    return spinCommand;
+  }
 }
