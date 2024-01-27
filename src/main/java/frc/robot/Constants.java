@@ -43,9 +43,9 @@ public final class Constants {
 
   // ---------- Wheel & GHear Measurements ----------
   public static final double WHEEL_RADIUS = Units.inchesToMeters(2);
-  // public static final double WHEEL_DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 /
-  // 27.0) * (45.0 / 15.0); //L2 Gear ratio
-  public static final double WHEEL_DRIVE_GEAR_RATIO = 6.12; // L3 Gear ratio
+  public static final double WHEEL_DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 /
+      27.0) * (45.0 / 15.0); // L2 Gear ratio
+  // public static final double WHEEL_DRIVE_GEAR_RATIO = 6.12; // L3 Gear ratio
   public static final double WHEEL_TURN_GEAR_RATIO = 12.8;
 
   // ---------- Wheel Rotation Offsets ----------
