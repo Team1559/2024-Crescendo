@@ -83,7 +83,10 @@ public class IndexedSwerveModule {
     }
   }
 
-  /** Runs the module with the specified setpoint state. Returns the optimized state. */
+  /**
+   * Runs the module with the specified setpoint state. Returns the optimized
+   * state.
+   */
   public SwerveModuleState runSetpoint(SwerveModuleState state) {
     // Optimize state based on current angle
     // Controllers run in "periodic" when the setpoint is not null
@@ -97,7 +100,9 @@ public class IndexedSwerveModule {
     return optimizedState;
   }
 
-  /** Runs the module with the specified voltage while controlling to zero degrees. */
+  /**
+   * Runs the module with the specified voltage while controlling to zero degrees.
+   */
   public void runCharacterization(double volts) {
     // Closed loop turn control
     angleSetpoint = new Rotation2d();
@@ -134,6 +139,11 @@ public class IndexedSwerveModule {
   /** Returns the current drive velocity of the module in meters per second. */
   public double getVelocityMetersPerSec() {
     return inputs.driveMotorVelocityRadPerSec * Constants.WHEEL_RADIUS;
+  }
+
+  /** Returns the module position. */
+  public SwerveModulePosition getPosition() {
+    return new SwerveModulePosition(getPositionMeters(), getAngle());
   }
 
   /** Returns the module position delta since the last call to this method. */

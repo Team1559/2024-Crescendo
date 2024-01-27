@@ -9,17 +9,20 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.gyro.GyroIo;
 import frc.robot.subsystems.gyro.GyroIoInputsAutoLogged;
 import frc.robot.subsystems.swerve.IndexedSwerveModule;
@@ -30,8 +33,10 @@ public class DriveBase extends SubsystemBase {
 
   // ========================= Class Level =========================
 
-  private static final double DRIVE_BASE_RADIUS = Math.hypot(Constants.TRACK_WIDTH_X / 2.0, Constants.TRACK_WIDTH_Y / 2.0);
+  private static final double DRIVE_BASE_RADIUS = Math.hypot(Constants.TRACK_WIDTH_X / 2.0,
+      Constants.TRACK_WIDTH_Y / 2.0);
   private static final double MAX_ANGULAR_SPEED = Constants.MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
+  private static final double ENCODER_STDDEV = 0.01;
 
   /** Returns an array of module translations. */
   public static Translation2d[] getModuleTranslations() {
@@ -49,9 +54,9 @@ public class DriveBase extends SubsystemBase {
   private final GyroIoInputsAutoLogged gyroInputs = new GyroIoInputsAutoLogged();
   private final IndexedSwerveModule[] modules = new IndexedSwerveModule[4];
 
-  private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
-  private Pose2d pose = new Pose2d();
-  private Rotation2d lastGyroRotation = new Rotation2d();
+  private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
+  private final SwerveDrivePoseEstimator poseEstimator;
+  private final SwerveModulePosition[] modulePositions;
 
   public enum WheelModuleIndex {
     /** 0 */
@@ -83,6 +88,16 @@ public class DriveBase extends SubsystemBase {
     modules[WheelModuleIndex.BACK_LEFT.value] = new IndexedSwerveModule(blModuleIO, WheelModuleIndex.BACK_LEFT.value);
     modules[WheelModuleIndex.BACK_RIGHT.value] = new IndexedSwerveModule(brModuleIO, WheelModuleIndex.BACK_RIGHT.value);
 
+    modulePositions = new SwerveModulePosition[4];
+    updateModulePositions();
+
+    // TODO: where should we source the initial pose?
+    poseEstimator = new SwerveDrivePoseEstimator(
+        kinematics, gyroInputs.yawPosition, modulePositions,
+        new Pose2d(0, 0, gyroInputs.yawPosition),
+        VecBuilder.fill(ENCODER_STDDEV, ENCODER_STDDEV, ENCODER_STDDEV),
+        VecBuilder.fill(1, 1, 1)); // placeholder, will be filled in by vision
+
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configureHolonomic(
         this::getPose,
@@ -99,6 +114,22 @@ public class DriveBase extends SubsystemBase {
         activePath -> Logger.recordOutput("Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()])));
     PathPlannerLogging.setLogTargetPoseCallback(
         targetPose -> Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose));
+  }
+
+  private void updateModulePositions() {
+    for (int i = 0; i < modules.length; i++) {
+      modulePositions[i] = modules[i].getPosition();
+    }
+  }
+
+  public Command turnToTargetCommand(double tx, double ty) {
+    Pose2d pose = getPose();
+    double DX = tx - pose.getX();
+    double DY = ty - pose.getY();
+    Translation2d T = new Translation2d(DX, DY);
+    Rotation2d A = T.getAngle();
+    Rotation2d DA = A.minus(pose.getRotation());
+    return DriveCommands.spinCommand(this, DA, 5);
   }
 
   @Override
@@ -125,23 +156,8 @@ public class DriveBase extends SubsystemBase {
     }
 
     // Update odometry
-    SwerveModulePosition[] wheelDeltas = new SwerveModulePosition[4];
-    for (int i = 0; i < 4; i++) {
-      wheelDeltas[i] = modules[i].getPositionDelta();
-    }
-
-    // The twist represents the motion of the robot since the last
-    // loop cycle in x, y, and theta based only on the modules,
-    // without the gyro. The gyro is always disconnected in simulation.
-    var twist = kinematics.toTwist2d(wheelDeltas);
-    if (gyroInputs.connected) {
-      // If the gyro is connected, replace the theta component of the twist
-      // with the change in angle since the last loop cycle.
-      twist = new Twist2d(twist.dx, twist.dy, gyroInputs.yawPosition.minus(lastGyroRotation).getRadians());
-      lastGyroRotation = gyroInputs.yawPosition;
-    }
-    // Apply the twist (change since last loop cycle) to the current pose
-    pose = pose.exp(twist);
+    updateModulePositions();
+    poseEstimator.update(gyroInputs.yawPosition, modulePositions);
   }
 
   /**
@@ -201,20 +217,24 @@ public class DriveBase extends SubsystemBase {
     return states;
   }
 
+  public SwerveDrivePoseEstimator getPoseEstimator() {
+    return poseEstimator;
+  }
+
   /** Returns the current odometry pose. */
   @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {
-    return pose;
+    return poseEstimator.getEstimatedPosition();
   }
 
   /** Returns the current odometry rotation. */
   public Rotation2d getRotation() {
-    return pose.getRotation();
+    return poseEstimator.getEstimatedPosition().getRotation();
   }
 
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
-    this.pose = pose;
+    poseEstimator.resetPosition(gyroInputs.yawPosition, modulePositions, pose);
   }
 
   /** Returns the maximum linear speed in meters per sec. */

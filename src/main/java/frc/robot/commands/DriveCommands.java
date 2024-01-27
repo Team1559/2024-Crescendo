@@ -86,6 +86,7 @@ public class DriveCommands {
     Command spinCommand = new Command() {
 
       private Rotation2d startingRotation, targetRotation;
+      private boolean isStartSignPositive;
 
       @Override
       public void initialize() {

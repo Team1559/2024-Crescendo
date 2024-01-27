@@ -6,10 +6,17 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.LightsCommands;
@@ -21,6 +28,9 @@ import frc.robot.subsystems.led.LightsSubsystem;
 import frc.robot.subsystems.swerve.SwerveModuleIoReplay;
 import frc.robot.subsystems.swerve.SwerveModuleIoSim;
 import frc.robot.subsystems.swerve.SwerveModuleIoTalonFx;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIoLimelight;
+import frc.robot.subsystems.vision.VisionIoSimAndReplay;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -36,6 +46,7 @@ public class RobotContainer {
   private final CommandXboxController controller = new CommandXboxController(0);
   private final LightsSubsystem lightsSubsystem = new LightsSubsystem();
   private final DriveBase driveBase;
+  private final Vision vision;
   private final LoggedDashboardChooser<Command> autoChooser;
 
   /**
@@ -54,6 +65,10 @@ public class RobotContainer {
             new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_RIGHT),
             new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_LEFT),
             new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
+
+        vision = new Vision(
+            driveBase.getPoseEstimator(),
+            new VisionIoLimelight("front"));
         break;
 
       case SIMULATION:
@@ -64,6 +79,10 @@ public class RobotContainer {
             new SwerveModuleIoSim(),
             new SwerveModuleIoSim(),
             new SwerveModuleIoSim());
+
+        vision = new Vision(
+            driveBase.getPoseEstimator(),
+            new VisionIoSimAndReplay());
         break;
 
       case LOG_REPLAY:
@@ -74,11 +93,22 @@ public class RobotContainer {
             new SwerveModuleIoReplay(),
             new SwerveModuleIoReplay(),
             new SwerveModuleIoReplay());
+
+        vision = new Vision(
+            driveBase.getPoseEstimator(),
+            new VisionIoSimAndReplay());
         break;
 
       default:
         throw new RuntimeException("Unknown Run Mode: " + Constants.CURRENT_OPERATING_MODE);
     }
+    // ========================= Auto =========================
+    Command blueSpeaker = driveBase.turnToTargetCommand(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42));
+    Command redSpeaker = driveBase.turnToTargetCommand(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42));
+    Command aimAtSpeaker = new ConditionalCommand(blueSpeaker, redSpeaker, this::isBlueAlliance);
+
+    NamedCommands.registerCommand("ShootNote", aimAtSpeaker);
+    NamedCommands.registerCommand("StartIntake", new PrintCommand("StartIntake working"));
 
     // ========================= Tele-Op =========================
     // ---------- Configure Joystick for Tele-Op ----------
@@ -117,12 +147,23 @@ public class RobotContainer {
     controller.rightBumper().onTrue(LightsCommands.changeBrightness(lightsSubsystem, false));
     controller.leftBumper().onTrue(LightsCommands.changeBrightness(lightsSubsystem, true));
 
+
     // ========================= Autonomous =========================
     // ---------- Create Named Commands for use by Pathe Planner ----------
     NamedCommands.registerCommand("spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
 
     // ---------- Set-up Autonomous Choices ----------
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+  }
+
+  private boolean isBlueAlliance() {
+    var Alliance = DriverStation.getAlliance();
+    if (Alliance.isEmpty()) {
+      System.out.println("Error, no alliance");
+      return false;
+    }
+    return Alliance.get() == DriverStation.Alliance.Blue;
+
   }
 
   /**
