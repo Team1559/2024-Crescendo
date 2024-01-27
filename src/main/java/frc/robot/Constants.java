@@ -66,6 +66,10 @@ public final class Constants {
   public static final int BACK_RIGHT_DRIVE_MOTOR_ID = 6;
   public static final int BACK_RIGHT_STEER_MOTOR_ID = 7;
   public static final int BACK_RIGHT_CANCODER_ID = 8;
+  
+  //Roborio devices
+  public static final int LEFT_FEED_MOTOR_ID = 20;
+  public static final int RIGHT_FEED_MOTOR_ID = 21;
 
   // ---------- Adressable LEDs ----------
   public static final int ADDRESSABLE_LED_PORT = 0;
