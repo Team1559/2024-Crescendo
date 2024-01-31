@@ -70,7 +70,8 @@ public final class Constants {
   // ---------- Adressable LEDs ----------
   public static final int ADDRESSABLE_LED_PORT = 0;
   public static final int ADDRESSABLE_LED_LENGTH = 144;
-
+  // ---------- Adressable LEDs ----------
+  public static final int COLOR_SENSOR_V3_NO_OBJECT_PROXIMITY = 300;
   // ========================= Enums ==========================================
   public static enum OperatingMode {
     REAL_WORLD,

@@ -1,7 +1,7 @@
 package frc.robot.subsystems.colorsensor;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import frc.robot.Constants;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.util.Color;
 
@@ -18,6 +18,9 @@ public class ColorSensor extends SubsystemBase{
   }
   public Color getColor(){
     return colorSensor.getColor();
+  }
+  public boolean isObjectDetected(){
+    return colorSensor.getProximity() > Constants.COLOR_SENSOR_V3_NO_OBJECT_PROXIMITY;
   }
   public int compareToSensor(Color color){
     int difference = 0;
