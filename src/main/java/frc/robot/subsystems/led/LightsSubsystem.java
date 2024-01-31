@@ -58,13 +58,13 @@ public class LightsSubsystem extends SubsystemBase {
 
     /**
      * Increase or decreases the brightness of the colors currently set to the
-     * {@link AddressableLEDBuffer} by 10%.
+     * {@link AddressableLEDBuffer} by 15%.
      * 
      * @param isDimming Decreases brightness when {@code true} and increases when
      *                  {@code false}.
      */
     public void changeBrightness(boolean isDimming) {
-        double factor = isDimming ? .9 : 1.1;
+        double factor = isDimming ? .85 : 1.15;
         for (int i = 0; i < ledBuffer.getLength(); i++) {
             Color currentColor = ledBuffer.getLED(i);
             ledBuffer.setLED(i, new Color(currentColor.red * factor, currentColor.green * factor,

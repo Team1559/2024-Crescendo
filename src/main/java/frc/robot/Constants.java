@@ -41,20 +41,20 @@ public final class Constants {
   // Middle of left wheel to middle of right wheel.
   public static final double TRACK_WIDTH_Y = Units.inchesToMeters(24.0);
 
-  // ---------- Wheel & Gear Measurements ----------
+  // ---------- Wheel & GHear Measurements ----------
   public static final double WHEEL_RADIUS = Units.inchesToMeters(2);
-  // public static final double WHEEL_DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 /
-  // 27.0) * (45.0 / 15.0); //L2 Gear ratio
-  public static final double WHEEL_DRIVE_GEAR_RATIO = 6.12; // L3 Gear ratio
+  public static final double WHEEL_DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 /
+      27.0) * (45.0 / 15.0); // L2 Gear ratio
+  // public static final double WHEEL_DRIVE_GEAR_RATIO = 6.12; // L3 Gear ratio
   public static final double WHEEL_TURN_GEAR_RATIO = 12.8;
 
   // ---------- Wheel Rotation Offsets ----------
   // Note: Chaning the Offset by Pie (180 degrees) will invert the direction the
   // wheel spins.
-  public static final Rotation2d FRONT_LEFT_ABSOLUTE_ENCODER_OFFSET = new Rotation2d(-2.26);
-  public static final Rotation2d FRONT_RIGHT_ABSOLUTE_ENCODER_OFFSET = new Rotation2d(-0.35);
-  public static final Rotation2d BACK_LEFT_ABSOLUTE_ENCODER_OFFSET = new Rotation2d(3.114);
-  public static final Rotation2d BACK_RIGHT_ABSOLUTE_ENCODER_OFFSET = new Rotation2d(-3.0236);
+  public static final Rotation2d FRONT_LEFT_ABSOLUTE_ENCODER_OFFSET = Rotation2d.fromRotations(-0.300293);
+  public static final Rotation2d FRONT_RIGHT_ABSOLUTE_ENCODER_OFFSET = Rotation2d.fromRotations(-0.228760);
+  public static final Rotation2d BACK_LEFT_ABSOLUTE_ENCODER_OFFSET = Rotation2d.fromRotations(-0.238525);
+  public static final Rotation2d BACK_RIGHT_ABSOLUTE_ENCODER_OFFSET = Rotation2d.fromRotations(-0.000732);
 
   // ---------- Game Piece Handling -------
   public static final double FEEDER_FORWARD_VOLTAGE = 6.0;
@@ -90,7 +90,8 @@ public final class Constants {
   // ---------- Adressable LEDs ----------
   public static final int ADDRESSABLE_LED_PORT = 0;
   public static final int ADDRESSABLE_LED_LENGTH = 144;
-
+  // ---------- Adressable LEDs ----------
+  public static final int COLOR_SENSOR_V3_NO_OBJECT_PROXIMITY = 300;
   // ========================= Enums ==========================================
   public static enum OperatingMode {
     REAL_WORLD,
