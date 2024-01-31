@@ -1,5 +1,6 @@
 package frc.robot;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -82,6 +83,18 @@ public final class Constants {
     REAL_WORLD,
     SIMULATION,
     LOG_REPLAY
+  }
+
+  // ========================= Configuration Objects ========================
+  public static CurrentLimitsConfigs GetDefaultCurrentLimitsConfig() {
+    // Allow 40A continuous, 80A momentary supply current.
+    // https://api.ctr-electronics.com/phoenix6/release/java/com/ctre/phoenix6/configs/CurrentLimitsConfigs.html
+    var limits = new CurrentLimitsConfigs();
+    limits.SupplyCurrentLimitEnable = true;
+    limits.SupplyCurrentLimit = 40.0;
+    limits.SupplyCurrentThreshold = 80.0;
+    limits.SupplyTimeThreshold = 0.5;
+    return limits;
   }
 
   // ========================= Constructors ===================================
