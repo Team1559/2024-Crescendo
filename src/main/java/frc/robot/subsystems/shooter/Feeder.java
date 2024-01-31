@@ -25,6 +25,8 @@ public class Feeder extends SubsystemBase {
     @Override
     public void periodic() {
         // TODO: Update  @AutoLog object. (See SwerveModuleIoTalonFx's updateInputs method for reference.).
+
+        // TODO: Log @AutoLog object. i.e. `Logger.processInputs("Drive/Module" + Integer.toString(index), inputs)`
     }
 
     // ========================= Functions =========================
