@@ -1,14 +1,16 @@
 package frc.robot.subsystems.shooter;
 
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Feeder extends SubsystemBase {
-    CANSparkMax feedMotorL = new CANSparkMax(Constants.LEFT_FEED_MOTOR_ID, MotorType.kBrushless);
-    CANSparkMax feedMotorR = new CANSparkMax(Constants.RIGHT_FEED_MOTOR_ID, MotorType.kBrushless);
+    private CANSparkMax feedMotorL = new CANSparkMax(Constants.LEFT_FEED_MOTOR_ID, MotorType.kBrushless);
+    private CANSparkMax feedMotorR = new CANSparkMax(Constants.RIGHT_FEED_MOTOR_ID, MotorType.kBrushless);
 
     public Feeder() {
         feedMotorL.setInverted(false);
@@ -28,8 +30,21 @@ public class Feeder extends SubsystemBase {
     }
 
     private void setVoltage(double voltage) {
-        feedMotorL.setVoltage(voltage);
+
         feedMotorR.setVoltage(voltage);
+    } // Add command methods here
+
+    public Command startFeederCommand() {
+        return new InstantCommand(this::startFeeder, this);
+
     }
-    // Add command methods here
+
+    public Command stopFeederCommand() {
+        return new InstantCommand(this::stopFeeder, this);
+    }
+
+    public Command reverFeederCommand() {
+        return new InstantCommand(this::reverseFeeder, this);
+    }
+
 }
