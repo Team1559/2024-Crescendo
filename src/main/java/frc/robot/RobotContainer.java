@@ -123,13 +123,14 @@ public class RobotContainer {
         driveBase));
 
     // ---------- Configure Light Buttons ----------
-    controller.a().onTrue(LightsCommands.setStaticPattern(lightsSubsystem,
-        new Color[] { Color.kDarkGreen, Color.kDarkGreen, Color.kLime, Color.kLime}));
+    controller.a().onTrue(LightsCommands.setStaticPattern(lightsSubsystem, new Color[] { Color.kDarkGreen, Color.kDarkGreen, Color.kBlack, Color.kBlack}));
     controller.b().onTrue(LightsCommands.setColor(lightsSubsystem, Color.kRed));
     controller.x().onTrue(LightsCommands.setDynamicPattern(lightsSubsystem,
-        new Color[] { Color.kAliceBlue, Color.kAliceBlue, Color.kDarkBlue, Color.kDarkBlue}, true));
+        new Color[] { Color.kBlue, Color.kBlue, Color.kBlue, Color.kDarkBlue, Color.kDarkBlue, Color.kDarkBlue}, true));
     controller.y().onTrue(LightsCommands.setDynamicPattern(lightsSubsystem,
-        new Color[] { Color.kYellow, Color.kOrange, Color.kBeige, Color.kBisque }, false));
+        new Color[] {
+          Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kBlack, Color.kBlack, Color.kBlack,
+          Color.kOrange, Color.kOrange, Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack, Color.kBlack, Color.kBlack, Color.kBlack}, false));
     controller.a().and(controller.b()).onTrue(LightsCommands.setColor(lightsSubsystem, Color.kBlack));
     controller.rightBumper().onTrue(LightsCommands.changeBrightness(lightsSubsystem, false));
     controller.leftBumper().onTrue(LightsCommands.changeBrightness(lightsSubsystem, true));
