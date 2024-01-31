@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Feeder extends SubsystemBase {
+
     private CANSparkMax feedMotorL = new CANSparkMax(Constants.LEFT_FEED_MOTOR_ID, MotorType.kBrushless);
     private CANSparkMax feedMotorR = new CANSparkMax(Constants.RIGHT_FEED_MOTOR_ID, MotorType.kBrushless);
 
@@ -17,6 +18,12 @@ public class Feeder extends SubsystemBase {
         feedMotorR.setInverted(true);
     }
 
+    @Override
+    public void periodic() {
+        // TODO: Log Data to Advantage.
+    }
+
+    // ========================= Functions =========================
     public void startFeeder() {
         setVoltage(Constants.FEEDER_FORWARD_VOLTAGE);
     }
@@ -30,9 +37,10 @@ public class Feeder extends SubsystemBase {
     }
 
     private void setVoltage(double voltage) {
-
         feedMotorR.setVoltage(voltage);
-    } // Add command methods here
+    }
+
+    // ========================= Commands =========================
 
     public Command startFeederCommand() {
         return new InstantCommand(this::startFeeder, this);

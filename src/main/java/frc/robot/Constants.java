@@ -8,15 +8,9 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
- * numerical or boolean
- * constants. This class should not be used for any other purpose. All constants
- * should be declared
- * globally (i.e. public static). Do not put anything functional in this class.
- *
- * <p>
- * It is advised to statically import this class (or one of its inner classes)
- * wherever the
- * constants are needed, to reduce verbosity.
+ * numerical or boolean constants. This class should not be used for any other purpose.
+ * All constants should be declared globally (i.e. public static). Do not put anything
+ * functional in this class.
  */
 public final class Constants {
 
@@ -57,16 +51,21 @@ public final class Constants {
   public static final Rotation2d BACK_RIGHT_ABSOLUTE_ENCODER_OFFSET = Rotation2d.fromRotations(-0.000732);
 
   // ---------- Game Piece Handling -------
-  public static final double FEEDER_FORWARD_VOLTAGE = 6.0;
-  public static final double FEEDER_REVERSE_VOLTAGE = -6.0;
-  public static final double FLYWHEEL_REVERSE_VOLTAGE = -6;
+  public static final double FEEDER_FORWARD_VOLTAGE = 6.0; // TODO: Configure Value.
+  public static final double FEEDER_REVERSE_VOLTAGE = -FEEDER_FORWARD_VOLTAGE;
+  public static final double FLYWHEEL_REVERSE_VOLTAGE = -6.0; // TODO: Configure Value.
 
   // ---------- Hardware Ids ----------
-  public static final int FLYWHEEL_L_ID = 0; // TODO
-  public static final int FLYWHEEL_R_ID = 0; // TODO
-  public static final String CANIVORE_BUS_ID = "1559Canivore";
+  // --- Camera ---
   public static final String CAMERA_1_NAME = "front";
+  // --- Canivore ---
+  public static final String CANIVORE_BUS_ID = "1559Canivore";
+  // --- Flywheel ---
+  public static final int FLYWHEEL_L_ID = 0; // TODO: Set Value.
+  public static final int FLYWHEEL_R_ID = 0; // TODO: Set Value.
+  // --- Gyro ---
   public static final int BASE_GYRO_ID = 12;
+  // --- Swerve Drives ---
   public static final int FRONT_LEFT_DRIVE_MOTOR_ID = 0;
   public static final int FRONT_LEFT_STEER_MOTOR_ID = 1;
   public static final int FRONT_LEFT_CANCODER_ID = 2;
@@ -79,19 +78,22 @@ public final class Constants {
   public static final int BACK_RIGHT_DRIVE_MOTOR_ID = 6;
   public static final int BACK_RIGHT_STEER_MOTOR_ID = 7;
   public static final int BACK_RIGHT_CANCODER_ID = 8;
-  // --------Logging Frequency-------
+
+  // ---------- Logging Frequency ----------
   public static final double ADVANTAGE_DEFAULT_LOG_FREQUENCY = 50.00;
   public static final double ADVANTAGE_ODOMETRY_LOG_FREQUENCY = 100.00;
 
-  // Roborio devices
+  // ---------- Roborio ----------
   public static final int LEFT_FEED_MOTOR_ID = 20;
   public static final int RIGHT_FEED_MOTOR_ID = 21;
 
   // ---------- Adressable LEDs ----------
   public static final int ADDRESSABLE_LED_PORT = 0;
   public static final int ADDRESSABLE_LED_LENGTH = 144;
-  // ---------- Adressable LEDs ----------
-  public static final int COLOR_SENSOR_V3_NO_OBJECT_PROXIMITY = 300;
+
+  // ---------- Color Sensor ----------
+  public static final int COLOR_SENSOR_V3_NO_OBJECT_PROXIMITY = 300; // TODO: Configure Value.
+
   // ========================= Enums ==========================================
   public static enum OperatingMode {
     REAL_WORLD,
@@ -101,6 +103,5 @@ public final class Constants {
 
   // ========================= Constructors ===================================
   /** Makes this class non-instantiable. */
-  private Constants() {
-  }
+  private Constants() {}
 }

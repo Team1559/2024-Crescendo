@@ -82,7 +82,7 @@ public class LightsSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (dynamicPattern != null) {
+        if (dynamicPattern != null) { // TODO: Slow down the scrolling.
             setStaticPatternHelper(dynamicPattern);
             dynamicPattern = scrollPattern(dynamicPattern, isDynamicPatternFowards);
         }
