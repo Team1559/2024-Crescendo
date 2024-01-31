@@ -43,8 +43,8 @@ public class Feeder extends SubsystemBase {
         return new InstantCommand(this::stopFeeder, this);
     }
 
-    public Command reverFeederCommand() {
+    public Command reverseFeederCommand() {
         return new InstantCommand(this::reverseFeeder, this);
     }
-
+    
 }

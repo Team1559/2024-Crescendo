@@ -59,8 +59,11 @@ public final class Constants {
   // ---------- Game Piece Handling -------
   public static final double FEEDER_FORWARD_VOLTAGE = 6.0;
   public static final double FEEDER_REVERSE_VOLTAGE = -6.0;
+  public static final double FLYWHEEL_REVERSE_VOLTAGE = -6;
 
   // ---------- Hardware Ids ----------
+  public static final int FLYWHEEL_L_ID = 0; // TODO
+  public static final int FLYWHEEL_R_ID = 0; // TODO
   public static final String CANIVORE_BUS_ID = "1559Canivore";
   public static final String CAMERA_1_NAME = "front";
   public static final int BASE_GYRO_ID = 12;
@@ -76,6 +79,9 @@ public final class Constants {
   public static final int BACK_RIGHT_DRIVE_MOTOR_ID = 6;
   public static final int BACK_RIGHT_STEER_MOTOR_ID = 7;
   public static final int BACK_RIGHT_CANCODER_ID = 8;
+  // --------Logging Frequency-------
+  public static final double ADVANTAGE_DEFAULT_LOG_FREQUENCY = 50.00;
+  public static final double ADVANTAGE_ODOMETRY_LOG_FREQUENCY = 100.00;
 
   // Roborio devices
   public static final int LEFT_FEED_MOTOR_ID = 20;
