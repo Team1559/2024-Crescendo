@@ -10,6 +10,10 @@ import frc.robot.Constants;
 
 public class Feeder extends SubsystemBase {
 
+    // TODO: Create Static @AutoLog class. (See SwerveModuleIo for reference.)
+
+    // TODO: Create Static @AutoLog object. (See IndexedSwerveModule's SwerveModuleIoInputsAutoLogged variable for reference.)
+
     private CANSparkMax feedMotorL = new CANSparkMax(Constants.LEFT_FEED_MOTOR_ID, MotorType.kBrushless);
     private CANSparkMax feedMotorR = new CANSparkMax(Constants.RIGHT_FEED_MOTOR_ID, MotorType.kBrushless);
 
@@ -20,7 +24,7 @@ public class Feeder extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // TODO: Log Data to Advantage.
+        // TODO: Update  @AutoLog object. (See SwerveModuleIoTalonFx's updateInputs method for reference.).
     }
 
     // ========================= Functions =========================

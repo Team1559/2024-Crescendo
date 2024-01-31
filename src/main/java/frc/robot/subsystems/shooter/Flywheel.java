@@ -12,6 +12,10 @@ import frc.robot.Constants;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class Flywheel extends SubsystemBase {
+
+    // TODO: Create Static @AutoLog class. (See SwerveModuleIo for reference.)
+
+    // TODO: Create Static @AutoLog object. (See IndexedSwerveModule's SwerveModuleIoInputsAutoLogged variable for reference.)
     
     private final StatusSignal<Double> flywheelLMotorVoltage, flywheelRMotorVoltage;
     private final StatusSignal<Double> flywheelLStatorCurrent, flywheelRStatorCurrent;
@@ -50,7 +54,7 @@ public class Flywheel extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // TODO: Log Data to Advantage.
+        // TODO: Update  @AutoLog object. (See SwerveModuleIoTalonFx's updateInputs method for reference.).
     }
 
     // ========================= Functions =========================
