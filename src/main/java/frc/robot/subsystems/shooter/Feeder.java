@@ -12,7 +12,8 @@ public class Feeder extends SubsystemBase {
 
     // TODO: Create Static @AutoLog class. (See SwerveModuleIo for reference.)
 
-    // TODO: Create Static @AutoLog object. (See IndexedSwerveModule's SwerveModuleIoInputsAutoLogged variable for reference.)
+    // TODO: Create Static @AutoLog object. (See IndexedSwerveModule's
+    // SwerveModuleIoInputsAutoLogged variable for reference.)
 
     private CANSparkMax feedMotorL = new CANSparkMax(Constants.LEFT_FEED_MOTOR_ID, MotorType.kBrushless);
     private CANSparkMax feedMotorR = new CANSparkMax(Constants.RIGHT_FEED_MOTOR_ID, MotorType.kBrushless);
@@ -24,9 +25,11 @@ public class Feeder extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // TODO: Update  @AutoLog object. (See SwerveModuleIoTalonFx's updateInputs method for reference.).
+        // TODO: Update @AutoLog object. (See SwerveModuleIoTalonFx's updateInputs
+        // method for reference.).
 
-        // TODO: Log @AutoLog object. i.e. `Logger.processInputs("Drive/Module" + Integer.toString(index), inputs)`
+        // TODO: Log @AutoLog object. i.e. `Logger.processInputs("Drive/Module" +
+        // Integer.toString(index), inputs)`
     }
 
     // ========================= Functions =========================
@@ -50,7 +53,6 @@ public class Feeder extends SubsystemBase {
 
     public Command startFeederCommand() {
         return new InstantCommand(this::startFeeder, this);
-
     }
 
     public Command stopFeederCommand() {
@@ -60,5 +62,5 @@ public class Feeder extends SubsystemBase {
     public Command reverseFeederCommand() {
         return new InstantCommand(this::reverseFeeder, this);
     }
-    
+
 }
