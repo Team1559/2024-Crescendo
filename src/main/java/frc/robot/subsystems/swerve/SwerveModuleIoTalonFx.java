@@ -17,22 +17,18 @@ import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
 
 /**
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn
- * motor controller, and
- * CANcoder
- *
+ * motor controller, and CANcoder.
  * <p>
  * NOTE: This implementation should be used as a starting point and adapted to
- * different hardware
- * configurations (e.g. If using an analog encoder, copy from
- * "ModuleIOSparkMax")
- *
+ * different hardware configurations (e.g. If using an analog encoder, copy from
+ * "ModuleIOSparkMax").
+ * </p>
  * <p>
  * To calibrate the absolute encoder offsets, point the modules straight (such
- * that forward
- * motion on the drive motor will propel the robot forward) and copy the
- * reported values from the
- * absolute encoders using AdvantageScope. These values are logged under
- * "/Drive/ModuleX/TurnAbsolutePositionRad"
+ * that forward motion on the drive motor will propel the robot forward) and
+ * copy the reported values from the absolute encoders using AdvantageScope.
+ * These values are logged under "/Drive/ModuleX/TurnAbsolutePositionRad".
+ * </p>
  */
 public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 
