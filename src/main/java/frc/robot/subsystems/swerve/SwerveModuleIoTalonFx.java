@@ -91,8 +91,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 
     // Set Drive TalonFXConfiguration.
     var driveTalonFXConfiguration = new TalonFXConfiguration();
-    driveTalonFXConfiguration.CurrentLimits.StatorCurrentLimit = 40.0;
-    driveTalonFXConfiguration.CurrentLimits.StatorCurrentLimitEnable = true;
+    driveTalonFXConfiguration.CurrentLimits = Constants.getDefaultCurrentLimitsConfig();
     driveMotor.getConfigurator().apply(driveTalonFXConfiguration);
 
     // Set Drive TalonFXConfiguration.
