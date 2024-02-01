@@ -5,6 +5,7 @@ import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -45,6 +46,7 @@ public class Flywheel extends SubsystemBase {
 
     private final TalonFX flywheelMotorL = new TalonFX(Constants.FLYWHEEL_L_ID);
     private final TalonFX flywheelMotorR = new TalonFX(Constants.FLYWHEEL_R_ID);
+
     private final FlywheelInputsAutoLogged inputs = new FlywheelInputsAutoLogged();
 
     public Flywheel() {
@@ -54,6 +56,11 @@ public class Flywheel extends SubsystemBase {
         flywheelMotorR.setInverted(false);
         flywheelMotorL.setNeutralMode(NeutralModeValue.Coast);
         flywheelMotorR.setNeutralMode(NeutralModeValue.Coast);
+
+        /*
+         * TODO: Setup Current Limits via a TalonFXConfiguration class. (See: The
+         * SwerveModuleIoTalonFx constructor as an example.)
+         */
 
         // ---------- Define Loggable Fields ----------
         flywheelLMotorVoltage = flywheelMotorL.getMotorVoltage();
@@ -72,6 +79,12 @@ public class Flywheel extends SubsystemBase {
         // ---------- Optimize Bus Utilization ----------
         flywheelMotorL.optimizeBusUtilization();
         flywheelMotorR.optimizeBusUtilization();
+    }
+
+    @Override
+    public void periodic() {
+        updateInputs();
+        Logger.processInputs("Shooter/Flywheel", inputs);
     }
 
     private void updateInputs() {
@@ -100,12 +113,6 @@ public class Flywheel extends SubsystemBase {
 
         inputs.lFaults = flywheelLFaults.getValue();
         inputs.rFaults = flywheelRFaults.getValue();
-    }
-
-    @Override
-    public void periodic() {
-        updateInputs();
-        Logger.processInputs("Shooter/Flywheel", inputs);
     }
 
     // ========================= Functions =========================

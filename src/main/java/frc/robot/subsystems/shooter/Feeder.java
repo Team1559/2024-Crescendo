@@ -13,7 +13,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
+// TODO: Convert this into a generic Dual Spark Max Subsystem.
 public class Feeder extends SubsystemBase {
+
     @AutoLog
     static class FeederInputs {
         public double lAppliedOutput;
@@ -38,6 +40,14 @@ public class Feeder extends SubsystemBase {
         feedMotorR.setInverted(true);
         feedMotorL.setIdleMode(IdleMode.kBrake);
         feedMotorR.setIdleMode(IdleMode.kBrake);
+
+        // TODO: Setup Current Limits.
+    }
+
+    @Override
+    public void periodic() {
+        updateInputs();
+        Logger.processInputs("Shooter/Feeder", inputs);
     }
 
     private void updateInputs() {
@@ -52,12 +62,6 @@ public class Feeder extends SubsystemBase {
         inputs.rMotorTemp = feedMotorR.getMotorTemperature();
         inputs.rFaults = feedMotorR.getFaults();
         inputs.rVelocity = feedMotorR.getEncoder().getVelocity();
-    }
-
-    @Override
-    public void periodic() {
-        updateInputs();
-        Logger.processInputs("Shooter/Feeder", inputs);
     }
 
     // ========================= Functions =========================

@@ -17,6 +17,13 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
  */
 public final class Constants {
 
+  // ========================= Enums ==========================================
+  public static enum OperatingMode {
+    REAL_WORLD,
+    SIMULATION,
+    LOG_REPLAY
+  }
+
   // ========================= CONSTANTS ======================================
   // ---------- Operation Modes ----------
   public static final OperatingMode CURRENT_OPERATING_MODE = OperatingMode.REAL_WORLD;
@@ -91,20 +98,19 @@ public final class Constants {
   public static final int ADDRESSABLE_LED_LENGTH = 144;
 
   // ---------- Color Sensor ----------
-  public static final int COLOR_SENSOR_V3_NO_OBJECT_PROXIMITY = 300; // TODO: Configure Value.
-
-  // ========================= Enums ==========================================
-  public static enum OperatingMode {
-    REAL_WORLD,
-    SIMULATION,
-    LOG_REPLAY
-  }
+  public static final int COLOR_SENSOR_PROXIMITY_THRESHOLD = 300; // TODO: Configure Value.
 
   // ========================= Configuration Objects ========================
+  /**
+   * Allow 40A continuous, 80A momentary supply current. See: <a href=
+   * "https://api.ctr-electronics.com/phoenix6/release/java/com/ctre/phoenix6/configs/CurrentLimitsConfigs.html">CTR
+   * Electronics: CurrentLimitsConfigs</a>
+   * 
+   * @return A {@link CurrentLimitsConfigs} object with the default Current
+   *         limits.
+   */
   public static CurrentLimitsConfigs getDefaultCurrentLimitsConfig() {
-    // Allow 40A continuous, 80A momentary supply current.
-    // https://api.ctr-electronics.com/phoenix6/release/java/com/ctre/phoenix6/configs/CurrentLimitsConfigs.html
-    var limits = new CurrentLimitsConfigs();
+    CurrentLimitsConfigs limits = new CurrentLimitsConfigs();
     limits.SupplyCurrentLimitEnable = true;
     limits.SupplyCurrentLimit = 40.0;
     limits.SupplyCurrentThreshold = 80.0;
