@@ -88,7 +88,7 @@ public final class Constants {
   }
 
   // ========================= Configuration Objects ========================
-  public static CurrentLimitsConfigs GetDefaultCurrentLimitsConfig() {
+  public static CurrentLimitsConfigs getDefaultCurrentLimitsConfig() {
     // Allow 40A continuous, 80A momentary supply current.
     // https://api.ctr-electronics.com/phoenix6/release/java/com/ctre/phoenix6/configs/CurrentLimitsConfigs.html
     var limits = new CurrentLimitsConfigs();
