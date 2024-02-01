@@ -19,18 +19,29 @@ public class Flywheel extends SubsystemBase {
     static class FlywheelInputs {
         public double lMotorVoltage;
         public double rMotorVoltage;
-        public double lStatorCurrent;
-        public double rStatorCurrent;
+
+        public double lSupplyCurrent;
+        public double rSupplyCurrent;
+
         public double lSupplyVoltage;
         public double rSupplyVoltage;
+
         public double lVelocity;
         public double rVelocity;
+
+        public double rMotorTemp;
+        public double lMotorTemp;
+
+        public int rFaults;
+        public int lFaults;
     }
 
     private final StatusSignal<Double> flywheelLMotorVoltage, flywheelRMotorVoltage;
-    private final StatusSignal<Double> flywheelLStatorCurrent, flywheelRStatorCurrent;
+    private final StatusSignal<Double> flywheelLSupplyCurrent, flywheelRSupplyCurrent;
     private final StatusSignal<Double> flywheelLSupplyVoltage, flywheelRSupplyVoltage;
     private final StatusSignal<Double> flywheelLVelocity, flywheelRVelocity;
+    private final StatusSignal<Double> flywheelLMotorTemp, flywheelRMotorTemp;
+    private final StatusSignal<Integer> flywheelLFaults, flywheelRFaults;
 
     private final TalonFX flywheelMotorL = new TalonFX(Constants.FLYWHEEL_L_ID);
     private final TalonFX flywheelMotorR = new TalonFX(Constants.FLYWHEEL_R_ID);
@@ -47,32 +58,48 @@ public class Flywheel extends SubsystemBase {
         // ---------- Define Loggable Fields ----------
         flywheelLMotorVoltage = flywheelMotorL.getMotorVoltage();
         flywheelRMotorVoltage = flywheelMotorR.getMotorVoltage();
-        flywheelLStatorCurrent = flywheelMotorL.getStatorCurrent();
-        flywheelRStatorCurrent = flywheelMotorR.getStatorCurrent();
+        flywheelLSupplyCurrent = flywheelMotorL.getSupplyCurrent();
+        flywheelRSupplyCurrent = flywheelMotorR.getSupplyCurrent();
         flywheelLSupplyVoltage = flywheelMotorL.getSupplyVoltage();
         flywheelRSupplyVoltage = flywheelMotorR.getSupplyVoltage();
         flywheelLVelocity = flywheelMotorL.getVelocity();
         flywheelRVelocity = flywheelMotorR.getVelocity();
+        flywheelLMotorTemp = flywheelMotorL.getDeviceTemp();
+        flywheelRMotorTemp = flywheelMotorR.getDeviceTemp();
+        flywheelLFaults = flywheelMotorL.getFaultField();
+        flywheelRFaults = flywheelMotorR.getFaultField();
 
         // ---------- Optimize Bus Utilization ----------
-        BaseStatusSignal.setUpdateFrequencyForAll(Constants.ADVANTAGE_DEFAULT_LOG_FREQUENCY,
-                flywheelLMotorVoltage, flywheelRMotorVoltage,
-                flywheelLStatorCurrent, flywheelRStatorCurrent,
-                flywheelLSupplyVoltage, flywheelRSupplyVoltage,
-                flywheelLVelocity, flywheelRVelocity);
         flywheelMotorL.optimizeBusUtilization();
         flywheelMotorR.optimizeBusUtilization();
     }
 
     private void updateInputs() {
+        BaseStatusSignal.refreshAll(
+                flywheelLMotorVoltage, flywheelRMotorVoltage,
+                flywheelLSupplyCurrent, flywheelRSupplyCurrent,
+                flywheelLSupplyVoltage, flywheelRSupplyVoltage,
+                flywheelLVelocity, flywheelRVelocity,
+                flywheelLMotorTemp, flywheelRMotorTemp,
+                flywheelLFaults, flywheelRFaults);
+
         inputs.lMotorVoltage = flywheelLMotorVoltage.getValueAsDouble();
         inputs.rMotorVoltage = flywheelRMotorVoltage.getValueAsDouble();
-        inputs.lStatorCurrent = flywheelLStatorCurrent.getValueAsDouble();
-        inputs.rStatorCurrent = flywheelRStatorCurrent.getValueAsDouble();
+
+        inputs.lSupplyCurrent = flywheelLSupplyCurrent.getValueAsDouble();
+        inputs.rSupplyCurrent = flywheelRSupplyCurrent.getValueAsDouble();
+
         inputs.lSupplyVoltage = flywheelLSupplyVoltage.getValueAsDouble();
         inputs.rSupplyVoltage = flywheelRSupplyVoltage.getValueAsDouble();
+
         inputs.lVelocity = flywheelLVelocity.getValueAsDouble();
         inputs.rVelocity = flywheelRVelocity.getValueAsDouble();
+
+        inputs.lMotorTemp = flywheelLMotorTemp.getValueAsDouble();
+        inputs.rMotorTemp = flywheelRMotorTemp.getValueAsDouble();
+
+        inputs.lFaults = flywheelLFaults.getValue();
+        inputs.rFaults = flywheelRFaults.getValue();
     }
 
     @Override

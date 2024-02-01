@@ -44,12 +44,16 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
   private final StatusSignal<Double> driveMotorVelocity;
   private final StatusSignal<Double> driveMotorAppliedVolts;
   private final StatusSignal<Double> driveMotorCurrent;
+  private final StatusSignal<Integer> driveMotorFaults;
+  private final StatusSignal<Double> driveMotorTemp;
 
   private final StatusSignal<Double> cancoderAbsolutePosition;
   private final StatusSignal<Double> steerMotorPosition;
   private final StatusSignal<Double> steerMotorVelocity;
   private final StatusSignal<Double> steerMotorAppliedVolts;
   private final StatusSignal<Double> steerMotorStatorCurrent;
+  private final StatusSignal<Integer> steerMotorFaults;
+  private final StatusSignal<Double> steerMotorTemp;
 
   private final Rotation2d absoluteEncoderOffset;
 
@@ -120,26 +124,17 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
     driveMotorVelocity = driveMotor.getVelocity();
     driveMotorAppliedVolts = driveMotor.getMotorVoltage();
     driveMotorCurrent = driveMotor.getStatorCurrent();
+    driveMotorFaults = driveMotor.getFaultField();
+    driveMotorTemp = driveMotor.getDeviceTemp();
 
     cancoderAbsolutePosition = cancoder.getAbsolutePosition();
     steerMotorPosition = steerMotor.getPosition();
     steerMotorVelocity = steerMotor.getVelocity();
     steerMotorAppliedVolts = steerMotor.getMotorVoltage();
     steerMotorStatorCurrent = steerMotor.getStatorCurrent();
+    steerMotorFaults = steerMotor.getFaultField();
+    steerMotorTemp = steerMotor.getDeviceTemp();
 
-    // Set Update frequency.
-    BaseStatusSignal.setUpdateFrequencyForAll(
-        Constants.ADVANTAGE_ODOMETRY_LOG_FREQUENCY, driveMotorPosition, steerMotorPosition); // Required for odometry,
-                                                                                             // use faster rate
-    BaseStatusSignal.setUpdateFrequencyForAll(
-        Constants.ADVANTAGE_DEFAULT_LOG_FREQUENCY,
-        driveMotorVelocity,
-        driveMotorAppliedVolts,
-        driveMotorCurrent,
-        cancoderAbsolutePosition,
-        steerMotorVelocity,
-        steerMotorAppliedVolts,
-        steerMotorStatorCurrent);
     driveMotor.optimizeBusUtilization();
     steerMotor.optimizeBusUtilization();
   }
@@ -165,7 +160,11 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         steerMotorPosition,
         steerMotorVelocity,
         steerMotorAppliedVolts,
-        steerMotorStatorCurrent);
+        steerMotorStatorCurrent,
+        driveMotorFaults,
+        steerMotorFaults,
+        driveMotorTemp,
+        steerMotorTemp);
 
     // Inverted driveMotorPosition so that sutonomous sees the robot moving in the
     // correct direction.
@@ -175,6 +174,8 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         / Constants.WHEEL_DRIVE_GEAR_RATIO;
     inputs.driveMotorAppliedVolts = driveMotorAppliedVolts.getValueAsDouble();
     inputs.driveMotorCurrentAmps = driveMotorCurrent.getValueAsDouble();
+    inputs.driveMotorFaults = driveMotorFaults.getValue();
+    inputs.driveMotorTemp = driveMotorTemp.getValueAsDouble();
 
     inputs.cancoderAbsolutePosition = Rotation2d.fromRotations(cancoderAbsolutePosition.getValueAsDouble())
         .minus(absoluteEncoderOffset);
@@ -184,5 +185,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         / Constants.WHEEL_TURN_GEAR_RATIO;
     inputs.steerMotorAppliedVolts = steerMotorAppliedVolts.getValueAsDouble();
     inputs.steerMotorCurrentAmps = steerMotorStatorCurrent.getValueAsDouble();
+    inputs.steerMotorFaults = steerMotorFaults.getValue();
+    inputs.steerMotorTemp = steerMotorTemp.getValueAsDouble();
   }
 }

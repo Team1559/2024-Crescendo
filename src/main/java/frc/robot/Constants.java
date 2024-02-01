@@ -8,8 +8,10 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
- * numerical or boolean constants. This class should not be used for any other purpose.
- * All constants should be declared globally (i.e. public static). Do not put anything
+ * numerical or boolean constants. This class should not be used for any other
+ * purpose.
+ * All constants should be declared globally (i.e. public static). Do not put
+ * anything
  * functional in this class.
  */
 public final class Constants {
@@ -79,10 +81,6 @@ public final class Constants {
   public static final int BACK_RIGHT_STEER_MOTOR_ID = 7;
   public static final int BACK_RIGHT_CANCODER_ID = 8;
 
-  // ---------- Logging Frequency ----------
-  public static final double ADVANTAGE_DEFAULT_LOG_FREQUENCY = 50.00;
-  public static final double ADVANTAGE_ODOMETRY_LOG_FREQUENCY = 100.00;
-
   // ---------- Roborio ----------
   public static final int LEFT_FEED_MOTOR_ID = 20;
   public static final int RIGHT_FEED_MOTOR_ID = 21;
@@ -103,5 +101,6 @@ public final class Constants {
 
   // ========================= Constructors ===================================
   /** Makes this class non-instantiable. */
-  private Constants() {}
+  private Constants() {
+  }
 }

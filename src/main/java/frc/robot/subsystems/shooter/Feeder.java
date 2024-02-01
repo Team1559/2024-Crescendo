@@ -1,7 +1,12 @@
 package frc.robot.subsystems.shooter;
 
 import com.revrobotics.CANSparkLowLevel.MotorType;
+
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -9,27 +14,50 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Feeder extends SubsystemBase {
+    @AutoLog
+    static class FeederInputs {
+        public double lAppliedOutput;
+        public double lOutputCurrent;
+        public double lMotorTemp;
+        public int lFaults;
+        public double lVelocity;
 
-    // TODO: Create Static @AutoLog class. (See SwerveModuleIo for reference.)
+        public double rAppliedOutput;
+        public double rOutputCurrent;
+        public double rMotorTemp;
+        public int rFaults;
+        public double rVelocity;
+    }
 
-    // TODO: Create Static @AutoLog object. (See IndexedSwerveModule's
-    // SwerveModuleIoInputsAutoLogged variable for reference.)
-
-    private CANSparkMax feedMotorL = new CANSparkMax(Constants.LEFT_FEED_MOTOR_ID, MotorType.kBrushless);
-    private CANSparkMax feedMotorR = new CANSparkMax(Constants.RIGHT_FEED_MOTOR_ID, MotorType.kBrushless);
+    private final CANSparkMax feedMotorL = new CANSparkMax(Constants.LEFT_FEED_MOTOR_ID, MotorType.kBrushless);
+    private final CANSparkMax feedMotorR = new CANSparkMax(Constants.RIGHT_FEED_MOTOR_ID, MotorType.kBrushless);
+    private final FeederInputsAutoLogged inputs = new FeederInputsAutoLogged();
 
     public Feeder() {
         feedMotorL.setInverted(false);
         feedMotorR.setInverted(true);
+        feedMotorL.setIdleMode(IdleMode.kBrake);
+        feedMotorR.setIdleMode(IdleMode.kBrake);
+    }
+
+    private void updateInputs() {
+        inputs.lAppliedOutput = feedMotorL.getAppliedOutput();
+        inputs.lOutputCurrent = feedMotorL.getOutputCurrent();
+        inputs.lMotorTemp = feedMotorL.getMotorTemperature();
+        inputs.lFaults = feedMotorL.getFaults();
+        inputs.lVelocity = feedMotorL.getEncoder().getVelocity();
+
+        inputs.rAppliedOutput = feedMotorR.getAppliedOutput();
+        inputs.rOutputCurrent = feedMotorR.getOutputCurrent();
+        inputs.rMotorTemp = feedMotorR.getMotorTemperature();
+        inputs.rFaults = feedMotorR.getFaults();
+        inputs.rVelocity = feedMotorR.getEncoder().getVelocity();
     }
 
     @Override
     public void periodic() {
-        // TODO: Update @AutoLog object. (See SwerveModuleIoTalonFx's updateInputs
-        // method for reference.).
-
-        // TODO: Log @AutoLog object. i.e. `Logger.processInputs("Drive/Module" +
-        // Integer.toString(index), inputs)`
+        updateInputs();
+        Logger.processInputs("Shooter/Feeder", inputs);
     }
 
     // ========================= Functions =========================
