@@ -14,10 +14,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 // TODO: Convert this into a generic Dual Spark Max Subsystem.
-public class Feeder extends SubsystemBase {
+public class DualCanSparkMaxSubsystem extends SubsystemBase {
 
     @AutoLog
-    static class FeederInputs {
+    static class DualMotorInputs {
         public double lAppliedOutput;
         public double lOutputCurrent;
         public double lMotorTemp;
@@ -31,39 +31,39 @@ public class Feeder extends SubsystemBase {
         public double rVelocity;
     }
 
-    private final CANSparkMax feedMotorL = new CANSparkMax(Constants.LEFT_FEED_MOTOR_ID, MotorType.kBrushless);
-    private final CANSparkMax feedMotorR = new CANSparkMax(Constants.RIGHT_FEED_MOTOR_ID, MotorType.kBrushless);
-    private final FeederInputsAutoLogged inputs = new FeederInputsAutoLogged();
+    private final CANSparkMax motorL = new CANSparkMax(Constants.LEFT_FEED_MOTOR_ID, MotorType.kBrushless);
+    private final CANSparkMax motorR = new CANSparkMax(Constants.RIGHT_FEED_MOTOR_ID, MotorType.kBrushless);
+    private final DualMotorInputsAutoLogged inputs = new DualMotorInputsAutoLogged();
 
-    public Feeder() {
-        feedMotorL.setInverted(false);
-        feedMotorR.setInverted(true);
-        feedMotorL.setIdleMode(IdleMode.kBrake);
-        feedMotorR.setIdleMode(IdleMode.kBrake);
-        feedMotorL.setSmartCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_LIMIT);
-        feedMotorR.setSmartCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_LIMIT);
-        feedMotorL.setSecondaryCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_SECONDARY_LIMIT);
-        feedMotorL.setSecondaryCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_SECONDARY_LIMIT);
+    public DualCanSparkMaxSubsystem() {
+        motorL.setInverted(false);
+        motorR.setInverted(true);
+        motorL.setIdleMode(IdleMode.kBrake);
+        motorR.setIdleMode(IdleMode.kBrake);
+        motorL.setSmartCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_LIMIT);
+        motorR.setSmartCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_LIMIT);
+        motorL.setSecondaryCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_SECONDARY_LIMIT);
+        motorL.setSecondaryCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_SECONDARY_LIMIT);
     }
 
     @Override
     public void periodic() {
         updateInputs();
-        Logger.processInputs("Shooter/Feeder", inputs);
+        Logger.processInputs("Shooter/DualCanSparkMaxSubsystem", inputs);
     }
 
     private void updateInputs() {
-        inputs.lAppliedOutput = feedMotorL.getAppliedOutput();
-        inputs.lOutputCurrent = feedMotorL.getOutputCurrent();
-        inputs.lMotorTemp = feedMotorL.getMotorTemperature();
-        inputs.lFaults = feedMotorL.getFaults();
-        inputs.lVelocity = feedMotorL.getEncoder().getVelocity();
+        inputs.lAppliedOutput = motorL.getAppliedOutput();
+        inputs.lOutputCurrent = motorL.getOutputCurrent();
+        inputs.lMotorTemp = motorL.getMotorTemperature();
+        inputs.lFaults = motorL.getFaults();
+        inputs.lVelocity = motorL.getEncoder().getVelocity();
 
-        inputs.rAppliedOutput = feedMotorR.getAppliedOutput();
-        inputs.rOutputCurrent = feedMotorR.getOutputCurrent();
-        inputs.rMotorTemp = feedMotorR.getMotorTemperature();
-        inputs.rFaults = feedMotorR.getFaults();
-        inputs.rVelocity = feedMotorR.getEncoder().getVelocity();
+        inputs.rAppliedOutput = motorR.getAppliedOutput();
+        inputs.rOutputCurrent = motorR.getOutputCurrent();
+        inputs.rMotorTemp = motorR.getMotorTemperature();
+        inputs.rFaults = motorR.getFaults();
+        inputs.rVelocity = motorR.getEncoder().getVelocity();
     }
 
     // ========================= Functions =========================
@@ -80,7 +80,7 @@ public class Feeder extends SubsystemBase {
     }
 
     private void setVoltage(double voltage) {
-        feedMotorR.setVoltage(voltage);
+        motorR.setVoltage(voltage);
     }
 
     // ========================= Commands =========================
