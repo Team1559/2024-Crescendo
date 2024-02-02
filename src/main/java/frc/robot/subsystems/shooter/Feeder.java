@@ -40,8 +40,10 @@ public class Feeder extends SubsystemBase {
         feedMotorR.setInverted(true);
         feedMotorL.setIdleMode(IdleMode.kBrake);
         feedMotorR.setIdleMode(IdleMode.kBrake);
-
-        // TODO: Setup Current Limits.
+        feedMotorL.setSmartCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_LIMIT);
+        feedMotorR.setSmartCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_LIMIT);
+        feedMotorL.setSecondaryCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_SECONDARY_LIMIT);
+        feedMotorL.setSecondaryCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_SECONDARY_LIMIT);
     }
 
     @Override

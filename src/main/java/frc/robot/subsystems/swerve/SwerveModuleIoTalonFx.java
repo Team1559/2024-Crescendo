@@ -99,9 +99,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 
     // Set Steer MotorOutputConfigs.
     var steerTalonFXConfiguration = new TalonFXConfiguration();
-    // TODO: Update to use the Default Current Limits.
-    steerTalonFXConfiguration.CurrentLimits.StatorCurrentLimit = 30.0;
-    steerTalonFXConfiguration.CurrentLimits.StatorCurrentLimitEnable = true;
+    steerTalonFXConfiguration.CurrentLimits = Constants.getDefaultCurrentLimitsConfig();
     steerMotor.getConfigurator().apply(steerTalonFXConfiguration);
 
     // Set Steer MotorOutputConfigs.

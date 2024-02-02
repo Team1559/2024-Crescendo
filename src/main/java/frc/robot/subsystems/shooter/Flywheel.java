@@ -57,10 +57,10 @@ public class Flywheel extends SubsystemBase {
         flywheelMotorL.setNeutralMode(NeutralModeValue.Coast);
         flywheelMotorR.setNeutralMode(NeutralModeValue.Coast);
 
-        /*
-         * TODO: Setup Current Limits via a TalonFXConfiguration class. (See: The
-         * SwerveModuleIoTalonFx constructor as an example.)
-         */
+        var driveTalonFXConfiguration = new TalonFXConfiguration();
+        driveTalonFXConfiguration.CurrentLimits = Constants.getDefaultCurrentLimitsConfig();
+        flywheelMotorL.getConfigurator().apply(driveTalonFXConfiguration);
+        flywheelMotorR.getConfigurator().apply(driveTalonFXConfiguration);
 
         // ---------- Define Loggable Fields ----------
         flywheelLMotorVoltage = flywheelMotorL.getMotorVoltage();
