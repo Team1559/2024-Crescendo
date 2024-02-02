@@ -90,12 +90,14 @@ public class DriveCommands {
         startingRotation = driveBase.getRotation();
         targetRotation = startingRotation.plus(rotationAmount);
       }
+      public static final  double kp = 20.0;
 
       @Override
       public void execute() {
         Rotation2d current = driveBase.getRotation();
         double delta = targetRotation.minus(current).getDegrees();
-        double omega = Math.copySign(speed, delta);
+        double rampOmega = Math.min(Math.abs(delta)/20, 1.0);
+        double omega = Math.copySign(speed, delta) * rampOmega;
         driveBase.runVelocity(new ChassisSpeeds(0, 0, omega));
       }
 
