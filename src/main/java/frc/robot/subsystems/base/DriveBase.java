@@ -117,7 +117,7 @@ public class DriveBase extends SubsystemBase {
   /** Returns the average drive velocity in radians/sec. */
   public double getCharacterizationVelocity() {
     double driveVelocityAverage = 0.0;
-    for (var module : modules) {
+    for (IndexedSwerveModule module : modules) {
       driveVelocityAverage += module.getCharacterizationVelocity();
     }
     return driveVelocityAverage / 4.0;
@@ -174,13 +174,13 @@ public class DriveBase extends SubsystemBase {
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
 
-    for (var module : modules) {
+    for (IndexedSwerveModule module : modules) {
       module.periodic();
     }
 
     // Stop moving when disabled
     if (DriverStation.isDisabled()) {
-      for (var module : modules) {
+      for (IndexedSwerveModule module : modules) {
         module.stop();
       }
     }
