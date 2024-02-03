@@ -57,7 +57,7 @@ public class Flywheel extends SubsystemBase {
         flywheelMotorL.setNeutralMode(NeutralModeValue.Coast);
         flywheelMotorR.setNeutralMode(NeutralModeValue.Coast);
 
-        var driveTalonFXConfiguration = new TalonFXConfiguration();
+        TalonFXConfiguration driveTalonFXConfiguration = new TalonFXConfiguration();
         driveTalonFXConfiguration.CurrentLimits = Constants.getDefaultCurrentLimitsConfig();
         flywheelMotorL.getConfigurator().apply(driveTalonFXConfiguration);
         flywheelMotorR.getConfigurator().apply(driveTalonFXConfiguration);
