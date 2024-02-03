@@ -15,16 +15,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.LightsCommands;
+import frc.robot.commands.ShooterCommands;
 import frc.robot.subsystems.base.DriveBase;
 import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
 import frc.robot.subsystems.gyro.GyroIoPigeon2;
 import frc.robot.subsystems.gyro.GyroIoSimAndReplay;
 import frc.robot.subsystems.led.LightsSubsystem;
 import frc.robot.subsystems.shooter.Aimer;
-import frc.robot.subsystems.shooter.DualCanSparkMaxSubsystem;
 import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.Intake;
@@ -51,8 +52,8 @@ public class RobotContainer {
   private final DriveBase driveBase;
   private final Vision vision;
   private final LoggedDashboardChooser<Command> autoChooser;
-  private final DualCanSparkMaxSubsystem intake;
-  private final DualCanSparkMaxSubsystem feeder;
+  private final Intake intake;
+  private final Feeder feeder;
   private final Aimer aimer;
   private final Flywheel flywheel;
 
@@ -121,18 +122,25 @@ public class RobotContainer {
     }
 
     // ========================= Autonomous =========================
-    // ---------- Create Named Commands for use by Pathe Planner ----------
-    NamedCommands.registerCommand("Spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
-    NamedCommands.registerCommand("StartIntake", new PrintCommand("StartIntake working"));
-    NamedCommands.registerCommand("Turn to Speaker", new ConditionalCommand(
+
+    Command aimCommand = new ConditionalCommand(
         // Turn to Blue Speaker.
         DriveCommands.turnToTargetCommand(driveBase,
             new Translation2d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42)), 5),
         // Turn to Red Speaker.
         DriveCommands.turnToTargetCommand(driveBase,
             new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42)), 5),
-        () -> DriverStation.getAlliance().get() == DriverStation.Alliance.Blue));
-
+        () -> DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
+    Command shootCommand;
+    // ---------- Create Named Commands for use by Pathe Planner ----------
+    NamedCommands.registerCommand("Spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
+    NamedCommands.registerCommand("StartIntake", new PrintCommand("StartIntake working"));
+    if (Constants.HAVE_SHOOTER) {
+      shootCommand = ShooterCommands.shootCommand(flywheel, feeder, lightsSubsystem);
+    } else {
+      shootCommand = LightsCommands.blink(lightsSubsystem, Color.kOrange);
+    }
+    NamedCommands.registerCommand("ShootNote", new SequentialCommandGroup(aimCommand, shootCommand));
     // ---------- Set-up Autonomous Choices ----------
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
