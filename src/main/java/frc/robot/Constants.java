@@ -67,6 +67,9 @@ public final class Constants {
   public static final double FEEDER_REVERSE_VOLTAGE = -FEEDER_FORWARD_VOLTAGE;
   public static final double FLYWHEEL_REVERSE_VOLTAGE = -6.0; // TODO: Configure Value.
 
+  public static final double AIMER_KP = 0; // TODO
+  public static final double AIMER_KI = 0;
+  public static final double AIMER_KD = 0;
   // ---------- Hardware Config --------
   public static final boolean HAVE_FEEDER = false;
   public static final boolean HAVE_INTAKE = false;
