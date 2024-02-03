@@ -97,15 +97,15 @@ public class DualCanSparkMaxSubsystem extends SubsystemBase {
     }
 
     // ========================= Functions =========================
-    public void startFeeder() {
+    public void start() {
         setVoltage(fowardsVoltage);
     }
 
-    public void stopFeeder() {
+    public void stop() {
         setVoltage(0.0);
     }
 
-    public void reverseFeeder() {
+    public void reverse() {
         setVoltage(reverseVoltage);
     }
 
@@ -115,16 +115,16 @@ public class DualCanSparkMaxSubsystem extends SubsystemBase {
 
     // ========================= Commands =========================
 
-    public Command startFeederCommand() {
-        return new InstantCommand(this::startFeeder, this);
+    public Command startCommand() {
+        return new InstantCommand(this::start, this);
     }
 
-    public Command stopFeederCommand() {
-        return new InstantCommand(this::stopFeeder, this);
+    public Command stopCommand() {
+        return new InstantCommand(this::stop, this);
     }
 
-    public Command reverseFeederCommand() {
-        return new InstantCommand(this::reverseFeeder, this);
+    public Command reverseCommand() {
+        return new InstantCommand(this::reverse, this);
     }
 
 }

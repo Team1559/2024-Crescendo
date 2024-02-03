@@ -25,7 +25,9 @@ import frc.robot.subsystems.gyro.GyroIoSimAndReplay;
 import frc.robot.subsystems.led.LightsSubsystem;
 import frc.robot.subsystems.shooter.Aimer;
 import frc.robot.subsystems.shooter.DualCanSparkMaxSubsystem;
+import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
+import frc.robot.subsystems.shooter.Intake;
 import frc.robot.subsystems.swerve.SwerveModuleIoReplay;
 import frc.robot.subsystems.swerve.SwerveModuleIoSim;
 import frc.robot.subsystems.swerve.SwerveModuleIoTalonFx;
@@ -98,14 +100,12 @@ public class RobotContainer {
         throw new RuntimeException("Unknown Run Mode: " + Constants.CURRENT_OPERATING_MODE);
     }
     if (Constants.HAVE_INTAKE) {
-      intake = new DualCanSparkMaxSubsystem("Intake", Constants.INTAKE_L_ID, Constants.INTAKE_R_ID,
-          Constants.INTAKE_FORWARD_VOLTAGE, Constants.INTAKE_REVERSE_VOLTAGE);
+      intake = new Intake();
     } else {
       intake = null;
     }
     if (Constants.HAVE_FEEDER) {
-      feeder = new DualCanSparkMaxSubsystem("Feeder", Constants.FEEDER_L_ID, Constants.FEEDER_R_ID,
-          Constants.FEEDER_FORWARD_VOLTAGE, Constants.FEEDER_REVERSE_VOLTAGE);
+      feeder = new Feeder();
     } else {
       feeder = null;
     }
