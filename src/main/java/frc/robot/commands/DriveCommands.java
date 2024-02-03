@@ -101,7 +101,7 @@ public class DriveCommands {
       public void execute() {
         Rotation2d current = driveBase.getRotation();
         double delta = targetRotation.minus(current).getDegrees();
-        double rampOmega = Math.max(Math.min(Math.abs(delta)/40, 1.0), .01);
+        double rampOmega = Math.max(Math.min(Math.abs(delta)/50, 1.0), .01);
         double omega = Math.copySign(speed, delta) * rampOmega;
         Logger.recordOutput("TurnToSpeaker/delta", delta);
         Logger.recordOutput("TurnToSpeaker/rampOmega", rampOmega);
