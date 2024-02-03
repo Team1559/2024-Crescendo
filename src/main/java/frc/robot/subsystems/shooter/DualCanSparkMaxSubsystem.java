@@ -8,12 +8,12 @@ import org.littletonrobotics.junction.Logger;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkBase.IdleMode;
 
+import edu.wpi.first.networktables.PubSub;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-// TODO: Convert this into a generic Dual Spark Max Subsystem.
 public class DualCanSparkMaxSubsystem extends SubsystemBase {
 
     @AutoLog
@@ -31,11 +31,38 @@ public class DualCanSparkMaxSubsystem extends SubsystemBase {
         public double rVelocity;
     }
 
-    private final CANSparkMax motorL = new CANSparkMax(Constants.LEFT_FEED_MOTOR_ID, MotorType.kBrushless);
-    private final CANSparkMax motorR = new CANSparkMax(Constants.RIGHT_FEED_MOTOR_ID, MotorType.kBrushless);
+    private final CANSparkMax motorL;
+    private final CANSparkMax motorR;
     private final DualMotorInputsAutoLogged inputs = new DualMotorInputsAutoLogged();
+    public final double fowardsVoltage;
+    public final double reverseVoltage;
 
-    public DualCanSparkMaxSubsystem() {
+    /**
+     * Create a new subsystem for two motors controlled by CANspark Controller
+     * 
+     * @param name     Name of subsystem
+     * @param motorLId Left motor ID
+     * @param motorRId Right motor ID
+     * @param voltage  Voltage for both fowards and reverse voltage
+     */
+    public DualCanSparkMaxSubsystem(String name, int motorLId, int motorRId, double voltage) {
+        this(name, motorLId, motorRId, voltage, voltage);
+    }
+
+    /**
+     * Create a new subsystem for two motors controlled by CANspark Controller
+     * 
+     * @param name           Name of subsystem
+     * @param motorLId       Left motor ID
+     * @param motorRId       Right motor ID
+     * @param fowardsVoltage Voltage for fowards movement
+     * @param reverseVoltage Voltage for reverse movement
+     */
+    public DualCanSparkMaxSubsystem(String name, int motorLId, int motorRId, double fowardsVoltage,
+            double reverseVoltage) {
+        super(name);
+        motorL = new CANSparkMax(motorLId, MotorType.kBrushless);
+        motorR = new CANSparkMax(motorRId, MotorType.kBrushless);
         motorL.setInverted(false);
         motorR.setInverted(true);
         motorL.setIdleMode(IdleMode.kBrake);
@@ -44,12 +71,15 @@ public class DualCanSparkMaxSubsystem extends SubsystemBase {
         motorR.setSmartCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_LIMIT);
         motorL.setSecondaryCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_SECONDARY_LIMIT);
         motorL.setSecondaryCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_SECONDARY_LIMIT);
+        this.fowardsVoltage = fowardsVoltage;
+        this.reverseVoltage = reverseVoltage;
+
     }
 
     @Override
     public void periodic() {
         updateInputs();
-        Logger.processInputs("Shooter/DualCanSparkMaxSubsystem", inputs);
+        Logger.processInputs("Shooter/" + getName(), inputs);
     }
 
     private void updateInputs() {
@@ -68,7 +98,7 @@ public class DualCanSparkMaxSubsystem extends SubsystemBase {
 
     // ========================= Functions =========================
     public void startFeeder() {
-        setVoltage(Constants.FEEDER_FORWARD_VOLTAGE);
+        setVoltage(fowardsVoltage);
     }
 
     public void stopFeeder() {
@@ -76,7 +106,7 @@ public class DualCanSparkMaxSubsystem extends SubsystemBase {
     }
 
     public void reverseFeeder() {
-        setVoltage(Constants.FEEDER_REVERSE_VOLTAGE);
+        setVoltage(reverseVoltage);
     }
 
     private void setVoltage(double voltage) {

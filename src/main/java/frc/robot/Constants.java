@@ -61,9 +61,18 @@ public final class Constants {
   public static final Rotation2d BACK_RIGHT_ABSOLUTE_ENCODER_OFFSET = Rotation2d.fromRotations(-0.000732);
 
   // ---------- Game Piece Handling -------
+  public static final double INTAKE_FORWARD_VOLTAGE = 6.0;
+  public static final double INTAKE_REVERSE_VOLTAGE = -6.0;
   public static final double FEEDER_FORWARD_VOLTAGE = 6.0; // TODO: Configure Value.
   public static final double FEEDER_REVERSE_VOLTAGE = -FEEDER_FORWARD_VOLTAGE;
   public static final double FLYWHEEL_REVERSE_VOLTAGE = -6.0; // TODO: Configure Value.
+
+  // ---------- Hardware Config --------
+  public static final boolean HAVE_FEEDER = false;
+  public static final boolean HAVE_INTAKE = false;
+  public static final boolean HAVE_FLYWHEEL = false;
+  public static final boolean HAVE_COLOR_SENSOR = false;
+  public static final boolean HAVE_SHOOTER = HAVE_FEEDER && HAVE_INTAKE && HAVE_FLYWHEEL && HAVE_COLOR_SENSOR;
 
   // ---------- Hardware Ids ----------
   // --- Camera ---
@@ -71,8 +80,15 @@ public final class Constants {
   // --- Canivore ---
   public static final String CANIVORE_BUS_ID = "1559Canivore";
   // --- Flywheel ---
-  public static final int FLYWHEEL_L_ID = 0; // TODO: Set Value.
-  public static final int FLYWHEEL_R_ID = 0; // TODO: Set Value.
+  public static final int INTAKE_L_ID = 20;
+  public static final int INTAKE_R_ID = 21;
+  public static final int FEEDER_L_ID = 22;
+  public static final int FEEDER_R_ID = 23;
+  public static final int AIMER_L_ID = 24;
+  public static final int AIMER_R_ID = 25;
+  public static final int FLYWHEEL_L_ID = 26;
+  public static final int FLYWHEEL_R_ID = 27;
+
   // --- Gyro ---
   public static final int BASE_GYRO_ID = 12;
   // --- Swerve Drives ---
