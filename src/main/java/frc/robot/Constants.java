@@ -70,6 +70,7 @@ public final class Constants {
   public static final double AIMER_KP = 0; // TODO
   public static final double AIMER_KI = 0;
   public static final double AIMER_KD = 0;
+  public static final double AIMER_ANGLE_OFFSET = 0; // TODO/calibrate
   // ---------- Hardware Config --------
   public static final boolean HAVE_FEEDER = false;
   public static final boolean HAVE_INTAKE = false;
@@ -108,9 +109,8 @@ public final class Constants {
   public static final int BACK_RIGHT_STEER_MOTOR_ID = 7;
   public static final int BACK_RIGHT_CANCODER_ID = 8;
 
-  // ---------- Roborio ----------
-  public static final int LEFT_FEED_MOTOR_ID = 20;
-  public static final int RIGHT_FEED_MOTOR_ID = 21;
+  // ---------- Digital IO Ports ----------
+  public static final int AIMER_ENCODER_PORT = 0;
 
   // ---------- Adressable LEDs ----------
   public static final int ADDRESSABLE_LED_PORT = 0;

@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -31,6 +32,7 @@ public class Aimer extends SubsystemBase {
 
     private final CANSparkMax motorL;
     private final CANSparkMax motorR;
+    private final DutyCycleEncoder encoder = new DutyCycleEncoder(Constants.AIMER_ENCODER_PORT);
     private final PIDController controller = new PIDController(Constants.AIMER_KP, Constants.AIMER_KI,
             Constants.AIMER_KD);
     private final AimerInputsAutoLogged inputs = new AimerInputsAutoLogged();
@@ -81,8 +83,7 @@ public class Aimer extends SubsystemBase {
     }
 
     public double getAngle() {
-        return 0;
-        // TODO: Gves current angle
+        return encoder.getAbsolutePosition() * 360 - Constants.AIMER_ANGLE_OFFSET;
     }
 
 }
