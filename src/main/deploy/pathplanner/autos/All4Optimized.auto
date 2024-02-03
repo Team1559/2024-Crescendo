@@ -12,21 +12,9 @@
     "data": {
       "commands": [
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 2.0
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "ShootNote"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 2.0
+            "name": "Turn to Speaker"
           }
         },
         {
@@ -50,13 +38,7 @@
         {
           "type": "named",
           "data": {
-            "name": "ShootNote"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 3.0
+            "name": "Turn to Speaker"
           }
         },
         {
@@ -68,43 +50,19 @@
         {
           "type": "named",
           "data": {
-            "name": "ShootNote"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 3.0
+            "name": "Turn to Speaker"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "MoveDiagUpAndRight"
+            "pathName": "CurveToTop"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "Turn to Speaker"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 4.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "DownFromTop"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ShootNote"
           }
         }
       ]
