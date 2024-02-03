@@ -1,5 +1,9 @@
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -10,8 +14,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.subsystems.base.DriveBase;
-
-import java.util.function.DoubleSupplier;
 
 public class DriveCommands {
 
@@ -88,7 +90,10 @@ public class DriveCommands {
       @Override
       public void initialize() {
         startingRotation = driveBase.getRotation();
+        System.out.println("Rotation start: " + startingRotation);
         targetRotation = startingRotation.plus(rotationAmount);
+        System.out.println("Rotation amount: " + rotationAmount);
+        System.out.println("Target Rotation: " + targetRotation);
       }
       public static final  double kp = 20.0;
 
@@ -96,8 +101,11 @@ public class DriveCommands {
       public void execute() {
         Rotation2d current = driveBase.getRotation();
         double delta = targetRotation.minus(current).getDegrees();
-        double rampOmega = Math.min(Math.abs(delta)/20, 1.0);
+        double rampOmega = Math.max(Math.min(Math.abs(delta)/40, 1.0), .01);
         double omega = Math.copySign(speed, delta) * rampOmega;
+        Logger.recordOutput("TurnToSpeaker/delta", delta);
+        Logger.recordOutput("TurnToSpeaker/rampOmega", rampOmega);
+        Logger.recordOutput("TurnToSpeaker/omega", omega);
         driveBase.runVelocity(new ChassisSpeeds(0, 0, omega));
       }
 
@@ -105,7 +113,7 @@ public class DriveCommands {
       public boolean isFinished() {
         Rotation2d current = driveBase.getRotation();
         double delta = targetRotation.minus(current).getDegrees();
-        return Math.abs(delta) < 1;
+        return Math.abs(delta) < .5;
       }
 
       @Override
