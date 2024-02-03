@@ -91,7 +91,7 @@ public class IndexedSwerveModule {
     // Optimize state based on current angle
     // Controllers run in "periodic" when the setpoint is not null
 
-    var optimizedState = SwerveModuleState.optimize(state, getAngle());
+    SwerveModuleState optimizedState = SwerveModuleState.optimize(state, getAngle());
 
     // Update setpoints, controllers run in "periodic"
     angleSetpoint = optimizedState.angle;
@@ -148,7 +148,7 @@ public class IndexedSwerveModule {
 
   /** Returns the module position delta since the last call to this method. */
   public SwerveModulePosition getPositionDelta() {
-    var delta = new SwerveModulePosition(getPositionMeters() - lastPositionMeters, getAngle());
+    SwerveModulePosition delta = new SwerveModulePosition(getPositionMeters() - lastPositionMeters, getAngle());
     lastPositionMeters = getPositionMeters();
     return delta;
   }

@@ -8,31 +8,38 @@ import frc.robot.Constants;
 
 public class LightsSubsystem extends SubsystemBase {
 
-  // ========================= Class Level =========================
+    // ========================= Class Level =========================
+    private static int dynamicColorCounter = 0;
+
     /**
      * Takes dynamic pattern and scrolls colors by 1.
      * 
      * @param pattern         An Array of {@link Color}s to be shifted.
      * @param isScrollFowards Shifts colors fowads w.hen {@code true} backwards when
      *                        {@code false}
+     * @param updateDelay     decreases the number of updates based on update delay,
+     *                        updates every nth attempt.
      * @return Shifted array of colors.
      */
-    public static Color[] scrollPattern(Color[] pattern, boolean isScrollFowards) {
-        Color[] tempArray = new Color[pattern.length];
-        if (isScrollFowards) {
-            for (int i = 0; i < pattern.length; i++) {
-                if (i == pattern.length - 1) {
-                    tempArray[0] = pattern[pattern.length - 1];
-                } else {
-                    tempArray[i + 1] = pattern[i];
+    public static Color[] scrollPattern(Color[] pattern, boolean isScrollFowards, int updateDelay) {
+        Color[] tempArray = pattern;
+        if (dynamicColorCounter % updateDelay == 0) {
+            tempArray = new Color[pattern.length];
+            if (isScrollFowards) {
+                for (int i = 0; i < pattern.length; i++) {
+                    if (i == pattern.length - 1) {
+                        tempArray[0] = pattern[pattern.length - 1];
+                    } else {
+                        tempArray[i + 1] = pattern[i];
+                    }
                 }
-            }
-        } else {
-            for (int i = 0; i < pattern.length; i++) {
-                if (i == 0) {
-                    tempArray[tempArray.length - 1] = pattern[0];
-                } else {
-                    tempArray[i - 1] = pattern[i];
+            } else {
+                for (int i = 0; i < pattern.length; i++) {
+                    if (i == 0) {
+                        tempArray[tempArray.length - 1] = pattern[0];
+                    } else {
+                        tempArray[i - 1] = pattern[i];
+                    }
                 }
             }
         }
@@ -84,7 +91,8 @@ public class LightsSubsystem extends SubsystemBase {
     public void periodic() {
         if (dynamicPattern != null) {
             setStaticPatternHelper(dynamicPattern);
-            dynamicPattern = scrollPattern(dynamicPattern, isDynamicPatternFowards);
+            dynamicColorCounter++;
+            dynamicPattern = scrollPattern(dynamicPattern, isDynamicPatternFowards, 3);
         }
     }
 
@@ -93,7 +101,8 @@ public class LightsSubsystem extends SubsystemBase {
      * <i>Notes:</i>
      * </p>
      * <ul>
-     * <li>If the patters does not fit evenly into the LEDs, it will be truncated.</li>
+     * <li>If the patters does not fit evenly into the LEDs, it will be
+     * truncated.</li>
      * <li>{@link Color#kblack} can be used to sparate the poattern.</li>
      * </ul>
      * 
@@ -121,12 +130,14 @@ public class LightsSubsystem extends SubsystemBase {
     }
 
     /**
-     * Sets all lights to a static multicolor pattern. This pattern will be repeated arross the LEDs.
+     * Sets all lights to a static multicolor pattern. This pattern will be repeated
+     * arross the LEDs.
      * <p>
      * <i>Notes:</i>
      * </p>
      * <ul>
-     * <li>If the patters does not fit evenly into the LEDs, it will be truncated.</li>
+     * <li>If the patters does not fit evenly into the LEDs, it will be
+     * truncated.</li>
      * <li>{@link Color#kblack} can be used to sparate the poattern.</li>
      * </ul>
      * 

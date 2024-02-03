@@ -1,10 +1,14 @@
 package frc.robot.subsystems.vision;
 
 import java.io.IOException;
+import java.util.Optional;
 
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -42,18 +46,18 @@ public class VisionIoPhoton implements VisionIo {
         inputs.pose = new Pose2d();
         inputs.timestamp = 0;
 
-        var optionalPoseEstimate = poseEstimator.update();
+        Optional<EstimatedRobotPose> optionalPoseEstimate = poseEstimator.update();
         if (!optionalPoseEstimate.isPresent()) {
             return;
         }
-        var poseEstimate = optionalPoseEstimate.get();
+        EstimatedRobotPose poseEstimate = optionalPoseEstimate.get();
 
-        var cameraResult = camera.getLatestResult();
+        PhotonPipelineResult cameraResult = camera.getLatestResult();
         if (!cameraResult.hasTargets()) {
             return;
         }
 
-        var target = cameraResult.getBestTarget();
+        PhotonTrackedTarget target = cameraResult.getBestTarget();
         if (target == null) {
             return;
         }

@@ -11,12 +11,16 @@ public interface SwerveModuleIo {
     public double driveMotorVelocityRadPerSec;
     public double driveMotorAppliedVolts;
     public double driveMotorCurrentAmps;
+    public int driveMotorFaults;
+    public double driveMotorTemp;
 
     public Rotation2d cancoderAbsolutePosition = new Rotation2d();
     public Rotation2d steerMotorPosition = new Rotation2d();
     public double steerMotorVelocityRadPerSec;
     public double steerMotorAppliedVolts;
     public double steerMotorCurrentAmps;
+    public int steerMotorFaults;
+    public double steerMotorTemp;
   }
 
   /** Run the drive motor at the specified voltage. */
