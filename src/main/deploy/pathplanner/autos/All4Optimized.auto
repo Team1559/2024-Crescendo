@@ -1,0 +1,73 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.3,
+      "y": 4.5
+    },
+    "rotation": -45.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Turn to Speaker"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MoveDiagonally"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StartIntake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MoveDiagBack"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Turn to Speaker"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DriveFromSpeaker"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Turn to Speaker"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CurveToTop"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Turn to Speaker"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
