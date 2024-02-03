@@ -127,10 +127,10 @@ public class RobotContainer {
     NamedCommands.registerCommand("Turn to Speaker", new ConditionalCommand(
         // Turn to Blue Speaker.
         DriveCommands.turnToTargetCommand(driveBase,
-            new Translation2d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42)), 5),
+            new Translation2d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42)), 4.5),
         // Turn to Red Speaker.
         DriveCommands.turnToTargetCommand(driveBase,
-            new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42)), 5),
+            new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42)), 4.5),
         () -> DriverStation.getAlliance().get() == DriverStation.Alliance.Blue));
 
     // ---------- Set-up Autonomous Choices ----------
