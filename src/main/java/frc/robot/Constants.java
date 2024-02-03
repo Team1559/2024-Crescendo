@@ -9,17 +9,20 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
- * numerical or boolean
- * constants. This class should not be used for any other purpose. All constants
- * should be declared
- * globally (i.e. public static). Do not put anything functional in this class.
- *
- * <p>
- * It is advised to statically import this class (or one of its inner classes)
- * wherever the
- * constants are needed, to reduce verbosity.
+ * numerical or boolean constants. This class should not be used for any other
+ * purpose.
+ * All constants should be declared globally (i.e. public static). Do not put
+ * anything
+ * functional in this class.
  */
 public final class Constants {
+
+  // ========================= Enums ==========================================
+  public static enum OperatingMode {
+    REAL_WORLD,
+    SIMULATION,
+    LOG_REPLAY
+  }
 
   // ========================= CONSTANTS ======================================
   // ---------- Operation Modes ----------
@@ -27,7 +30,7 @@ public final class Constants {
   public static final NeutralModeValue WHEEL_BRAKE_MODE = NeutralModeValue.Brake;
   public static final boolean FIELD_RELATIVE = false;
 
-  // ---------- Aliance ----------
+  // ---------- Alliance ----------
   // This is the side of the field that the aumation path are made for.
   public static final Alliance DEFAULT_ALLIANCE = Alliance.Blue;
   public static final boolean FLIP_PATH_IF_ALLIANCE_IS_NOT_DEFAULT = true;
@@ -57,10 +60,45 @@ public final class Constants {
   public static final Rotation2d BACK_LEFT_ABSOLUTE_ENCODER_OFFSET = Rotation2d.fromRotations(-0.238525);
   public static final Rotation2d BACK_RIGHT_ABSOLUTE_ENCODER_OFFSET = Rotation2d.fromRotations(-0.000732);
 
+  // ---------- Game Piece Handling -------
+  public static final double INTAKE_FORWARD_VOLTAGE = 6.0;
+  public static final double INTAKE_REVERSE_VOLTAGE = -6.0;
+  public static final double FEEDER_FORWARD_VOLTAGE = 6.0; // TODO: Configure Value.
+  public static final double FEEDER_REVERSE_VOLTAGE = -FEEDER_FORWARD_VOLTAGE;
+  public static final double FLYWHEEL_REVERSE_VOLTAGE = -6.0; // TODO: Configure Value.
+
+  public static final double AIMER_KP = 0; // TODO
+  public static final double AIMER_KI = 0;
+  public static final double AIMER_KD = 0;
+  public static final double AIMER_ANGLE_OFFSET = 0; // TODO/calibrate
+
+  // ---------- Hardware Config --------
+  public static final boolean HAVE_FEEDER = false;
+  public static final boolean HAVE_INTAKE = false;
+  public static final boolean HAVE_AIMER = false;
+  public static final boolean HAVE_FLYWHEEL = false;
+  public static final boolean HAVE_COLOR_SENSOR = false;
+  public static final boolean HAVE_SHOOTER = HAVE_FEEDER && HAVE_INTAKE && HAVE_AIMER && HAVE_FLYWHEEL
+      && HAVE_COLOR_SENSOR;
+
   // ---------- Hardware Ids ----------
+  // --- Camera ---
+  public static final String CAMERA_1_NAME = "front"; // TODO: Set Value.
+  // --- Canivore ---
   public static final String CANIVORE_BUS_ID = "1559Canivore";
-  public static final String CAMERA_1_NAME = "front";
+  // --- Flywheel ---
+  public static final int INTAKE_L_ID = 20;
+  public static final int INTAKE_R_ID = 21;
+  public static final int FEEDER_L_ID = 22;
+  public static final int FEEDER_R_ID = 23;
+  public static final int AIMER_L_ID = 24;
+  public static final int AIMER_R_ID = 25;
+  public static final int FLYWHEEL_L_ID = 26;
+  public static final int FLYWHEEL_R_ID = 27;
+
+  // --- Gyro ---
   public static final int BASE_GYRO_ID = 12;
+  // --- Swerve Drives ---
   public static final int FRONT_LEFT_DRIVE_MOTOR_ID = 0;
   public static final int FRONT_LEFT_STEER_MOTOR_ID = 1;
   public static final int FRONT_LEFT_CANCODER_ID = 2;
@@ -74,24 +112,30 @@ public final class Constants {
   public static final int BACK_RIGHT_STEER_MOTOR_ID = 7;
   public static final int BACK_RIGHT_CANCODER_ID = 8;
 
+  // ---------- Digital IO Ports ----------
+  public static final int AIMER_ENCODER_PORT = 0;
+
   // ---------- Adressable LEDs ----------
   public static final int ADDRESSABLE_LED_PORT = 0;
   public static final int ADDRESSABLE_LED_LENGTH = 144;
-  // ---------- Adressable LEDs ----------
-  public static final int COLOR_SENSOR_V3_NO_OBJECT_PROXIMITY = 300;
 
-  // ========================= Enums ==========================================
-  public static enum OperatingMode {
-    REAL_WORLD,
-    SIMULATION,
-    LOG_REPLAY
-  }
+  // ---------- Color Sensor ----------
+  public static final int COLOR_SENSOR_PROXIMITY_THRESHOLD = 300; // TODO: Configure Value.
+  // ---------- Power Constants ----------
+  public static final int NEO_SPARK_BRUSHLESS_CURRENT_LIMIT = 24;
+  public static final int NEO_SPARK_BRUSHLESS_CURRENT_SECONDARY_LIMIT = 80;
 
   // ========================= Configuration Objects ========================
+  /**
+   * Allow 40A continuous, 80A momentary supply current. See: <a href=
+   * "https://api.ctr-electronics.com/phoenix6/release/java/com/ctre/phoenix6/configs/CurrentLimitsConfigs.html">CTR
+   * Electronics: CurrentLimitsConfigs</a>
+   * 
+   * @return A {@link CurrentLimitsConfigs} object with the default Current
+   *         limits.
+   */
   public static CurrentLimitsConfigs getDefaultCurrentLimitsConfig() {
-    // Allow 40A continuous, 80A momentary supply current.
-    // https://api.ctr-electronics.com/phoenix6/release/java/com/ctre/phoenix6/configs/CurrentLimitsConfigs.html
-    var limits = new CurrentLimitsConfigs();
+    CurrentLimitsConfigs limits = new CurrentLimitsConfigs();
     limits.SupplyCurrentLimitEnable = true;
     limits.SupplyCurrentLimit = 40.0;
     limits.SupplyCurrentThreshold = 80.0;

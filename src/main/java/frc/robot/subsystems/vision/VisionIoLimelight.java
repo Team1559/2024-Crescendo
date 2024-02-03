@@ -19,7 +19,7 @@ public class VisionIoLimelight implements VisionIo {
     }
 
     public void updateInputs(VisionInputs inputs) {
-        var data = LimelightHelpers.getBotPose(cameraName);
+        double[] data = LimelightHelpers.getBotPose(cameraName);
 
         if (data.length < 6) {
             inputs.havePose = false;

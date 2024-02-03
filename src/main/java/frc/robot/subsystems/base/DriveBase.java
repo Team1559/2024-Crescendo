@@ -19,10 +19,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.gyro.GyroIo;
 import frc.robot.subsystems.gyro.GyroIoInputsAutoLogged;
 import frc.robot.subsystems.swerve.IndexedSwerveModule;
@@ -50,7 +48,8 @@ public class DriveBase extends SubsystemBase {
     }
   }
 
-  private static final double DRIVE_BASE_RADIUS = Math.hypot(Constants.TRACK_WIDTH_X / 2.0, Constants.TRACK_WIDTH_Y / 2.0);
+  private static final double DRIVE_BASE_RADIUS = Math.hypot(Constants.TRACK_WIDTH_X / 2.0,
+      Constants.TRACK_WIDTH_Y / 2.0);
   private static final double MAX_ANGULAR_SPEED = Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND / DRIVE_BASE_RADIUS;
   private static final double ENCODER_STDDEV = 0.01;
 
@@ -82,14 +81,14 @@ public class DriveBase extends SubsystemBase {
 
     this.gyroIO = gyroIO;
     modules[WheelModuleIndex.FRONT_LEFT.value] = new IndexedSwerveModule(flModuleIO, WheelModuleIndex.FRONT_LEFT.value);
-    modules[WheelModuleIndex.FRONT_RIGHT.value] = new IndexedSwerveModule(frModuleIO,  WheelModuleIndex.FRONT_RIGHT.value);
+    modules[WheelModuleIndex.FRONT_RIGHT.value] = new IndexedSwerveModule(frModuleIO,
+        WheelModuleIndex.FRONT_RIGHT.value);
     modules[WheelModuleIndex.BACK_LEFT.value] = new IndexedSwerveModule(blModuleIO, WheelModuleIndex.BACK_LEFT.value);
     modules[WheelModuleIndex.BACK_RIGHT.value] = new IndexedSwerveModule(brModuleIO, WheelModuleIndex.BACK_RIGHT.value);
 
     modulePositions = new SwerveModulePosition[4];
     updateModulePositions();
 
-    // TODO: where should we source the initial pose?
     poseEstimator = new SwerveDrivePoseEstimator(
         kinematics, gyroInputs.yawPosition, modulePositions,
         new Pose2d(0, 0, gyroInputs.yawPosition),
@@ -102,7 +101,8 @@ public class DriveBase extends SubsystemBase {
         this::setPose,
         () -> kinematics.toChassisSpeeds(getModuleStates()),
         this::runVelocity,
-        new HolonomicPathFollowerConfig(Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND, DRIVE_BASE_RADIUS, new ReplanningConfig()),
+        new HolonomicPathFollowerConfig(Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND, DRIVE_BASE_RADIUS,
+            new ReplanningConfig()),
         // Flips path if aliance is on red side.
         () -> Constants.FLIP_PATH_IF_ALLIANCE_IS_NOT_DEFAULT && DriverStation.getAlliance().isPresent()
             && DriverStation.getAlliance().get() != Constants.DEFAULT_ALLIANCE,
@@ -117,7 +117,7 @@ public class DriveBase extends SubsystemBase {
   /** Returns the average drive velocity in radians/sec. */
   public double getCharacterizationVelocity() {
     double driveVelocityAverage = 0.0;
-    for (var module : modules) {
+    for (IndexedSwerveModule module : modules) {
       driveVelocityAverage += module.getCharacterizationVelocity();
     }
     return driveVelocityAverage / 4.0;
@@ -174,13 +174,13 @@ public class DriveBase extends SubsystemBase {
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
 
-    for (var module : modules) {
+    for (IndexedSwerveModule module : modules) {
       module.periodic();
     }
 
     // Stop moving when disabled
     if (DriverStation.isDisabled()) {
-      for (var module : modules) {
+      for (IndexedSwerveModule module : modules) {
         module.stop();
       }
     }

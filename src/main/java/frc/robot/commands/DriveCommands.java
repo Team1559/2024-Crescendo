@@ -160,4 +160,10 @@ public class DriveCommands {
 
     return spinCommand;
   }
+
+  // TODO: Create method to duplaicate turnToTargetCommand functionality using a SwerveControllerCommand.
+  //public static SwerveControllerCommand turnToTargetSwerveControllerCommand(DriveBase driveBase, Translation2d target, double speed)
+  
+  // TODO: Create method to duplaicate turnToTargetCommand functionality using a PIDCommand.
+  //public static PIDCommand  turnToTargetPidCommand(DriveBase driveBase, Translation2d target, double speed)
 }
