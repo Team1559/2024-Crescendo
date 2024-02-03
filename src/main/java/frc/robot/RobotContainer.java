@@ -4,7 +4,6 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -18,13 +17,13 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.LightsCommands;
 import frc.robot.subsystems.base.DriveBase;
 import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
 import frc.robot.subsystems.gyro.GyroIoPigeon2;
 import frc.robot.subsystems.gyro.GyroIoSimAndReplay;
 import frc.robot.subsystems.led.LightsSubsystem;
+import frc.robot.subsystems.shooter.Aimer;
 import frc.robot.subsystems.shooter.DualCanSparkMaxSubsystem;
 import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.swerve.SwerveModuleIoReplay;
@@ -52,6 +51,7 @@ public class RobotContainer {
   private final LoggedDashboardChooser<Command> autoChooser;
   private final DualCanSparkMaxSubsystem intake;
   private final DualCanSparkMaxSubsystem feeder;
+  private final Aimer aimer;
   private final Flywheel flywheel;
 
   /**
@@ -109,11 +109,17 @@ public class RobotContainer {
     } else {
       feeder = null;
     }
+    if (Constants.HAVE_AIMER) {
+      aimer = new Aimer();
+    } else {
+      aimer = null;
+    }
     if (Constants.HAVE_FLYWHEEL) {
       flywheel = new Flywheel();
     } else {
       flywheel = null;
     }
+
     // ========================= Autonomous =========================
     // ---------- Create Named Commands for use by Pathe Planner ----------
     NamedCommands.registerCommand("Spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));

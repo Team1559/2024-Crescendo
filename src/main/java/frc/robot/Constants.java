@@ -71,12 +71,15 @@ public final class Constants {
   public static final double AIMER_KI = 0;
   public static final double AIMER_KD = 0;
   public static final double AIMER_ANGLE_OFFSET = 0; // TODO/calibrate
+
   // ---------- Hardware Config --------
   public static final boolean HAVE_FEEDER = false;
   public static final boolean HAVE_INTAKE = false;
+  public static final boolean HAVE_AIMER = false;
   public static final boolean HAVE_FLYWHEEL = false;
   public static final boolean HAVE_COLOR_SENSOR = false;
-  public static final boolean HAVE_SHOOTER = HAVE_FEEDER && HAVE_INTAKE && HAVE_FLYWHEEL && HAVE_COLOR_SENSOR;
+  public static final boolean HAVE_SHOOTER = HAVE_FEEDER && HAVE_INTAKE && HAVE_AIMER && HAVE_FLYWHEEL
+      && HAVE_COLOR_SENSOR;
 
   // ---------- Hardware Ids ----------
   // --- Camera ---
