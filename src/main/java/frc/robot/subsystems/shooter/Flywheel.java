@@ -77,6 +77,14 @@ public class Flywheel extends SubsystemBase {
         flywheelRFaults = flywheelMotorR.getFaultField();
 
         // ---------- Optimize Bus Utilization ----------
+        BaseStatusSignal.setUpdateFrequencyForAll(
+                Constants.ADVANTAGE_DEFAULT_LOG_FREQUENCY,
+                flywheelLMotorVoltage, flywheelRMotorVoltage,
+                flywheelLSupplyCurrent, flywheelRSupplyCurrent,
+                flywheelLSupplyVoltage, flywheelRSupplyVoltage,
+                flywheelLVelocity, flywheelRVelocity,
+                flywheelLMotorTemp, flywheelRMotorTemp,
+                flywheelLFaults, flywheelRFaults);
         flywheelMotorL.optimizeBusUtilization();
         flywheelMotorR.optimizeBusUtilization();
     }
