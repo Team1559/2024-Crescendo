@@ -23,14 +23,18 @@ Contains constants that need to be updated per robot. i.e.
 
 # Steps to Fork for New Season
 ## On or After January 1st
-### Update this repo to support the newly released version of WPILib
+### Install Lastest Version of WPILib (VSCode) and Update Repo
 * Download and Install the latest version of WPILib
   * See: https://docs.wpilib.org/en/stable/docs/zero-to-robot/step-2/wpilib-setup.html
   * When prompted select "Download for this computer only"
 * Ensure that the following Extensions are installed:
-  * **TODO**
+  * [Extension Pack for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack)
+  * [Gradle Extension Pack](https://marketplace.visualstudio.com/items?itemName=richardwillis.vscode-gradle-extension-pack)
 * Ensure that the following Settings are set:
-  * **TODO**
+  * Editor: Format on Save
+    * `checked`
+  * Editor: Format on Save Mode
+    * `file`
 * Open this repo in the latest version the WPILib VS Code
   * When prompted, migrated the code to support the lates vbersion of WPILib
 * Update all Vendor Libraries
@@ -51,7 +55,7 @@ Contains constants that need to be updated per robot. i.e.
 * Update the firmware of everything on the CAN BUS
 
 ### Test the Swirve Drive
-At theis point everything should work. Test the robot and fix any issues. Push any fixed to the `main` branch.
+At this point everything should work. Test the robot and fix any issues. Push any fixed to the `main` branch.
 
 ## After the Game Announcement/Kickoff
 * **TODO**
