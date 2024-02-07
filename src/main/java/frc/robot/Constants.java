@@ -98,7 +98,6 @@ public final class Constants {
   public static final int AIMER_R_ID = 25;
   public static final int FLYWHEEL_L_ID = 26;
   public static final int FLYWHEEL_R_ID = 27;
-
   // --- Gyro ---
   public static final int BASE_GYRO_ID = 12;
   // --- Swerve Drives ---
@@ -124,6 +123,7 @@ public final class Constants {
 
   // ---------- Color Sensor ----------
   public static final int COLOR_SENSOR_PROXIMITY_THRESHOLD = 300; // TODO: Configure Value.
+
   // ---------- Power Constants ----------
   public static final int NEO_SPARK_BRUSHLESS_CURRENT_LIMIT = 24;
   public static final int NEO_SPARK_BRUSHLESS_CURRENT_SECONDARY_LIMIT = 80;

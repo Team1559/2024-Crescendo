@@ -24,7 +24,7 @@ import frc.robot.subsystems.base.DriveBase;
 import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
 import frc.robot.subsystems.gyro.GyroIoPigeon2;
 import frc.robot.subsystems.gyro.GyroIoSimAndReplay;
-import frc.robot.subsystems.led.LightsSubsystem;
+import frc.robot.subsystems.led.Leds;
 import frc.robot.subsystems.shooter.Aimer;
 import frc.robot.subsystems.shooter.ColorSensor;
 import frc.robot.subsystems.shooter.Feeder;
@@ -49,7 +49,7 @@ import frc.robot.subsystems.vision.VisionIoSimAndReplay;
 public class RobotContainer {
 
   private final CommandXboxController controller = new CommandXboxController(0);
-  private final LightsSubsystem lightsSubsystem = new LightsSubsystem();
+  private final Leds lightsSubsystem = new Leds();
   private final DriveBase driveBase;
   private final Vision vision;
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -102,6 +102,8 @@ public class RobotContainer {
       default:
         throw new RuntimeException("Unknown Run Mode: " + Constants.CURRENT_OPERATING_MODE);
     }
+
+    // ---------- Initialize Subsystems ----------
     if (Constants.HAVE_INTAKE) {
       intake = new Intake();
     } else {
@@ -128,8 +130,8 @@ public class RobotContainer {
       sensor = null;
     }
 
-    // ========================= Autonomous =========================
-
+    // ========================= Create Dual Purpose Commands
+    // =========================
     Command aimCommand = new ConditionalCommand(
         // Turn to Blue Speaker.
         DriveCommands.turnToTargetCommand(driveBase,
@@ -139,15 +141,18 @@ public class RobotContainer {
             new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42)), 4.5),
         () -> DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
     Command shootCommand;
-    // ---------- Create Named Commands for use by Pathe Planner ----------
-    NamedCommands.registerCommand("Spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
-    NamedCommands.registerCommand("StartIntake", new PrintCommand("StartIntake working"));
     if (Constants.HAVE_SHOOTER) {
       shootCommand = ShooterCommands.shootCommand(flywheel, feeder, lightsSubsystem, sensor);
     } else {
       shootCommand = LightsCommands.blinkCommand(lightsSubsystem, Color.kOrange);
     }
+
+    // ========================= Autonomous =========================
+    // ---------- Create Named Commands for use by Path Planner ----------
+    NamedCommands.registerCommand("Spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
+    NamedCommands.registerCommand("StartIntake", LightsCommands.blinkCommand(lightsSubsystem, Color.kPurple));
     NamedCommands.registerCommand("ShootNote", new SequentialCommandGroup(/* aimCommand, */ shootCommand));
+
     // ---------- Set-up Autonomous Choices ----------
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -167,25 +172,28 @@ public class RobotContainer {
         driveBase));
     controller.povLeft().whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(0, 1, 0)),
         driveBase));
-    // ---------- Configure Buttons for Tele-Op ----------
+
+    // ---------- Configure Buttons for SubSystem Actions ----------
     controller.a().onTrue(shootCommand);
+
     // ---------- Configure Light Buttons ----------
-    controller.a().and(controller.x()).onTrue(LightsCommands.setStaticPattern(lightsSubsystem,
+    controller.start().and(controller.a()).onTrue(lightsSubsystem.setStaticPatternCommand(
         new Color[] { Color.kDarkGreen, Color.kDarkGreen, Color.kBlack, Color.kBlack }));
-    controller.b().onTrue(LightsCommands.setColor(lightsSubsystem, Color.kRed));
-    controller.x().onTrue(LightsCommands.setDynamicPattern(lightsSubsystem,
-        new Color[] { Color.kBlue, Color.kBlue, Color.kBlue, Color.kDarkBlue, Color.kDarkBlue, Color.kDarkBlue },
-        true));
-    controller.y().onTrue(LightsCommands.setDynamicPattern(lightsSubsystem,
+    controller.start().and(controller.b()).onTrue(lightsSubsystem.setStaticColorCommand(Color.kRed));
+    controller.start().and(controller.x())
+        .onTrue(lightsSubsystem.setDynamicPatternCommand(
+            new Color[] { Color.kBlue, Color.kBlue, Color.kBlue, Color.kBlue, Color.kBlue,
+                Color.kNavy, Color.kNavy, Color.kNavy, Color.kNavy, Color.kNavy },
+            true));
+    controller.start().and(controller.y()).onTrue(lightsSubsystem.setDynamicPatternCommand(
         new Color[] {
-            Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack,
-            Color.kBlack, Color.kBlack, Color.kBlack,
-            Color.kOrange, Color.kOrange, Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack,
-            Color.kBlack, Color.kBlack, Color.kBlack },
+            Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kBlack,
+            Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack, Color.kBlack },
         false));
-    controller.a().and(controller.b()).onTrue(LightsCommands.setColor(lightsSubsystem, Color.kBlack));
-    controller.rightBumper().onTrue(LightsCommands.changeBrightness(lightsSubsystem, false));
-    controller.leftBumper().onTrue(LightsCommands.changeBrightness(lightsSubsystem, true));
+    controller.leftBumper().and(controller.rightBumper())
+        .onTrue(lightsSubsystem.setStaticColorCommand(Color.kBlack));
+    controller.leftBumper().onTrue(lightsSubsystem.changeBrightnessCommand(true));
+    controller.rightBumper().onTrue(lightsSubsystem.changeBrightnessCommand(false));
   }
 
   /**

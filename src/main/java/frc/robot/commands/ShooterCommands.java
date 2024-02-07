@@ -4,17 +4,20 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.subsystems.led.LightsSubsystem;
+import frc.robot.subsystems.led.Leds;
 import frc.robot.subsystems.shooter.ColorSensor;
 import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
 
 public class ShooterCommands {
+
   /** Makes Class non-instantiable */
   private ShooterCommands() {
   }
 
-  public static Command shootCommand(Flywheel flywheel, Feeder feeder, LightsSubsystem LEDs, ColorSensor sensor) {
+  // TODO: Add Reverse Commands. (Spins Flywheel & Feeder)
+
+  public static Command shootCommand(Flywheel flywheel, Feeder feeder, Leds LEDs, ColorSensor sensor) {
   //@formatter:off
     return new SequentialCommandGroup(
       spinUpFlywheelCommand(flywheel),
@@ -34,6 +37,6 @@ public class ShooterCommands {
       flywheel.startFlywheelCommand(), 
       new WaitCommand(0.5)
       );
-    }
     //@formatter:on
+  }
 }
