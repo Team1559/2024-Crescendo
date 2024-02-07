@@ -54,7 +54,7 @@ Contains constants that need to be updated per robot. i.e.
 * Scan for everything on the CAN BUS
 * Update the firmware of everything on the CAN BUS
 
-### Test the Swirve Drive
+### Test the Robot
 At this point everything should work. Test the robot and fix any issues. Push any fixed to the `main` branch.
 
 ## After the Game Announcement/Kickoff
