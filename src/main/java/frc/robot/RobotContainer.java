@@ -161,7 +161,7 @@ public class RobotContainer {
     driveBase.setDefaultCommand(DriveCommands.joystickDrive(driveBase,
         () -> -controller.getLeftY(),
         () -> -controller.getLeftX(),
-        () -> -controller.getRightX()));
+        () -> -controller.getLeftTriggerAxis() + controller.getRightTriggerAxis()));
 
     // ---------- Configure D-PAD for Tele-Op ----------
     controller.povUp().whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(1, 0, 0)),
@@ -177,9 +177,9 @@ public class RobotContainer {
     controller.a().onTrue(shootCommand);
 
     // ---------- Configure Light Buttons ----------
-    controller.start().and(controller.a()).onTrue(lightsSubsystem.setStaticPatternCommand(
-        new Color[] { Color.kDarkGreen, Color.kDarkGreen, Color.kBlack, Color.kBlack }));
-    controller.start().and(controller.b()).onTrue(lightsSubsystem.setStaticColorCommand(Color.kRed));
+    controller.start().and(controller.a()).onTrue(lightsSubsystem.setStaticColorCommand(Color.kDarkGreen));
+    controller.start().and(controller.b()).onTrue(lightsSubsystem.setStaticPatternCommand(
+        new Color[] { Color.kDarkRed, Color.kDarkRed, Color.kBlack, Color.kBlack }));
     controller.start().and(controller.x())
         .onTrue(lightsSubsystem.setDynamicPatternCommand(
             new Color[] { Color.kBlue, Color.kBlue, Color.kBlue, Color.kBlue, Color.kBlue,
@@ -190,10 +190,10 @@ public class RobotContainer {
             Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kBlack,
             Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack, Color.kBlack },
         false));
-    controller.leftBumper().and(controller.rightBumper())
-        .onTrue(lightsSubsystem.setStaticColorCommand(Color.kBlack));
     controller.leftBumper().onTrue(lightsSubsystem.changeBrightnessCommand(true));
     controller.rightBumper().onTrue(lightsSubsystem.changeBrightnessCommand(false));
+    controller.leftBumper().and(controller.rightBumper())
+        .onTrue(lightsSubsystem.setStaticColorCommand(Color.kBlack));
   }
 
   /**
