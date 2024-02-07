@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.led.LightsSubsystem;
@@ -22,19 +23,7 @@ public class LightsCommands {
    * @return
    */
   public static Command changeBrightness(LightsSubsystem subsystem, boolean isDimming) {
-    Command command = new Command() {
-      @Override
-      public void initialize() {
-        subsystem.changeBrightness(isDimming);
-      }
-
-      @Override
-      public boolean isFinished() {
-        return true;
-      }
-    };
-    command.addRequirements(subsystem);
-    return command;
+    return new InstantCommand(() -> subsystem.changeBrightness(isDimming), subsystem);
   }
 
   /**
@@ -141,7 +130,7 @@ public class LightsCommands {
    * @param color
    * @return
    */
-  public static Command blink(LightsSubsystem subsystem, Color color) {
+  public static Command blinkCommand(LightsSubsystem subsystem, Color color) {
     return new SequentialCommandGroup(setColor(subsystem, color), new WaitCommand(.5), setToAllianceColor(subsystem));
   }
 }

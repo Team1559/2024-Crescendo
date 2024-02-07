@@ -26,6 +26,7 @@ import frc.robot.subsystems.gyro.GyroIoPigeon2;
 import frc.robot.subsystems.gyro.GyroIoSimAndReplay;
 import frc.robot.subsystems.led.LightsSubsystem;
 import frc.robot.subsystems.shooter.Aimer;
+import frc.robot.subsystems.shooter.ColorSensor;
 import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.Intake;
@@ -56,6 +57,7 @@ public class RobotContainer {
   private final Feeder feeder;
   private final Aimer aimer;
   private final Flywheel flywheel;
+  private final ColorSensor sensor;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -120,6 +122,11 @@ public class RobotContainer {
     } else {
       flywheel = null;
     }
+    if (Constants.HAVE_COLOR_SENSOR) {
+      sensor = new ColorSensor();
+    } else {
+      sensor = null;
+    }
 
     // ========================= Autonomous =========================
 
@@ -136,11 +143,11 @@ public class RobotContainer {
     NamedCommands.registerCommand("Spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
     NamedCommands.registerCommand("StartIntake", new PrintCommand("StartIntake working"));
     if (Constants.HAVE_SHOOTER) {
-      shootCommand = ShooterCommands.shootCommand(flywheel, feeder, lightsSubsystem);
+      shootCommand = ShooterCommands.shootCommand(flywheel, feeder, lightsSubsystem, sensor);
     } else {
-      shootCommand = LightsCommands.blink(lightsSubsystem, Color.kOrange);
+      shootCommand = LightsCommands.blinkCommand(lightsSubsystem, Color.kOrange);
     }
-    NamedCommands.registerCommand("ShootNote", new SequentialCommandGroup(aimCommand, shootCommand));
+    NamedCommands.registerCommand("ShootNote", new SequentialCommandGroup(/* aimCommand, */ shootCommand));
     // ---------- Set-up Autonomous Choices ----------
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -160,9 +167,10 @@ public class RobotContainer {
         driveBase));
     controller.povLeft().whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(0, 1, 0)),
         driveBase));
-
+    // ---------- Configure Buttons for Tele-Op ----------
+    controller.a().onTrue(shootCommand);
     // ---------- Configure Light Buttons ----------
-    controller.a().onTrue(LightsCommands.setStaticPattern(lightsSubsystem,
+    controller.a().and(controller.x()).onTrue(LightsCommands.setStaticPattern(lightsSubsystem,
         new Color[] { Color.kDarkGreen, Color.kDarkGreen, Color.kBlack, Color.kBlack }));
     controller.b().onTrue(LightsCommands.setColor(lightsSubsystem, Color.kRed));
     controller.x().onTrue(LightsCommands.setDynamicPattern(lightsSubsystem,

@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.led.LightsSubsystem;
+import frc.robot.subsystems.shooter.ColorSensor;
 import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
 
@@ -13,20 +14,26 @@ public class ShooterCommands {
   private ShooterCommands() {
   }
 
-  // TODO
-  public static Command shootCommand(Flywheel flywheel, Feeder feeder, LightsSubsystem LEDs) {
+  public static Command shootCommand(Flywheel flywheel, Feeder feeder, LightsSubsystem LEDs, ColorSensor sensor) {
+  //@formatter:off
     return new SequentialCommandGroup(
-        flywheel.startFlywheelCommand(12), new WaitCommand(0.5),
-        feeder.startCommand(), LightsCommands.setColor(LEDs, Color.kDarkViolet),
-        new WaitCommand(1), flywheel.stopFlywheelCommand(), feeder.stopCommand(),
-        LightsCommands.setToAllianceColor(LEDs)
-
-    // -Turn on FLyhwheels first.
-    // -Give wheels time to come up to speed.
-    // -Turn on feed motor so that the note gets pushed forward into the flywheel.
-    // *Start LED pattern for launch.*
-    // -Give time for note to launch.
-    // -After note launches, turn off the motors and LEDs.
+      spinUpFlywheelCommand(flywheel),
+      feeder.startCommand(),
+      LightsCommands.blinkCommand(LEDs, Color.kOrange),
+      sensor.waitForNoObjectCommand(),
+      new WaitCommand(.25),
+      feeder.stopCommand(),
+      flywheel.stopFlywheelCommand()
     );
+    //@formatter:on
   }
+
+  public static Command spinUpFlywheelCommand(Flywheel flywheel) {
+    //@formatter:off
+    return new SequentialCommandGroup(
+      flywheel.startFlywheelCommand(), 
+      new WaitCommand(0.5)
+      );
+    }
+    //@formatter:on
 }
