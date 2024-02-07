@@ -19,9 +19,9 @@ public class VisionIoLimelight implements VisionIo {
     }
 
     public void updateInputs(VisionInputs inputs) {
-        double[] data = LimelightHelpers.getBotPose(cameraName);
+        double[] data = LimelightHelpers.getBotPose_wpiBlue(cameraName);
 
-        if (data.length < 6) {
+        if (data.length < 6 || (data[0] == 0 && data[1] == 0)) {
             inputs.havePose = false;
             inputs.pose = new Pose2d();
             inputs.timestamp = 0;

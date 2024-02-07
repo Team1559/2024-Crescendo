@@ -70,7 +70,7 @@ public class RobotContainer {
             new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_RIGHT),
             new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_LEFT),
             new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
-        vision = new Vision(driveBase.getPoseEstimator(), new VisionIoLimelight(Constants.CAMERA_1_NAME));
+        vision = new Vision(driveBase.getPoseEstimator(), new VisionIoLimelight(Constants.SHOOTER_CAMERA_NAME));
         break;
 
       case SIMULATION:
