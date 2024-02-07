@@ -8,7 +8,6 @@ import org.littletonrobotics.junction.Logger;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkBase.IdleMode;
 
-import edu.wpi.first.networktables.PubSub;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -45,7 +44,7 @@ public class DualCanSparkMaxSubsystem extends SubsystemBase {
      * @param motorRId Right motor ID
      * @param voltage  Voltage for both fowards and reverse voltage
      */
-    public DualCanSparkMaxSubsystem(String name, int motorLId, int motorRId, double voltage) {
+    protected DualCanSparkMaxSubsystem(String name, int motorLId, int motorRId, double voltage) {
         this(name, motorLId, motorRId, voltage, voltage);
     }
 
@@ -58,7 +57,7 @@ public class DualCanSparkMaxSubsystem extends SubsystemBase {
      * @param fowardsVoltage Voltage for fowards movement
      * @param reverseVoltage Voltage for reverse movement
      */
-    public DualCanSparkMaxSubsystem(String name, int motorLId, int motorRId, double fowardsVoltage,
+    protected DualCanSparkMaxSubsystem(String name, int motorLId, int motorRId, double fowardsVoltage,
             double reverseVoltage) {
         super(name);
         motorL = new CANSparkMax(motorLId, MotorType.kBrushless);
