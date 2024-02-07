@@ -96,6 +96,7 @@ public class Flywheel extends SubsystemBase {
         // Set Voltages
         flywheelMotorL.setControl(new VoltageOut(currentVoltage));
         flywheelMotorR.setControl(new VoltageOut(currentVoltage));
+
         // Log inputs
         updateInputs();
         Logger.processInputs("Shooter/Flywheel", inputs);

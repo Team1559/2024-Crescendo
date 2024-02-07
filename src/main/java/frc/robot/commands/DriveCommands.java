@@ -91,10 +91,10 @@ public class DriveCommands {
       @Override
       public void initialize() {
         startingRotation = driveBase.getRotation();
-        System.out.println("Rotation start: " + startingRotation);
+        // System.out.println("Rotation start: " + startingRotation);
         targetRotation = startingRotation.plus(rotationAmount);
-        System.out.println("Rotation amount: " + rotationAmount);
-        System.out.println("Target Rotation: " + targetRotation);
+        // System.out.println("Rotation amount: " + rotationAmount);
+        // System.out.println("Target Rotation: " + targetRotation);
       }
 
       @Override
@@ -103,9 +103,9 @@ public class DriveCommands {
         double delta = targetRotation.minus(current).getDegrees();
         double rampOmega = Math.max(Math.min(Math.abs(delta) / 50, 1.0), .01);
         double omega = Math.copySign(speed, delta) * rampOmega;
-        Logger.recordOutput("TurnToSpeaker/delta", delta);
-        Logger.recordOutput("TurnToSpeaker/rampOmega", rampOmega);
-        Logger.recordOutput("TurnToSpeaker/omega", omega);
+        Logger.recordOutput("Spin/delta", delta);
+        Logger.recordOutput("Spin/rampOmega", rampOmega);
+        Logger.recordOutput("Spin/omega", omega);
         driveBase.runVelocity(new ChassisSpeeds(0, 0, omega));
       }
 
