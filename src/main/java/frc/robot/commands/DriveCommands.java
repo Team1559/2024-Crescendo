@@ -1,10 +1,12 @@
 package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -171,4 +173,57 @@ public class DriveCommands {
   // PIDCommand.
   // public static PIDCommand turnToTargetPidCommand(DriveBase driveBase,
   // Translation2d target, double speed)
+  public static Command aimingDrive(DriveBase drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      Supplier<Translation2d> target) {
+    Command aimingDrive = new Command() {
+      PIDController pid = new PIDController(Constants.MAX_ANGULAR_SPEED / 50, 0, 0);
+
+      @Override
+      public void initialize() {
+        pid.setSetpoint(0);
+        pid.setTolerance(1);
+        pid.enableContinuousInput(-180, 180);
+      }
+
+      @Override
+      public void execute() {
+        // Apply deadband
+        double linearMagnitude = MathUtil.applyDeadband(
+            Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
+            Constants.JOYSTICK_DEADBAND);
+        Rotation2d linearDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+        double omega = MathUtil.clamp(
+            pid.calculate(drive.getRotationToTarget(target.get()).plus(Rotation2d.fromDegrees(180)).getDegrees()),
+            -.1, .1);
+        // Square values
+        linearMagnitude = linearMagnitude * linearMagnitude;
+
+        // Calcaulate new linear velocity
+        Translation2d linearVelocity = new Pose2d(new Translation2d(), linearDirection)
+            .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
+            .getTranslation();
+
+        if (Constants.FIELD_RELATIVE) {
+          // Convert to field relative speeds & send command
+          drive.runVelocity(
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                  omega * drive.getMaxAngularSpeedRadPerSec(),
+                  drive.getRotation()));
+        } else {
+          drive.runVelocity(
+              new ChassisSpeeds(
+                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                  omega * drive.getMaxAngularSpeedRadPerSec()));
+        }
+
+      }
+    };
+    aimingDrive.addRequirements(drive);
+    return aimingDrive;
+  }
 }

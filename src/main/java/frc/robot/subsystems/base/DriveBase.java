@@ -48,9 +48,6 @@ public class DriveBase extends SubsystemBase {
     }
   }
 
-  private static final double DRIVE_BASE_RADIUS = Math.hypot(Constants.TRACK_WIDTH_X / 2.0,
-      Constants.TRACK_WIDTH_Y / 2.0);
-  private static final double MAX_ANGULAR_SPEED = Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND / DRIVE_BASE_RADIUS;
   private static final double ENCODER_STDDEV = 0.01;
 
   /** Returns an array of module translations. */
@@ -101,7 +98,7 @@ public class DriveBase extends SubsystemBase {
         this::setPose,
         () -> kinematics.toChassisSpeeds(getModuleStates()),
         this::runVelocity,
-        new HolonomicPathFollowerConfig(Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND, DRIVE_BASE_RADIUS,
+        new HolonomicPathFollowerConfig(Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND, Constants.DRIVE_BASE_RADIUS,
             new ReplanningConfig()),
         // Flips path if aliance is on red side.
         () -> Constants.FLIP_PATH_IF_ALLIANCE_IS_NOT_DEFAULT && DriverStation.getAlliance().isPresent()
@@ -125,7 +122,7 @@ public class DriveBase extends SubsystemBase {
 
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
-    return MAX_ANGULAR_SPEED;
+    return Constants.MAX_ANGULAR_SPEED;
   }
 
   /** Returns the maximum linear speed in meters per sec. */
@@ -161,11 +158,20 @@ public class DriveBase extends SubsystemBase {
     return poseEstimator.getEstimatedPosition().getRotation();
   }
 
+  /**
+   * This gets the rotation from the current position to the target position, and
+   * it's trying to point the front of the robot to the target.
+   * 
+   * @param target
+   * @return
+   */
   public Rotation2d getRotationToTarget(Translation2d target) {
     Pose2d currentPose = getPose();
     Translation2d deltaTranslation = target.minus(currentPose.getTranslation());
     Rotation2d deltaAngle = deltaTranslation.getAngle();
-    return deltaAngle.minus(currentPose.getRotation()).minus(Rotation2d.fromDegrees(180));//Subtract 180 to point back of robot rather than the front at the Speaker
+    return deltaAngle.minus(currentPose.getRotation()).minus(Rotation2d.fromDegrees(180));// Subtract 180 to point back
+                                                                                          // of robot rather than the
+                                                                                          // front at the Speaker
   }
 
   @Override

@@ -137,10 +137,10 @@ public class RobotContainer {
     Command aimCommand = new ConditionalCommand(
         // Turn to Blue Speaker.
         DriveCommands.turnToTargetCommand(driveBase,
-            new Translation2d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42)), 4.5),
+            Constants.BLUE_SPEAKER_LOCATION, 4.5),
         // Turn to Red Speaker.
         DriveCommands.turnToTargetCommand(driveBase,
-            new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42)), 4.5),
+            Constants.RED_SPEAKER_LOCATION, 4.5),
         () -> DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
     Command autoShootCommand;
     if (Constants.HAVE_SHOOTER) {
@@ -158,7 +158,7 @@ public class RobotContainer {
     driveBase.setDefaultCommand(DriveCommands.joystickDrive(driveBase,
         () -> -controller.getLeftY(),
         () -> -controller.getLeftX(),
-        () -> -controller.getLeftTriggerAxis() + controller.getRightTriggerAxis()));
+        () -> controller.getLeftTriggerAxis() - controller.getRightTriggerAxis()));
 
     // ---------- Configure D-PAD for Tele-Op ----------
     controller.povUp().whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(1, 0, 0)),
@@ -178,6 +178,10 @@ public class RobotContainer {
       teleOpShootCommand = LightsCommands.blinkCommand(lightsSubsystem, Color.kOrange);
     }
     controller.a().onTrue(teleOpShootCommand);
+    controller.b().whileTrue(DriveCommands.aimingDrive(driveBase,
+        () -> -controller.getLeftY(),
+        () -> -controller.getLeftX(),
+        Constants.SPEAKER_LOCATION_SUPPLIER));
 
     // ---------- Configure Light Buttons ----------
     controller.start().and(controller.a()).onTrue(lightsSubsystem.setStaticColorCommand(Color.kDarkGreen));
@@ -186,7 +190,7 @@ public class RobotContainer {
     controller.start().and(controller.x())
         .onTrue(lightsSubsystem.setDynamicPatternCommand(
             new Color[] { Color.kBlue, Color.kBlue, Color.kBlue, Color.kBlue, Color.kBlue,
-                Color.kNavy, Color.kNavy, Color.kNavy, Color.kNavy, Color.kNavy },
+                Color.kViolet, Color.kViolet, Color.kViolet, Color.kViolet, Color.kViolet },
             true));
     controller.start().and(controller.y()).onTrue(lightsSubsystem.setDynamicPatternCommand(
         new Color[] {
