@@ -129,8 +129,11 @@ public class RobotContainer {
       sensor = null;
     }
 
-    // ========================= Create Dual Purpose Commands
-    // =========================
+    // ========================= Autonomous =========================
+    // ---------- Create Named Commands for use by Path Planner ----------
+    NamedCommands.registerCommand("Spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
+    NamedCommands.registerCommand("StartIntake", LightsCommands.blinkCommand(lightsSubsystem, Color.kPurple));
+
     Command aimCommand = new ConditionalCommand(
         // Turn to Blue Speaker.
         DriveCommands.turnToTargetCommand(driveBase,
@@ -139,20 +142,12 @@ public class RobotContainer {
         DriveCommands.turnToTargetCommand(driveBase,
             new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42)), 4.5),
         () -> DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
-    Command teleOpShootCommand;
     Command autoShootCommand;
     if (Constants.HAVE_SHOOTER) {
-      teleOpShootCommand = ShooterCommands.shootCommand(flywheel, feeder, lightsSubsystem, sensor);
       autoShootCommand = ShooterCommands.shootCommand(flywheel, feeder, lightsSubsystem, sensor);
     } else {
-      teleOpShootCommand = LightsCommands.blinkCommand(lightsSubsystem, Color.kOrange);
       autoShootCommand = LightsCommands.blinkCommand(lightsSubsystem, Color.kOrange);
     }
-
-    // ========================= Autonomous =========================
-    // ---------- Create Named Commands for use by Path Planner ----------
-    NamedCommands.registerCommand("Spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
-    NamedCommands.registerCommand("StartIntake", LightsCommands.blinkCommand(lightsSubsystem, Color.kPurple));
     NamedCommands.registerCommand("ShootNote", new SequentialCommandGroup(aimCommand, autoShootCommand));
 
     // ---------- Set-up Autonomous Choices ----------
@@ -176,6 +171,12 @@ public class RobotContainer {
         driveBase));
 
     // ---------- Configure Buttons for SubSystem Actions ----------
+    Command teleOpShootCommand;
+    if (Constants.HAVE_SHOOTER) {
+      teleOpShootCommand = ShooterCommands.shootCommand(flywheel, feeder, lightsSubsystem, sensor);
+    } else {
+      teleOpShootCommand = LightsCommands.blinkCommand(lightsSubsystem, Color.kOrange);
+    }
     controller.a().onTrue(teleOpShootCommand);
 
     // ---------- Configure Light Buttons ----------
