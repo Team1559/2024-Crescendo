@@ -18,7 +18,8 @@ import frc.robot.subsystems.base.DriveBase;
 public class DriveCommands {
 
   /** Makes this class non-instantiable. */
-  private DriveCommands() {}
+  private DriveCommands() {
+  }
 
   /**
    * Field relative drive command using two joysticks (controlling linear and
@@ -90,22 +91,21 @@ public class DriveCommands {
       @Override
       public void initialize() {
         startingRotation = driveBase.getRotation();
-        System.out.println("Rotation start: " + startingRotation);
+        // System.out.println("Rotation start: " + startingRotation);
         targetRotation = startingRotation.plus(rotationAmount);
-        System.out.println("Rotation amount: " + rotationAmount);
-        System.out.println("Target Rotation: " + targetRotation);
+        // System.out.println("Rotation amount: " + rotationAmount);
+        // System.out.println("Target Rotation: " + targetRotation);
       }
-      public static final  double kp = 20.0;
 
       @Override
       public void execute() {
         Rotation2d current = driveBase.getRotation();
         double delta = targetRotation.minus(current).getDegrees();
-        double rampOmega = Math.max(Math.min(Math.abs(delta)/50, 1.0), .01);
+        double rampOmega = Math.max(Math.min(Math.abs(delta) / 50, 1.0), .01);
         double omega = Math.copySign(speed, delta) * rampOmega;
-        Logger.recordOutput("TurnToSpeaker/delta", delta);
-        Logger.recordOutput("TurnToSpeaker/rampOmega", rampOmega);
-        Logger.recordOutput("TurnToSpeaker/omega", omega);
+        Logger.recordOutput("Spin/delta", delta);
+        Logger.recordOutput("Spin/rampOmega", rampOmega);
+        Logger.recordOutput("Spin/omega", omega);
         driveBase.runVelocity(new ChassisSpeeds(0, 0, omega));
       }
 
@@ -131,7 +131,7 @@ public class DriveCommands {
 
     Command spinCommand = new Command() {
 
-    private Command spinCommand;
+      private Command spinCommand;
 
       @Override
       public void initialize() {
@@ -161,9 +161,14 @@ public class DriveCommands {
     return spinCommand;
   }
 
-  // TODO: Create method to duplaicate turnToTargetCommand functionality using a SwerveControllerCommand.
-  //public static SwerveControllerCommand turnToTargetSwerveControllerCommand(DriveBase driveBase, Translation2d target, double speed)
-  
-  // TODO: Create method to duplaicate turnToTargetCommand functionality using a PIDCommand.
-  //public static PIDCommand  turnToTargetPidCommand(DriveBase driveBase, Translation2d target, double speed)
+  // TODO: Create method to duplaicate turnToTargetCommand functionality using a
+  // SwerveControllerCommand.
+  // public static SwerveControllerCommand
+  // turnToTargetSwerveControllerCommand(DriveBase driveBase, Translation2d
+  // target, double speed)
+
+  // TODO: Create method to duplaicate turnToTargetCommand functionality using a
+  // PIDCommand.
+  // public static PIDCommand turnToTargetPidCommand(DriveBase driveBase,
+  // Translation2d target, double speed)
 }

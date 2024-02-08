@@ -3,10 +3,12 @@ package frc.robot.subsystems.led;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class LightsSubsystem extends SubsystemBase {
+public class Leds extends SubsystemBase {
 
     // ========================= Class Level =========================
     private static int dynamicColorCounter = 0;
@@ -56,13 +58,23 @@ public class LightsSubsystem extends SubsystemBase {
      * Initialize the {@link AddressableLED}, {@link AddresableLEDBuffer}, and
      * starts LEDs.
      */
-    public LightsSubsystem() {
+    public Leds() {
         addressableLED = new AddressableLED(Constants.ADDRESSABLE_LED_PORT);
         addressableLED.setLength(Constants.ADDRESSABLE_LED_LENGTH);
         ledBuffer = new AddressableLEDBuffer(Constants.ADDRESSABLE_LED_LENGTH);
         addressableLED.start();
     }
 
+    @Override
+    public void periodic() {
+        if (dynamicPattern != null) {
+            setStaticPatternHelper(dynamicPattern);
+            dynamicColorCounter++;
+            dynamicPattern = scrollPattern(dynamicPattern, isDynamicPatternFowards, 3);
+        }
+    }
+
+    // ========================= Functions =========================
     /**
      * Increase or decreases the brightness of the colors currently set to the
      * {@link AddressableLEDBuffer} by 15%.
@@ -70,7 +82,7 @@ public class LightsSubsystem extends SubsystemBase {
      * @param isDimming Decreases brightness when {@code true} and increases when
      *                  {@code false}.
      */
-    public void changeBrightness(boolean isDimming) {
+    public void changeBrightness(boolean isDimming) { // TODO: Get working for scrolling lights.
         double factor = isDimming ? .85 : 1.15;
         for (int i = 0; i < ledBuffer.getLength(); i++) {
             Color currentColor = ledBuffer.getLED(i);
@@ -85,15 +97,6 @@ public class LightsSubsystem extends SubsystemBase {
      */
     private void disableDynamicPattern() {
         dynamicPattern = null;
-    }
-
-    @Override
-    public void periodic() {
-        if (dynamicPattern != null) {
-            setStaticPatternHelper(dynamicPattern);
-            dynamicColorCounter++;
-            dynamicPattern = scrollPattern(dynamicPattern, isDynamicPatternFowards, 3);
-        }
     }
 
     /**
@@ -165,4 +168,51 @@ public class LightsSubsystem extends SubsystemBase {
         disableDynamicPattern();
         setStaticColor(Color.kBlack);
     }
+
+    // ========================= Commands =========================
+    /**
+     * Dims/Brightens the lights
+     * 
+     * @param isDimming are lights being dimmed or brightened
+     * @return
+     */
+    public Command changeBrightnessCommand(boolean isDimming) {
+        return new InstantCommand(() -> changeBrightness(isDimming), this);
+    }
+
+    // TODO: Create disableDynamicPatternCommand method.
+
+    /**
+     * Set the lights to a scrolling pattern
+     * 
+     * @param pattern                 Pattern the LEDs are being set to
+     * @param isDynamicPatternFowards is the pattern scrolling fowards or backwards
+     * @return
+     */
+    public Command setDynamicPatternCommand(Color[] pattern, boolean isDynamicPatternFowards) {
+        return new InstantCommand(() -> setDynamicPattern(pattern, isDynamicPatternFowards), this);
+    }
+
+    /**
+     * Set color of the LEDs
+     * 
+     * @param color Color LEDs are being set to
+     * @return
+     */
+    public Command setStaticColorCommand(Color color) {
+        return new InstantCommand(() -> setStaticColor(color), this);
+    }
+
+    /**
+     * Sets a static patttern to the LEDs
+     * 
+     * @param subsystem LEDs being set
+     * @param pattern   Pattern being set to the LEDs
+     * @return
+     */
+    public Command setStaticPatternCommand(Color[] pattern) {
+        return new InstantCommand(() -> setStaticPattern(pattern), this);
+    }
+
+    // TODO: Create turnOffCommand method.
 }

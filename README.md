@@ -1,22 +1,40 @@
 # Constants Class
-
-Physcial things declared and tuning and ID's with firmware are all identified. 
+Contains constants that need to be updated per robot. i.e.
+* Capability Flags
+* Hardware Ids
+* Constraints and Tuning Parameters
 
 
 # Tele-Op
-
-Using the controller we made the joystick go forward, backward, left and right, along with being able to spin in place to the right or left. Using the D-Pad the robot can precisely move forward, backward and left and right. Everything is correct and well caliberatted. Right joystick is spin in place and left joystick is forward, backward, left and right. 
+* **Driving:** Left Joystick
+  * D-Pad isolates directional commands for tuning
+* **Spinning:** Triggers
+* **LEDs:**
+  * [Start + A] = Solid $\color{green}Green$
+  * [Start + B] = Solid $\color{red}Red$ and Black pattern
+  * [Start + X] = $\color{lightblue}Light \space Blue$ $\color{blue}Dark \space Blue$ pattern moving in one direction
+  * [Start + Y] = $\color{yellow}Yellow$ and Black pattern moving in the other direction
+  * [Left Bumber] = _Decrease Brightness_
+  * [Right Bumber] = **Increase Brightness**
+  * [Left + Right Bumber] = Turn Off LEDs
 
 # Autonomous
-
-The robot can move in a good sqaure, and it can be used for testing your callibrations. The name of this routine is Sqare Auto. Each side of the square is 1 meter.
+* **TODO**
 
 # Steps to Fork for New Season
 ## On or After January 1st
-### Update this repo to support the newly released version of WPILib
+### Install Lastest Version of WPILib (VSCode) and Update Repo
 * Download and Install the latest version of WPILib
   * See: https://docs.wpilib.org/en/stable/docs/zero-to-robot/step-2/wpilib-setup.html
   * When prompted select "Download for this computer only"
+* Ensure that the following Extensions are installed:
+  * [Extension Pack for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack)
+  * [Gradle Extension Pack](https://marketplace.visualstudio.com/items?itemName=richardwillis.vscode-gradle-extension-pack)
+* Ensure that the following Settings are set:
+  * Editor: Format on Save
+    * `checked`
+  * Editor: Format on Save Mode
+    * `file`
 * Open this repo in the latest version the WPILib VS Code
   * When prompted, migrated the code to support the lates vbersion of WPILib
 * Update all Vendor Libraries
@@ -36,8 +54,8 @@ The robot can move in a good sqaure, and it can be used for testing your callibr
 * Scan for everything on the CAN BUS
 * Update the firmware of everything on the CAN BUS
 
-### Test the Swirve Drive
-At theis point everything should work. Test the robot and fix any issues. Push any fixed to the `main` branch.
+### Test the Robot
+At this point everything should work. Test the robot and fix any issues. Push any fixed to the `main` branch.
 
 ## After the Game Announcement/Kickoff
-* TODO
+* **TODO**

@@ -14,18 +14,21 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.LightsCommands;
+import frc.robot.commands.ShooterCommands;
 import frc.robot.subsystems.base.DriveBase;
 import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
 import frc.robot.subsystems.gyro.GyroIoPigeon2;
 import frc.robot.subsystems.gyro.GyroIoSimAndReplay;
-import frc.robot.subsystems.led.LightsSubsystem;
+import frc.robot.subsystems.led.Leds;
 import frc.robot.subsystems.shooter.Aimer;
-import frc.robot.subsystems.shooter.DualCanSparkMaxSubsystem;
+import frc.robot.subsystems.shooter.ColorSensor;
+import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
+import frc.robot.subsystems.shooter.Intake;
 import frc.robot.subsystems.swerve.SwerveModuleIoReplay;
 import frc.robot.subsystems.swerve.SwerveModuleIoSim;
 import frc.robot.subsystems.swerve.SwerveModuleIoTalonFx;
@@ -45,14 +48,15 @@ import frc.robot.subsystems.vision.VisionIoSimAndReplay;
 public class RobotContainer {
 
   private final CommandXboxController controller = new CommandXboxController(0);
-  private final LightsSubsystem lightsSubsystem = new LightsSubsystem();
+  private final Leds lightsSubsystem = new Leds();
   private final DriveBase driveBase;
   private final Vision vision;
   private final LoggedDashboardChooser<Command> autoChooser;
-  private final DualCanSparkMaxSubsystem intake;
-  private final DualCanSparkMaxSubsystem feeder;
+  private final Intake intake;
+  private final Feeder feeder;
   private final Aimer aimer;
   private final Flywheel flywheel;
+  private final ColorSensor sensor;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -97,15 +101,15 @@ public class RobotContainer {
       default:
         throw new RuntimeException("Unknown Run Mode: " + Constants.CURRENT_OPERATING_MODE);
     }
+
+    // ---------- Initialize Subsystems ----------
     if (Constants.HAVE_INTAKE) {
-      intake = new DualCanSparkMaxSubsystem("Intake", Constants.INTAKE_L_ID, Constants.INTAKE_R_ID,
-          Constants.INTAKE_FORWARD_VOLTAGE, Constants.INTAKE_REVERSE_VOLTAGE);
+      intake = new Intake();
     } else {
       intake = null;
     }
     if (Constants.HAVE_FEEDER) {
-      feeder = new DualCanSparkMaxSubsystem("Feeder", Constants.FEEDER_L_ID, Constants.FEEDER_R_ID,
-          Constants.FEEDER_FORWARD_VOLTAGE, Constants.FEEDER_REVERSE_VOLTAGE);
+      feeder = new Feeder();
     } else {
       feeder = null;
     }
@@ -119,19 +123,32 @@ public class RobotContainer {
     } else {
       flywheel = null;
     }
+    if (Constants.HAVE_COLOR_SENSOR) {
+      sensor = new ColorSensor();
+    } else {
+      sensor = null;
+    }
 
     // ========================= Autonomous =========================
-    // ---------- Create Named Commands for use by Pathe Planner ----------
+    // ---------- Create Named Commands for use by Path Planner ----------
     NamedCommands.registerCommand("Spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
-    NamedCommands.registerCommand("StartIntake", new PrintCommand("StartIntake working"));
-    NamedCommands.registerCommand("Turn to Speaker", new ConditionalCommand(
+    NamedCommands.registerCommand("StartIntake", LightsCommands.blinkCommand(lightsSubsystem, Color.kPurple));
+
+    Command aimCommand = new ConditionalCommand(
         // Turn to Blue Speaker.
         DriveCommands.turnToTargetCommand(driveBase,
             new Translation2d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42)), 4.5),
         // Turn to Red Speaker.
         DriveCommands.turnToTargetCommand(driveBase,
             new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42)), 4.5),
-        () -> DriverStation.getAlliance().get() == DriverStation.Alliance.Blue));
+        () -> DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
+    Command autoShootCommand;
+    if (Constants.HAVE_SHOOTER) {
+      autoShootCommand = ShooterCommands.shootCommand(flywheel, feeder, lightsSubsystem, sensor);
+    } else {
+      autoShootCommand = LightsCommands.blinkCommand(lightsSubsystem, Color.kOrange);
+    }
+    NamedCommands.registerCommand("ShootNote", new SequentialCommandGroup(aimCommand, autoShootCommand));
 
     // ---------- Set-up Autonomous Choices ----------
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -141,7 +158,7 @@ public class RobotContainer {
     driveBase.setDefaultCommand(DriveCommands.joystickDrive(driveBase,
         () -> -controller.getLeftY(),
         () -> -controller.getLeftX(),
-        () -> -controller.getRightX()));
+        () -> -controller.getLeftTriggerAxis() + controller.getRightTriggerAxis()));
 
     // ---------- Configure D-PAD for Tele-Op ----------
     controller.povUp().whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(1, 0, 0)),
@@ -153,23 +170,33 @@ public class RobotContainer {
     controller.povLeft().whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(0, 1, 0)),
         driveBase));
 
+    // ---------- Configure Buttons for SubSystem Actions ----------
+    Command teleOpShootCommand;
+    if (Constants.HAVE_SHOOTER) {
+      teleOpShootCommand = ShooterCommands.shootCommand(flywheel, feeder, lightsSubsystem, sensor);
+    } else {
+      teleOpShootCommand = LightsCommands.blinkCommand(lightsSubsystem, Color.kOrange);
+    }
+    controller.a().onTrue(teleOpShootCommand);
+
     // ---------- Configure Light Buttons ----------
-    controller.a().onTrue(LightsCommands.setStaticPattern(lightsSubsystem,
-        new Color[] { Color.kDarkGreen, Color.kDarkGreen, Color.kBlack, Color.kBlack }));
-    controller.b().onTrue(LightsCommands.setColor(lightsSubsystem, Color.kRed));
-    controller.x().onTrue(LightsCommands.setDynamicPattern(lightsSubsystem,
-        new Color[] { Color.kBlue, Color.kBlue, Color.kBlue, Color.kDarkBlue, Color.kDarkBlue, Color.kDarkBlue },
-        true));
-    controller.y().onTrue(LightsCommands.setDynamicPattern(lightsSubsystem,
+    controller.start().and(controller.a()).onTrue(lightsSubsystem.setStaticColorCommand(Color.kDarkGreen));
+    controller.start().and(controller.b()).onTrue(lightsSubsystem.setStaticPatternCommand(
+        new Color[] { Color.kDarkRed, Color.kDarkRed, Color.kBlack, Color.kBlack }));
+    controller.start().and(controller.x())
+        .onTrue(lightsSubsystem.setDynamicPatternCommand(
+            new Color[] { Color.kBlue, Color.kBlue, Color.kBlue, Color.kBlue, Color.kBlue,
+                Color.kNavy, Color.kNavy, Color.kNavy, Color.kNavy, Color.kNavy },
+            true));
+    controller.start().and(controller.y()).onTrue(lightsSubsystem.setDynamicPatternCommand(
         new Color[] {
-            Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack,
-            Color.kBlack, Color.kBlack, Color.kBlack,
-            Color.kOrange, Color.kOrange, Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack,
-            Color.kBlack, Color.kBlack, Color.kBlack },
+            Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kBlack,
+            Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack, Color.kBlack },
         false));
-    controller.a().and(controller.b()).onTrue(LightsCommands.setColor(lightsSubsystem, Color.kBlack));
-    controller.rightBumper().onTrue(LightsCommands.changeBrightness(lightsSubsystem, false));
-    controller.leftBumper().onTrue(LightsCommands.changeBrightness(lightsSubsystem, true));
+    controller.leftBumper().onTrue(lightsSubsystem.changeBrightnessCommand(true));
+    controller.rightBumper().onTrue(lightsSubsystem.changeBrightnessCommand(false));
+    controller.leftBumper().and(controller.rightBumper())
+        .onTrue(lightsSubsystem.setStaticColorCommand(Color.kBlack));
   }
 
   /**

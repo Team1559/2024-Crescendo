@@ -49,6 +49,8 @@ public class Flywheel extends SubsystemBase {
 
     private final FlywheelInputsAutoLogged inputs = new FlywheelInputsAutoLogged();
 
+    private double currentVoltage;
+
     public Flywheel() {
 
         // ---------- Configure Motors ----------
@@ -91,6 +93,11 @@ public class Flywheel extends SubsystemBase {
 
     @Override
     public void periodic() {
+        // Set Voltages
+        flywheelMotorL.setControl(new VoltageOut(currentVoltage));
+        flywheelMotorR.setControl(new VoltageOut(currentVoltage));
+
+        // Log inputs
         updateInputs();
         Logger.processInputs("Shooter/Flywheel", inputs);
     }
@@ -124,25 +131,45 @@ public class Flywheel extends SubsystemBase {
     }
 
     // ========================= Functions =========================
-
+    /**
+     * Start the Flywheels with a specific voltage
+     * 
+     * @param voltage Set Flywheels to this voltage
+     */
     public void startFlywheel(double voltage) {
-        flywheelMotorL.setControl(new VoltageOut(voltage));
-        flywheelMotorR.setControl(new VoltageOut(voltage));
+        currentVoltage = voltage;
     }
 
+    /**
+     * Start the Flywheels with default volage
+     */
+    public void startFlywheel() {
+        startFlywheel(Constants.FLYWHEEL_FOWARDS_VOLTAGE);
+    }
+
+    /**
+     * Stop the Flywheels
+     */
     public void stopFlywheel() {
+        currentVoltage = 0;
         flywheelMotorL.stopMotor();
         flywheelMotorR.stopMotor();
     }
 
+    /**
+     * Reverse the Flywheels
+     */
     public void reverseFlywheel() {
         startFlywheel(Constants.FLYWHEEL_REVERSE_VOLTAGE);
     }
 
     // ========================= Commands =========================
-
     public Command startFlywheelCommand(double voltage) {
         return new InstantCommand(() -> startFlywheel(voltage), this);
+    }
+
+    public Command startFlywheelCommand() {
+        return new InstantCommand(this::startFlywheel, this);
     }
 
     public Command stopFlywheelCommand() {

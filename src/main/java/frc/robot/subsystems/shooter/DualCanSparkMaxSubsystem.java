@@ -8,7 +8,6 @@ import org.littletonrobotics.junction.Logger;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkBase.IdleMode;
 
-import edu.wpi.first.networktables.PubSub;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -45,7 +44,7 @@ public class DualCanSparkMaxSubsystem extends SubsystemBase {
      * @param motorRId Right motor ID
      * @param voltage  Voltage for both fowards and reverse voltage
      */
-    public DualCanSparkMaxSubsystem(String name, int motorLId, int motorRId, double voltage) {
+    protected DualCanSparkMaxSubsystem(String name, int motorLId, int motorRId, double voltage) {
         this(name, motorLId, motorRId, voltage, voltage);
     }
 
@@ -58,7 +57,7 @@ public class DualCanSparkMaxSubsystem extends SubsystemBase {
      * @param fowardsVoltage Voltage for fowards movement
      * @param reverseVoltage Voltage for reverse movement
      */
-    public DualCanSparkMaxSubsystem(String name, int motorLId, int motorRId, double fowardsVoltage,
+    protected DualCanSparkMaxSubsystem(String name, int motorLId, int motorRId, double fowardsVoltage,
             double reverseVoltage) {
         super(name);
         motorL = new CANSparkMax(motorLId, MotorType.kBrushless);
@@ -97,15 +96,15 @@ public class DualCanSparkMaxSubsystem extends SubsystemBase {
     }
 
     // ========================= Functions =========================
-    public void startFeeder() {
+    public void start() {
         setVoltage(fowardsVoltage);
     }
 
-    public void stopFeeder() {
+    public void stop() {
         setVoltage(0.0);
     }
 
-    public void reverseFeeder() {
+    public void reverse() {
         setVoltage(reverseVoltage);
     }
 
@@ -115,16 +114,16 @@ public class DualCanSparkMaxSubsystem extends SubsystemBase {
 
     // ========================= Commands =========================
 
-    public Command startFeederCommand() {
-        return new InstantCommand(this::startFeeder, this);
+    public Command startCommand() {
+        return new InstantCommand(this::start, this);
     }
 
-    public Command stopFeederCommand() {
-        return new InstantCommand(this::stopFeeder, this);
+    public Command stopCommand() {
+        return new InstantCommand(this::stop, this);
     }
 
-    public Command reverseFeederCommand() {
-        return new InstantCommand(this::reverseFeeder, this);
+    public Command reverseCommand() {
+        return new InstantCommand(this::reverse, this);
     }
 
 }
