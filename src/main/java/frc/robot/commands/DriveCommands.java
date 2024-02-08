@@ -19,6 +19,8 @@ import frc.robot.subsystems.base.DriveBase;
 
 public class DriveCommands {
 
+  private static final double SLOW_DOWN_THRESHOLD_IN_DEGREES = 45;
+
   /** Makes this class non-instantiable. */
   private DriveCommands() {
   }
@@ -30,7 +32,8 @@ public class DriveCommands {
 
     Command aimingDrive = new Command() {
 
-      PIDController pid = new PIDController(Constants.MAX_ANGULAR_SPEED / 50, 0, 0); // TODO: Tune.
+      PIDController pid = new PIDController(
+          Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS / SLOW_DOWN_THRESHOLD_IN_DEGREES, 0, 0); // TODO: Tune.
 
       @Override
       public void initialize() {
@@ -46,7 +49,7 @@ public class DriveCommands {
         double linearMagnitude = MathUtil.applyDeadband(Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
             Constants.JOYSTICK_DEADBAND);
 
-        // Square values.
+        // Square values, to accelerate mor gradually.
         linearMagnitude = linearMagnitude * linearMagnitude;
 
         // Calcaulate new linear velocity.
@@ -55,15 +58,17 @@ public class DriveCommands {
             .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d())).getTranslation();
 
         // Calculate omega velocity.
-        double omega = pid
-            .calculate(driveBase.getRotationToTarget(target.get()).plus(Rotation2d.fromDegrees(180)).getDegrees());
-        omega = MathUtil.clamp(omega, -.1, .1); // TODO: Set Min & Max.
+        double degreesToTarget = driveBase.getRotationToTarget(target.get()).plus(Rotation2d.fromDegrees(180))
+            .getDegrees();
+        double omega = MathUtil.clamp(pid.calculate(degreesToTarget),
+            -Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS,
+            Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS);
 
         // Scale Velocities to between 0 and Max.
-        double scaledXVelocity = linearVelocity.getX() * driveBase.getMaxLinearSpeedMetersPerSec(),
-            scaledYVelocity = linearVelocity.getY() * driveBase.getMaxLinearSpeedMetersPerSec(),
+        double scaledXVelocity = linearVelocity.getX() * Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND,
+            scaledYVelocity = linearVelocity.getY() * Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND,
             // TODO: We are Clamping above, do we really also want to "scale" here?
-            scaledOmegaVelocity = omega * driveBase.getMaxAngularSpeedRadPerSec();
+            scaledOmegaVelocity = omega * Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS;
 
         // Run Velocities.
         if (Constants.FIELD_RELATIVE) {
@@ -73,7 +78,24 @@ public class DriveCommands {
           driveBase.runVelocity(new ChassisSpeeds(scaledXVelocity, scaledYVelocity, scaledOmegaVelocity));
         }
 
+        // Log Calculated Values.
+        Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/vxMetersPerSecond", scaledXVelocity);
+        Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/vyMetersPerSecond", scaledYVelocity);
+        Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/omegaRadiansPerSecond", scaledOmegaVelocity);
       }
+
+      @Override
+      public boolean isFinished() {
+        // TODO: PIDController does NOT automatically do this for us, when calling the
+        // calculate method.
+        return false;
+      }
+
+      @Override
+      public void end(boolean interrupted) {
+        // TODO: Need to close the PIDController as it is an AutoCloseable class.
+      }
+
     };
     aimingDrive.addRequirements(driveBase);
     return aimingDrive;
@@ -91,7 +113,7 @@ public class DriveCommands {
               Constants.JOYSTICK_DEADBAND);
           double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), Constants.JOYSTICK_DEADBAND);
 
-          // Square values.
+          // Square values, to accelerate mor gradually.
           linearMagnitude = linearMagnitude * linearMagnitude;
           omega = Math.copySign(omega * omega, omega);
 
@@ -101,9 +123,10 @@ public class DriveCommands {
               .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d())).getTranslation();
 
           // Scale Velocities to between 0 and Max.
-          double scaledXVelocity = linearVelocity.getX() * driveBase.getMaxLinearSpeedMetersPerSec(),
-              scaledYVelocity = linearVelocity.getY() * driveBase.getMaxLinearSpeedMetersPerSec(),
-              scaledOmegaVelocity = omega * driveBase.getMaxAngularSpeedRadPerSec();
+          double scaledXVelocity = linearVelocity.getX() * Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND,
+              scaledYVelocity = linearVelocity.getY() * Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND,
+              scaledOmegaVelocity = omega * Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS;
+          ;
 
           // Run Velocities.
           if (Constants.FIELD_RELATIVE) {
@@ -150,7 +173,7 @@ public class DriveCommands {
       public void execute() {
         Rotation2d current = driveBase.getRotation();
         double delta = targetRotation.minus(current).getDegrees();
-        double rampOmega = Math.max(Math.min(Math.abs(delta) / 50, 1.0), .01);
+        double rampOmega = Math.max(Math.min(Math.abs(delta) / SLOW_DOWN_THRESHOLD_IN_DEGREES, 1.0), .01);
         double omega = Math.copySign(speed, delta) * rampOmega;
         Logger.recordOutput("Spin/delta", delta);
         Logger.recordOutput("Spin/rampOmega", rampOmega);

@@ -65,7 +65,7 @@ public class RobotContainer {
    */
   public RobotContainer() {
 
-    // ---------- Initialize the Drive Base ----------
+    // ----- Initialize Subsystems with Simulation and/or Log Replay Modes -----
     switch (Constants.CURRENT_OPERATING_MODE) {
 
       case REAL_WORLD:
@@ -107,7 +107,7 @@ public class RobotContainer {
         throw new RuntimeException("Unknown Run Mode: " + Constants.CURRENT_OPERATING_MODE);
     }
 
-    // ---------- Initialize Subsystems ----------
+    // ----- Initialize Subsystems without Simulation and/or Log Replay Modes -----
     aimer = Constants.HAVE_AIMER ? new Aimer() : null;
     colorSensor = Constants.HAVE_COLOR_SENSOR ? new ColorSensor() : null;
     feeder = Constants.HAVE_FEEDER ? new Feeder() : null;
@@ -194,8 +194,7 @@ public class RobotContainer {
           false));
       controller.leftBumper().onTrue(leds.changeBrightnessCommand(true));
       controller.rightBumper().onTrue(leds.changeBrightnessCommand(false));
-      controller.leftBumper().and(controller.rightBumper())
-          .onTrue(leds.setStaticColorCommand(Color.kBlack));
+      controller.leftBumper().and(controller.rightBumper()).onTrue(leds.setStaticColorCommand(Color.kBlack));
     }
   }
 

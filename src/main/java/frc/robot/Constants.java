@@ -60,7 +60,8 @@ public final class Constants {
   // ---------- Driving Config ----------
   public static final double JOYSTICK_DEADBAND = 0.2;
   public static final double MAX_LINEAR_SPEED_IN_METERS_PER_SECOND = 3.0;
-  public static final double MAX_ANGULAR_SPEED = Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND / DRIVE_BASE_RADIUS;
+  public static final double MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS = Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND
+      / DRIVE_BASE_RADIUS;
   public static final double ADVANTAGE_ODOMETRY_LOG_FREQUENCY = 100.0;
   public static final double ADVANTAGE_DEFAULT_LOG_FREQUENCY = 50.0;
 

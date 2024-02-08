@@ -120,16 +120,6 @@ public class DriveBase extends SubsystemBase {
     return driveVelocityAverage / 4.0;
   }
 
-  /** Returns the maximum angular speed in radians per sec. */
-  public double getMaxAngularSpeedRadPerSec() {
-    return Constants.MAX_ANGULAR_SPEED;
-  }
-
-  /** Returns the maximum linear speed in meters per sec. */
-  public double getMaxLinearSpeedMetersPerSec() {
-    return Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND;
-  }
-
   /**
    * Returns the module states (turn angles and drive velocities) for all of the
    * modules.
@@ -215,6 +205,7 @@ public class DriveBase extends SubsystemBase {
    * @param speeds Speeds in meters/sec
    */
   public void runVelocity(ChassisSpeeds speeds) {
+
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
