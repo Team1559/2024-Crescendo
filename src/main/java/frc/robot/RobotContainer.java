@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
@@ -140,18 +139,21 @@ public class RobotContainer {
         DriveCommands.turnToTargetCommand(driveBase,
             new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42)), 4.5),
         () -> DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
-    Command shootCommand;
+    Command teleOpShootCommand;
+    Command autoShootCommand;
     if (Constants.HAVE_SHOOTER) {
-      shootCommand = ShooterCommands.shootCommand(flywheel, feeder, lightsSubsystem, sensor);
+      teleOpShootCommand = ShooterCommands.shootCommand(flywheel, feeder, lightsSubsystem, sensor);
+      autoShootCommand = ShooterCommands.shootCommand(flywheel, feeder, lightsSubsystem, sensor);
     } else {
-      shootCommand = LightsCommands.blinkCommand(lightsSubsystem, Color.kOrange);
+      teleOpShootCommand = LightsCommands.blinkCommand(lightsSubsystem, Color.kOrange);
+      autoShootCommand = LightsCommands.blinkCommand(lightsSubsystem, Color.kOrange);
     }
 
     // ========================= Autonomous =========================
     // ---------- Create Named Commands for use by Path Planner ----------
     NamedCommands.registerCommand("Spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
     NamedCommands.registerCommand("StartIntake", LightsCommands.blinkCommand(lightsSubsystem, Color.kPurple));
-    NamedCommands.registerCommand("ShootNote", new SequentialCommandGroup(/* aimCommand, */ shootCommand));
+    NamedCommands.registerCommand("ShootNote", new SequentialCommandGroup(aimCommand, autoShootCommand));
 
     // ---------- Set-up Autonomous Choices ----------
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -174,7 +176,7 @@ public class RobotContainer {
         driveBase));
 
     // ---------- Configure Buttons for SubSystem Actions ----------
-    controller.a().onTrue(shootCommand);
+    controller.a().onTrue(teleOpShootCommand);
 
     // ---------- Configure Light Buttons ----------
     controller.start().and(controller.a()).onTrue(lightsSubsystem.setStaticColorCommand(Color.kDarkGreen));
