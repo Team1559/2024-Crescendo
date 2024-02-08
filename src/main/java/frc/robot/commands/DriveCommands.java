@@ -60,7 +60,11 @@ public class DriveCommands {
         // Calculate omega velocity.
         double degreesToTarget = driveBase.getRotationToTarget(target.get()).plus(Rotation2d.fromDegrees(180))
             .getDegrees();
-        double omega = MathUtil.clamp(pid.calculate(degreesToTarget),
+        // Range:
+        // - If kd = 0: minimumInput * kp - ki <-> maximumInput * kp + ki.
+        // - If kd != 0: -Double.MAX_VALUE <-> Double.MAX_VALUE.
+        double omega = pid.calculate(degreesToTarget);
+        omega = MathUtil.clamp(omega,
             -Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS,
             Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS);
 
