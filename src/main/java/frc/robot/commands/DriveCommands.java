@@ -23,50 +23,97 @@ public class DriveCommands {
   private DriveCommands() {
   }
 
-  /**
-   * Field relative drive command using two joysticks (controlling linear and
-   * angular velocities).
-   */
-  public static Command joystickDrive(DriveBase drive,
+  public static Command autoAimAndManuallyDriveCommand(DriveBase driveBase,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      Supplier<Translation2d> target) {
+
+    Command aimingDrive = new Command() {
+
+      PIDController pid = new PIDController(Constants.MAX_ANGULAR_SPEED / 50, 0, 0); // TODO: Tune.
+
+      @Override
+      public void initialize() {
+        pid.setSetpoint(0);
+        pid.setTolerance(1);
+        pid.enableContinuousInput(-180, 180);
+      }
+
+      @Override
+      public void execute() {
+
+        // Apply deadband.
+        double linearMagnitude = MathUtil.applyDeadband(Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
+            Constants.JOYSTICK_DEADBAND);
+
+        // Square values.
+        linearMagnitude = linearMagnitude * linearMagnitude;
+
+        // Calcaulate new linear velocity.
+        Rotation2d linearDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+        Translation2d linearVelocity = new Pose2d(new Translation2d(), linearDirection)
+            .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d())).getTranslation();
+
+        // Calculate omega velocity.
+        double omega = pid
+            .calculate(driveBase.getRotationToTarget(target.get()).plus(Rotation2d.fromDegrees(180)).getDegrees());
+        omega = MathUtil.clamp(omega, -.1, .1); // TODO: Set Min & Max.
+
+        // Scale Velocities to between 0 and Max.
+        double scaledXVelocity = linearVelocity.getX() * driveBase.getMaxLinearSpeedMetersPerSec(),
+            scaledYVelocity = linearVelocity.getY() * driveBase.getMaxLinearSpeedMetersPerSec(),
+            // TODO: We are Clamping above, do we really also want to "scale" here?
+            scaledOmegaVelocity = omega * driveBase.getMaxAngularSpeedRadPerSec();
+
+        // Run Velocities.
+        if (Constants.FIELD_RELATIVE) {
+          driveBase.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(scaledXVelocity, scaledYVelocity,
+              scaledOmegaVelocity, driveBase.getRotation()));
+        } else {
+          driveBase.runVelocity(new ChassisSpeeds(scaledXVelocity, scaledYVelocity, scaledOmegaVelocity));
+        }
+
+      }
+    };
+    aimingDrive.addRequirements(driveBase);
+    return aimingDrive;
+  }
+
+  public static Command manualDriveDefaultCommand(DriveBase driveBase,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       DoubleSupplier omegaSupplier) {
 
     return Commands.run(
         () -> {
-          // Apply deadband
-          double linearMagnitude = MathUtil.applyDeadband(
-              Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
+          // Apply deadband.
+          double linearMagnitude = MathUtil.applyDeadband(Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
               Constants.JOYSTICK_DEADBAND);
-          Rotation2d linearDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
           double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), Constants.JOYSTICK_DEADBAND);
 
-          // Square values
+          // Square values.
           linearMagnitude = linearMagnitude * linearMagnitude;
           omega = Math.copySign(omega * omega, omega);
 
-          // Calcaulate new linear velocity
+          // Calcaulate new linear velocity.
+          Rotation2d linearDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
           Translation2d linearVelocity = new Pose2d(new Translation2d(), linearDirection)
-              .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
-              .getTranslation();
+              .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d())).getTranslation();
 
+          // Scale Velocities to between 0 and Max.
+          double scaledXVelocity = linearVelocity.getX() * driveBase.getMaxLinearSpeedMetersPerSec(),
+              scaledYVelocity = linearVelocity.getY() * driveBase.getMaxLinearSpeedMetersPerSec(),
+              scaledOmegaVelocity = omega * driveBase.getMaxAngularSpeedRadPerSec();
+
+          // Run Velocities.
           if (Constants.FIELD_RELATIVE) {
-            // Convert to field relative speeds & send command
-            drive.runVelocity(
-                ChassisSpeeds.fromFieldRelativeSpeeds(
-                    linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                    linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                    omega * drive.getMaxAngularSpeedRadPerSec(),
-                    drive.getRotation()));
+            driveBase.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(scaledXVelocity, scaledYVelocity,
+                scaledOmegaVelocity, driveBase.getRotation()));
           } else {
-            drive.runVelocity(
-                new ChassisSpeeds(
-                    linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                    linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                    omega * drive.getMaxAngularSpeedRadPerSec()));
+            driveBase.runVelocity(new ChassisSpeeds(scaledXVelocity, scaledYVelocity, scaledOmegaVelocity));
           }
         },
-        drive);
+        driveBase);
   }
 
   /**
@@ -129,6 +176,17 @@ public class DriveCommands {
     return spinCommand;
   }
 
+  // TODO: Create method to duplaicate turnToTargetCommand functionality using a
+  // SwerveControllerCommand.
+  // public static SwerveControllerCommand
+  // turnToTargetSwerveControllerCommand(DriveBase driveBase, Translation2d
+  // target, double speed)
+
+  // TODO: Create method to duplaicate turnToTargetCommand functionality using a
+  // PIDCommand.
+  // public static PIDCommand turnToTargetPidCommand(DriveBase driveBase,
+  // Translation2d target, double speed)
+
   public static Command turnToTargetCommand(DriveBase driveBase, Translation2d target, double speed) {
 
     Command spinCommand = new Command() {
@@ -163,67 +221,4 @@ public class DriveCommands {
     return spinCommand;
   }
 
-  // TODO: Create method to duplaicate turnToTargetCommand functionality using a
-  // SwerveControllerCommand.
-  // public static SwerveControllerCommand
-  // turnToTargetSwerveControllerCommand(DriveBase driveBase, Translation2d
-  // target, double speed)
-
-  // TODO: Create method to duplaicate turnToTargetCommand functionality using a
-  // PIDCommand.
-  // public static PIDCommand turnToTargetPidCommand(DriveBase driveBase,
-  // Translation2d target, double speed)
-  public static Command aimingDrive(DriveBase drive,
-      DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier,
-      Supplier<Translation2d> target) {
-    Command aimingDrive = new Command() {
-      PIDController pid = new PIDController(Constants.MAX_ANGULAR_SPEED / 50, 0, 0);
-
-      @Override
-      public void initialize() {
-        pid.setSetpoint(0);
-        pid.setTolerance(1);
-        pid.enableContinuousInput(-180, 180);
-      }
-
-      @Override
-      public void execute() {
-        // Apply deadband
-        double linearMagnitude = MathUtil.applyDeadband(
-            Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
-            Constants.JOYSTICK_DEADBAND);
-        Rotation2d linearDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
-        double omega = MathUtil.clamp(
-            pid.calculate(drive.getRotationToTarget(target.get()).plus(Rotation2d.fromDegrees(180)).getDegrees()),
-            -.1, .1);
-        // Square values
-        linearMagnitude = linearMagnitude * linearMagnitude;
-
-        // Calcaulate new linear velocity
-        Translation2d linearVelocity = new Pose2d(new Translation2d(), linearDirection)
-            .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
-            .getTranslation();
-
-        if (Constants.FIELD_RELATIVE) {
-          // Convert to field relative speeds & send command
-          drive.runVelocity(
-              ChassisSpeeds.fromFieldRelativeSpeeds(
-                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                  omega * drive.getMaxAngularSpeedRadPerSec(),
-                  drive.getRotation()));
-        } else {
-          drive.runVelocity(
-              new ChassisSpeeds(
-                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                  omega * drive.getMaxAngularSpeedRadPerSec()));
-        }
-
-      }
-    };
-    aimingDrive.addRequirements(drive);
-    return aimingDrive;
-  }
 }

@@ -42,13 +42,11 @@ public final class Constants {
       Units.inchesToMeters(218.42));
   public static final Translation2d RED_SPEAKER_LOCATION = new Translation2d(Units.inchesToMeters(652.73),
       Units.inchesToMeters(218.42));
-
-  public static boolean isBlueAlliance() {
+  public static final Supplier<Boolean> IS_ON_BLUE_ALLIANCE = () -> {
     return DriverStation.getAlliance().get() == DriverStation.Alliance.Blue;
-  }
-
+  };
   public static final Supplier<Translation2d> SPEAKER_LOCATION_SUPPLIER = () -> {
-    return isBlueAlliance() ? BLUE_SPEAKER_LOCATION : RED_SPEAKER_LOCATION;
+    return IS_ON_BLUE_ALLIANCE.get() ? BLUE_SPEAKER_LOCATION : RED_SPEAKER_LOCATION;
   };
 
   // ---------- Robot Measurements ----------
@@ -94,11 +92,13 @@ public final class Constants {
   public static final double AIMER_ANGLE_OFFSET = 0; // TODO/calibrate
 
   // ---------- Hardware Config --------
-  public static final boolean HAVE_FEEDER = false;
-  public static final boolean HAVE_INTAKE = false;
   public static final boolean HAVE_AIMER = false;
-  public static final boolean HAVE_FLYWHEEL = false;
   public static final boolean HAVE_COLOR_SENSOR = false;
+  public static final boolean HAVE_FEEDER = false;
+  public static final boolean HAVE_FLYWHEEL = false;
+  public static final boolean HAVE_INTAKE = false;
+  public static final boolean HAVE_LEDS = true;
+  public static final boolean HAVE_VISION = false;
   public static final boolean HAVE_SHOOTER = HAVE_FEEDER && HAVE_INTAKE && HAVE_AIMER && HAVE_FLYWHEEL
       && HAVE_COLOR_SENSOR;
 
