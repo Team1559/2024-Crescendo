@@ -9,13 +9,15 @@ Contains constants that need to be updated per robot. i.e.
 * **Driving:** Left Joystick
   * D-Pad isolates directional commands for tuning
 * **Spinning:** Triggers
+  * [Left Trigger] = Spin Counter-Clockwise
+  * [Right Trigger] = Spin Clockwise
 * **LEDs:**
   * [Start + A] = Solid $\color{green}Green$
-  * [Start + B] = Solid $\color{red}Red$ and Black pattern
-  * [Start + X] = $\color{lightblue}Light \space Blue$ $\color{blue}Dark \space Blue$ pattern moving in one direction
-  * [Start + Y] = $\color{yellow}Yellow$ and Black pattern moving in the other direction
-  * [Left Bumber] = _Decrease Brightness_
-  * [Right Bumber] = **Increase Brightness**
+  * [Start + B] = Solid $\color{red}Red$ and **Black** pattern
+  * [Start + X] = $\color{blue}Blue$ and $\color{purple}Purple$ pattern moving in one direction
+  * [Start + Y] = $\color{yellow}Yellow$ and **Black** pattern moving in the other direction
+  * [Left Bumber] = <span style="font-size:smaller;">Decrease Brightness</span>
+  * [Right Bumber] = <span style="font-size:larger;">Increase Brightness</span>
   * [Left + Right Bumber] = Turn Off LEDs
 
 # Autonomous

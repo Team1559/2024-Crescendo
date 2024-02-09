@@ -24,7 +24,7 @@ public class LightsCommands {
   public static Command setToAllianceColor(Leds subsystem) {
     return new InstantCommand(() -> {
       if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
-        subsystem.setStaticColor(Color.kAliceBlue);
+        subsystem.setStaticColor(Color.kBlue);
       } else {
         subsystem.setStaticColor(Color.kRed);
       }
