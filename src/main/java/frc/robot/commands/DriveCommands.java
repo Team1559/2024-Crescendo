@@ -92,7 +92,7 @@ public class DriveCommands {
 
       @Override
       public boolean isFinished() {
-        return false; // pid.atSetpoint();
+        return false;
       }
 
       @Override

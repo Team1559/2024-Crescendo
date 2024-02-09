@@ -163,20 +163,27 @@ public class RobotContainer {
         driveBase));
 
     // ---------- Configure Buttons for SubSystem Actions ----------
-    Command teleOpShootCommand;
+    Command speakerTeleOpShootCommand;
+    Command ampTeleOpShootCommand;
     if (Constants.HAVE_SHOOTER) {
-      teleOpShootCommand = ShooterCommands.shootCommand(flywheel, feeder, leds, colorSensor);
+      speakerTeleOpShootCommand = ShooterCommands.shootCommand(flywheel, feeder, leds, colorSensor);
+      ampTeleOpShootCommand = ShooterCommands.shootCommand(flywheel, feeder, leds, colorSensor);
     } else if (Constants.HAVE_LEDS) {
-      teleOpShootCommand = LightsCommands.blinkCommand(leds, Color.kOrange);
+      speakerTeleOpShootCommand = LightsCommands.blinkCommand(leds, Color.kOrange);
+      ampTeleOpShootCommand = LightsCommands.blinkCommand(leds, Color.kViolet);
     }
     if (Constants.HAVE_SHOOTER || Constants.HAVE_LEDS) {
-      controller.a().onTrue(teleOpShootCommand);
+      controller.y().onTrue(speakerTeleOpShootCommand);
+      controller.x().onTrue(ampTeleOpShootCommand);
     }
     controller.b().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase,
         () -> -controller.getLeftY(),
         () -> -controller.getLeftX(),
         Constants.SPEAKER_LOCATION_SUPPLIER));
-
+    controller.a().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase,
+        () -> -controller.getLeftY(),
+        () -> -controller.getLeftX(),
+        Constants.AMP_LOCATION_SUPPLIER));
     // ---------- Configure Light Buttons ----------
     if (Constants.HAVE_LEDS) {
       controller.start().and(controller.a()).onTrue(leds.setStaticColorCommand(Color.kDarkGreen));

@@ -42,11 +42,18 @@ public final class Constants {
       Units.inchesToMeters(218.42));
   public static final Translation2d RED_SPEAKER_LOCATION = new Translation2d(Units.inchesToMeters(652.73),
       Units.inchesToMeters(218.42));
+  public static final Translation2d BLUE_AMP_LOCATION = new Translation2d(Units.inchesToMeters(72.5),
+      Units.inchesToMeters(323.00));
+  public static final Translation2d RED_AMP_LOCATION = new Translation2d(Units.inchesToMeters(578.77),
+      Units.inchesToMeters(323.00));
   public static final Supplier<Boolean> IS_ON_BLUE_ALLIANCE = () -> {
     return DriverStation.getAlliance().get() == DriverStation.Alliance.Blue;
   };
   public static final Supplier<Translation2d> SPEAKER_LOCATION_SUPPLIER = () -> {
     return IS_ON_BLUE_ALLIANCE.get() ? BLUE_SPEAKER_LOCATION : RED_SPEAKER_LOCATION;
+  };
+  public static final Supplier<Translation2d> AMP_LOCATION_SUPPLIER = () -> {
+    return IS_ON_BLUE_ALLIANCE.get() ? BLUE_AMP_LOCATION : RED_AMP_LOCATION;
   };
 
   // ---------- Robot Measurements ----------
