@@ -26,8 +26,8 @@ public class Aimer extends SubsystemBase {
         public double lVelocity, rVelocity;
     }
 
-    private final CANSparkMax motorL = new CANSparkMax(Constants.AIMER_L_ID, MotorType.kBrushless);
-    private final CANSparkMax motorR = new CANSparkMax(Constants.AIMER_R_ID, MotorType.kBrushless);
+    private final CANSparkMax motorL = new CANSparkMax(Constants.AIMER_LEFT_MOTOR_ID, MotorType.kBrushless);
+    private final CANSparkMax motorR = new CANSparkMax(Constants.AIMER_RIGHT_MOTOR_ID, MotorType.kBrushless);
     private final DutyCycleEncoder encoder = new DutyCycleEncoder(Constants.AIMER_ENCODER_PORT);
     private final PIDController controller = new PIDController(Constants.AIMER_KP, Constants.AIMER_KI,
             Constants.AIMER_KD);
