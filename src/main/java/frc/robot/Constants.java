@@ -78,6 +78,7 @@ public final class Constants {
       27.0) * (45.0 / 15.0); // L2 Gear ratio
   // public static final double WHEEL_DRIVE_GEAR_RATIO = 6.12; // L3 Gear ratio
   public static final double WHEEL_TURN_GEAR_RATIO = 12.8;
+
   // ---------- Wheel Rotation Offsets ----------
   // Note: Chaning the Offset by Pie (180 degrees) will invert the direction the
   // wheel spins.

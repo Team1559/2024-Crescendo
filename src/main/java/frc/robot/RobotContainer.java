@@ -37,12 +37,10 @@ import frc.robot.util.KColor;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
- * Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in
- * the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of
- * the robot (including
- * subsystems, commands, and button mappings) should be declared here.
+ * Command-based is a "declarative" paradigm, very little robot logic should
+ * actually be handled in the {@link Robot} periodic methods (other than the
+ * scheduler calls). Instead, the structure of the robot (including subsystems,
+ * commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
 
@@ -162,6 +160,7 @@ public class RobotContainer {
         driveBase));
 
     // ---------- Configure Buttons for SubSystem Actions ----------
+    // TODO: Map these to different commands.
     Command speakerTeleOpShootCommand;
     Command ampTeleOpShootCommand;
     if (Constants.HAVE_SHOOTER) {
@@ -183,20 +182,18 @@ public class RobotContainer {
         () -> -controller.getLeftY(),
         () -> -controller.getLeftX(),
         Constants.AMP_LOCATION_SUPPLIER));
+
     // ---------- Configure Light Buttons ----------
     if (Constants.HAVE_LEDS) {
       controller.start().and(controller.a()).onTrue(leds.setStaticColorCommand(Color.kDarkGreen));
       controller.start().and(controller.b()).onTrue(leds.setStaticPatternCommand(
           new Color[] { KColor.ALLIANCE_RED, KColor.ALLIANCE_RED, Color.kBlack, Color.kBlack }));
-      controller.start().and(controller.x())
-          .onTrue(leds.setDynamicPatternCommand(
-              new Color[] { KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE,
-                  Color.kBlack },
-              true));
-      controller.start().and(controller.y()).onTrue(leds.setDynamicPatternCommand(
-          new Color[] {
-              Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kBlack,
-              Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack, Color.kBlack },
+      controller.start().and(controller.x()).onTrue(leds.setDynamicPatternCommand(new Color[] {
+          KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE,
+          Color.kDarkViolet, Color.kDarkViolet, Color.kDarkViolet }, true));
+      controller.start().and(controller.y()).onTrue(leds.setDynamicPatternCommand(new Color[] {
+          Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kBlack,
+          Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack, Color.kBlack },
           false));
       controller.leftBumper().onTrue(leds.changeBrightnessCommand(true));
       controller.rightBumper().onTrue(leds.changeBrightnessCommand(false));
