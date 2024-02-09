@@ -85,21 +85,22 @@ public final class Constants {
       && HAVE_COLOR_SENSOR;
 
   // ---------- Hardware Ids ----------
+  // --- Aimer --- TODO: Set Ids.
+  public static final int AIMER_LEFT_MOTOR_ID = 0;
+  public static final int AIMER_RIGHT_MOTOR_ID = 0;
   // --- Camera ---
   public static final String SHOOTER_CAMERA_NAME = "limelight";
   // --- Canivore ---
   public static final String CANIVORE_BUS_ID = "1559Canivore";
-  // --- Flywheel ---
-  public static final int INTAKE_L_ID = 20;
-  public static final int INTAKE_R_ID = 21;
-  public static final int FEEDER_L_ID = 22;
-  public static final int FEEDER_R_ID = 23;
-  public static final int AIMER_L_ID = 24;
-  public static final int AIMER_R_ID = 25;
-  public static final int FLYWHEEL_L_ID = 26;
-  public static final int FLYWHEEL_R_ID = 27;
+  // --- Feeder --- TODO: Set Id.
+  public static final int FEEDER_MOTOR_ID = 0;
+  // --- Flywheel --- TODO: Set Ids.
+  public static final int FLYWHEEL_LEFT_MOTOR_ID = 0;
+  public static final int FLYWHEEL_RIGHT_MOTOR_ID = 0;
   // --- Gyro ---
   public static final int BASE_GYRO_ID = 12;
+  // --- Intake --- TODO: Set Id.
+  public static final int INTAKE_MOTOR_ID = 0;
   // --- Swerve Drives ---
   public static final int FRONT_LEFT_DRIVE_MOTOR_ID = 0;
   public static final int FRONT_LEFT_STEER_MOTOR_ID = 1;
