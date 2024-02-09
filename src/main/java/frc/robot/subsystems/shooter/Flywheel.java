@@ -44,8 +44,8 @@ public class Flywheel extends SubsystemBase {
     private final StatusSignal<Double> flywheelLMotorTemp, flywheelRMotorTemp;
     private final StatusSignal<Integer> flywheelLFaults, flywheelRFaults;
 
-    private final TalonFX flywheelMotorL = new TalonFX(Constants.FLYWHEEL_L_ID);
-    private final TalonFX flywheelMotorR = new TalonFX(Constants.FLYWHEEL_R_ID);
+    private final TalonFX flywheelMotorL = new TalonFX(Constants.FLYWHEEL_LEFT_MOTOR_ID);
+    private final TalonFX flywheelMotorR = new TalonFX(Constants.FLYWHEEL_RIGHT_MOTOR_ID);
 
     private final FlywheelInputsAutoLogged inputs = new FlywheelInputsAutoLogged();
 
