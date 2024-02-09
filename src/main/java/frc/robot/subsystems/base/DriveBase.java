@@ -159,9 +159,7 @@ public class DriveBase extends SubsystemBase {
     Pose2d currentPose = getPose();
     Translation2d deltaTranslation = target.minus(currentPose.getTranslation());
     Rotation2d deltaAngle = deltaTranslation.getAngle();
-    // Subtract 180 to point back of robot rather than the front at the Speaker.
-    // TODO: Does not match Javadoc Description.
-    return deltaAngle.minus(currentPose.getRotation()).minus(Rotation2d.fromDegrees(180));
+    return deltaAngle.minus(currentPose.getRotation());
   }
 
   @Override

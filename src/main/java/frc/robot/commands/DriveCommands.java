@@ -32,11 +32,13 @@ public class DriveCommands {
 
     Command aimingDrive = new Command() {
 
-      PIDController pid = new PIDController(
-          Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS / SLOW_DOWN_THRESHOLD_IN_DEGREES, 0, 0); // TODO: Tune.
+      PIDController pid;
 
       @Override
       public void initialize() {
+        pid = new PIDController(
+            Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS / (SLOW_DOWN_THRESHOLD_IN_DEGREES * 2), 0, 0); // TODO:
+        // Tune.
         pid.setSetpoint(0);
         pid.setTolerance(1);
         pid.enableContinuousInput(-180, 180);
@@ -58,46 +60,45 @@ public class DriveCommands {
             .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d())).getTranslation();
 
         // Calculate omega velocity.
-        double degreesToTarget = driveBase.getRotationToTarget(target.get()).plus(Rotation2d.fromDegrees(180))
+        double degreesToTarget = -driveBase.getRotationToTarget(target.get()).plus(Rotation2d.fromDegrees(180))
             .getDegrees();
         // Range:
         // - If kd = 0: minimumInput * kp - ki <-> maximumInput * kp + ki.
         // - If kd != 0: -Double.MAX_VALUE <-> Double.MAX_VALUE.
         double omega = pid.calculate(degreesToTarget);
+
         omega = MathUtil.clamp(omega,
             -Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS,
             Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS);
 
         // Scale Velocities to between 0 and Max.
         double scaledXVelocity = linearVelocity.getX() * Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND,
-            scaledYVelocity = linearVelocity.getY() * Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND,
-            // TODO: We are Clamping above, do we really also want to "scale" here?
-            scaledOmegaVelocity = omega * Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS;
+            scaledYVelocity = linearVelocity.getY() * Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND;
 
         // Run Velocities.
         if (Constants.FIELD_RELATIVE) {
           driveBase.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(scaledXVelocity, scaledYVelocity,
-              scaledOmegaVelocity, driveBase.getRotation()));
+              omega, driveBase.getRotation()));
         } else {
-          driveBase.runVelocity(new ChassisSpeeds(scaledXVelocity, scaledYVelocity, scaledOmegaVelocity));
+          driveBase.runVelocity(new ChassisSpeeds(scaledXVelocity, scaledYVelocity, omega));
         }
 
         // Log Calculated Values.
+        Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/degreesToTarget", degreesToTarget);
         Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/vxMetersPerSecond", scaledXVelocity);
         Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/vyMetersPerSecond", scaledYVelocity);
-        Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/omegaRadiansPerSecond", scaledOmegaVelocity);
+        Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/omegaRadiansPerSecond", omega);
       }
 
       @Override
       public boolean isFinished() {
-        // TODO: PIDController does NOT automatically do this for us, when calling the
-        // calculate method.
-        return false;
+        return false; // pid.atSetpoint();
       }
 
       @Override
       public void end(boolean interrupted) {
         // TODO: Need to close the PIDController as it is an AutoCloseable class.
+        pid.close();
       }
 
     };
