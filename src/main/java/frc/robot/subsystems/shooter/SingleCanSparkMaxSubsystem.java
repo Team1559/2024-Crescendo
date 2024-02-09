@@ -16,7 +16,7 @@ import frc.robot.Constants;
 public class SingleCanSparkMaxSubsystem extends SubsystemBase {
 
     @AutoLog
-    static class DualMotorInputs {
+    static class SingleCanSparkMaxSubsystemInputs {
         public double appliedOutput;
         public double outputCurrent;
         public double motorTemp;
@@ -28,7 +28,7 @@ public class SingleCanSparkMaxSubsystem extends SubsystemBase {
     public final double reverseVoltage;
 
     private final CANSparkMax motor;
-    private final DualMotorInputsAutoLogged inputs = new DualMotorInputsAutoLogged();
+    private final SingleCanSparkMaxSubsystemInputsAutoLogged inputs = new SingleCanSparkMaxSubsystemInputsAutoLogged();
 
     /**
      * Create a new subsystem for two motors controlled by CANspark Controller
