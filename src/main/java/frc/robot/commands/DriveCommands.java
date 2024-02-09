@@ -1,10 +1,12 @@
 package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -17,54 +19,124 @@ import frc.robot.subsystems.base.DriveBase;
 
 public class DriveCommands {
 
+  private static final double SLOW_DOWN_THRESHOLD_IN_DEGREES = 45;
+
   /** Makes this class non-instantiable. */
   private DriveCommands() {
   }
 
-  /**
-   * Field relative drive command using two joysticks (controlling linear and
-   * angular velocities).
-   */
-  public static Command joystickDrive(DriveBase drive,
+  public static Command autoAimAndManuallyDriveCommand(DriveBase driveBase,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      Supplier<Translation2d> target) {
+
+    Command aimingDrive = new Command() {
+
+      PIDController pid;
+
+      @Override
+      public void initialize() {
+        pid = new PIDController(
+            Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS / (SLOW_DOWN_THRESHOLD_IN_DEGREES * 2), 0, 0); // TODO:
+        // Tune.
+        pid.setSetpoint(0);
+        pid.setTolerance(1);
+        pid.enableContinuousInput(-180, 180);
+      }
+
+      @Override
+      public void execute() {
+
+        // Apply deadband.
+        double linearMagnitude = MathUtil.applyDeadband(Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
+            Constants.JOYSTICK_DEADBAND);
+
+        // Square values, to accelerate mor gradually.
+        linearMagnitude = linearMagnitude * linearMagnitude;
+
+        // Calcaulate new linear velocity.
+        Rotation2d linearDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+        Translation2d linearVelocity = new Pose2d(new Translation2d(), linearDirection)
+            .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d())).getTranslation();
+
+        // Calculate omega velocity.
+        double degreesToTarget = -driveBase.getRotationToTarget(target.get()).plus(Rotation2d.fromDegrees(180))
+            .getDegrees();
+        // Range:
+        // - If kd = 0: minimumInput * kp - ki <-> maximumInput * kp + ki.
+        // - If kd != 0: -Double.MAX_VALUE <-> Double.MAX_VALUE.
+        double omega = pid.calculate(degreesToTarget);
+
+        omega = MathUtil.clamp(omega,
+            -Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS,
+            Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS);
+
+        // Scale Velocities to between 0 and Max.
+        double scaledXVelocity = linearVelocity.getX() * Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND,
+            scaledYVelocity = linearVelocity.getY() * Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND;
+
+        // Run Velocities.
+        if (Constants.FIELD_RELATIVE) {
+          driveBase.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(scaledXVelocity, scaledYVelocity,
+              omega, driveBase.getRotation()));
+        } else {
+          driveBase.runVelocity(new ChassisSpeeds(scaledXVelocity, scaledYVelocity, omega));
+        }
+
+        // Log Calculated Values.
+        Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/degreesToTarget", degreesToTarget);
+        Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/vxMetersPerSecond", scaledXVelocity);
+        Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/vyMetersPerSecond", scaledYVelocity);
+        Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/omegaRadiansPerSecond", omega);
+      }
+
+      @Override
+      public void end(boolean interrupted) {
+        // TODO: Need to close the PIDController as it is an AutoCloseable class.
+        pid.close();
+      }
+
+    };
+    aimingDrive.addRequirements(driveBase);
+    return aimingDrive;
+  }
+
+  public static Command manualDriveDefaultCommand(DriveBase driveBase,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       DoubleSupplier omegaSupplier) {
 
     return Commands.run(
         () -> {
-          // Apply deadband
-          double linearMagnitude = MathUtil.applyDeadband(
-              Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
+          // Apply deadband.
+          double linearMagnitude = MathUtil.applyDeadband(Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
               Constants.JOYSTICK_DEADBAND);
-          Rotation2d linearDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
           double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), Constants.JOYSTICK_DEADBAND);
 
-          // Square values
+          // Square values, to accelerate mor gradually.
           linearMagnitude = linearMagnitude * linearMagnitude;
           omega = Math.copySign(omega * omega, omega);
 
-          // Calcaulate new linear velocity
+          // Calcaulate new linear velocity.
+          Rotation2d linearDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
           Translation2d linearVelocity = new Pose2d(new Translation2d(), linearDirection)
-              .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
-              .getTranslation();
+              .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d())).getTranslation();
 
+          // Scale Velocities to between 0 and Max.
+          double scaledXVelocity = linearVelocity.getX() * Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND,
+              scaledYVelocity = linearVelocity.getY() * Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND,
+              scaledOmegaVelocity = omega * Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS;
+          ;
+
+          // Run Velocities.
           if (Constants.FIELD_RELATIVE) {
-            // Convert to field relative speeds & send command
-            drive.runVelocity(
-                ChassisSpeeds.fromFieldRelativeSpeeds(
-                    linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                    linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                    omega * drive.getMaxAngularSpeedRadPerSec(),
-                    drive.getRotation()));
+            driveBase.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(scaledXVelocity, scaledYVelocity,
+                scaledOmegaVelocity, driveBase.getRotation()));
           } else {
-            drive.runVelocity(
-                new ChassisSpeeds(
-                    linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                    linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                    omega * drive.getMaxAngularSpeedRadPerSec()));
+            driveBase.runVelocity(new ChassisSpeeds(scaledXVelocity, scaledYVelocity, scaledOmegaVelocity));
           }
         },
-        drive);
+        driveBase);
   }
 
   /**
@@ -101,7 +173,7 @@ public class DriveCommands {
       public void execute() {
         Rotation2d current = driveBase.getRotation();
         double delta = targetRotation.minus(current).getDegrees();
-        double rampOmega = Math.max(Math.min(Math.abs(delta) / 50, 1.0), .01);
+        double rampOmega = Math.max(Math.min(Math.abs(delta) / SLOW_DOWN_THRESHOLD_IN_DEGREES, 1.0), .01);
         double omega = Math.copySign(speed, delta) * rampOmega;
         Logger.recordOutput("Spin/delta", delta);
         Logger.recordOutput("Spin/rampOmega", rampOmega);
@@ -126,6 +198,17 @@ public class DriveCommands {
 
     return spinCommand;
   }
+
+  // TODO: Create method to duplaicate turnToTargetCommand functionality using a
+  // SwerveControllerCommand.
+  // public static SwerveControllerCommand
+  // turnToTargetSwerveControllerCommand(DriveBase driveBase, Translation2d
+  // target, double speed)
+
+  // TODO: Create method to duplaicate turnToTargetCommand functionality using a
+  // PIDCommand.
+  // public static PIDCommand turnToTargetPidCommand(DriveBase driveBase,
+  // Translation2d target, double speed)
 
   public static Command turnToTargetCommand(DriveBase driveBase, Translation2d target, double speed) {
 
@@ -161,14 +244,4 @@ public class DriveCommands {
     return spinCommand;
   }
 
-  // TODO: Create method to duplaicate turnToTargetCommand functionality using a
-  // SwerveControllerCommand.
-  // public static SwerveControllerCommand
-  // turnToTargetSwerveControllerCommand(DriveBase driveBase, Translation2d
-  // target, double speed)
-
-  // TODO: Create method to duplaicate turnToTargetCommand functionality using a
-  // PIDCommand.
-  // public static PIDCommand turnToTargetPidCommand(DriveBase driveBase,
-  // Translation2d target, double speed)
 }

@@ -17,13 +17,13 @@ public class ShooterCommands {
 
   // TODO: Add Reverse Commands. (Spins Flywheel & Feeder)
 
-  public static Command shootCommand(Flywheel flywheel, Feeder feeder, Leds LEDs, ColorSensor sensor) {
+  public static Command shootCommand(Flywheel flywheel, Feeder feeder, Leds leds, ColorSensor colorSensor) {
     //@formatter:off
     return new SequentialCommandGroup(
       spinUpFlywheelCommand(flywheel),
       feeder.startCommand(),
-      LightsCommands.blinkCommand(LEDs, Color.kOrange),
-      sensor.waitForNoObjectCommand(),
+      LightsCommands.blinkCommand(leds, Color.kOrange),
+      colorSensor.waitForNoObjectCommand(),
       new WaitCommand(.25),
       feeder.stopCommand(),
       flywheel.stopFlywheelCommand()

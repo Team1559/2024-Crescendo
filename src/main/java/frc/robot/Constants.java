@@ -1,10 +1,14 @@
 package frc.robot;
 
+import java.util.function.Supplier;
+
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
@@ -34,18 +38,32 @@ public final class Constants {
   // This is the side of the field that the aumation path are made for.
   public static final Alliance DEFAULT_ALLIANCE = Alliance.Blue;
   public static final boolean FLIP_PATH_IF_ALLIANCE_IS_NOT_DEFAULT = true;
-
-  // ---------- Driving Config ----------
-  public static final double JOYSTICK_DEADBAND = 0.2;
-  public static final double MAX_LINEAR_SPEED_IN_METERS_PER_SECOND = 3.0;
-  public static final double ADVANTAGE_ODOMETRY_LOG_FREQUENCY = 100.0;
-  public static final double ADVANTAGE_DEFAULT_LOG_FREQUENCY = 50.0;
+  public static final Translation2d BLUE_SPEAKER_LOCATION = new Translation2d(Units.inchesToMeters(-1.5),
+      Units.inchesToMeters(218.42));
+  public static final Translation2d RED_SPEAKER_LOCATION = new Translation2d(Units.inchesToMeters(652.73),
+      Units.inchesToMeters(218.42));
+  public static final Supplier<Boolean> IS_ON_BLUE_ALLIANCE = () -> {
+    return DriverStation.getAlliance().get() == DriverStation.Alliance.Blue;
+  };
+  public static final Supplier<Translation2d> SPEAKER_LOCATION_SUPPLIER = () -> {
+    return IS_ON_BLUE_ALLIANCE.get() ? BLUE_SPEAKER_LOCATION : RED_SPEAKER_LOCATION;
+  };
 
   // ---------- Robot Measurements ----------
   // Middle of front wheel to middle of back wheel.
   public static final double TRACK_WIDTH_X = Units.inchesToMeters(24.0);
   // Middle of left wheel to middle of right wheel.
   public static final double TRACK_WIDTH_Y = Units.inchesToMeters(24.0);
+  public static final double DRIVE_BASE_RADIUS = Math.hypot(Constants.TRACK_WIDTH_X / 2.0,
+      Constants.TRACK_WIDTH_Y / 2.0);
+
+  // ---------- Driving Config ----------
+  public static final double JOYSTICK_DEADBAND = 0.2;
+  public static final double MAX_LINEAR_SPEED_IN_METERS_PER_SECOND = 3.0;
+  public static final double MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS = Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND
+      / DRIVE_BASE_RADIUS;
+  public static final double ADVANTAGE_ODOMETRY_LOG_FREQUENCY = 100.0;
+  public static final double ADVANTAGE_DEFAULT_LOG_FREQUENCY = 50.0;
 
   // ---------- Wheel & GHear Measurements ----------
   public static final double WHEEL_RADIUS = Units.inchesToMeters(2);
@@ -53,7 +71,6 @@ public final class Constants {
       27.0) * (45.0 / 15.0); // L2 Gear ratio
   // public static final double WHEEL_DRIVE_GEAR_RATIO = 6.12; // L3 Gear ratio
   public static final double WHEEL_TURN_GEAR_RATIO = 12.8;
-
   // ---------- Wheel Rotation Offsets ----------
   // Note: Chaning the Offset by Pie (180 degrees) will invert the direction the
   // wheel spins.
@@ -76,11 +93,12 @@ public final class Constants {
   public static final double AIMER_ANGLE_OFFSET = 0; // TODO/calibrate
 
   // ---------- Hardware Config --------
-  public static final boolean HAVE_FEEDER = false;
-  public static final boolean HAVE_INTAKE = false;
   public static final boolean HAVE_AIMER = false;
-  public static final boolean HAVE_FLYWHEEL = false;
   public static final boolean HAVE_COLOR_SENSOR = false;
+  public static final boolean HAVE_FEEDER = false;
+  public static final boolean HAVE_FLYWHEEL = false;
+  public static final boolean HAVE_INTAKE = false;
+  public static final boolean HAVE_VISION = false;
   public static final boolean HAVE_SHOOTER = HAVE_FEEDER && HAVE_INTAKE && HAVE_AIMER && HAVE_FLYWHEEL
       && HAVE_COLOR_SENSOR;
 
