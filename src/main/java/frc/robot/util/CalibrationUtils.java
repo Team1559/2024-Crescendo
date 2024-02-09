@@ -20,7 +20,7 @@ public class CalibrationUtils {
         SequentialCommandGroup commands = new SequentialCommandGroup();
 
         for (int breakingAngleInDgrees = 45; breakingAngleInDgrees > 0; breakingAngleInDgrees -= 15) {
-            for (int breakingExponent = 1; breakingExponent <= 3; breakingExponent++) {
+            for (double breakingExponent = 0.5; breakingExponent <= 3; breakingExponent += 0.5) {
                 commands.addCommands(
                         calibrateSpinStep(driveBase, Rotation2d.fromDegrees(breakingAngleInDgrees), breakingExponent));
             }
@@ -30,7 +30,7 @@ public class CalibrationUtils {
     }
 
     public static Command calibrateSpinStep(DriveBase driveBase, Rotation2d breakingAngleThreshold,
-            int breakingExponent) {
+            double breakingExponent) {
 
         Command command = new Command() {
 
@@ -76,8 +76,8 @@ public class CalibrationUtils {
         return command;
     }
 
-    private static double getAngularSpeedPercentage(Translation2d currentPosition, Translation2d targetPosition,
-            Rotation2d breakingAngleThreshold, int breakingExponent) {
+    public static double getAngularSpeedPercentage(Translation2d currentPosition, Translation2d targetPosition,
+            Rotation2d breakingAngleThreshold, double breakingExponent) {
 
         Translation2d deltaPosition = targetPosition.minus(currentPosition);
         Rotation2d deltaRotation = deltaPosition.getAngle();
@@ -92,12 +92,12 @@ public class CalibrationUtils {
                 breakingExponent);
     }
 
-    private static double getAngularSpeedPercentage(Rotation2d currentRotation, Rotation2d targetRotation,
-            Rotation2d breakingAngleThreshold, int breakingExponent) {
+    public static double getAngularSpeedPercentage(Rotation2d currentRotation, Rotation2d targetRotation,
+            Rotation2d breakingAngleThreshold, double breakingExponent) {
 
-        if (breakingExponent < 1) {
+        if (breakingExponent <= 0) {
             throw new IllegalArgumentException(
-                    "breakingExponent must be greater than or equal to 1 but curretly is: " + breakingExponent + "!");
+                    "breakingExponent must be greater 0 but curretly is: " + breakingExponent + "!");
         }
 
         double breakingPathPercentLeft = -1;
