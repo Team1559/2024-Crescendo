@@ -86,7 +86,7 @@ public final class Constants {
 
   // ---------- Hardware Ids ----------
   // --- Camera ---
-  public static final String SHOOTER_CAMERA_NAME = "limelight-shooter";
+  public static final String SHOOTER_CAMERA_NAME = "limelight";
   // --- Canivore ---
   public static final String CANIVORE_BUS_ID = "1559Canivore";
   // --- Flywheel ---
