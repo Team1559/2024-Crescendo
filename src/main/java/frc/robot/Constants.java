@@ -66,16 +66,15 @@ public final class Constants {
 
   // ---------- Driving Config ----------
   public static final double JOYSTICK_DEADBAND = 0.2;
-  public static final double MAX_LINEAR_SPEED_IN_METERS_PER_SECOND = 3.0;
+  public static final double MAX_LINEAR_SPEED_IN_METERS_PER_SECOND = 5;
   public static final double MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS = Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND
       / DRIVE_BASE_RADIUS;
   public static final double ADVANTAGE_ODOMETRY_LOG_FREQUENCY = 100.0;
   public static final double ADVANTAGE_DEFAULT_LOG_FREQUENCY = 50.0;
 
-  // ---------- Wheel & GHear Measurements ----------
+  // ---------- Wheel & Gear Measurements ----------
   public static final double WHEEL_RADIUS = Units.inchesToMeters(2);
-  public static final double WHEEL_DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 /
-      27.0) * (45.0 / 15.0); // L2 Gear ratio
+  public static final double WHEEL_DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0); // L2 Gear ratio
   // public static final double WHEEL_DRIVE_GEAR_RATIO = 6.12; // L3 Gear ratio
   public static final double WHEEL_TURN_GEAR_RATIO = 12.8;
 

@@ -33,6 +33,7 @@ import frc.robot.subsystems.swerve.SwerveModuleIoTalonFx;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIoLimelight;
 import frc.robot.subsystems.vision.VisionIoSimAndReplay;
+import frc.robot.util.CalibrationUtils;
 import frc.robot.util.KColor;
 
 /**
@@ -168,32 +169,40 @@ public class RobotContainer {
       speakerTeleOpShootCommand = LightsCommands.blinkCommand(leds, Color.kOrange);
       ampTeleOpShootCommand = LightsCommands.blinkCommand(leds, Color.kViolet);
     }
-	controller.y().onTrue(speakerTeleOpShootCommand);
-	controller.x().onTrue(ampTeleOpShootCommand);
+    controller.y().onTrue(speakerTeleOpShootCommand);
+    // controller.x().onTrue(ampTeleOpShootCommand);
 
-    controller.b().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase,
-        () -> -controller.getLeftY(),
-        () -> -controller.getLeftX(),
-        Constants.SPEAKER_LOCATION_SUPPLIER));
-    controller.a().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase,
-        () -> -controller.getLeftY(),
-        () -> -controller.getLeftX(),
-        Constants.AMP_LOCATION_SUPPLIER));
+    /*
+     * controller.b().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(
+     * driveBase,
+     * () -> -controller.getLeftY(),
+     * () -> -controller.getLeftX(),
+     * Constants.SPEAKER_LOCATION_SUPPLIER));
+     * controller.a().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(
+     * driveBase,
+     * () -> -controller.getLeftY(),
+     * () -> -controller.getLeftX(),
+     * Constants.AMP_LOCATION_SUPPLIER));
+     */
 
     // ---------- Configure Light Buttons ----------
-	controller.start().and(controller.a()).onTrue(leds.setStaticColorCommand(Color.kDarkGreen));
-	controller.start().and(controller.b()).onTrue(leds.setStaticPatternCommand(
-	  new Color[] { KColor.ALLIANCE_RED, KColor.ALLIANCE_RED, Color.kBlack, Color.kBlack }));
-	controller.start().and(controller.x()).onTrue(leds.setDynamicPatternCommand(new Color[] {
-	  KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE,
-	  Color.kDarkViolet, Color.kDarkViolet, Color.kDarkViolet }, true));
-	controller.start().and(controller.y()).onTrue(leds.setDynamicPatternCommand(new Color[] {
-	  Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kBlack,
-	  Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack, Color.kBlack },
-	  false));
-	controller.leftBumper().onTrue(leds.changeBrightnessCommand(true));
-	controller.rightBumper().onTrue(leds.changeBrightnessCommand(false));
-	controller.leftBumper().and(controller.rightBumper()).onTrue(leds.setStaticColorCommand(Color.kBlack));
+    controller.start().and(controller.a()).onTrue(leds.setStaticColorCommand(Color.kDarkGreen));
+    controller.start().and(controller.b()).onTrue(leds.setStaticPatternCommand(
+        new Color[] { KColor.ALLIANCE_RED, KColor.ALLIANCE_RED, Color.kBlack, Color.kBlack }));
+    controller.start().and(controller.x()).onTrue(leds.setDynamicPatternCommand(new Color[] {
+        KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE,
+        Color.kDarkViolet, Color.kDarkViolet, Color.kDarkViolet }, true));
+    controller.start().and(controller.y()).onTrue(leds.setDynamicPatternCommand(new Color[] {
+        Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kBlack,
+        Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack, Color.kBlack },
+        false));
+    controller.leftBumper().onTrue(leds.changeBrightnessCommand(true));
+    controller.rightBumper().onTrue(leds.changeBrightnessCommand(false));
+    controller.leftBumper().and(controller.rightBumper()).onTrue(leds.setStaticColorCommand(Color.kBlack));
+
+    controller.a().onTrue(CalibrationUtils.calibrateSpinStep(driveBase, Rotation2d.fromDegrees(45), 1));
+    controller.b().onTrue(CalibrationUtils.calibrateSpinStep(driveBase, Rotation2d.fromDegrees(15), 2));
+    controller.x().onTrue(CalibrationUtils.calibrateSpin(driveBase));
   }
 
   /**
