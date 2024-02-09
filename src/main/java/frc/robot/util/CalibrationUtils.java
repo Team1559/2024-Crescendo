@@ -76,6 +76,29 @@ public class CalibrationUtils {
         return command;
     }
 
+    /**
+     * Calculates how fast and what direction to go, to get to the given target
+     * given some parameters.
+     * 
+     * @param currentPosition        Where you are.
+     * @param targetPosition         Where you want to be.
+     * @param breakingAngleThreshold Once within this angle to the target, the
+     *                               returned speed percentage will start decreasing
+     *                               below 100%.
+     * @param breakingExponent
+     *                               <ul>
+     *                               <li>Numbers between 0 and 1 will cause the
+     *                               speed to decrease more gradually, with more of
+     *                               a jump to stop at the end.</li>
+     *                               <li>1 will be the most smooth and even speed
+     *                               decrease rate.</li>
+     *                               <li>Numbers greater than 1 will cause the speed
+     *                               to decrease more agressivly, with more of an
+     *                               initial slow down jump.</li>
+     *                               </ul>
+     * 
+     * @return The reccomended speed percentage as a number between 0 and 1.
+     */
     public static double getAngularSpeedPercentage(Translation2d currentPosition, Translation2d targetPosition,
             Rotation2d breakingAngleThreshold, double breakingExponent) {
 
@@ -92,6 +115,29 @@ public class CalibrationUtils {
                 breakingExponent);
     }
 
+    /**
+     * Calculates how fast and what direction to go, to get to the given target
+     * given some parameters.
+     * 
+     * @param currentRotation        Where you are.
+     * @param targetRotation         Where you want to be.
+     * @param breakingAngleThreshold Once within this angle to the target, the
+     *                               returned speed percentage will start decreasing
+     *                               below 100%.
+     * @param breakingExponent
+     *                               <ul>
+     *                               <li>Numbers between 0 and 1 will cause the
+     *                               speed to decrease more gradually, with more of
+     *                               a jump to stop at the end.</li>
+     *                               <li>1 will be the most smooth and even speed
+     *                               decrease rate.</li>
+     *                               <li>Numbers greater than 1 will cause the speed
+     *                               to decrease more agressivly, with more of an
+     *                               initial slow down jump.</li>
+     *                               </ul>
+     * 
+     * @return The reccomended speed percentage as a number between 0 and 1.
+     */
     public static double getAngularSpeedPercentage(Rotation2d currentRotation, Rotation2d targetRotation,
             Rotation2d breakingAngleThreshold, double breakingExponent) {
 
