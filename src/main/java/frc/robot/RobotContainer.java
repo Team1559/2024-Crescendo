@@ -6,9 +6,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -35,6 +33,7 @@ import frc.robot.subsystems.swerve.SwerveModuleIoTalonFx;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIoLimelight;
 import frc.robot.subsystems.vision.VisionIoSimAndReplay;
+import frc.robot.util.KColor;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -188,11 +187,11 @@ public class RobotContainer {
     if (Constants.HAVE_LEDS) {
       controller.start().and(controller.a()).onTrue(leds.setStaticColorCommand(Color.kDarkGreen));
       controller.start().and(controller.b()).onTrue(leds.setStaticPatternCommand(
-          new Color[] { Color.kDarkRed, Color.kDarkRed, Color.kBlack, Color.kBlack }));
+          new Color[] { KColor.ALLIANCE_RED, KColor.ALLIANCE_RED, Color.kBlack, Color.kBlack }));
       controller.start().and(controller.x())
           .onTrue(leds.setDynamicPatternCommand(
-              new Color[] { Color.kBlue, Color.kBlue, Color.kBlue, Color.kBlue, Color.kBlue,
-                  Color.kBlueViolet, Color.kBlueViolet, Color.kBlueViolet, Color.kBlueViolet, Color.kBlueViolet },
+              new Color[] { KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE,
+                  Color.kBlack },
               true));
       controller.start().and(controller.y()).onTrue(leds.setDynamicPatternCommand(
           new Color[] {
