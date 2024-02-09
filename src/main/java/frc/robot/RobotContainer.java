@@ -6,9 +6,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,6 +19,8 @@ import frc.robot.commands.LightsCommands;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.subsystems.base.DriveBase;
 import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
+import frc.robot.subsystems.general.SingleMotorIoReplay;
+import frc.robot.subsystems.general.SingleMotorIoSparkMax;
 import frc.robot.subsystems.gyro.GyroIoPigeon2;
 import frc.robot.subsystems.gyro.GyroIoSimAndReplay;
 import frc.robot.subsystems.led.Leds;
@@ -76,6 +76,12 @@ public class RobotContainer {
             new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_RIGHT),
             new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_LEFT),
             new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
+        feeder = Constants.HAVE_FEEDER
+            ? new Feeder(new SingleMotorIoSparkMax(Constants.FEEDER_MOTOR_ID, false))
+            : null;
+        intake = Constants.HAVE_INTAKE
+            ? new Intake(new SingleMotorIoSparkMax(Constants.INTAKE_MOTOR_ID, false))
+            : null;
         vision = Constants.HAVE_VISION
             ? new Vision(driveBase.getPoseEstimator(), new VisionIoLimelight(Constants.SHOOTER_CAMERA_NAME))
             : null;
@@ -89,6 +95,12 @@ public class RobotContainer {
             new SwerveModuleIoSim(),
             new SwerveModuleIoSim(),
             new SwerveModuleIoSim());
+        feeder = Constants.HAVE_FEEDER
+            ? new Feeder(new SingleMotorIoSparkMax(Constants.FEEDER_MOTOR_ID, false))
+            : null;
+        intake = Constants.HAVE_INTAKE
+            ? new Intake(new SingleMotorIoSparkMax(Constants.INTAKE_MOTOR_ID, false))
+            : null;
         vision = Constants.HAVE_VISION ? new Vision(driveBase.getPoseEstimator(), new VisionIoSimAndReplay()) : null;
         break;
 
@@ -100,6 +112,12 @@ public class RobotContainer {
             new SwerveModuleIoReplay(),
             new SwerveModuleIoReplay(),
             new SwerveModuleIoReplay());
+        feeder = Constants.HAVE_FEEDER
+            ? new Feeder(new SingleMotorIoReplay())
+            : null;
+        intake = Constants.HAVE_INTAKE
+            ? new Intake(new SingleMotorIoReplay())
+            : null;
         vision = Constants.HAVE_VISION ? new Vision(driveBase.getPoseEstimator(), new VisionIoSimAndReplay()) : null;
         break;
 
@@ -110,9 +128,7 @@ public class RobotContainer {
     // ----- Initialize Subsystems without Simulation and/or Log Replay Modes -----
     aimer = Constants.HAVE_AIMER ? new Aimer() : null;
     colorSensor = Constants.HAVE_COLOR_SENSOR ? new ColorSensor() : null;
-    feeder = Constants.HAVE_FEEDER ? new Feeder() : null;
     flywheel = Constants.HAVE_FLYWHEEL ? new Flywheel() : null;
-    intake = Constants.HAVE_INTAKE ? new Intake() : null;
     // We can safely emit LED instructions even if there are no LEDs.
     // (The LED control hardware is built into the RoboRio so always "exists".)
     leds = new Leds();

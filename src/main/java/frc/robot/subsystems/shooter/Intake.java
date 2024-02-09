@@ -1,9 +1,11 @@
 package frc.robot.subsystems.shooter;
 
 import frc.robot.Constants;
+import frc.robot.subsystems.general.SingleMotorIo;
+import frc.robot.subsystems.general.SingleMotorSubsystem;
 
-public class Intake extends SingleCanSparkMaxSubsystem {
-    public Intake() {
-        super("Intake", Constants.INTAKE_MOTOR_ID, Constants.INTAKE_FORWARD_VOLTAGE, Constants.INTAKE_REVERSE_VOLTAGE);
+public class Intake extends SingleMotorSubsystem {
+    public Intake(SingleMotorIo io) {
+        super("Shooter/Intake", io, Constants.INTAKE_FORWARD_VOLTAGE, Constants.INTAKE_REVERSE_VOLTAGE);
     }
 }
