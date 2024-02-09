@@ -22,7 +22,7 @@ public class ShooterCommands {
     return new SequentialCommandGroup(
       spinUpFlywheelCommand(flywheel),
       feeder.startCommand(),
-      LightsCommands.blinkCommand(leds, Color.kOrange), // TODO: What if Constants.HAVE_LEDS == false?
+      LightsCommands.blinkCommand(leds, Color.kOrange),
       colorSensor.waitForNoObjectCommand(),
       new WaitCommand(.25),
       feeder.stopCommand(),

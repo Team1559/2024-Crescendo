@@ -106,14 +106,13 @@ public final class Constants {
   public static final boolean HAVE_FEEDER = false;
   public static final boolean HAVE_FLYWHEEL = false;
   public static final boolean HAVE_INTAKE = false;
-  public static final boolean HAVE_LEDS = true;
   public static final boolean HAVE_VISION = false;
   public static final boolean HAVE_SHOOTER = HAVE_FEEDER && HAVE_INTAKE && HAVE_AIMER && HAVE_FLYWHEEL
       && HAVE_COLOR_SENSOR;
 
   // ---------- Hardware Ids ----------
   // --- Camera ---
-  public static final String SHOOTER_CAMERA_NAME = "limelight-shooter";
+  public static final String SHOOTER_CAMERA_NAME = "limelight";
   // --- Canivore ---
   public static final String CANIVORE_BUS_ID = "1559Canivore";
   // --- Flywheel ---
