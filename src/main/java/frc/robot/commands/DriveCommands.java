@@ -91,11 +91,6 @@ public class DriveCommands {
       }
 
       @Override
-      public boolean isFinished() {
-        return false; // pid.atSetpoint();
-      }
-
-      @Override
       public void end(boolean interrupted) {
         // TODO: Need to close the PIDController as it is an AutoCloseable class.
         pid.close();
