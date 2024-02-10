@@ -179,4 +179,5 @@ public class Flywheel extends SubsystemBase {
     public Command reverseFlywheelCommand() {
         return new InstantCommand(this::reverseFlywheel, this);
     }
+
 }

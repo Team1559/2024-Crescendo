@@ -84,13 +84,22 @@ public class ShooterCommands {
     );
     //@formatter:on
   }
-
   public static Command spinUpFlywheelCommand(Flywheel flywheel) {
     //@formatter:off
     return new SequentialCommandGroup(
       flywheel.startFlywheelCommand(), 
       new WaitCommand(0.5)
       );
+      //@formattter:on
+  }
+  public static Command autoShootCommand(Feeder feeder, Leds leds, ColorSensor colorSensor) {
+    //@formatter:off
+    return new SequentialCommandGroup(
+      feeder.startCommand(),
+      LightsCommands.blinkCommand(leds, Color.kOrange),
+      colorSensor.waitForNoObjectCommand(),
+      new WaitCommand(.25),
+      feeder.stopCommand());
     //@formatter:on
   }
 }

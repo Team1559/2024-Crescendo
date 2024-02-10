@@ -128,6 +128,10 @@ public class RobotContainer {
                 NamedCommands.registerCommand("Spin 180",
                                 DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
                 NamedCommands.registerCommand("StartIntake", LedCommands.blinkCommand(leds, Color.kPurple));
+                if (Constants.HAVE_FLYWHEEL) {
+                        NamedCommands.registerCommand("Spin Up Flywheel",
+                                        ShooterCommands.spinUpFlywheelCommand(flywheel));
+                }
 
                 Command aimCommand = new ConditionalCommand(
                                 // Turn to Blue Speaker.
@@ -141,7 +145,7 @@ public class RobotContainer {
                 if (Constants.HAVE_SHOOTER) {
                         autoShootCommand = ShooterCommands.shootCommand(flywheel, feeder, leds, colorSensor);
                 } else {
-                        autoShootCommand = LedCommands.blinkCommand(leds, Color.kOrange);
+                        autoShootCommand = LightsCommands.blinkCommand(leds, Color.kOrange);
                 }
                 NamedCommands.registerCommand("ShootNote", new SequentialCommandGroup(aimCommand, autoShootCommand));
 
@@ -208,43 +212,38 @@ public class RobotContainer {
                                                 () -> -controller1.getLeftX(),
                                                 Constants.AMP_LOCATION_SUPPLIER));
 
-                // ---------- Configure Emergency Buttons ----------
-                controller1.povUp().whileTrue(reverseShooterCommand);
-                controller1.povDown().whileTrue(stopIntakeFeederCommand);
-
                 // ---------- Configure Light Buttons ----------
-                controller1.start().and(controller1.a()).whileTrue(leds.setColorCommand(Color.kDarkGreen));
-                controller1.start().and(controller1.b()).whileTrue(leds.setStaticPatternCommand(
+                controller1.start().and(controller1.a()).onTrue(leds.setColorCommand(Color.kDarkGreen));
+                controller1.start().and(controller1.b()).onTrue(leds.setStaticPatternCommand(
                                 new Color[] { KColor.ALLIANCE_RED, KColor.ALLIANCE_RED, Color.kBlack, Color.kBlack }));
-                controller1.start().and(controller1.x()).whileTrue(leds.setDynamicPatternCommand(new Color[] {
+                controller1.start().and(controller1.x()).onTrue(leds.setDynamicPatternCommand(new Color[] {
                                 KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE,
                                 Color.kDarkViolet, Color.kDarkViolet, Color.kDarkViolet }, true));
-                controller1.start().and(controller1.y()).whileTrue(leds.setDynamicPatternCommand(new Color[] {
+                controller1.start().and(controller1.y()).onTrue(leds.setDynamicPatternCommand(new Color[] {
                                 Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kBlack,
                                 Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack, Color.kBlack },
                                 false));
-                controller1.start().and(controller1.leftBumper()).onTrue(leds.changeBrightnessCommand(true));
-                controller1.start().and(controller1.rightBumper()).onTrue(leds.changeBrightnessCommand(false));
-                controller1.leftBumper().and(controller1.rightBumper()).and(not(controller1.b()))
-                                .whileTrue(leds.setColorCommand(Color.kBlack));
+                controller1.leftBumper().onTrue(leds.changeBrightnessCommand(true));
+                controller1.rightBumper().onTrue(leds.changeBrightnessCommand(false));
+                controller1.leftBumper().and(controller1.rightBumper()).onTrue(leds.setColorCommand(Color.kBlack));
 
-                Controller 2 Configure Buttons
-                controller2.a().whileTrue(new StartEndCommand(intake::start, intake::stop,
-                intake));
-                controller2.b().whileTrue(new StartEndCommand(flywheel::start,
-                flywheel::stop, flywheel));
-                controller2.y().whileTrue(new StartEndCommand(feeder::start, feeder::stop,
-                feeder));
-                controller2.povUp().onTrue(new InstantCommand(() -> {
-                double currentAngle = aimer.getAngle();
-                double targetAngle = currentAngle + 5;
-                aimer.setTargetAngle(targetAngle);
-                }));
-                controller2.povDown().onTrue(new InstantCommand(() -> {
-                double currentAngle = aimer.getAngle();
-                double targetAngle = currentAngle - 5;
-                aimer.setTargetAngle(targetAngle);
-                }));
+                // Controller 2 Configure Buttons
+                if (Constants.HAVE_SHOOTER) {
+                        controller2.a().whileTrue(new StartEndCommand(intake::start, intake::stop, intake));
+                        controller2.b().whileTrue(new StartEndCommand(flywheel::start, flywheel::stop, flywheel));
+                        controller2.y().whileTrue(new StartEndCommand(feeder::start, feeder::stop, feeder));
+                        controller2.povUp().onTrue(new InstantCommand(() -> {
+                                double currentAngle = aimer.getAngle();
+                                double targetAngle = currentAngle + 5;
+                                aimer.setTargetAngle(targetAngle);
+                        }));
+
+                        controller2.povDown().onTrue(new InstantCommand(() -> {
+                                double currentAngle = aimer.getAngle();
+                                double targetAngle = currentAngle - 5;
+                                aimer.setTargetAngle(targetAngle);
+                        }));
+                }
         }
 
         /**
