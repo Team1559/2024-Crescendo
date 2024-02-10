@@ -97,7 +97,8 @@ public class CalibrationUtils {
      *                               initial slow down jump.</li>
      *                               </ul>
      * 
-     * @return The reccomended speed percentage as a number between 0 and 1.
+     * @return The reccomended directional speed percentage as a number between -1
+     *         and 1.
      */
     public static double getAngularSpeedPercentage(Translation2d currentPosition, Translation2d targetPosition,
             Rotation2d breakingAngleThreshold, double breakingExponent) {
@@ -136,7 +137,8 @@ public class CalibrationUtils {
      *                               initial slow down jump.</li>
      *                               </ul>
      * 
-     * @return The reccomended speed percentage as a number between 0 and 1.
+     * @return The reccomended directional speed percentage as a number between -1
+     *         and 1.
      */
     public static double getAngularSpeedPercentage(Rotation2d currentRotation, Rotation2d targetRotation,
             Rotation2d breakingAngleThreshold, double breakingExponent) {
@@ -146,13 +148,13 @@ public class CalibrationUtils {
                     "breakingExponent must be greater 0 but curretly is: " + breakingExponent + "!");
         }
 
-        double breakingPathPercentLeft = -1;
+        double breakingPathPercentRemaining = -1;
         Rotation2d deltaRotation = targetRotation.minus(currentRotation);
 
         double angularSpeedPercentage = Math.copySign(1, deltaRotation.getDegrees());
         if (Math.abs(deltaRotation.getDegrees()) < breakingAngleThreshold.getDegrees()) {
-            breakingPathPercentLeft = deltaRotation.getDegrees() / breakingAngleThreshold.getDegrees();
-            angularSpeedPercentage = Math.pow(breakingPathPercentLeft, breakingExponent);
+            breakingPathPercentRemaining = deltaRotation.getDegrees() / breakingAngleThreshold.getDegrees();
+            angularSpeedPercentage = Math.pow(breakingPathPercentRemaining, breakingExponent);
         }
 
         Logger.recordOutput("CalibrationUtils/getAngularSpeedPercentage-Rotation2d/currentRotation", currentRotation);
@@ -163,7 +165,7 @@ public class CalibrationUtils {
         Logger.recordOutput("CalibrationUtils/getAngularSpeedPercentage-Rotation2d/angularSpeedPercentage",
                 angularSpeedPercentage);
         Logger.recordOutput("CalibrationUtils/getAngularSpeedPercentage-Rotation2d/breakingPathPercentLeft",
-                breakingPathPercentLeft);
+                breakingPathPercentRemaining);
         Logger.recordOutput("CalibrationUtils/getAngularSpeedPercentage-Rotation2d/angularSpeedPercentage",
                 angularSpeedPercentage);
 
