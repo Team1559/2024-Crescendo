@@ -39,7 +39,7 @@ public class ShooterCommands {
       );
       //@formattter:on
   }
-      public static Command autoShootCommand(Feeder feeder, Leds leds, ColorSensor colorSensor) {
+  public static Command autoShootCommand(Feeder feeder, Leds leds, ColorSensor colorSensor) {
     //@formatter:off
     return new SequentialCommandGroup(
       feeder.startCommand(),
