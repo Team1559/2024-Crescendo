@@ -14,19 +14,19 @@
         {
           "type": "named",
           "data": {
-            "name": "ShootNote"
+            "name": "Start Flywheel"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Auto Shoot"
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "MoveDiagonally"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StartIntake"
           }
         },
         {
@@ -38,7 +38,7 @@
         {
           "type": "named",
           "data": {
-            "name": "ShootNote"
+            "name": "Auto Shoot"
           }
         },
         {
@@ -50,7 +50,7 @@
         {
           "type": "named",
           "data": {
-            "name": "ShootNote"
+            "name": "Auto Shoot"
           }
         },
         {
@@ -62,7 +62,7 @@
         {
           "type": "named",
           "data": {
-            "name": "ShootNote"
+            "name": "Auto Shoot"
           }
         }
       ]

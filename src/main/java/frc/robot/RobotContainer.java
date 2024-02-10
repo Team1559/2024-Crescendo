@@ -121,6 +121,8 @@ public class RobotContainer {
     // ---------- Create Named Commands for use by Path Planner ----------
     NamedCommands.registerCommand("Spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
     NamedCommands.registerCommand("StartIntake", LightsCommands.blinkCommand(leds, Color.kPurple));
+    NamedCommands.registerCommand("Spin Up Flywheel", ShooterCommands.spinUpFlywheelCommand(flywheel));
+   
 
     Command aimCommand = new ConditionalCommand(
         // Turn to Blue Speaker.
@@ -132,11 +134,11 @@ public class RobotContainer {
         () -> DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
     Command autoShootCommand;
     if (Constants.HAVE_SHOOTER) {
-      autoShootCommand = ShooterCommands.shootCommand(flywheel, feeder, leds, colorSensor);
+      autoShootCommand = ShooterCommands.autoShootCommand(feeder, leds, colorSensor);
     } else {
       autoShootCommand = LightsCommands.blinkCommand(leds, Color.kOrange);
     }
-    NamedCommands.registerCommand("ShootNote", new SequentialCommandGroup(aimCommand, autoShootCommand));
+    NamedCommands.registerCommand("Auto Shoot", new SequentialCommandGroup(aimCommand, autoShootCommand));
 
     // ---------- Set-up Autonomous Choices ----------
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
