@@ -18,7 +18,7 @@ public class LedCommands {
    * 
    * @param leds  leds being set
    * @param color color being blinked to
-   * @return
+   * @return Blink Command
    */
   public static Command blinkCommand(Leds leds, Color color) {
     Duration WAIT_TIME = Duration.ofMillis(500);
