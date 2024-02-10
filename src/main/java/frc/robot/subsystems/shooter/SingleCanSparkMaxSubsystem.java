@@ -24,11 +24,12 @@ public class SingleCanSparkMaxSubsystem extends SubsystemBase {
         public double velocity;
     }
 
-    public final double fowardsVoltage;
-    public final double reverseVoltage;
+    public final double FORWARDS_VOLTAGE, REVERSE_VOLTAGE;
 
     private final CANSparkMax motor;
     private final SingleCanSparkMaxSubsystemInputsAutoLogged inputs = new SingleCanSparkMaxSubsystemInputsAutoLogged();
+
+    private double appliedVoltage;
 
     /**
      * Create a new subsystem for two motors controlled by CANspark Controller
@@ -52,18 +53,23 @@ public class SingleCanSparkMaxSubsystem extends SubsystemBase {
      */
     protected SingleCanSparkMaxSubsystem(String name, int motorId, double fowardsVoltage, double reverseVoltage,
             boolean isInverted) {
+
         super(name);
+
+        FORWARDS_VOLTAGE = fowardsVoltage;
+        REVERSE_VOLTAGE = reverseVoltage;
+
         motor = new CANSparkMax(motorId, MotorType.kBrushless);
         motor.setInverted(isInverted);
         motor.setIdleMode(IdleMode.kBrake);
         motor.setSmartCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_LIMIT);
         motor.setSecondaryCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_SECONDARY_LIMIT);
-        this.fowardsVoltage = fowardsVoltage;
-        this.reverseVoltage = reverseVoltage;
     }
 
     @Override
     public void periodic() {
+        motor.setVoltage(appliedVoltage);
+
         updateInputs();
         Logger.processInputs("Shooter/" + getName(), inputs);
     }
@@ -78,7 +84,7 @@ public class SingleCanSparkMaxSubsystem extends SubsystemBase {
 
     // ========================= Functions =========================
     public void start() {
-        setVoltage(fowardsVoltage);
+        setVoltage(FORWARDS_VOLTAGE);
     }
 
     public void stop() {
@@ -86,11 +92,11 @@ public class SingleCanSparkMaxSubsystem extends SubsystemBase {
     }
 
     public void reverse() {
-        setVoltage(reverseVoltage);
+        setVoltage(REVERSE_VOLTAGE);
     }
 
-    private void setVoltage(double voltage) {
-        motor.setVoltage(voltage);
+    public void setVoltage(double voltage) {
+        appliedVoltage = voltage;
     }
 
     // ========================= Commands =========================
@@ -107,4 +113,5 @@ public class SingleCanSparkMaxSubsystem extends SubsystemBase {
         return new InstantCommand(this::reverse, this);
     }
 
+    // TODO: Create setVoltageCommand method.
 }
