@@ -16,13 +16,13 @@ Contains constants that need to be updated per robot. i.e.
   * [B] = Aim at speaker
   * [Y + B + Rightbumper] = Fire at amp
   * [B + Right Bumper] = Aim at amp
-* **LEDs:**
+* **LEDs:** (On Hold)
   * [Start + A] = Solid $\color{green}Green$
   * [Start + B] = Solid $\color{red}Red$ and **Black** pattern
   * [Start + X] = $\color{blue}Blue$ and $\color{purple}Purple$ pattern moving in one direction
   * [Start + Y] = $\color{yellow}Yellow$ and **Black** pattern moving in the other direction
-  * [Left Bumber] = <span style="font-size:smaller;">Decrease Brightness</span>
-  * [Right Bumber] = <span style="font-size:larger;">Increase Brightness</span>
+  * [Start + Left Bumber] = <span style="font-size:smaller;">Decrease Brightness</span>
+  * [Start + Right Bumber] = <span style="font-size:larger;">Increase Brightness</span>
   * [Left + Right Bumber] = Turn Off LEDs
 * **Emergency:**
   * [D-Pad Up] = Reverse Shooter

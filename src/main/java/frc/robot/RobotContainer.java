@@ -203,20 +203,20 @@ public class RobotContainer {
     controller.povDown().whileTrue(stopIntakeFeederCommand);
 
     // ---------- Configure Light Buttons ----------
-    controller.start().and(controller.a()).onTrue(leds.setColorCommand(Color.kDarkGreen));
-    controller.start().and(controller.b()).onTrue(leds.setStaticPatternCommand(
+    controller.start().and(controller.a()).whileTrue(leds.setColorCommand(Color.kDarkGreen));
+    controller.start().and(controller.b()).whileTrue(leds.setStaticPatternCommand(
         new Color[] { KColor.ALLIANCE_RED, KColor.ALLIANCE_RED, Color.kBlack, Color.kBlack }));
-    controller.start().and(controller.x()).onTrue(leds.setDynamicPatternCommand(new Color[] {
+    controller.start().and(controller.x()).whileTrue(leds.setDynamicPatternCommand(new Color[] {
         KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE,
         Color.kDarkViolet, Color.kDarkViolet, Color.kDarkViolet }, true));
-    controller.start().and(controller.y()).onTrue(leds.setDynamicPatternCommand(new Color[] {
+    controller.start().and(controller.y()).whileTrue(leds.setDynamicPatternCommand(new Color[] {
         Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kBlack,
         Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack, Color.kBlack },
         false));
-    controller.leftBumper().and(not(controller.b())).onTrue(leds.changeBrightnessCommand(true));
-    controller.rightBumper().and(not(controller.b())).onTrue(leds.changeBrightnessCommand(false));
+    controller.start().and(controller.leftBumper()).onTrue(leds.changeBrightnessCommand(true));
+    controller.start().and(controller.rightBumper()).onTrue(leds.changeBrightnessCommand(false));
     controller.leftBumper().and(controller.rightBumper()).and(not(controller.b()))
-        .onTrue(leds.setColorCommand(Color.kBlack));
+        .whileTrue(leds.setColorCommand(Color.kBlack));
   }
 
   /**
