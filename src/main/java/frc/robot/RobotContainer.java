@@ -121,10 +121,11 @@ public class RobotContainer {
     // ---------- Create Named Commands for use by Path Planner ----------
     NamedCommands.registerCommand("Spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
     NamedCommands.registerCommand("StartIntake", LightsCommands.blinkCommand(leds, Color.kPurple));
-    NamedCommands.registerCommand("Spin Up Flywheel", ShooterCommands.spinUpFlywheelCommand(flywheel));
-   
+    if (Constants.HAVE_FLYWHEEL) {
+      NamedCommands.registerCommand("Spin Up Flywheel", ShooterCommands.spinUpFlywheelCommand(flywheel));
+    }
 
-    Command aimCommand = new ConditionalCommand(
+    Command turnToSpeakerCommand = new ConditionalCommand(
         // Turn to Blue Speaker.
         DriveCommands.turnToTargetCommand(driveBase,
             Constants.BLUE_SPEAKER_LOCATION, 4.5),
@@ -132,13 +133,14 @@ public class RobotContainer {
         DriveCommands.turnToTargetCommand(driveBase,
             Constants.RED_SPEAKER_LOCATION, 4.5),
         () -> DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
+
     Command autoShootCommand;
     if (Constants.HAVE_SHOOTER) {
       autoShootCommand = ShooterCommands.autoShootCommand(feeder, leds, colorSensor);
     } else {
       autoShootCommand = LightsCommands.blinkCommand(leds, Color.kOrange);
     }
-    NamedCommands.registerCommand("Auto Shoot", new SequentialCommandGroup(aimCommand, autoShootCommand));
+    NamedCommands.registerCommand("Auto Shoot", new SequentialCommandGroup(turnToSpeakerCommand, autoShootCommand));
 
     // ---------- Set-up Autonomous Choices ----------
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -173,8 +175,8 @@ public class RobotContainer {
       speakerTeleOpShootCommand = LightsCommands.blinkCommand(leds, Color.kOrange);
       ampTeleOpShootCommand = LightsCommands.blinkCommand(leds, Color.kViolet);
     }
-	controller1.y().onTrue(speakerTeleOpShootCommand);
-	controller1.x().onTrue(ampTeleOpShootCommand);
+    controller1.y().onTrue(speakerTeleOpShootCommand);
+    controller1.x().onTrue(ampTeleOpShootCommand);
 
     controller1.b().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase,
         () -> -controller1.getLeftY(),
@@ -186,37 +188,39 @@ public class RobotContainer {
         Constants.AMP_LOCATION_SUPPLIER));
 
     // ---------- Configure Light Buttons ----------
-	controller1.start().and(controller1.a()).onTrue(leds.setStaticColorCommand(Color.kDarkGreen));
-	controller1.start().and(controller1.b()).onTrue(leds.setStaticPatternCommand(
-	  new Color[] { KColor.ALLIANCE_RED, KColor.ALLIANCE_RED, Color.kBlack, Color.kBlack }));
-	controller1.start().and(controller1.x()).onTrue(leds.setDynamicPatternCommand(new Color[] {
-	  KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE,
-	  Color.kDarkViolet, Color.kDarkViolet, Color.kDarkViolet }, true));
-	controller1.start().and(controller1.y()).onTrue(leds.setDynamicPatternCommand(new Color[] {
-	  Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kBlack,
-	  Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack, Color.kBlack },
-	  false));
-	controller1.leftBumper().onTrue(leds.changeBrightnessCommand(true));
-	controller1.rightBumper().onTrue(leds.changeBrightnessCommand(false));
-	controller1.leftBumper().and(controller1.rightBumper()).onTrue(leds.setStaticColorCommand(Color.kBlack));
+    controller1.start().and(controller1.a()).onTrue(leds.setStaticColorCommand(Color.kDarkGreen));
+    controller1.start().and(controller1.b()).onTrue(leds.setStaticPatternCommand(
+        new Color[] { KColor.ALLIANCE_RED, KColor.ALLIANCE_RED, Color.kBlack, Color.kBlack }));
+    controller1.start().and(controller1.x()).onTrue(leds.setDynamicPatternCommand(new Color[] {
+        KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE,
+        Color.kDarkViolet, Color.kDarkViolet, Color.kDarkViolet }, true));
+    controller1.start().and(controller1.y()).onTrue(leds.setDynamicPatternCommand(new Color[] {
+        Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kBlack,
+        Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack, Color.kBlack },
+        false));
+    controller1.leftBumper().onTrue(leds.changeBrightnessCommand(true));
+    controller1.rightBumper().onTrue(leds.changeBrightnessCommand(false));
+    controller1.leftBumper().and(controller1.rightBumper()).onTrue(leds.setStaticColorCommand(Color.kBlack));
 
+    // Controller 2 Configure Buttons
+    if (Constants.HAVE_SHOOTER) {
+      controller2.a().whileTrue(new StartEndCommand(intake::start, intake::stop, intake));
+      controller2.b().whileTrue(new StartEndCommand(flywheel::start, flywheel::stop, flywheel));
+      controller2.y().whileTrue(new StartEndCommand(feeder::start, feeder::stop, feeder));
+      controller2.povUp().onTrue(new InstantCommand(() -> {
+        double currentAngle = aimer.getAngle();
+        double targetAngle = currentAngle + 5;
+        aimer.setTargetAngle(targetAngle);
+      }));
 
-  //Controller 2 Configure Buttons 
-  controller2.a().whileTrue(new StartEndCommand(intake::start, intake::stop, intake ));
-  controller2.b().whileTrue(new StartEndCommand(flywheel::start,flywheel::stop, flywheel));
-  controller2.y().whileTrue(new StartEndCommand(feeder::start, feeder::stop, feeder));
-  controller2.povUp().onTrue(new InstantCommand(()->{
-    double currentAngle = aimer.getAngle();
-    double targetAngle = currentAngle+5;
-    aimer.setTargetAngle(targetAngle);
-  }));
-  controller2.povDown().onTrue(new InstantCommand(()->{
-    double currentAngle = aimer.getAngle();
-    double targetAngle = currentAngle-5;
-    aimer.setTargetAngle(targetAngle);
-  }));
+      controller2.povDown().onTrue(new InstantCommand(() -> {
+        double currentAngle = aimer.getAngle();
+        double targetAngle = currentAngle - 5;
+        aimer.setTargetAngle(targetAngle);
+      }));
+    }
   }
-    
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
