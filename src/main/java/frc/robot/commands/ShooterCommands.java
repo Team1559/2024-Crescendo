@@ -41,12 +41,13 @@ public class ShooterCommands {
 
   // ========================= Other Commands =========================
 
-  public static Command reverseShooterCommand(Flywheel flywheel, Feeder feeder, Leds leds) {
+  public static Command reverseShooterCommand(Flywheel flywheel, Feeder feeder, Intake intake, Leds leds) {
     Command reverseShooterCommand = new Command() {
       @Override
-      public void execute() { // TODO: Reverse Intake.
+      public void execute() {
         flywheel.reverseFlywheel();
         feeder.reverse();
+        intake.reverse();
         leds.setDynamicPattern(new Color[] { Color.kRed, Color.kRed, Color.kRed, Color.kRed, Color.kRed, Color.kBlack,
             Color.kBlack, Color.kBlack, Color.kBlack }, true);
       }
@@ -55,10 +56,11 @@ public class ShooterCommands {
       public void end(boolean interrupted) {
         flywheel.stop();
         feeder.stop();
+        intake.stop();
         leds.setAllianceColor();
       }
     };
-    reverseShooterCommand.addRequirements(flywheel, feeder, leds);
+    reverseShooterCommand.addRequirements(flywheel, feeder, intake, leds);
     return reverseShooterCommand;
   }
 
