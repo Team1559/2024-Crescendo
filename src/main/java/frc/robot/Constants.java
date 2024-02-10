@@ -98,6 +98,8 @@ public final class Constants {
   public static final double AIMER_KI = 0;
   public static final double AIMER_KD = 0;
   public static final double AIMER_ANGLE_OFFSET = 0; // TODO/calibrate
+  public static final double AIMER_LOWER_ANGLE = 0;
+  public static final double AIMER_UPPER_ANGLE = 70; 
 
   // ---------- Hardware Config --------
   public static final boolean HAVE_AIMER = false;

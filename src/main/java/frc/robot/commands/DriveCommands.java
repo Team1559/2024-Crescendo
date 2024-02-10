@@ -226,7 +226,8 @@ public class DriveCommands {
 
       @Override
       public void initialize() {
-        Rotation2d rotation = driveBase.getRotationToTarget(target);
+       // Rotating plus 180 degrees to postion the back of the robot to the target.
+        Rotation2d rotation = driveBase.getRotationToTarget(target).plus(Rotation2d.fromDegrees(180));
         spinCommand = spinCommand(driveBase, rotation, speed);
         spinCommand.initialize();
       }
