@@ -39,6 +39,18 @@ Available auto routines:
 * ShootPickShoot: Shoots a preloaded note, then drives forward to pick up the note and shoots it too. Starting position: directly in front of the speaker.
 * All4: Shoots a preloaded note, then drives to pick up the note by the stage pillar, pulls up in front of the speaker to shoot, drives straight forward to pick up and shoot the note in front of the speaker, then picks up the other close note and shoots it.
 
+
+# LED States
+
+| Color  | State |
+---------|--------
+| Red    | Normal operation for Red alliance robot  |
+| Blue   | Normal operation for Blue alliance robot |
+| Orange | Note in the system; intake off.          |
+| Violet | Single blink when shooting completes.    |
+| Green  | Intake disabled by copilot.              |
+
+
 # Steps to Fork for New Season
 ## On or After January 1st
 ### Install Lastest Version of WPILib (VSCode) and Update Repo
