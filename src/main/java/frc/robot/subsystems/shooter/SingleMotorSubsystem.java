@@ -12,6 +12,7 @@ public class SingleMotorSubsystem extends SubsystemBase {
 
     private final double forwardsVoltage;
     private final double reverseVoltage;
+    private double appliedVoltage;
 
     private final SingleMotorIo io;
     private final SingleMotorIoInputsAutoLogged inputs = new SingleMotorIoInputsAutoLogged();
@@ -35,6 +36,8 @@ public class SingleMotorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        io.setVoltage(appliedVoltage);
+
         io.updateInputs(inputs);
         Logger.processInputs(getName(), inputs);
     }
@@ -53,7 +56,7 @@ public class SingleMotorSubsystem extends SubsystemBase {
     }
 
     private void setVoltage(double voltage) {
-        io.setVoltage(voltage);
+        appliedVoltage = voltage;
     }
 
     // ========================= Commands =========================
