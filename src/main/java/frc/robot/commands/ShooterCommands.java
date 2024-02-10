@@ -48,8 +48,7 @@ public class ShooterCommands {
         flywheel.reverseFlywheel();
         feeder.reverse();
         intake.reverse();
-        leds.setDynamicPattern(new Color[] { Color.kRed, Color.kRed, Color.kRed, Color.kRed, Color.kRed, Color.kBlack,
-            Color.kBlack, Color.kBlack, Color.kBlack }, true);
+        leds.setDynamicPattern(new Color[] { Color.kRed, Color.kRed, Color.kBlack, Color.kBlack }, true);
       }
 
       @Override
@@ -64,10 +63,11 @@ public class ShooterCommands {
     return reverseShooterCommand;
   }
 
-  public static Command stopIntakeFeederCommand(Intake intake, Feeder feeder) {
+  public static Command stopIntakeFeederCommand(Intake intake, Feeder feeder, Leds leds) {
     return new InstantCommand(() -> {
       intake.stop();
       feeder.stop();
+      leds.setDynamicPattern(new Color[] { Color.kRed, Color.kRed, Color.kBlack, Color.kBlack }, true);
     }, intake, feeder);
   }
 

@@ -190,7 +190,7 @@ public class RobotContainer {
                         speakerTeleOpShootCommand = ShooterCommands.shootCommand(flywheel, feeder, leds, colorSensor);
                         ampTeleOpShootCommand = ShooterCommands.shootCommand(flywheel, feeder, leds, colorSensor);
                         reverseShooterCommand = ShooterCommands.reverseShooterCommand(flywheel, feeder, intake, leds);
-                        stopIntakeFeederCommand = ShooterCommands.stopIntakeFeederCommand(intake, feeder);
+                        stopIntakeFeederCommand = ShooterCommands.stopIntakeFeederCommand(intake, feeder, leds);
                 } else {
                         speakerTeleOpShootCommand = LedCommands.blinkCommand(leds, Color.kOrange);
                         ampTeleOpShootCommand = LedCommands.blinkCommand(leds, Color.kViolet);
