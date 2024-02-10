@@ -63,15 +63,18 @@ public class ShooterCommands {
     return reverseShooterCommand;
   }
 
-  public static Command stopIntakeFeederCommand(Intake intake, Feeder feeder, Leds leds) {
-    return new InstantCommand(() -> {
-      intake.stop();
-      feeder.stop();
-      leds.setDynamicPattern(new Color[] { Color.kRed, Color.kRed, Color.kBlack, Color.kBlack }, true);
-    }, intake, feeder);
+  public static Command shootAutonomousCommand(Feeder feeder, Leds leds, ColorSensor colorSensor) {
+    //@formatter:off
+    return new SequentialCommandGroup(
+      feeder.startCommand(),
+      LedCommands.blinkCommand(leds, Color.kOrange),
+      colorSensor.waitForNoObjectCommand(),
+      new WaitCommand(.25),
+      feeder.stopCommand());
+    //@formatter:on
   }
 
-  public static Command shootCommand(Flywheel flywheel, Feeder feeder, Leds leds, ColorSensor colorSensor) {
+  public static Command shootTeleopCommand(Flywheel flywheel, Feeder feeder, Leds leds, ColorSensor colorSensor) {
     //@formatter:off
     return new SequentialCommandGroup(
       spinUpFlywheelCommand(flywheel),
@@ -93,14 +96,12 @@ public class ShooterCommands {
       );
       //@formattter:on
   }
-  public static Command autoShootCommand(Feeder feeder, Leds leds, ColorSensor colorSensor) {
-    //@formatter:off
-    return new SequentialCommandGroup(
-      feeder.startCommand(),
-      LedCommands.blinkCommand(leds, Color.kOrange),
-      colorSensor.waitForNoObjectCommand(),
-      new WaitCommand(.25),
-      feeder.stopCommand());
-    //@formatter:on
+
+  public static Command stopIntakeFeederCommand(Intake intake, Feeder feeder, Leds leds) {
+    return new InstantCommand(() -> {
+      intake.stop();
+      feeder.stop();
+      leds.setDynamicPattern(new Color[] { Color.kRed, Color.kRed, Color.kBlack, Color.kBlack }, true);
+    }, intake, feeder);
   }
 }

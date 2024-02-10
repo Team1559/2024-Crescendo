@@ -143,11 +143,11 @@ public class RobotContainer {
                                 () -> DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
                 Command autoShootCommand;
                 if (Constants.HAVE_SHOOTER) {
-                        autoShootCommand = ShooterCommands.shootCommand(flywheel, feeder, leds, colorSensor);
+                        autoShootCommand = ShooterCommands.shootAutonomousCommand(feeder, leds, colorSensor);
                 } else {
                         autoShootCommand = LedCommands.blinkCommand(leds, Color.kOrange);
                 }
-                NamedCommands.registerCommand("ShootNote", new SequentialCommandGroup(aimCommand, autoShootCommand));
+                NamedCommands.registerCommand("Auto Shoot", new SequentialCommandGroup(aimCommand, autoShootCommand));
 
                 // ---------- Set-up Autonomous Choices ----------
                 autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -189,7 +189,7 @@ public class RobotContainer {
                 Command reverseShooterCommand;
                 Command stopIntakeFeederCommand;
                 if (Constants.HAVE_SHOOTER) {
-                        teleOpShootCommand = ShooterCommands.shootCommand(flywheel, feeder, leds, colorSensor);
+                        teleOpShootCommand = ShooterCommands.shootTeleopCommand(flywheel, feeder, leds, colorSensor);
                         reverseShooterCommand = ShooterCommands.reverseShooterCommand(flywheel, feeder, intake, leds);
                         stopIntakeFeederCommand = ShooterCommands.stopIntakeFeederCommand(intake, feeder, leds);
                 } else {
