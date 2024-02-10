@@ -53,7 +53,7 @@ public class ShooterCommands {
 
       @Override
       public void end(boolean interrupted) {
-        flywheel.stopFlywheel();
+        flywheel.stop();
         feeder.stop();
         leds.setAllianceColor();
       }
