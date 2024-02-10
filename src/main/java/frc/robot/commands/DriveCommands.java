@@ -25,8 +25,6 @@ public class DriveCommands {
   }
 
   // TODO: Deduplicate code between this and the manualDriveDefaultCommand method.
-  // TODO: Spin Up Flywheel while Aiming. (Will need to also update
-  // ShooterCommands.shootTeleopCommand)
   public static Command autoAimAndManuallyDriveCommand(DriveBase driveBase,
       Flywheel flywheel,
       DoubleSupplier xSupplier,
@@ -43,7 +41,7 @@ public class DriveCommands {
         pid.setSetpoint(0); // Degrees from target.
         pid.setTolerance(1/* degree(s) */);
         pid.enableContinuousInput(-180, 180); // Degrees.
-        flywheel.start();
+        flywheel.start(); // Will get turned of in Shoot command.
       }
 
       @Override

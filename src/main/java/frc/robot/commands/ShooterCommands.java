@@ -77,6 +77,9 @@ public class ShooterCommands {
   public static Command shootTeleopCommand(Flywheel flywheel, Feeder feeder, Leds leds, ColorSensor colorSensor) {
     //@formatter:off
     return new SequentialCommandGroup(
+      // Should have already been started in Aim command.
+      // But including here, just in case.
+      flywheel.startFlywheelCommand(),
       feeder.startCommand(),
       leds.setColorCommand(Color.kMediumSpringGreen),
       colorSensor.waitForNoObjectCommand(),
