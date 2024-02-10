@@ -14,13 +14,13 @@
         {
           "type": "named",
           "data": {
-            "name": "ShootNote"
+            "name": "Spin Up Flywheel"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "StartIntake"
+            "name": "Auto Shoot"
           }
         },
         {

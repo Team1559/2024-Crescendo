@@ -19,12 +19,11 @@ import frc.robot.subsystems.base.DriveBase;
 
 public class DriveCommands {
 
-  private static final double SLOW_DOWN_THRESHOLD_IN_DEGREES = 45;
-
   /** Makes this class non-instantiable. */
   private DriveCommands() {
   }
 
+  // TODO: Deduplicate code between this and the manualDriveDefaultCommand method.
   public static Command autoAimAndManuallyDriveCommand(DriveBase driveBase,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
@@ -36,12 +35,10 @@ public class DriveCommands {
 
       @Override
       public void initialize() {
-        pid = new PIDController(
-            Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS / (SLOW_DOWN_THRESHOLD_IN_DEGREES * 2), 0, 0); // TODO:
-        // Tune.
-        pid.setSetpoint(0);
-        pid.setTolerance(1);
-        pid.enableContinuousInput(-180, 180);
+        pid = new PIDController(Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS / 90 /* degrees */, 0, 0);
+        pid.setSetpoint(0); // Degrees from target.
+        pid.setTolerance(1/* degree(s) */);
+        pid.enableContinuousInput(-180, 180); // Degrees.
       }
 
       @Override
@@ -60,12 +57,16 @@ public class DriveCommands {
             .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d())).getTranslation();
 
         // Calculate omega velocity.
-        double degreesToTarget = -driveBase.getRotationToTarget(target.get()).plus(Rotation2d.fromDegrees(180))
+        double degreesToTarget = driveBase.getRotationToTarget(target.get()).plus(Rotation2d.fromDegrees(180))
             .getDegrees();
-        // Range:
-        // - If kd = 0: minimumInput * kp - ki <-> maximumInput * kp + ki.
-        // - If kd != 0: -Double.MAX_VALUE <-> Double.MAX_VALUE.
-        double omega = pid.calculate(degreesToTarget);
+        /*
+         * Range:
+         * - If kd = 0: minimumInput * kp - ki <-> maximumInput * kp + ki.
+         * - If kd != 0: -Double.MAX_VALUE <-> Double.MAX_VALUE.
+         */
+        // We are inverting the direction because degreesToTarget is our "correction",
+        // but the PIDController wants our "position".
+        double omega = pid.calculate(-degreesToTarget);
 
         omega = MathUtil.clamp(omega,
             -Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS,
@@ -91,8 +92,14 @@ public class DriveCommands {
       }
 
       @Override
+      public boolean isFinished() {
+        // Never stop, because this command will be used as a While True command.
+        return false;
+      }
+
+      @Override
       public void end(boolean interrupted) {
-        // TODO: Need to close the PIDController as it is an AutoCloseable class.
+        // No need to tell the motors to stop, because the default command will kick in.
         pid.close();
       }
 
@@ -158,34 +165,35 @@ public class DriveCommands {
 
     Command spinCommand = new Command() {
 
-      private Rotation2d startingRotation, targetRotation;
+      private Rotation2d targetRotation;
 
       @Override
       public void initialize() {
-        startingRotation = driveBase.getRotation();
-        // System.out.println("Rotation start: " + startingRotation);
+        Rotation2d startingRotation = driveBase.getRotation();
         targetRotation = startingRotation.plus(rotationAmount);
-        // System.out.println("Rotation amount: " + rotationAmount);
-        // System.out.println("Target Rotation: " + targetRotation);
       }
 
       @Override
       public void execute() {
+
         Rotation2d current = driveBase.getRotation();
         double delta = targetRotation.minus(current).getDegrees();
-        double rampOmega = Math.max(Math.min(Math.abs(delta) / SLOW_DOWN_THRESHOLD_IN_DEGREES, 1.0), .01);
+
+        double rampOmega = Math.max(Math.min(Math.abs(delta) / 50 /* degrees */, 1.0), .01);
         double omega = Math.copySign(speed, delta) * rampOmega;
-        Logger.recordOutput("Spin/delta", delta);
-        Logger.recordOutput("Spin/rampOmega", rampOmega);
-        Logger.recordOutput("Spin/omega", omega);
+
         driveBase.runVelocity(new ChassisSpeeds(0, 0, omega));
+
+        Logger.recordOutput("DriveCommands/spinCommand/delta", delta);
+        Logger.recordOutput("DriveCommands/spinCommand/rampOmega", rampOmega);
+        Logger.recordOutput("DriveCommands/spinCommand/omega", omega);
       }
 
       @Override
       public boolean isFinished() {
         Rotation2d current = driveBase.getRotation();
         double delta = targetRotation.minus(current).getDegrees();
-        return Math.abs(delta) < .5;
+        return Math.abs(delta) < .5 /* degrees */;
       }
 
       @Override
@@ -218,7 +226,8 @@ public class DriveCommands {
 
       @Override
       public void initialize() {
-        Rotation2d rotation = driveBase.getRotationToTarget(target);
+       // Rotating plus 180 degrees to postion the back of the robot to the target.
+        Rotation2d rotation = driveBase.getRotationToTarget(target).plus(Rotation2d.fromDegrees(180));
         spinCommand = spinCommand(driveBase, rotation, speed);
         spinCommand.initialize();
       }
