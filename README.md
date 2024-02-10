@@ -12,9 +12,8 @@ Contains constants that need to be updated per robot. i.e.
   * [Left Trigger] = Spin Counter-Clockwise
   * [Right Trigger] = Spin Clockwise
 * **Shooting:** Letter Buttons
-  * [Y + B] = Fire at speaker
+  * [Y + B] = Fire
   * [B] = Aim at speaker. Robot rotates to maintain aim; aimer tracks the target; flywheels run at speaker speed.
-  * [Y + B + Rightbumper] = Fire at amp
   * [B + Right Bumper] = Aim at amp. Robot rotates to maintain aim; aimer is at amp position; flywheels run at amp speed.
 * **LEDs:** (On Hold)
   * [Start + A] = Solid $\color{green}Green$

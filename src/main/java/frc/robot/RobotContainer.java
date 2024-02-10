@@ -181,25 +181,21 @@ public class RobotContainer {
                         new Trigger((colorSensor::isObjectDetected)).whileTrue(leds.setColorCommand(Color.kDarkOrange));
 
                 // ---------- Configure Buttons for SubSystem Actions ----------
-                // TODO: Map these to different commands.
-                Command speakerTeleOpShootCommand;
-                Command ampTeleOpShootCommand;
+                Command teleOpShootCommand;
                 Command reverseShooterCommand;
                 Command stopIntakeFeederCommand;
                 if (Constants.HAVE_SHOOTER) {
-                        speakerTeleOpShootCommand = ShooterCommands.shootCommand(flywheel, feeder, leds, colorSensor);
-                        ampTeleOpShootCommand = ShooterCommands.shootCommand(flywheel, feeder, leds, colorSensor);
+                        teleOpShootCommand = ShooterCommands.shootCommand(flywheel, feeder, leds, colorSensor);
                         reverseShooterCommand = ShooterCommands.reverseShooterCommand(flywheel, feeder, intake, leds);
                         stopIntakeFeederCommand = ShooterCommands.stopIntakeFeederCommand(intake, feeder, leds);
                 } else {
-                        speakerTeleOpShootCommand = LedCommands.blinkCommand(leds, Color.kOrange);
-                        ampTeleOpShootCommand = LedCommands.blinkCommand(leds, Color.kViolet);
+                        teleOpShootCommand = LedCommands.blinkCommand(leds, Color.kOrange);
+
                         reverseShooterCommand = LedCommands.blinkCommand(leds, Color.kTomato);
                         stopIntakeFeederCommand = LedCommands.blinkCommand(leds, Color.kDarkKhaki);
                 }
-                controller1.y().and(controller1.b()).and(not(controller1.rightBumper()))
-                                .onTrue(speakerTeleOpShootCommand);
-                controller1.y().and(controller1.b()).and(controller1.rightBumper()).onTrue(ampTeleOpShootCommand);
+                controller1.y().and(controller1.b())
+                                .onTrue(teleOpShootCommand);
 
                 controller1.b().and(not(controller1.rightBumper()))
                                 .whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase,
@@ -232,19 +228,22 @@ public class RobotContainer {
                 controller1.leftBumper().and(controller1.rightBumper()).and(not(controller1.b()))
                                 .whileTrue(leds.setColorCommand(Color.kBlack));
 
-                // Controller 2 Configure Buttons
-                controller2.a().whileTrue(new StartEndCommand(intake::start, intake::stop, intake));
-                controller2.b().whileTrue(new StartEndCommand(flywheel::start, flywheel::stop, flywheel));
-                controller2.y().whileTrue(new StartEndCommand(feeder::start, feeder::stop, feeder));
+                Controller 2 Configure Buttons
+                controller2.a().whileTrue(new StartEndCommand(intake::start, intake::stop,
+                intake));
+                controller2.b().whileTrue(new StartEndCommand(flywheel::start,
+                flywheel::stop, flywheel));
+                controller2.y().whileTrue(new StartEndCommand(feeder::start, feeder::stop,
+                feeder));
                 controller2.povUp().onTrue(new InstantCommand(() -> {
-                        double currentAngle = aimer.getAngle();
-                        double targetAngle = currentAngle + 5;
-                        aimer.setTargetAngle(targetAngle);
+                double currentAngle = aimer.getAngle();
+                double targetAngle = currentAngle + 5;
+                aimer.setTargetAngle(targetAngle);
                 }));
                 controller2.povDown().onTrue(new InstantCommand(() -> {
-                        double currentAngle = aimer.getAngle();
-                        double targetAngle = currentAngle - 5;
-                        aimer.setTargetAngle(targetAngle);
+                double currentAngle = aimer.getAngle();
+                double targetAngle = currentAngle - 5;
+                aimer.setTargetAngle(targetAngle);
                 }));
         }
 
