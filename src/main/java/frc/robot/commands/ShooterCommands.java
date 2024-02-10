@@ -84,6 +84,7 @@ public class ShooterCommands {
     );
     //@formatter:on
   }
+
   public static Command spinUpFlywheelCommand(Flywheel flywheel) {
     //@formatter:off
     return new SequentialCommandGroup(
@@ -96,7 +97,7 @@ public class ShooterCommands {
     //@formatter:off
     return new SequentialCommandGroup(
       feeder.startCommand(),
-      LightsCommands.blinkCommand(leds, Color.kOrange),
+      LedCommands.blinkCommand(leds, Color.kOrange),
       colorSensor.waitForNoObjectCommand(),
       new WaitCommand(.25),
       feeder.stopCommand());

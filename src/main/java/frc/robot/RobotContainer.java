@@ -145,7 +145,7 @@ public class RobotContainer {
                 if (Constants.HAVE_SHOOTER) {
                         autoShootCommand = ShooterCommands.shootCommand(flywheel, feeder, leds, colorSensor);
                 } else {
-                        autoShootCommand = LightsCommands.blinkCommand(leds, Color.kOrange);
+                        autoShootCommand = LedCommands.blinkCommand(leds, Color.kOrange);
                 }
                 NamedCommands.registerCommand("ShootNote", new SequentialCommandGroup(aimCommand, autoShootCommand));
 
