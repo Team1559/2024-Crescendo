@@ -12,7 +12,9 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.LightsCommands;
@@ -44,7 +46,8 @@ import frc.robot.util.KColor;
  */
 public class RobotContainer {
 
-  private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController controller1 = new CommandXboxController(0);
+  private final CommandXboxController controller2 = new CommandXboxController(1);
   private final LoggedDashboardChooser<Command> autoChooser;
 
   private final DriveBase driveBase;
@@ -138,23 +141,23 @@ public class RobotContainer {
     // ---------- Set-up Autonomous Choices ----------
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
-    // ========================= Tele-Op =========================
+    // ========================= Tele-Op Controller 1 =========================
     // ---------- Configure Joystick for Tele-Op ----------
     driveBase.setDefaultCommand(DriveCommands.manualDriveDefaultCommand(driveBase,
-        () -> -controller.getLeftY(),
-        () -> -controller.getLeftX(),
-        () -> controller.getLeftTriggerAxis() > controller.getRightTriggerAxis()
-            ? controller.getLeftTriggerAxis()
-            : -controller.getRightTriggerAxis()));
+        () -> -controller1.getLeftY(),
+        () -> -controller1.getLeftX(),
+        () -> controller1.getLeftTriggerAxis() > controller1.getRightTriggerAxis()
+            ? controller1.getLeftTriggerAxis()
+            : -controller1.getRightTriggerAxis()));
 
-    // ---------- Configure D-PAD for Tele-Op ----------
-    controller.povUp().whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(1, 0, 0)),
+    // ---------- Configure D-PAD for Tele-Op Controller 1 ----------
+    controller1.povUp().whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(1, 0, 0)),
         driveBase));
-    controller.povDown().whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(-1, 0, 0)),
+    controller1.povDown().whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(-1, 0, 0)),
         driveBase));
-    controller.povRight().whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(0, -1, 0)),
+    controller1.povRight().whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(0, -1, 0)),
         driveBase));
-    controller.povLeft().whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(0, 1, 0)),
+    controller1.povLeft().whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(0, 1, 0)),
         driveBase));
 
     // ---------- Configure Buttons for SubSystem Actions ----------
@@ -168,34 +171,50 @@ public class RobotContainer {
       speakerTeleOpShootCommand = LightsCommands.blinkCommand(leds, Color.kOrange);
       ampTeleOpShootCommand = LightsCommands.blinkCommand(leds, Color.kViolet);
     }
-	controller.y().onTrue(speakerTeleOpShootCommand);
-	controller.x().onTrue(ampTeleOpShootCommand);
+	controller1.y().onTrue(speakerTeleOpShootCommand);
+	controller1.x().onTrue(ampTeleOpShootCommand);
 
-    controller.b().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase,
-        () -> -controller.getLeftY(),
-        () -> -controller.getLeftX(),
+    controller1.b().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase,
+        () -> -controller1.getLeftY(),
+        () -> -controller1.getLeftX(),
         Constants.SPEAKER_LOCATION_SUPPLIER));
-    controller.a().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase,
-        () -> -controller.getLeftY(),
-        () -> -controller.getLeftX(),
+    controller1.a().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase,
+        () -> -controller1.getLeftY(),
+        () -> -controller1.getLeftX(),
         Constants.AMP_LOCATION_SUPPLIER));
 
     // ---------- Configure Light Buttons ----------
-	controller.start().and(controller.a()).onTrue(leds.setStaticColorCommand(Color.kDarkGreen));
-	controller.start().and(controller.b()).onTrue(leds.setStaticPatternCommand(
+	controller1.start().and(controller1.a()).onTrue(leds.setStaticColorCommand(Color.kDarkGreen));
+	controller1.start().and(controller1.b()).onTrue(leds.setStaticPatternCommand(
 	  new Color[] { KColor.ALLIANCE_RED, KColor.ALLIANCE_RED, Color.kBlack, Color.kBlack }));
-	controller.start().and(controller.x()).onTrue(leds.setDynamicPatternCommand(new Color[] {
+	controller1.start().and(controller1.x()).onTrue(leds.setDynamicPatternCommand(new Color[] {
 	  KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE,
 	  Color.kDarkViolet, Color.kDarkViolet, Color.kDarkViolet }, true));
-	controller.start().and(controller.y()).onTrue(leds.setDynamicPatternCommand(new Color[] {
+	controller1.start().and(controller1.y()).onTrue(leds.setDynamicPatternCommand(new Color[] {
 	  Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kBlack,
 	  Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack, Color.kBlack },
 	  false));
-	controller.leftBumper().onTrue(leds.changeBrightnessCommand(true));
-	controller.rightBumper().onTrue(leds.changeBrightnessCommand(false));
-	controller.leftBumper().and(controller.rightBumper()).onTrue(leds.setStaticColorCommand(Color.kBlack));
-  }
+	controller1.leftBumper().onTrue(leds.changeBrightnessCommand(true));
+	controller1.rightBumper().onTrue(leds.changeBrightnessCommand(false));
+	controller1.leftBumper().and(controller1.rightBumper()).onTrue(leds.setStaticColorCommand(Color.kBlack));
 
+
+  //Controller 2 Configure Buttons 
+  controller2.a().whileTrue(new StartEndCommand(intake::start, intake::stop, intake ));
+  controller2.b().whileTrue(new StartEndCommand(flywheel::start,flywheel::stop, flywheel));
+  controller2.y().whileTrue(new StartEndCommand(feeder::start, feeder::stop, feeder));
+  controller2.povUp().onTrue(new InstantCommand(()->{
+    double currentAngle = aimer.getAngle();
+    double targetAngle = currentAngle+5;
+    aimer.setTargetAngle(targetAngle);
+  }));
+  controller2.povDown().onTrue(new InstantCommand(()->{
+    double currentAngle = aimer.getAngle();
+    double targetAngle = currentAngle-5;
+    aimer.setTargetAngle(targetAngle);
+  }));
+  }
+    
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *

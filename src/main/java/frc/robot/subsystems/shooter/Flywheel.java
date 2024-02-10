@@ -143,14 +143,14 @@ public class Flywheel extends SubsystemBase {
     /**
      * Start the Flywheels with default volage
      */
-    public void startFlywheel() {
+    public void start() {
         startFlywheel(Constants.FLYWHEEL_FOWARDS_VOLTAGE);
     }
 
     /**
      * Stop the Flywheels
      */
-    public void stopFlywheel() {
+    public void stop() {
         currentVoltage = 0;
         flywheelMotorL.stopMotor();
         flywheelMotorR.stopMotor();
@@ -169,11 +169,11 @@ public class Flywheel extends SubsystemBase {
     }
 
     public Command startFlywheelCommand() {
-        return new InstantCommand(this::startFlywheel, this);
+        return new InstantCommand(this::start, this);
     }
 
     public Command stopFlywheelCommand() {
-        return new InstantCommand(this::stopFlywheel, this);
+        return new InstantCommand(this::stop, this);
     }
 
     public Command reverseFlywheelCommand() {
