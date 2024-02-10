@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.subsystems.base.DriveBase;
+import frc.robot.subsystems.shooter.Flywheel;
 
 public class DriveCommands {
 
@@ -24,8 +25,10 @@ public class DriveCommands {
   }
 
   // TODO: Deduplicate code between this and the manualDriveDefaultCommand method.
-  // TODO: Spin Up Flywheel while Aiming. (Will need to also update ShooterCommands.shootTeleopCommand)
+  // TODO: Spin Up Flywheel while Aiming. (Will need to also update
+  // ShooterCommands.shootTeleopCommand)
   public static Command autoAimAndManuallyDriveCommand(DriveBase driveBase,
+      Flywheel flywheel,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       Supplier<Translation2d> target) {
@@ -40,6 +43,7 @@ public class DriveCommands {
         pid.setSetpoint(0); // Degrees from target.
         pid.setTolerance(1/* degree(s) */);
         pid.enableContinuousInput(-180, 180); // Degrees.
+        flywheel.start();
       }
 
       @Override
@@ -227,7 +231,7 @@ public class DriveCommands {
 
       @Override
       public void initialize() {
-       // Rotating plus 180 degrees to postion the back of the robot to the target.
+        // Rotating plus 180 degrees to postion the back of the robot to the target.
         Rotation2d rotation = driveBase.getRotationToTarget(target).plus(Rotation2d.fromDegrees(180));
         spinCommand = spinCommand(driveBase, rotation, speed);
         spinCommand.initialize();

@@ -194,7 +194,6 @@ public class RobotContainer {
                         stopIntakeFeederCommand = ShooterCommands.stopIntakeFeederCommand(intake, feeder, leds);
                 } else {
                         teleOpShootCommand = LedCommands.blinkCommand(leds, Color.kOrange);
-
                         reverseShooterCommand = LedCommands.blinkCommand(leds, Color.kTomato);
                         stopIntakeFeederCommand = LedCommands.blinkCommand(leds, Color.kDarkKhaki);
                 }
@@ -202,12 +201,12 @@ public class RobotContainer {
                                 .onTrue(teleOpShootCommand);
 
                 controller1.b().and(not(controller1.rightBumper()))
-                                .whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase,
+                                .whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel,
                                                 () -> -controller1.getLeftY(),
                                                 () -> -controller1.getLeftX(),
                                                 Constants.SPEAKER_LOCATION_SUPPLIER));
                 controller1.b().and(controller1.rightBumper())
-                                .whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase,
+                                .whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel,
                                                 () -> -controller1.getLeftY(),
                                                 () -> -controller1.getLeftX(),
                                                 Constants.AMP_LOCATION_SUPPLIER));
