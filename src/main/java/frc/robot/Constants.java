@@ -42,11 +42,18 @@ public final class Constants {
       Units.inchesToMeters(218.42));
   public static final Translation2d RED_SPEAKER_LOCATION = new Translation2d(Units.inchesToMeters(652.73),
       Units.inchesToMeters(218.42));
+  public static final Translation2d BLUE_AMP_LOCATION = new Translation2d(Units.inchesToMeters(72.5),
+      Units.inchesToMeters(323.00));
+  public static final Translation2d RED_AMP_LOCATION = new Translation2d(Units.inchesToMeters(578.77),
+      Units.inchesToMeters(323.00));
   public static final Supplier<Boolean> IS_ON_BLUE_ALLIANCE = () -> {
     return DriverStation.getAlliance().get() == DriverStation.Alliance.Blue;
   };
   public static final Supplier<Translation2d> SPEAKER_LOCATION_SUPPLIER = () -> {
     return IS_ON_BLUE_ALLIANCE.get() ? BLUE_SPEAKER_LOCATION : RED_SPEAKER_LOCATION;
+  };
+  public static final Supplier<Translation2d> AMP_LOCATION_SUPPLIER = () -> {
+    return IS_ON_BLUE_ALLIANCE.get() ? BLUE_AMP_LOCATION : RED_AMP_LOCATION;
   };
 
   // ---------- Robot Measurements ----------
@@ -71,6 +78,7 @@ public final class Constants {
       27.0) * (45.0 / 15.0); // L2 Gear ratio
   // public static final double WHEEL_DRIVE_GEAR_RATIO = 6.12; // L3 Gear ratio
   public static final double WHEEL_TURN_GEAR_RATIO = 12.8;
+
   // ---------- Wheel Rotation Offsets ----------
   // Note: Chaning the Offset by Pie (180 degrees) will invert the direction the
   // wheel spins.

@@ -6,9 +6,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -35,15 +33,14 @@ import frc.robot.subsystems.swerve.SwerveModuleIoTalonFx;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIoLimelight;
 import frc.robot.subsystems.vision.VisionIoSimAndReplay;
+import frc.robot.util.KColor;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
- * Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in
- * the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of
- * the robot (including
- * subsystems, commands, and button mappings) should be declared here.
+ * Command-based is a "declarative" paradigm, very little robot logic should
+ * actually be handled in the {@link Robot} periodic methods (other than the
+ * scheduler calls). Instead, the structure of the robot (including subsystems,
+ * commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
 
@@ -161,35 +158,42 @@ public class RobotContainer {
         driveBase));
 
     // ---------- Configure Buttons for SubSystem Actions ----------
-    Command teleOpShootCommand;
+    // TODO: Map these to different commands.
+    Command speakerTeleOpShootCommand;
+    Command ampTeleOpShootCommand;
     if (Constants.HAVE_SHOOTER) {
-      teleOpShootCommand = ShooterCommands.shootCommand(flywheel, feeder, leds, colorSensor);
+      speakerTeleOpShootCommand = ShooterCommands.shootCommand(flywheel, feeder, leds, colorSensor);
+      ampTeleOpShootCommand = ShooterCommands.shootCommand(flywheel, feeder, leds, colorSensor);
     } else {
-      teleOpShootCommand = LightsCommands.blinkCommand(leds, Color.kOrange);
+      speakerTeleOpShootCommand = LightsCommands.blinkCommand(leds, Color.kOrange);
+      ampTeleOpShootCommand = LightsCommands.blinkCommand(leds, Color.kViolet);
     }
-    controller.a().onTrue(teleOpShootCommand);
+	controller.y().onTrue(speakerTeleOpShootCommand);
+	controller.x().onTrue(ampTeleOpShootCommand);
+
     controller.b().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase,
         () -> -controller.getLeftY(),
         () -> -controller.getLeftX(),
         Constants.SPEAKER_LOCATION_SUPPLIER));
+    controller.a().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase,
+        () -> -controller.getLeftY(),
+        () -> -controller.getLeftX(),
+        Constants.AMP_LOCATION_SUPPLIER));
 
     // ---------- Configure Light Buttons ----------
-    controller.start().and(controller.a()).onTrue(leds.setStaticColorCommand(Color.kDarkGreen));
-    controller.start().and(controller.b()).onTrue(leds.setStaticPatternCommand(
-        new Color[] { Color.kDarkRed, Color.kDarkRed, Color.kBlack, Color.kBlack }));
-    controller.start().and(controller.x())
-        .onTrue(leds.setDynamicPatternCommand(
-            new Color[] { Color.kBlue, Color.kBlue, Color.kBlue, Color.kBlue, Color.kBlue,
-                Color.kBlueViolet, Color.kBlueViolet, Color.kBlueViolet, Color.kBlueViolet, Color.kBlueViolet },
-            true));
-    controller.start().and(controller.y()).onTrue(leds.setDynamicPatternCommand(
-        new Color[] {
-            Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kBlack,
-            Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack, Color.kBlack },
-        false));
-    controller.leftBumper().onTrue(leds.changeBrightnessCommand(true));
-    controller.rightBumper().onTrue(leds.changeBrightnessCommand(false));
-    controller.leftBumper().and(controller.rightBumper()).onTrue(leds.setStaticColorCommand(Color.kBlack));
+	controller.start().and(controller.a()).onTrue(leds.setStaticColorCommand(Color.kDarkGreen));
+	controller.start().and(controller.b()).onTrue(leds.setStaticPatternCommand(
+	  new Color[] { KColor.ALLIANCE_RED, KColor.ALLIANCE_RED, Color.kBlack, Color.kBlack }));
+	controller.start().and(controller.x()).onTrue(leds.setDynamicPatternCommand(new Color[] {
+	  KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE,
+	  Color.kDarkViolet, Color.kDarkViolet, Color.kDarkViolet }, true));
+	controller.start().and(controller.y()).onTrue(leds.setDynamicPatternCommand(new Color[] {
+	  Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kBlack,
+	  Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack, Color.kBlack },
+	  false));
+	controller.leftBumper().onTrue(leds.changeBrightnessCommand(true));
+	controller.rightBumper().onTrue(leds.changeBrightnessCommand(false));
+	controller.leftBumper().and(controller.rightBumper()).onTrue(leds.setStaticColorCommand(Color.kBlack));
   }
 
   /**
