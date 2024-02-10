@@ -1,8 +1,9 @@
-package frc.robot.subsystems.general;
+package frc.robot.io.single_motor;
 
 import org.littletonrobotics.junction.AutoLog;
 
 public interface SingleMotorIo {
+    
     @AutoLog
     static class SingleMotorIoInputs {
         public double appliedOutput;

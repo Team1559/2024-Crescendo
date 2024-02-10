@@ -1,15 +1,17 @@
-package frc.robot.subsystems.general;
+package frc.robot.subsystems.shooter;
 
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.io.single_motor.SingleMotorIo;
+import frc.robot.io.single_motor.SingleMotorIoInputsAutoLogged;
 
 public class SingleMotorSubsystem extends SubsystemBase {
+
     private final double forwardsVoltage;
     private final double reverseVoltage;
-    private double appliedVoltage;
 
     private final SingleMotorIo io;
     private final SingleMotorIoInputsAutoLogged inputs = new SingleMotorIoInputsAutoLogged();
@@ -29,12 +31,10 @@ public class SingleMotorSubsystem extends SubsystemBase {
         this.io = io;
         this.forwardsVoltage = forwardsVoltage;
         this.reverseVoltage = reverseVoltage;
-        this.appliedVoltage = 0;
     }
 
     @Override
     public void periodic() {
-        io.setVoltage(appliedVoltage);
         io.updateInputs(inputs);
         Logger.processInputs(getName(), inputs);
     }
@@ -53,7 +53,7 @@ public class SingleMotorSubsystem extends SubsystemBase {
     }
 
     private void setVoltage(double voltage) {
-        appliedVoltage = voltage;
+        io.setVoltage(voltage);
     }
 
     // ========================= Commands =========================

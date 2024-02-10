@@ -1,5 +1,6 @@
-package frc.robot.subsystems.vision;
+package frc.robot.io.vision;
 
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.Vision.VisionInputs;
 
 public interface VisionIo {

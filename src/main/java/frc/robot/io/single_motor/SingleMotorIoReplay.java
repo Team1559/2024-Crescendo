@@ -1,4 +1,4 @@
-package frc.robot.subsystems.general;
+package frc.robot.io.single_motor;
 
 public class SingleMotorIoReplay implements SingleMotorIo {
 

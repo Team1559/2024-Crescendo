@@ -1,4 +1,4 @@
-package frc.robot.subsystems.swerve;
+package frc.robot.io.swerve_module;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;

@@ -21,10 +21,9 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.gyro.GyroIo;
-import frc.robot.subsystems.gyro.GyroIoInputsAutoLogged;
-import frc.robot.subsystems.swerve.IndexedSwerveModule;
-import frc.robot.subsystems.swerve.SwerveModuleIo;
+import frc.robot.io.gyro.GyroIo;
+import frc.robot.io.swerve_module.SwerveModuleIo;
+import frc.robot.io.gyro.GyroIoInputsAutoLogged;
 import frc.robot.util.LocalAdStarAk;
 
 public class DriveBase extends SubsystemBase {

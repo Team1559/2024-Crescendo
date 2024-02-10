@@ -1,4 +1,4 @@
-package frc.robot.subsystems.swerve;
+package frc.robot.subsystems.base;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -8,6 +8,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants;
+import frc.robot.io.swerve_module.SwerveModuleIo;
+import frc.robot.io.swerve_module.SwerveModuleIoInputsAutoLogged;
 
 public class IndexedSwerveModule {
 

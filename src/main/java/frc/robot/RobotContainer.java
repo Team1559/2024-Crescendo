@@ -17,24 +17,24 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.LightsCommands;
 import frc.robot.commands.ShooterCommands;
+import frc.robot.io.gyro.GyroIoPigeon2;
+import frc.robot.io.gyro.GyroIoSimAndReplay;
+import frc.robot.io.single_motor.SingleMotorIoReplay;
+import frc.robot.io.single_motor.SingleMotorIoSparkMax;
+import frc.robot.io.swerve_module.SwerveModuleIoReplay;
+import frc.robot.io.swerve_module.SwerveModuleIoSim;
+import frc.robot.io.swerve_module.SwerveModuleIoTalonFx;
+import frc.robot.io.vision.VisionIoLimelight;
+import frc.robot.io.vision.VisionIoSimAndReplay;
 import frc.robot.subsystems.base.DriveBase;
 import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
-import frc.robot.subsystems.general.SingleMotorIoReplay;
-import frc.robot.subsystems.general.SingleMotorIoSparkMax;
-import frc.robot.subsystems.gyro.GyroIoPigeon2;
-import frc.robot.subsystems.gyro.GyroIoSimAndReplay;
 import frc.robot.subsystems.led.Leds;
 import frc.robot.subsystems.shooter.Aimer;
 import frc.robot.subsystems.shooter.ColorSensor;
 import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.Intake;
-import frc.robot.subsystems.swerve.SwerveModuleIoReplay;
-import frc.robot.subsystems.swerve.SwerveModuleIoSim;
-import frc.robot.subsystems.swerve.SwerveModuleIoTalonFx;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionIoLimelight;
-import frc.robot.subsystems.vision.VisionIoSimAndReplay;
 
 /**
  * This class is where the bulk of the robot should be declared. Since

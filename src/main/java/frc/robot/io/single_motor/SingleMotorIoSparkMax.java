@@ -1,4 +1,4 @@
-package frc.robot.subsystems.general;
+package frc.robot.io.single_motor;
 
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -7,6 +7,7 @@ import com.revrobotics.CANSparkMax;
 import frc.robot.Constants;
 
 public class SingleMotorIoSparkMax implements SingleMotorIo {
+
     private final CANSparkMax motor;
 
     /**

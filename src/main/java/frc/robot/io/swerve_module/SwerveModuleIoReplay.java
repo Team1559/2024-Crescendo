@@ -1,4 +1,4 @@
-package frc.robot.subsystems.swerve;
+package frc.robot.io.swerve_module;
 
 /**
  * No funclionality provided because none needed for replay.

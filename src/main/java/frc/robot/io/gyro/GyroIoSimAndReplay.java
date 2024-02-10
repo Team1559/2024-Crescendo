@@ -1,4 +1,4 @@
-package frc.robot.subsystems.gyro;
+package frc.robot.io.gyro;
 
 /**
  * Provides no finction.

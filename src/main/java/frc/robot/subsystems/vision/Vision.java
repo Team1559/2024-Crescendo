@@ -9,6 +9,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.io.vision.VisionIo;
 
 public class Vision extends SubsystemBase {
     private final VisionIo[] ios;

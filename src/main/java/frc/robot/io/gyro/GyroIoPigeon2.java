@@ -1,4 +1,4 @@
-package frc.robot.subsystems.gyro;
+package frc.robot.io.gyro;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;

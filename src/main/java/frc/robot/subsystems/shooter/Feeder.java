@@ -1,8 +1,7 @@
 package frc.robot.subsystems.shooter;
 
 import frc.robot.Constants;
-import frc.robot.subsystems.general.SingleMotorIo;
-import frc.robot.subsystems.general.SingleMotorSubsystem;
+import frc.robot.io.single_motor.SingleMotorIo;
 
 public class Feeder extends SingleMotorSubsystem {
     public Feeder(SingleMotorIo io) {

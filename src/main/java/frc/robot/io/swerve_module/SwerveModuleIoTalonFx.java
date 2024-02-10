@@ -1,4 +1,4 @@
-package frc.robot.subsystems.swerve;
+package frc.robot.io.swerve_module;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
