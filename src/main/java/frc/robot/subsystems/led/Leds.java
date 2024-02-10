@@ -189,8 +189,6 @@ public class Leds extends SubsystemBase {
         return new InstantCommand(() -> changeBrightness(isDimming), this);
     }
 
-    // TODO: Create disableDynamicPatternCommand method.
-
     /**
      * Set the lights to a scrolling pattern
      * 
@@ -226,5 +224,12 @@ public class Leds extends SubsystemBase {
     public Command setAllianceColorCommand() {
         return new InstantCommand(this::setAllianceColor, this);
     }
-    // TODO: Create turnOffCommand method.
+
+    public Command turnOffCommand() {
+        return new InstantCommand(this::turnOff, this);
+    }
+
+    public Command disableDynamiPatternCommand() {
+        return new InstantCommand(this::disableDynamicPattern, this);
+    }
 }

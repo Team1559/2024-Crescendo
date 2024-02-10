@@ -10,6 +10,8 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -79,7 +81,7 @@ public class Aimer extends SubsystemBase {
 
     // ========================= Functions =========================
     public void setTargetAngle(double angle) {
-        double targetAngle = MathUtil.clamp(angle,Constants.AIMER_LOWER_ANGLE,Constants.AIMER_UPPER_ANGLE);
+        double targetAngle = MathUtil.clamp(angle, Constants.AIMER_LOWER_ANGLE, Constants.AIMER_UPPER_ANGLE);
         controller.setSetpoint(targetAngle);
     }
 
@@ -88,5 +90,7 @@ public class Aimer extends SubsystemBase {
     }
 
     // ========================= Commands =========================
-    // TODO: create setTargetAngleCommand method.
+    public Command setTargetAngleCommand(double angle) {
+        return new InstantCommand(() -> setTargetAngle(angle), this);
+    }
 }
