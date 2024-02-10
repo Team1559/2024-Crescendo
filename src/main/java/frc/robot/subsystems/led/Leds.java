@@ -124,12 +124,21 @@ public class Leds extends SubsystemBase {
      * 
      * @param color {@link Color} the lights are being set to.
      */
-    public void setStaticColor(Color color) {
+    public void setColor(Color color) {
         disableDynamicPattern();
         for (int i = 0; i < ledBuffer.getLength(); i++) {
             ledBuffer.setLED(i, color);
         }
         addressableLED.setData(ledBuffer);
+    }
+
+    public void setAllianceColor() {
+        disableDynamicPattern();
+        if (Constants.IS_ON_BLUE_ALLIANCE.get()) {
+            setColor(Color.kBlue);
+        } else {
+            setColor(Color.kRed);
+        }
     }
 
     /**
@@ -166,7 +175,7 @@ public class Leds extends SubsystemBase {
      */
     public void turnOff() {
         disableDynamicPattern();
-        setStaticColor(Color.kBlack);
+        setColor(Color.kBlack);
     }
 
     // ========================= Commands =========================
@@ -179,8 +188,6 @@ public class Leds extends SubsystemBase {
     public Command changeBrightnessCommand(boolean isDimming) {
         return new InstantCommand(() -> changeBrightness(isDimming), this);
     }
-
-    // TODO: Create disableDynamicPatternCommand method.
 
     /**
      * Set the lights to a scrolling pattern
@@ -199,8 +206,8 @@ public class Leds extends SubsystemBase {
      * @param color Color LEDs are being set to
      * @return
      */
-    public Command setStaticColorCommand(Color color) {
-        return new InstantCommand(() -> setStaticColor(color), this);
+    public Command setColorCommand(Color color) {
+        return new InstantCommand(() -> setColor(color), this);
     }
 
     /**
@@ -214,5 +221,15 @@ public class Leds extends SubsystemBase {
         return new InstantCommand(() -> setStaticPattern(pattern), this);
     }
 
-    // TODO: Create turnOffCommand method.
+    public Command setAllianceColorCommand() {
+        return new InstantCommand(this::setAllianceColor, this);
+    }
+
+    public Command turnOffCommand() {
+        return new InstantCommand(this::turnOff, this);
+    }
+
+    public Command disableDynamiPatternCommand() {
+        return new InstantCommand(this::disableDynamicPattern, this);
+    }
 }
