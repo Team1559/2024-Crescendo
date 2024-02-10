@@ -15,14 +15,33 @@ public class ShooterCommands {
   private ShooterCommands() {
   }
 
-  // TODO: Add Reverse Commands. (Spins Flywheel & Feeder)
+  public static Command reverseShooterCommand(Flywheel flywheel, Feeder feeder, Leds leds) {
+    Command reverseShooterCommand = new Command() {
+      @Override
+      public void execute() {
+        flywheel.reverseFlywheel();
+        feeder.reverse();
+        leds.setDynamicPattern(new Color[] { Color.kRed, Color.kRed, Color.kRed, Color.kRed, Color.kRed, Color.kBlack,
+            Color.kBlack, Color.kBlack, Color.kBlack }, true);
+      }
+
+      @Override
+      public void end(boolean interrupted) {
+        flywheel.stopFlywheel();
+        feeder.stop();
+        leds.setAllianceColor();
+      }
+    };
+    reverseShooterCommand.addRequirements(flywheel, feeder, leds);
+    return reverseShooterCommand;
+  }
 
   public static Command shootCommand(Flywheel flywheel, Feeder feeder, Leds leds, ColorSensor colorSensor) {
     //@formatter:off
     return new SequentialCommandGroup(
       spinUpFlywheelCommand(flywheel),
       feeder.startCommand(),
-      LightsCommands.blinkCommand(leds, Color.kOrange),
+      LedCommands.blinkCommand(leds, Color.kOrange),
       colorSensor.waitForNoObjectCommand(),
       new WaitCommand(.25),
       feeder.stopCommand(),

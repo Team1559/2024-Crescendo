@@ -7,15 +7,15 @@ Contains constants that need to be updated per robot. i.e.
 
 # Tele-Op
 * **Driving:** Left Joystick
-  * D-Pad isolates directional commands for tuning
+  * [D-Pad + Back] isolates directional commands for tuning
 * **Spinning:** Triggers
   * [Left Trigger] = Spin Counter-Clockwise
   * [Right Trigger] = Spin Clockwise
 * **Shooting:** Letter Buttons
-  * [Y] = Fire at speaker
+  * [Y + B] = Fire at speaker
   * [B] = Aim at speaker
-  * [X] = Fire at amp
-  * [A] = Aim at amp
+  * [Y + B + Rightbumper] = Fire at amp
+  * [B + Right Bumper] = Aim at amp
 * **LEDs:**
   * [Start + A] = Solid $\color{green}Green$
   * [Start + B] = Solid $\color{red}Red$ and **Black** pattern
@@ -24,7 +24,8 @@ Contains constants that need to be updated per robot. i.e.
   * [Left Bumber] = <span style="font-size:smaller;">Decrease Brightness</span>
   * [Right Bumber] = <span style="font-size:larger;">Increase Brightness</span>
   * [Left + Right Bumber] = Turn Off LEDs
-
+* **Emergency:**
+  * [D-Pad Up] = Reverse Shooter
 # Autonomous
 * **TODO**
 

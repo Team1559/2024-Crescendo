@@ -132,6 +132,15 @@ public class Leds extends SubsystemBase {
         addressableLED.setData(ledBuffer);
     }
 
+    public void setAllianceColor() {
+        disableDynamicPattern();
+        if (Constants.IS_ON_BLUE_ALLIANCE.get()) {
+            setStaticColor(Color.kBlue);
+        } else {
+            setStaticColor(Color.kRed);
+        }
+    }
+
     /**
      * Sets all lights to a static multicolor pattern. This pattern will be repeated
      * arross the LEDs.
@@ -214,5 +223,8 @@ public class Leds extends SubsystemBase {
         return new InstantCommand(() -> setStaticPattern(pattern), this);
     }
 
+    public Command setAllianceColorCommand() {
+        return new InstantCommand(this::setAllianceColor, this);
+    }
     // TODO: Create turnOffCommand method.
 }
