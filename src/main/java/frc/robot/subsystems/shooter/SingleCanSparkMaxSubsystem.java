@@ -37,8 +37,8 @@ public class SingleCanSparkMaxSubsystem extends SubsystemBase {
      * @param motorId Left motor ID
      * @param voltage Voltage for both fowards and reverse voltage
      */
-    protected SingleCanSparkMaxSubsystem(String name, int motorId, double voltage) {
-        this(name, motorId, voltage, voltage);
+    protected SingleCanSparkMaxSubsystem(String name, int motorId, double voltage, boolean isInverted) {
+        this(name, motorId, voltage, voltage, isInverted);
     }
 
     /**
@@ -48,11 +48,13 @@ public class SingleCanSparkMaxSubsystem extends SubsystemBase {
      * @param motorId        Left motor ID
      * @param fowardsVoltage Voltage for fowards movement
      * @param reverseVoltage Voltage for reverse movement
+     * @param isInverted     Determines the direction of the motor
      */
-    protected SingleCanSparkMaxSubsystem(String name, int motorId, double fowardsVoltage, double reverseVoltage) {
+    protected SingleCanSparkMaxSubsystem(String name, int motorId, double fowardsVoltage, double reverseVoltage,
+            boolean isInverted) {
         super(name);
         motor = new CANSparkMax(motorId, MotorType.kBrushless);
-        motor.setInverted(false); // TODO: This needs to be passed into the constructor.
+        motor.setInverted(isInverted);
         motor.setIdleMode(IdleMode.kBrake);
         motor.setSmartCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_LIMIT);
         motor.setSecondaryCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_SECONDARY_LIMIT);

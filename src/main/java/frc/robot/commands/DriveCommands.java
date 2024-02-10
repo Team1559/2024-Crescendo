@@ -24,6 +24,7 @@ public class DriveCommands {
   }
 
   // TODO: Deduplicate code between this and the manualDriveDefaultCommand method.
+  // TODO: Spin Up Flywheel while Aiming. (Will need to also update ShooterCommands.shootTeleopCommand)
   public static Command autoAimAndManuallyDriveCommand(DriveBase driveBase,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,

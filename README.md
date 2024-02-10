@@ -7,24 +7,24 @@ Contains constants that need to be updated per robot. i.e.
 
 # Tele-Op
 * **Driving:** Left Joystick
-  * D-Pad isolates directional commands for tuning
+  * [D-Pad + Back] isolates directional commands for tuning
 * **Spinning:** Triggers
   * [Left Trigger] = Spin Counter-Clockwise
   * [Right Trigger] = Spin Clockwise
 * **Shooting:** Letter Buttons
-  * [Y] = Fire at speaker
+  * [Y + B] = Fire
   * [B] = Aim at speaker. Robot rotates to maintain aim; aimer tracks the target; flywheels run at speaker speed.
-  * [X] = Fire at amp
-  * [A] = Aim at amp. Robot rotates to maintain aim; aimer is at amp position; flywheels run at amp speed.
-* **LEDs:**
+  * [B + Right Bumper] = Aim at amp. Robot rotates to maintain aim; aimer is at amp position; flywheels run at amp speed.
+* **LEDs:** (On Hold)
   * [Start + A] = Solid $\color{green}Green$
   * [Start + B] = Solid $\color{red}Red$ and **Black** pattern
   * [Start + X] = $\color{blue}Blue$ and $\color{purple}Purple$ pattern moving in one direction
   * [Start + Y] = $\color{yellow}Yellow$ and **Black** pattern moving in the other direction
-  * [Left Bumber] = <span style="font-size:smaller;">Decrease Brightness</span>
-  * [Right Bumber] = <span style="font-size:larger;">Increase Brightness</span>
+  * [Start + Left Bumber] = <span style="font-size:smaller;">Decrease Brightness</span>
+  * [Start + Right Bumber] = <span style="font-size:larger;">Increase Brightness</span>
   * [Left + Right Bumber] = Turn Off LEDs
-
+* **Emergency:**
+  * [D-Pad Up] = Reverse Shooter
 # Autonomous
 
 During auto, the intake and flywheel run continuously to enable faster collecting and shooting of Notes.
