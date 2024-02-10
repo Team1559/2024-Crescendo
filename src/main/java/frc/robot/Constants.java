@@ -47,7 +47,7 @@ public final class Constants {
   public static final Translation2d RED_AMP_LOCATION = new Translation2d(Units.inchesToMeters(578.77),
       Units.inchesToMeters(323.00));
   public static final Supplier<Boolean> IS_ON_BLUE_ALLIANCE = () -> {
-    return DriverStation.getAlliance().get() == DriverStation.Alliance.Blue;
+    return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue;
   };
   public static final Supplier<Translation2d> SPEAKER_LOCATION_SUPPLIER = () -> {
     return IS_ON_BLUE_ALLIANCE.get() ? BLUE_SPEAKER_LOCATION : RED_SPEAKER_LOCATION;
@@ -121,6 +121,7 @@ public final class Constants {
   public static final String CANIVORE_BUS_ID = "1559Canivore";
   // --- Feeder --- TODO: Set Id.
   public static final int FEEDER_MOTOR_ID = 0;
+  public static final boolean IS_FEEDER_INVERTED = false;
   // --- Flywheel --- TODO: Set Ids.
   public static final int FLYWHEEL_LEFT_MOTOR_ID = 0;
   public static final int FLYWHEEL_RIGHT_MOTOR_ID = 0;
@@ -128,6 +129,7 @@ public final class Constants {
   public static final int BASE_GYRO_ID = 12;
   // --- Intake --- TODO: Set Id.
   public static final int INTAKE_MOTOR_ID = 0;
+  public static final boolean IS_INTAKE_INVERTED = false;
   // --- Swerve Drives ---
   public static final int FRONT_LEFT_DRIVE_MOTOR_ID = 0;
   public static final int FRONT_LEFT_STEER_MOTOR_ID = 1;
