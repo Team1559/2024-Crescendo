@@ -2,12 +2,15 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.led.Leds;
 import frc.robot.subsystems.shooter.ColorSensor;
 import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
+import frc.robot.subsystems.shooter.Intake;
 
 public class ShooterCommands {
 
@@ -15,10 +18,33 @@ public class ShooterCommands {
   private ShooterCommands() {
   }
 
+  // ========================= Default Commands =========================
+  public static Command defaultIntakeCommand(Intake intake, ColorSensor sensor) {
+    return Commands.run(() -> {
+      if (sensor.isObjectDetected()) {
+        intake.stop();
+      } else {
+        intake.start();
+      }
+    }, intake);
+  }
+
+  public static Command defaultFeederCommand(Feeder feeder, ColorSensor sensor) {
+    return Commands.run(() -> {
+      if (sensor.isObjectDetected()) {
+        feeder.stop();
+      } else {
+        feeder.start();
+      }
+    }, feeder);
+  }
+
+  // ========================= Other Commands =========================
+
   public static Command reverseShooterCommand(Flywheel flywheel, Feeder feeder, Leds leds) {
     Command reverseShooterCommand = new Command() {
       @Override
-      public void execute() {
+      public void execute() { // TODO: Reverse Intake.
         flywheel.reverseFlywheel();
         feeder.reverse();
         leds.setDynamicPattern(new Color[] { Color.kRed, Color.kRed, Color.kRed, Color.kRed, Color.kRed, Color.kBlack,
@@ -34,6 +60,13 @@ public class ShooterCommands {
     };
     reverseShooterCommand.addRequirements(flywheel, feeder, leds);
     return reverseShooterCommand;
+  }
+
+  public static Command stopIntakeFeederCommand(Intake intake, Feeder feeder) {
+    return new InstantCommand(() -> {
+      intake.stop();
+      feeder.stop();
+    }, intake, feeder);
   }
 
   public static Command shootCommand(Flywheel flywheel, Feeder feeder, Leds leds, ColorSensor colorSensor) {

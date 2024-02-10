@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.LedCommands;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.subsystems.base.DriveBase;
@@ -150,9 +149,9 @@ public class RobotContainer {
             ? controller.getLeftTriggerAxis()
             : -controller.getRightTriggerAxis()));
     if (Constants.HAVE_INTAKE)
-      intake.setDefaultCommand(IntakeCommands.defaultIntakeCommand(intake, colorSensor));
+      intake.setDefaultCommand(ShooterCommands.defaultIntakeCommand(intake, colorSensor));
     if (Constants.HAVE_FEEDER)
-      intake.setDefaultCommand(IntakeCommands.defaultFeederCommand(feeder, colorSensor));
+      intake.setDefaultCommand(ShooterCommands.defaultFeederCommand(feeder, colorSensor));
     leds.setDefaultCommand(LedCommands.defaultLedCommand(leds));
     // ---------- Configure D-PAD for Tele-Op ----------
     controller.povUp().and(controller.back())
@@ -180,7 +179,7 @@ public class RobotContainer {
       speakerTeleOpShootCommand = ShooterCommands.shootCommand(flywheel, feeder, leds, colorSensor);
       ampTeleOpShootCommand = ShooterCommands.shootCommand(flywheel, feeder, leds, colorSensor);
       reverseShooterCommand = ShooterCommands.reverseShooterCommand(flywheel, feeder, leds);
-      stopIntakeFeederCommand = IntakeCommands.stopIntakeFeederCommand(intake, feeder);
+      stopIntakeFeederCommand = ShooterCommands.stopIntakeFeederCommand(intake, feeder);
     } else {
       speakerTeleOpShootCommand = LedCommands.blinkCommand(leds, Color.kOrange);
       ampTeleOpShootCommand = LedCommands.blinkCommand(leds, Color.kViolet);
