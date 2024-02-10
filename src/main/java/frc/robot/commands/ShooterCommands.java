@@ -41,7 +41,7 @@ public class ShooterCommands {
     return new SequentialCommandGroup(
       spinUpFlywheelCommand(flywheel),
       feeder.startCommand(),
-      LedCommands.blinkCommand(leds, Color.kOrange),
+      leds.setColorCommand(Color.kMediumSpringGreen),
       colorSensor.waitForNoObjectCommand(),
       new WaitCommand(.25),
       feeder.stopCommand(),

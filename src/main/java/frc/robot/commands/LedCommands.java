@@ -5,6 +5,7 @@ import java.time.LocalTime;
 
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.led.Leds;
 
 public class LedCommands {
@@ -27,7 +28,7 @@ public class LedCommands {
 
       @Override
       public void initialize() {
-        leds.setStaticColor(color);
+        leds.setColor(color);
         startTime = LocalTime.now();
       }
 
@@ -36,13 +37,14 @@ public class LedCommands {
         Duration timeWaited = Duration.between(startTime, LocalTime.now());
         return timeWaited.compareTo(WAIT_TIME) >= 0;
       }
-
-      @Override
-      public void end(boolean interrupted) {
-        leds.setAllianceColor(); // TODO - Layering colors
-      }
     };
     blinkCommand.addRequirements(leds);
     return blinkCommand;
+  }
+
+  public static Command defaultLedCommand(Leds leds) {
+    return Commands.run(() -> {
+      leds.setAllianceColor();
+    }, leds);
   }
 }

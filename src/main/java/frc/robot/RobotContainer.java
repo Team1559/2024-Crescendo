@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.LedCommands;
@@ -152,6 +153,7 @@ public class RobotContainer {
       intake.setDefaultCommand(IntakeCommands.defaultIntakeCommand(intake, colorSensor));
     if (Constants.HAVE_FEEDER)
       intake.setDefaultCommand(IntakeCommands.defaultFeederCommand(feeder, colorSensor));
+    leds.setDefaultCommand(LedCommands.defaultLedCommand(leds));
     // ---------- Configure D-PAD for Tele-Op ----------
     controller.povUp().and(controller.back())
         .whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(1, 0, 0)),
@@ -165,7 +167,9 @@ public class RobotContainer {
     controller.povLeft().and(controller.back())
         .whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(0, 1, 0)),
             driveBase));
-
+    // ---------- Configure Triggers ----------
+    if (Constants.HAVE_COLOR_SENSOR)
+      new Trigger((colorSensor::isObjectDetected)).whileTrue(leds.setColorCommand(Color.kDarkOrange));
     // ---------- Configure Buttons for SubSystem Actions ----------
     // TODO: Map these to different commands.
     Command speakerTeleOpShootCommand;
@@ -200,7 +204,7 @@ public class RobotContainer {
     controller.povDown().whileTrue(stopIntakeFeederCommand);
 
     // ---------- Configure Light Buttons ----------
-    controller.start().and(controller.a()).onTrue(leds.setStaticColorCommand(Color.kDarkGreen));
+    controller.start().and(controller.a()).onTrue(leds.setColorCommand(Color.kDarkGreen));
     controller.start().and(controller.b()).onTrue(leds.setStaticPatternCommand(
         new Color[] { KColor.ALLIANCE_RED, KColor.ALLIANCE_RED, Color.kBlack, Color.kBlack }));
     controller.start().and(controller.x()).onTrue(leds.setDynamicPatternCommand(new Color[] {
@@ -213,7 +217,7 @@ public class RobotContainer {
     controller.leftBumper().and(not(controller.b())).onTrue(leds.changeBrightnessCommand(true));
     controller.rightBumper().and(not(controller.b())).onTrue(leds.changeBrightnessCommand(false));
     controller.leftBumper().and(controller.rightBumper()).and(not(controller.b()))
-        .onTrue(leds.setStaticColorCommand(Color.kBlack));
+        .onTrue(leds.setColorCommand(Color.kBlack));
   }
 
   /**

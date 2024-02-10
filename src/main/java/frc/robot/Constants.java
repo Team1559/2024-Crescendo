@@ -47,7 +47,7 @@ public final class Constants {
   public static final Translation2d RED_AMP_LOCATION = new Translation2d(Units.inchesToMeters(578.77),
       Units.inchesToMeters(323.00));
   public static final Supplier<Boolean> IS_ON_BLUE_ALLIANCE = () -> {
-    return DriverStation.getAlliance().get() == DriverStation.Alliance.Blue;
+    return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue;
   };
   public static final Supplier<Translation2d> SPEAKER_LOCATION_SUPPLIER = () -> {
     return IS_ON_BLUE_ALLIANCE.get() ? BLUE_SPEAKER_LOCATION : RED_SPEAKER_LOCATION;

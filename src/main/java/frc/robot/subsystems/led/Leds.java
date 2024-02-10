@@ -124,7 +124,7 @@ public class Leds extends SubsystemBase {
      * 
      * @param color {@link Color} the lights are being set to.
      */
-    public void setStaticColor(Color color) {
+    public void setColor(Color color) {
         disableDynamicPattern();
         for (int i = 0; i < ledBuffer.getLength(); i++) {
             ledBuffer.setLED(i, color);
@@ -135,9 +135,9 @@ public class Leds extends SubsystemBase {
     public void setAllianceColor() {
         disableDynamicPattern();
         if (Constants.IS_ON_BLUE_ALLIANCE.get()) {
-            setStaticColor(Color.kBlue);
+            setColor(Color.kBlue);
         } else {
-            setStaticColor(Color.kRed);
+            setColor(Color.kRed);
         }
     }
 
@@ -175,7 +175,7 @@ public class Leds extends SubsystemBase {
      */
     public void turnOff() {
         disableDynamicPattern();
-        setStaticColor(Color.kBlack);
+        setColor(Color.kBlack);
     }
 
     // ========================= Commands =========================
@@ -208,8 +208,8 @@ public class Leds extends SubsystemBase {
      * @param color Color LEDs are being set to
      * @return
      */
-    public Command setStaticColorCommand(Color color) {
-        return new InstantCommand(() -> setStaticColor(color), this);
+    public Command setColorCommand(Color color) {
+        return new InstantCommand(() -> setColor(color), this);
     }
 
     /**
