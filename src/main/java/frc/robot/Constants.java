@@ -100,7 +100,7 @@ public final class Constants {
   public static final double AIMER_KD = 0;
   public static final double AIMER_ANGLE_OFFSET = 0; // TODO/calibrate
   public static final double AIMER_LOWER_ANGLE = 0;
-  public static final double AIMER_UPPER_ANGLE = 70; 
+  public static final double AIMER_UPPER_ANGLE = 70;
 
   // ---------- Hardware Config --------
   public static final boolean HAVE_AIMER = false;
@@ -113,23 +113,23 @@ public final class Constants {
       && HAVE_COLOR_SENSOR;
 
   // ---------- Hardware Ids ----------
-  // --- Aimer --- TODO: Set Ids.
-  public static final int AIMER_LEFT_MOTOR_ID = 0;
-  public static final int AIMER_RIGHT_MOTOR_ID = 0;
+  // --- Aimer ---
+  public static final int AIMER_LEFT_MOTOR_ID = 23;
+  public static final int AIMER_RIGHT_MOTOR_ID = 22;
   // --- Camera ---
   public static final String SHOOTER_CAMERA_NAME = "limelight";
   // --- Canivore ---
   public static final String CANIVORE_BUS_ID = "1559Canivore";
-  // --- Feeder --- TODO: Set Id.
-  public static final int FEEDER_MOTOR_ID = 0;
+  // --- Feeder ---
+  public static final int FEEDER_MOTOR_ID = 21;
   public static final boolean IS_FEEDER_INVERTED = false;
-  // --- Flywheel --- TODO: Set Ids.
-  public static final int FLYWHEEL_LEFT_MOTOR_ID = 0;
-  public static final int FLYWHEEL_RIGHT_MOTOR_ID = 0;
+  // --- Flywheel ----
+  public static final int FLYWHEEL_LEFT_MOTOR_ID = 24;
+  public static final int FLYWHEEL_RIGHT_MOTOR_ID = 25;
   // --- Gyro ---
   public static final int BASE_GYRO_ID = 12;
-  // --- Intake --- TODO: Set Id.
-  public static final int INTAKE_MOTOR_ID = 0;
+  // --- Intake ---
+  public static final int INTAKE_MOTOR_ID = 20;
   public static final boolean IS_INTAKE_INVERTED = false;
   // --- Swerve Drives ---
   public static final int FRONT_LEFT_DRIVE_MOTOR_ID = 0;
