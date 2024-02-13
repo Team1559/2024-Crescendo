@@ -1,10 +1,11 @@
 package frc.robot.subsystems.shooter;
 
 import frc.robot.Constants;
+import frc.robot.subsystems.general.SingleMotorIo;
+import frc.robot.subsystems.general.SingleMotorSubsystem;
 
-public class Feeder extends SingleCanSparkMaxSubsystem {
-    public Feeder() {
-        super("Feeder", Constants.FEEDER_MOTOR_ID, Constants.FEEDER_FORWARD_VOLTAGE, Constants.FEEDER_REVERSE_VOLTAGE,
-                Constants.IS_FEEDER_INVERTED);
+public class Feeder extends SingleMotorSubsystem {
+    public Feeder(SingleMotorIo io) {
+        super("Feeder", io, Constants.FEEDER_FORWARD_VOLTAGE, Constants.FEEDER_REVERSE_VOLTAGE);
     }
 }

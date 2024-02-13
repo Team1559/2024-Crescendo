@@ -19,6 +19,8 @@ import frc.robot.commands.LedCommands;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.subsystems.base.DriveBase;
 import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
+import frc.robot.subsystems.general.SingleMotorIoReplay;
+import frc.robot.subsystems.general.SingleMotorIoSparkMax;
 import frc.robot.subsystems.gyro.GyroIoPigeon2;
 import frc.robot.subsystems.gyro.GyroIoSimAndReplay;
 import frc.robot.subsystems.led.Leds;
@@ -69,45 +71,58 @@ public class RobotContainer {
                 // ----- Initialize Subsystems with Simulation and/or Log Replay Modes -----
                 switch (Constants.CURRENT_OPERATING_MODE) {
 
-                        case REAL_WORLD:
-                                // Real robot, instantiate hardware IO implementations
-                                driveBase = new DriveBase(
-                                                new GyroIoPigeon2(),
-                                                new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_LEFT),
-                                                new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_RIGHT),
-                                                new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_LEFT),
-                                                new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
-                                vision = Constants.HAVE_VISION
-                                                ? new Vision(driveBase.getPoseEstimator(),
-                                                                new VisionIoLimelight(Constants.SHOOTER_CAMERA_NAME))
-                                                : null;
-                                break;
+      case REAL_WORLD:
+        // Real robot, instantiate hardware IO implementations
+        driveBase = new DriveBase(
+            new GyroIoPigeon2(),
+            new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_LEFT),
+            new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_RIGHT),
+            new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_LEFT),
+            new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
+        feeder = Constants.HAVE_FEEDER
+            ? new Feeder(new SingleMotorIoSparkMax(Constants.FEEDER_MOTOR_ID, false))
+            : null;
+        intake = Constants.HAVE_INTAKE
+            ? new Intake(new SingleMotorIoSparkMax(Constants.INTAKE_MOTOR_ID, false))
+            : null;
+        vision = Constants.HAVE_VISION
+            ? new Vision(driveBase.getPoseEstimator(), new VisionIoLimelight(Constants.SHOOTER_CAMERA_NAME))
+            : null;
+        break;
 
-                        case SIMULATION:
-                                // Sim robot, instantiate physics sim IO implementations
-                                driveBase = new DriveBase(
-                                                new GyroIoSimAndReplay(),
-                                                new SwerveModuleIoSim(),
-                                                new SwerveModuleIoSim(),
-                                                new SwerveModuleIoSim(),
-                                                new SwerveModuleIoSim());
-                                vision = Constants.HAVE_VISION
-                                                ? new Vision(driveBase.getPoseEstimator(), new VisionIoSimAndReplay())
-                                                : null;
-                                break;
+      case SIMULATION:
+        // Sim robot, instantiate physics sim IO implementations
+        driveBase = new DriveBase(
+            new GyroIoSimAndReplay(),
+            new SwerveModuleIoSim(),
+            new SwerveModuleIoSim(),
+            new SwerveModuleIoSim(),
+            new SwerveModuleIoSim());
+        feeder = Constants.HAVE_FEEDER
+            ? new Feeder(new SingleMotorIoSparkMax(Constants.FEEDER_MOTOR_ID, false))
+            : null;
+        intake = Constants.HAVE_INTAKE
+            ? new Intake(new SingleMotorIoSparkMax(Constants.INTAKE_MOTOR_ID, false))
+            : null;
+        vision = Constants.HAVE_VISION ? new Vision(driveBase.getPoseEstimator(), new VisionIoSimAndReplay()) : null;
+        break;
 
-                        case LOG_REPLAY:
-                                // Replayed robot, disable IO implementations
-                                driveBase = new DriveBase(
-                                                new GyroIoSimAndReplay(),
-                                                new SwerveModuleIoReplay(),
-                                                new SwerveModuleIoReplay(),
-                                                new SwerveModuleIoReplay(),
-                                                new SwerveModuleIoReplay());
-                                vision = Constants.HAVE_VISION
-                                                ? new Vision(driveBase.getPoseEstimator(), new VisionIoSimAndReplay())
-                                                : null;
-                                break;
+      case LOG_REPLAY:
+        // Replayed robot, disable IO implementations
+        driveBase = new DriveBase(
+            new GyroIoSimAndReplay(),
+            new SwerveModuleIoReplay(),
+            new SwerveModuleIoReplay(),
+            new SwerveModuleIoReplay(),
+            new SwerveModuleIoReplay());
+        feeder = Constants.HAVE_FEEDER
+            ? new Feeder(new SingleMotorIoReplay())
+            : null;
+        intake = Constants.HAVE_INTAKE
+            ? new Intake(new SingleMotorIoReplay())
+            : null;
+        vision = Constants.HAVE_VISION ? new Vision(driveBase.getPoseEstimator(), new VisionIoSimAndReplay()) : null;
+        break;
 
                         default:
                                 throw new RuntimeException("Unknown Run Mode: " + Constants.CURRENT_OPERATING_MODE);
@@ -116,9 +131,7 @@ public class RobotContainer {
                 // ----- Initialize Subsystems without Simulation and/or Log Replay Modes -----
                 aimer = Constants.HAVE_AIMER ? new Aimer() : null;
                 colorSensor = Constants.HAVE_COLOR_SENSOR ? new ColorSensor() : null;
-                feeder = Constants.HAVE_FEEDER ? new Feeder() : null;
                 flywheel = Constants.HAVE_FLYWHEEL ? new Flywheel() : null;
-                intake = Constants.HAVE_INTAKE ? new Intake() : null;
                 // We can safely emit LED instructions even if there are no LEDs.
                 // (The LED control hardware is built into the RoboRio so always "exists".)
                 leds = new Leds();
