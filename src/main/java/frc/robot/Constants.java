@@ -74,7 +74,9 @@ public final class Constants {
 
   // ---------- Wheel & GHear Measurements ----------
   public static final double WHEEL_RADIUS = Units.inchesToMeters(2);
-  public static final double WHEEL_DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 /
+  public static final double WHEEL_DRIVE_GEAR_RATIO_L3 = (50.0 / 14.0) * (16.0 /
+      28.0) * (45.0 / 15.0); // L3 Gear ratio
+  public static final double WHEEL_DRIVE_GEAR_RATIO_L2 = (50.0 / 14.0) * (17.0 /
       27.0) * (45.0 / 15.0); // L2 Gear ratio
   // public static final double WHEEL_DRIVE_GEAR_RATIO = 6.12; // L3 Gear ratio
   public static final double WHEEL_TURN_GEAR_RATIO = 12.8;
@@ -82,10 +84,15 @@ public final class Constants {
   // ---------- Wheel Rotation Offsets ----------
   // Note: Chaning the Offset by Pie (180 degrees) will invert the direction the
   // wheel spins.
-  public static final Rotation2d FRONT_LEFT_ABSOLUTE_ENCODER_OFFSET = Rotation2d.fromRotations(-0.300293);
-  public static final Rotation2d FRONT_RIGHT_ABSOLUTE_ENCODER_OFFSET = Rotation2d.fromRotations(-0.228760);
-  public static final Rotation2d BACK_LEFT_ABSOLUTE_ENCODER_OFFSET = Rotation2d.fromRotations(-0.238525);
-  public static final Rotation2d BACK_RIGHT_ABSOLUTE_ENCODER_OFFSET = Rotation2d.fromRotations(-0.000732);
+
+  public static final boolean IS_PRACTICE_BOT = false;
+
+  // FL, FR, BL, BR
+  // 8, 11, 5, 2
+  public static final Rotation2d[] ABSOLUTE_ENCODER_OFFSETS_PRACTICE = { Rotation2d.fromRotations(-0.300293),
+      Rotation2d.fromRotations(-0.228760), Rotation2d.fromRotations(-0.238525), Rotation2d.fromRotations(-0.000732) };
+  public static final Rotation2d[] ABSOLUTE_ENCODER_OFFSETS_REAL = { Rotation2d.fromRotations(-0.023),
+      Rotation2d.fromRotations(0.0045), Rotation2d.fromRotations(-0.444), Rotation2d.fromRotations(-0.135) };
 
   // ---------- Game Piece Handling -------
   public static final double INTAKE_FORWARD_VOLTAGE = 6.0;
