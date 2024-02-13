@@ -41,7 +41,7 @@ public class DriveCommands {
         pid.setSetpoint(0); // Degrees from target.
         pid.setTolerance(1/* degree(s) */);
         pid.enableContinuousInput(-180, 180); // Degrees.
-        flywheel.start(); // Will get turned of in Shoot command.
+        flywheel.start();
       }
 
       @Override
