@@ -92,7 +92,7 @@ public class IndexedSwerveModule {
     // Optimize state based on current angle
     // Controllers run in "periodic" when the setpoint is not null
 
-    SwerveModuleState optimizedState = SwerveModuleState.optimize(state, getAngle());
+    SwerveModuleState optimizedState = state; // SwerveModuleState.optimize(state, getAngle());
 
     // Update setpoints, controllers run in "periodic"
     angleSetpoint = optimizedState.angle;
