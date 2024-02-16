@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -81,16 +80,13 @@ public class RobotContainer {
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_LEFT),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
                 feeder = Constants.HAVE_FEEDER
-                        ? new Feeder(new SingleMotorIoSparkMax(Constants.FEEDER_MOTOR_ID,
-                                false))
+                        ? new Feeder(new SingleMotorIoSparkMax(Constants.FEEDER_MOTOR_ID, Constants.IS_FEEDER_INVERTED))
                         : null;
                 intake = Constants.HAVE_INTAKE
-                        ? new Intake(new SingleMotorIoSparkMax(Constants.INTAKE_MOTOR_ID,
-                                Constants.IS_INTAKE_INVERTED))
+                        ? new Intake(new SingleMotorIoSparkMax(Constants.INTAKE_MOTOR_ID, Constants.IS_INTAKE_INVERTED))
                         : null;
                 vision = Constants.HAVE_VISION
-                        ? new Vision(driveBase.getPoseEstimator(),
-                                new VisionIoLimelight(Constants.SHOOTER_CAMERA_NAME))
+                        ? new Vision(driveBase.poseEstimator, new VisionIoLimelight(Constants.SHOOTER_CAMERA_NAME))
                         : null;
                 break;
 
@@ -103,15 +99,12 @@ public class RobotContainer {
                         new SwerveModuleIoSim(),
                         new SwerveModuleIoSim());
                 feeder = Constants.HAVE_FEEDER
-                        ? new Feeder(new SingleMotorIoSparkMax(Constants.FEEDER_MOTOR_ID,
-                                false))
+                        ? new Feeder(new SingleMotorIoSparkMax(Constants.FEEDER_MOTOR_ID, Constants.IS_FEEDER_INVERTED))
                         : null;
                 intake = Constants.HAVE_INTAKE
-                        ? new Intake(new SingleMotorIoSparkMax(Constants.INTAKE_MOTOR_ID,
-                                Constants.IS_INTAKE_INVERTED))
+                        ? new Intake(new SingleMotorIoSparkMax(Constants.INTAKE_MOTOR_ID, Constants.IS_INTAKE_INVERTED))
                         : null;
-                vision = Constants.HAVE_VISION
-                        ? new Vision(driveBase.getPoseEstimator(), new VisionIoSimAndReplay())
+                vision = Constants.HAVE_VISION ? new Vision(driveBase.poseEstimator, new VisionIoSimAndReplay())
                         : null;
                 break;
 
@@ -123,14 +116,9 @@ public class RobotContainer {
                         new SwerveModuleIoReplay(),
                         new SwerveModuleIoReplay(),
                         new SwerveModuleIoReplay());
-                feeder = Constants.HAVE_FEEDER
-                        ? new Feeder(new SingleMotorIoReplay())
-                        : null;
-                intake = Constants.HAVE_INTAKE
-                        ? new Intake(new SingleMotorIoReplay())
-                        : null;
-                vision = Constants.HAVE_VISION
-                        ? new Vision(driveBase.getPoseEstimator(), new VisionIoSimAndReplay())
+                feeder = Constants.HAVE_FEEDER ? new Feeder(new SingleMotorIoReplay()) : null;
+                intake = Constants.HAVE_INTAKE ? new Intake(new SingleMotorIoReplay()) : null;
+                vision = Constants.HAVE_VISION ? new Vision(driveBase.poseEstimator, new VisionIoSimAndReplay())
                         : null;
                 break;
 
@@ -148,12 +136,10 @@ public class RobotContainer {
 
         // ========================= Autonomous =========================
         // ---------- Create Named Commands for use by Path Planner ----------
-        NamedCommands.registerCommand("Spin 180",
-                DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
+        NamedCommands.registerCommand("Spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
         NamedCommands.registerCommand("StartIntake", LedCommands.blinkCommand(leds, Color.kPurple));
         if (Constants.HAVE_FLYWHEEL) {
-            NamedCommands.registerCommand("Spin Up Flywheel",
-                    ShooterCommands.spinUpFlywheelCommand(flywheel));
+            NamedCommands.registerCommand("Spin Up Flywheel", ShooterCommands.spinUpFlywheelCommand(flywheel));
         }
 
         Command aimCommand = new ConditionalCommand(
@@ -181,36 +167,20 @@ public class RobotContainer {
                 () -> controller1.getLeftTriggerAxis() > controller1.getRightTriggerAxis()
                         ? controller1.getLeftTriggerAxis()
                         : -controller1.getRightTriggerAxis()));
-        if (Constants.HAVE_INTAKE) {
-            intake.setDefaultCommand(ShooterCommands.defaultIntakeCommand(intake,
-                    colorSensor));
+        if (Constants.HAVE_INTAKE) { // TODO: What will happen if the color sensor is null?
+            intake.setDefaultCommand(ShooterCommands.defaultIntakeCommand(intake, colorSensor));
         }
-        if (Constants.HAVE_FEEDER) {
-            intake.setDefaultCommand(ShooterCommands.defaultFeederCommand(feeder,
-                    colorSensor));
+        if (Constants.HAVE_FEEDER) { // TODO: What will happen if the color sensor is null?
+            intake.setDefaultCommand(ShooterCommands.defaultFeederCommand(feeder, colorSensor));
         }
         leds.setDefaultCommand(LedCommands.defaultLedCommand(leds));
 
-        // ---------- Configure D-PAD for Tele-Op Controller 1 ----------
-        controller1.povUp().and(controller1.back())
-                .whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(1, 0, 0)),
-                        driveBase));
-        controller1.povDown().and(controller1.back())
-                .whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(-1, 0, 0)),
-                        driveBase));
-        controller1.povRight().and(controller1.back())
-                .whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(0, -1, 0)),
-                        driveBase));
-        controller1.povLeft().and(controller1.back())
-                .whileTrue(Commands.run(() -> driveBase.runVelocity(new ChassisSpeeds(0, 1, 0)),
-                        driveBase));
-
-        // ---------- Configure Triggers ----------
+        // ---------- Configure Command Triggers ----------
         if (Constants.HAVE_COLOR_SENSOR) {
             new Trigger((colorSensor::isObjectDetected)).whileTrue(leds.setColorCommand(Color.kDarkOrange));
         }
 
-        // ---------- Configure Buttons for SubSystem Actions ----------
+        // ---------- Configure Buttons for SubSystem Actions (Controller 1) ----------
         Command teleOpShootCommand;
         Command reverseShooterCommand;
         Command stopIntakeFeederCommand;
@@ -223,21 +193,18 @@ public class RobotContainer {
             reverseShooterCommand = LedCommands.blinkCommand(leds, Color.kTomato);
             stopIntakeFeederCommand = LedCommands.blinkCommand(leds, Color.kDarkKhaki);
         }
-        controller1.y().and(controller1.b())
-                .onTrue(teleOpShootCommand);
+        controller1.y().and(controller1.b()).onTrue(teleOpShootCommand);
 
         controller1.b().and(not(controller1.rightBumper()))
                 .whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel,
-                        () -> -controller1.getLeftY(),
-                        () -> -controller1.getLeftX(),
+                        () -> -controller1.getLeftY(), () -> -controller1.getLeftX(),
                         Constants.SPEAKER_LOCATION_SUPPLIER));
         controller1.b().and(controller1.rightBumper())
                 .whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel,
-                        () -> -controller1.getLeftY(),
-                        () -> -controller1.getLeftX(),
+                        () -> -controller1.getLeftY(), () -> -controller1.getLeftX(),
                         Constants.AMP_LOCATION_SUPPLIER));
 
-        // ---------- Configure Light Buttons ----------
+        // ---------- Configure Light Buttons (Controller 1) ----------
         controller1.start().and(controller1.a()).onTrue(leds.setColorCommand(Color.kDarkGreen));
         controller1.start().and(controller1.b()).onTrue(leds.setStaticPatternCommand(
                 new Color[] { KColor.ALLIANCE_RED, KColor.ALLIANCE_RED, Color.kBlack, Color.kBlack }));
@@ -252,26 +219,25 @@ public class RobotContainer {
         controller1.rightBumper().onTrue(leds.changeBrightnessCommand(false));
         controller1.leftBumper().and(controller1.rightBumper()).onTrue(leds.setColorCommand(Color.kBlack));
 
-        // Controller 2 Configure Buttons
-        if (Constants.HAVE_INTAKE)
-            controller2.a().whileTrue(new StartEndCommand(intake::start, intake::stop, intake));
-        if (Constants.HAVE_FLYWHEEL)
-            controller2.b().whileTrue(new StartEndCommand(flywheel::start, flywheel::stop, flywheel));
-        if (Constants.HAVE_FEEDER)
-            controller2.y().whileTrue(new StartEndCommand(feeder::start, feeder::stop, feeder));
-        controller2.x().onTrue(colorSensor.getProximityCommand());
-        if (Constants.HAVE_AIMER) {
-            controller2.povUp().onTrue(new InstantCommand(() -> {
-                double currentAngle = aimer.getAngle();
-                double targetAngle = currentAngle + 5;
-                aimer.setTargetAngle(targetAngle);
-            }));
+        // ---------- Configure D-PAD for Tele-Op (Controller 1) ----------
+        controller2.povUp().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(1, 0, 0)));
+        controller2.povDown().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(-1, 0, 0)));
+        controller2.povRight().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(0, -1, 0)));
+        controller2.povLeft().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(0, 1, 0)));
 
-            controller2.povDown().onTrue(new InstantCommand(() -> {
-                double currentAngle = aimer.getAngle();
-                double targetAngle = currentAngle - 5;
-                aimer.setTargetAngle(targetAngle);
-            }));
+        // ---------- Configure Subsystem Debug Buttons (Controller 2) ----------
+        if (Constants.HAVE_INTAKE) {
+            controller2.a().whileTrue(new StartEndCommand(intake::start, intake::stop, intake));
+        }
+        if (Constants.HAVE_FLYWHEEL) {
+            controller2.b().whileTrue(new StartEndCommand(flywheel::start, flywheel::stop, flywheel));
+        }
+        if (Constants.HAVE_FEEDER) {
+            controller2.y().whileTrue(new StartEndCommand(feeder::start, feeder::stop, feeder));
+        }
+        if (Constants.HAVE_AIMER) {
+            controller2.rightTrigger().onTrue(new InstantCommand(() -> aimer.setTargetAngle(aimer.getAngle() + 5)));
+            controller2.leftTrigger().onTrue(new InstantCommand(() -> aimer.setTargetAngle(aimer.getAngle() - 5)));
         }
     }
 

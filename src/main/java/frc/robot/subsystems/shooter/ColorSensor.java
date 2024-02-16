@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.util.Color;
 
 import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.ColorSensorV3;
 
@@ -36,7 +35,6 @@ public class ColorSensor extends SubsystemBase {
     @Override
     public void periodic() {
         updateInputs();
-        Logger.processInputs("Shooter/ColorSensor", inputs);
     }
 
     private void updateInputs() {
