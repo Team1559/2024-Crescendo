@@ -43,7 +43,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
   private final StatusSignal<Integer> driveMotorFaults;
   private final StatusSignal<Double> driveMotorTemp;
 
-  private final StatusSignal<Double> cancoderAbsolutePosition;
+  private final StatusSignal<Double> cancoderOffsetPosition;
   private final StatusSignal<Double> steerMotorPosition;
   private final StatusSignal<Double> steerMotorVelocity;
   private final StatusSignal<Double> steerMotorAppliedVolts;
@@ -120,7 +120,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
     driveMotorFaults = driveMotor.getFaultField();
     driveMotorTemp = driveMotor.getDeviceTemp();
 
-    cancoderAbsolutePosition = cancoder.getAbsolutePosition();
+    cancoderOffsetPosition = cancoder.getAbsolutePosition();
     steerMotorPosition = steerMotor.getPosition();
     steerMotorVelocity = steerMotor.getVelocity();
     steerMotorAppliedVolts = steerMotor.getMotorVoltage();
@@ -129,15 +129,14 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
     steerMotorTemp = steerMotor.getDeviceTemp();
 
     // Set Update frequency.
-    BaseStatusSignal.setUpdateFrequencyForAll(
-        Constants.ADVANTAGE_ODOMETRY_LOG_FREQUENCY, driveMotorPosition, steerMotorPosition); // Required for odometry,
-                                                                                             // use faster rate
+    BaseStatusSignal.setUpdateFrequencyForAll( // Required for odometry, use faster rate
+        Constants.ADVANTAGE_ODOMETRY_LOG_FREQUENCY, driveMotorPosition, steerMotorPosition);
     BaseStatusSignal.setUpdateFrequencyForAll(
         Constants.ADVANTAGE_DEFAULT_LOG_FREQUENCY,
         driveMotorVelocity,
         driveMotorAppliedVolts,
         driveMotorCurrent,
-        cancoderAbsolutePosition,
+        cancoderOffsetPosition,
         steerMotorVelocity,
         steerMotorAppliedVolts,
         steerMotorStatorCurrent);
@@ -158,12 +157,13 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 
   @Override
   public void updateInputs(SwerveModuleIoInputs inputs) {
+    
     BaseStatusSignal.refreshAll(
         driveMotorPosition,
         driveMotorVelocity,
         driveMotorAppliedVolts,
         driveMotorCurrent,
-        cancoderAbsolutePosition,
+        cancoderOffsetPosition,
         steerMotorPosition,
         steerMotorVelocity,
         steerMotorAppliedVolts,
@@ -173,23 +173,19 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         driveMotorTemp,
         steerMotorTemp);
 
-    // Inverted driveMotorPosition so that sutonomous sees the robot moving in the
-    // correct direction.
-    inputs.driveMotorPositionRad = Units.rotationsToRadians(-driveMotorPosition.getValueAsDouble())
-        / Constants.WHEEL_DRIVE_GEAR_RATIO_L3;
-    inputs.driveMotorVelocityRadPerSec = Units.rotationsToRadians(driveMotorVelocity.getValueAsDouble())
-        / Constants.WHEEL_DRIVE_GEAR_RATIO_L3;
+    inputs.cancoderAbsolutePosition = Rotation2d.fromRotations(cancoderOffsetPosition.getValueAsDouble());
+    inputs.cancoderOffsetPosition = inputs.cancoderAbsolutePosition.minus(absoluteEncoderOffset);
+    
+    // Inverted driveMotorPosition so that autonomous sees the robot moving in the correct direction.
+    inputs.driveMotorPositionRad = Units.rotationsToRadians(-driveMotorPosition.getValueAsDouble()) / Constants.WHEEL_DRIVE_GEAR_RATIO_L3;
+    inputs.driveMotorVelocityRadPerSec = Units.rotationsToRadians(driveMotorVelocity.getValueAsDouble()) / Constants.WHEEL_DRIVE_GEAR_RATIO_L3;
     inputs.driveMotorAppliedVolts = driveMotorAppliedVolts.getValueAsDouble();
     inputs.driveMotorCurrentAmps = driveMotorCurrent.getValueAsDouble();
     inputs.driveMotorFaults = driveMotorFaults.getValue();
     inputs.driveMotorTemp = driveMotorTemp.getValueAsDouble();
 
-    inputs.cancoderAbsolutePosition = Rotation2d.fromRotations(cancoderAbsolutePosition.getValueAsDouble())
-        .minus(absoluteEncoderOffset);
-    inputs.steerMotorPosition = Rotation2d
-        .fromRotations(steerMotorPosition.getValueAsDouble() / Constants.WHEEL_TURN_GEAR_RATIO);
-    inputs.steerMotorVelocityRadPerSec = Units.rotationsToRadians(steerMotorVelocity.getValueAsDouble())
-        / Constants.WHEEL_TURN_GEAR_RATIO;
+    inputs.steerMotorPosition = Rotation2d.fromRotations(steerMotorPosition.getValueAsDouble() / Constants.WHEEL_TURN_GEAR_RATIO).plus(Rotation2d.fromRadians(0));
+    inputs.steerMotorVelocityRadPerSec = Units.rotationsToRadians(steerMotorVelocity.getValueAsDouble()) / Constants.WHEEL_TURN_GEAR_RATIO;
     inputs.steerMotorAppliedVolts = steerMotorAppliedVolts.getValueAsDouble();
     inputs.steerMotorCurrentAmps = steerMotorStatorCurrent.getValueAsDouble();
     inputs.steerMotorFaults = steerMotorFaults.getValue();

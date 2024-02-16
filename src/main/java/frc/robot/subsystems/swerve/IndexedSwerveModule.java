@@ -56,8 +56,8 @@ public class IndexedSwerveModule {
 
     // On first cycle, reset relative turn encoder
     // Wait until absolute angle is nonzero in case it wasn't initialized yet
-    if (turnRelativeOffset == null && inputs.cancoderAbsolutePosition.getRadians() != 0.0) {
-      turnRelativeOffset = inputs.cancoderAbsolutePosition.minus(inputs.steerMotorPosition);
+    if (turnRelativeOffset == null && inputs.cancoderOffsetPosition.getRadians() != 0.0) {
+      turnRelativeOffset = inputs.cancoderOffsetPosition.minus(inputs.steerMotorPosition);
     }
 
     // Run closed loop turn control

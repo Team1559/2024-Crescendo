@@ -44,12 +44,14 @@ public class SwerveModuleIoSim implements SwerveModuleIo {
     driveSim.update(LOOP_PERIOD_SECS);
     turnSim.update(LOOP_PERIOD_SECS);
 
+    inputs.cancoderAbsolutePosition = new Rotation2d(turnSim.getAngularPositionRad());
+    inputs.cancoderOffsetPosition = inputs.cancoderAbsolutePosition.plus(turnAbsoluteInitPosition);
+
     inputs.driveMotorPositionRad = driveSim.getAngularPositionRad();
     inputs.driveMotorVelocityRadPerSec = driveSim.getAngularVelocityRadPerSec();
     inputs.driveMotorAppliedVolts = driveAppliedVolts;
     inputs.driveMotorCurrentAmps = Math.abs(driveSim.getCurrentDrawAmps());
 
-    inputs.cancoderAbsolutePosition = new Rotation2d(turnSim.getAngularPositionRad()).plus(turnAbsoluteInitPosition);
     inputs.steerMotorPosition = new Rotation2d(turnSim.getAngularPositionRad());
     inputs.steerMotorVelocityRadPerSec = turnSim.getAngularVelocityRadPerSec();
     inputs.steerMotorAppliedVolts = turnAppliedVolts;
