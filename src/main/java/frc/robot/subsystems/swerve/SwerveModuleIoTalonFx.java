@@ -32,167 +32,173 @@ import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
  */
 public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 
-  private final TalonFX driveMotor;
-  private final TalonFX steerMotor;
-  private final CANcoder cancoder;
+    private final TalonFX driveMotor;
+    private final TalonFX steerMotor;
+    private final CANcoder cancoder;
 
-  private final StatusSignal<Double> driveMotorPosition;
-  private final StatusSignal<Double> driveMotorVelocity;
-  private final StatusSignal<Double> driveMotorAppliedVolts;
-  private final StatusSignal<Double> driveMotorCurrent;
-  private final StatusSignal<Integer> driveMotorFaults;
-  private final StatusSignal<Double> driveMotorTemp;
+    private final StatusSignal<Double> cancoderAbsolutePosition;
 
-  private final StatusSignal<Double> cancoderAbsolutePosition;
-  private final StatusSignal<Double> steerMotorPosition;
-  private final StatusSignal<Double> steerMotorVelocity;
-  private final StatusSignal<Double> steerMotorAppliedVolts;
-  private final StatusSignal<Double> steerMotorStatorCurrent;
-  private final StatusSignal<Integer> steerMotorFaults;
-  private final StatusSignal<Double> steerMotorTemp;
+    private final StatusSignal<Double> driveMotorPosition;
+    private final StatusSignal<Double> driveMotorVelocity;
+    private final StatusSignal<Double> driveMotorAppliedVolts;
+    private final StatusSignal<Double> driveMotorCurrent;
+    private final StatusSignal<Integer> driveMotorFaults;
+    private final StatusSignal<Double> driveMotorTemp;
+    private final StatusSignal<Double> steerMotorPosition;
+    private final StatusSignal<Double> steerMotorVelocity;
+    private final StatusSignal<Double> steerMotorAppliedVolts;
+    private final StatusSignal<Double> steerMotorStatorCurrent;
+    private final StatusSignal<Integer> steerMotorFaults;
+    private final StatusSignal<Double> steerMotorTemp;
 
-  private final Rotation2d absoluteEncoderOffset;
+    private final Rotation2d absoluteEncoderOffset;
 
-  public SwerveModuleIoTalonFx(WheelModuleIndex index) {
+    public SwerveModuleIoTalonFx(WheelModuleIndex index) {
 
-    // Assign Motor and Encoder Ids and configue wheel offset.
-    absoluteEncoderOffset = (Constants.IS_PRACTICE_BOT ? Constants.SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_PRACTICE
-        : Constants.SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_REAL)[index.value];
+        // Assign Motor and Encoder Ids and configue wheel offset.
+        absoluteEncoderOffset = (Constants.IS_PRACTICE_BOT ? Constants.SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_PRACTICE
+                : Constants.SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_REAL)[index.value];
 
-    switch (index) {
-      case FRONT_LEFT:
-        driveMotor = new TalonFX(Constants.FRONT_LEFT_DRIVE_MOTOR_ID, Constants.CANIVORE_BUS_ID);
-        steerMotor = new TalonFX(Constants.FRONT_LEFT_STEER_MOTOR_ID, Constants.CANIVORE_BUS_ID);
-        cancoder = new CANcoder(Constants.FRONT_LEFT_CANCODER_ID, Constants.CANIVORE_BUS_ID);
-        break;
-      case FRONT_RIGHT:
-        driveMotor = new TalonFX(Constants.FRONT_RIGHT_DRIVE_MOTOR_ID, Constants.CANIVORE_BUS_ID);
-        steerMotor = new TalonFX(Constants.FRONT_RIGHT_STEER_MOTOR_ID, Constants.CANIVORE_BUS_ID);
-        cancoder = new CANcoder(Constants.FRONT_RIGHT_CANCODER_ID, Constants.CANIVORE_BUS_ID);
-        break;
-      case BACK_LEFT:
-        driveMotor = new TalonFX(Constants.BACK_LEFT_DRIVE_MOTOR_ID, Constants.CANIVORE_BUS_ID);
-        steerMotor = new TalonFX(Constants.BACK_LEFT_STEER_MOTOR_ID, Constants.CANIVORE_BUS_ID);
-        cancoder = new CANcoder(Constants.BACK_LEFT_CANCODER_ID, Constants.CANIVORE_BUS_ID);
-        break;
-      case BACK_RIGHT:
-        driveMotor = new TalonFX(Constants.BACK_RIGHT_DRIVE_MOTOR_ID, Constants.CANIVORE_BUS_ID);
-        steerMotor = new TalonFX(Constants.BACK_RIGHT_STEER_MOTOR_ID, Constants.CANIVORE_BUS_ID);
-        cancoder = new CANcoder(Constants.BACK_RIGHT_CANCODER_ID, Constants.CANIVORE_BUS_ID);
-        break;
-      default:
-        throw new RuntimeException("Invalid module index: " + index);
+        switch (index) {
+            case FRONT_LEFT:
+                driveMotor = new TalonFX(Constants.FRONT_LEFT_DRIVE_MOTOR_ID, Constants.CANIVORE_BUS_ID);
+                steerMotor = new TalonFX(Constants.FRONT_LEFT_STEER_MOTOR_ID, Constants.CANIVORE_BUS_ID);
+                cancoder = new CANcoder(Constants.FRONT_LEFT_CANCODER_ID, Constants.CANIVORE_BUS_ID);
+                break;
+            case FRONT_RIGHT:
+                driveMotor = new TalonFX(Constants.FRONT_RIGHT_DRIVE_MOTOR_ID, Constants.CANIVORE_BUS_ID);
+                steerMotor = new TalonFX(Constants.FRONT_RIGHT_STEER_MOTOR_ID, Constants.CANIVORE_BUS_ID);
+                cancoder = new CANcoder(Constants.FRONT_RIGHT_CANCODER_ID, Constants.CANIVORE_BUS_ID);
+                break;
+            case BACK_LEFT:
+                driveMotor = new TalonFX(Constants.BACK_LEFT_DRIVE_MOTOR_ID, Constants.CANIVORE_BUS_ID);
+                steerMotor = new TalonFX(Constants.BACK_LEFT_STEER_MOTOR_ID, Constants.CANIVORE_BUS_ID);
+                cancoder = new CANcoder(Constants.BACK_LEFT_CANCODER_ID, Constants.CANIVORE_BUS_ID);
+                break;
+            case BACK_RIGHT:
+                driveMotor = new TalonFX(Constants.BACK_RIGHT_DRIVE_MOTOR_ID, Constants.CANIVORE_BUS_ID);
+                steerMotor = new TalonFX(Constants.BACK_RIGHT_STEER_MOTOR_ID, Constants.CANIVORE_BUS_ID);
+                cancoder = new CANcoder(Constants.BACK_RIGHT_CANCODER_ID, Constants.CANIVORE_BUS_ID);
+                break;
+            default:
+                throw new RuntimeException("Invalid module index: " + index);
+        }
+
+        // Set Drive TalonFXConfiguration.
+        TalonFXConfiguration driveTalonFXConfiguration = new TalonFXConfiguration();
+        driveTalonFXConfiguration.CurrentLimits = Constants.getDefaultCurrentLimitsConfig();
+        driveMotor.getConfigurator().apply(driveTalonFXConfiguration);
+
+        // Set Drive TalonFXConfiguration.
+        MotorOutputConfigs driveMotorOutputConfigs = new MotorOutputConfigs();
+        driveMotorOutputConfigs.NeutralMode = Constants.WHEEL_BRAKE_MODE;
+        // Inverted to match our Swerve Drive Module Gear Box & Motors.
+        driveMotorOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
+        driveMotor.getConfigurator().apply(driveMotorOutputConfigs);
+
+        // Set Steer MotorOutputConfigs.
+        TalonFXConfiguration steerTalonFXConfiguration = new TalonFXConfiguration();
+        steerTalonFXConfiguration.CurrentLimits = Constants.getDefaultCurrentLimitsConfig();
+        steerMotor.getConfigurator().apply(steerTalonFXConfiguration);
+
+        // Set Steer MotorOutputConfigs.
+        MotorOutputConfigs steerMotorOutputConfigs = new MotorOutputConfigs();
+        steerMotorOutputConfigs.NeutralMode = Constants.WHEEL_BRAKE_MODE;
+        // Inverted to match our Swerve Drive Module Gear Box & Motors.
+        steerMotorOutputConfigs.Inverted = InvertedValue.CounterClockwise_Positive;
+        steerMotor.getConfigurator().apply(steerMotorOutputConfigs);
+
+        // Set CAN Coder Configs.
+        CANcoderConfiguration canCoderConfiguration = new CANcoderConfiguration();
+        cancoder.getConfigurator().apply(canCoderConfiguration);
+
+        // Get current state.
+        cancoderAbsolutePosition = cancoder.getAbsolutePosition();
+
+        driveMotorPosition = driveMotor.getPosition();
+        driveMotorVelocity = driveMotor.getVelocity();
+        driveMotorAppliedVolts = driveMotor.getMotorVoltage();
+        driveMotorCurrent = driveMotor.getStatorCurrent();
+        driveMotorFaults = driveMotor.getFaultField();
+        driveMotorTemp = driveMotor.getDeviceTemp();
+
+        steerMotorPosition = steerMotor.getPosition();
+        steerMotorVelocity = steerMotor.getVelocity();
+        steerMotorAppliedVolts = steerMotor.getMotorVoltage();
+        steerMotorStatorCurrent = steerMotor.getStatorCurrent();
+        steerMotorFaults = steerMotor.getFaultField();
+        steerMotorTemp = steerMotor.getDeviceTemp();
+
+        // Set Update frequency.
+        BaseStatusSignal.setUpdateFrequencyForAll( // Required for odometry, use faster rate
+                Constants.ADVANTAGE_ODOMETRY_LOG_FREQUENCY, driveMotorPosition, steerMotorPosition);
+        BaseStatusSignal.setUpdateFrequencyForAll(
+                Constants.ADVANTAGE_DEFAULT_LOG_FREQUENCY,
+                driveMotorVelocity,
+                driveMotorAppliedVolts,
+                driveMotorCurrent,
+                cancoderAbsolutePosition,
+                steerMotorVelocity,
+                steerMotorAppliedVolts,
+                steerMotorStatorCurrent);
+
+        driveMotor.optimizeBusUtilization();
+        steerMotor.optimizeBusUtilization();
     }
 
-    // Set Drive TalonFXConfiguration.
-    TalonFXConfiguration driveTalonFXConfiguration = new TalonFXConfiguration();
-    driveTalonFXConfiguration.CurrentLimits = Constants.getDefaultCurrentLimitsConfig();
-    driveMotor.getConfigurator().apply(driveTalonFXConfiguration);
+    @Override
+    public void setDriveVoltage(double volts) {
+        driveMotor.setControl(new VoltageOut(volts));
+    }
 
-    // Set Drive TalonFXConfiguration.
-    MotorOutputConfigs driveMotorOutputConfigs = new MotorOutputConfigs();
-    driveMotorOutputConfigs.NeutralMode = Constants.WHEEL_BRAKE_MODE;
-    // Inverted to match our Swerve Drive Module Gear Box & Motors.
-    driveMotorOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
-    driveMotor.getConfigurator().apply(driveMotorOutputConfigs);
+    @Override
+    public void setTurnVoltage(double volts) {
+        steerMotor.setControl(new VoltageOut(volts));
+    }
 
-    // Set Steer MotorOutputConfigs.
-    TalonFXConfiguration steerTalonFXConfiguration = new TalonFXConfiguration();
-    steerTalonFXConfiguration.CurrentLimits = Constants.getDefaultCurrentLimitsConfig();
-    steerMotor.getConfigurator().apply(steerTalonFXConfiguration);
+    @Override
+    public void updateInputs(SwerveModuleIoInputs inputs) {
 
-    // Set Steer MotorOutputConfigs.
-    MotorOutputConfigs steerMotorOutputConfigs = new MotorOutputConfigs();
-    steerMotorOutputConfigs.NeutralMode = Constants.WHEEL_BRAKE_MODE;
-    // Inverted to match our Swerve Drive Module Gear Box & Motors.
-    steerMotorOutputConfigs.Inverted = InvertedValue.CounterClockwise_Positive;
-    steerMotor.getConfigurator().apply(steerMotorOutputConfigs);
+        BaseStatusSignal.refreshAll(
 
-    // Set CAN Coder Configs.
-    CANcoderConfiguration canCoderConfiguration = new CANcoderConfiguration();
-    cancoder.getConfigurator().apply(canCoderConfiguration);
+                cancoderAbsolutePosition,
 
-    // Get current state.
-    driveMotorPosition = driveMotor.getPosition();
-    driveMotorVelocity = driveMotor.getVelocity();
-    driveMotorAppliedVolts = driveMotor.getMotorVoltage();
-    driveMotorCurrent = driveMotor.getStatorCurrent();
-    driveMotorFaults = driveMotor.getFaultField();
-    driveMotorTemp = driveMotor.getDeviceTemp();
+                driveMotorPosition,
+                driveMotorVelocity,
+                driveMotorAppliedVolts,
+                driveMotorCurrent,
 
-    cancoderAbsolutePosition = cancoder.getAbsolutePosition();
-    steerMotorPosition = steerMotor.getPosition();
-    steerMotorVelocity = steerMotor.getVelocity();
-    steerMotorAppliedVolts = steerMotor.getMotorVoltage();
-    steerMotorStatorCurrent = steerMotor.getStatorCurrent();
-    steerMotorFaults = steerMotor.getFaultField();
-    steerMotorTemp = steerMotor.getDeviceTemp();
+                steerMotorPosition,
+                steerMotorVelocity,
+                steerMotorAppliedVolts,
+                steerMotorStatorCurrent,
+                driveMotorFaults,
+                steerMotorFaults,
+                driveMotorTemp,
+                steerMotorTemp);
 
-    // Set Update frequency.
-    BaseStatusSignal.setUpdateFrequencyForAll(
-        Constants.ADVANTAGE_ODOMETRY_LOG_FREQUENCY, driveMotorPosition, steerMotorPosition); // Required for odometry,
-                                                                                             // use faster rate
-    BaseStatusSignal.setUpdateFrequencyForAll(
-        Constants.ADVANTAGE_DEFAULT_LOG_FREQUENCY,
-        driveMotorVelocity,
-        driveMotorAppliedVolts,
-        driveMotorCurrent,
-        cancoderAbsolutePosition,
-        steerMotorVelocity,
-        steerMotorAppliedVolts,
-        steerMotorStatorCurrent);
+        inputs.cancoderAbsolutePosition = Rotation2d.fromRotations(cancoderAbsolutePosition.getValueAsDouble());
+        inputs.cancoderOffsetPosition = inputs.cancoderAbsolutePosition.minus(absoluteEncoderOffset);
 
-    driveMotor.optimizeBusUtilization();
-    steerMotor.optimizeBusUtilization();
-  }
+        // Inverted driveMotorPosition so that autonomous sees the robot moving in the
+        // correct direction.
+        inputs.driveMotorPositionRad = Units.rotationsToRadians(-driveMotorPosition.getValueAsDouble())
+                / Constants.WHEEL_DRIVE_GEAR_RATIO_L3;
+        inputs.driveMotorVelocityRadPerSec = Units.rotationsToRadians(driveMotorVelocity.getValueAsDouble())
+                / Constants.WHEEL_DRIVE_GEAR_RATIO_L3;
+        inputs.driveMotorAppliedVolts = driveMotorAppliedVolts.getValueAsDouble();
+        inputs.driveMotorCurrentAmps = driveMotorCurrent.getValueAsDouble();
+        inputs.driveMotorFaults = driveMotorFaults.getValue();
+        inputs.driveMotorTemp = driveMotorTemp.getValueAsDouble();
 
-  @Override
-  public void setDriveVoltage(double volts) {
-    driveMotor.setControl(new VoltageOut(volts));
-  }
-
-  @Override
-  public void setTurnVoltage(double volts) {
-    steerMotor.setControl(new VoltageOut(volts));
-  }
-
-  @Override
-  public void updateInputs(SwerveModuleIoInputs inputs) {
-    BaseStatusSignal.refreshAll(
-        driveMotorPosition,
-        driveMotorVelocity,
-        driveMotorAppliedVolts,
-        driveMotorCurrent,
-        cancoderAbsolutePosition,
-        steerMotorPosition,
-        steerMotorVelocity,
-        steerMotorAppliedVolts,
-        steerMotorStatorCurrent,
-        driveMotorFaults,
-        steerMotorFaults,
-        driveMotorTemp,
-        steerMotorTemp);
-
-    // Inverted driveMotorPosition so that sutonomous sees the robot moving in the
-    // correct direction.
-    inputs.driveMotorPositionRad = Units.rotationsToRadians(-driveMotorPosition.getValueAsDouble())
-        / Constants.WHEEL_DRIVE_GEAR_RATIO_L3;
-    inputs.driveMotorVelocityRadPerSec = Units.rotationsToRadians(driveMotorVelocity.getValueAsDouble())
-        / Constants.WHEEL_DRIVE_GEAR_RATIO_L3;
-    inputs.driveMotorAppliedVolts = driveMotorAppliedVolts.getValueAsDouble();
-    inputs.driveMotorCurrentAmps = driveMotorCurrent.getValueAsDouble();
-    inputs.driveMotorFaults = driveMotorFaults.getValue();
-    inputs.driveMotorTemp = driveMotorTemp.getValueAsDouble();
-
-    inputs.cancoderAbsolutePosition = Rotation2d.fromRotations(cancoderAbsolutePosition.getValueAsDouble())
-        .minus(absoluteEncoderOffset);
-    inputs.steerMotorPosition = Rotation2d
-        .fromRotations(steerMotorPosition.getValueAsDouble() / Constants.WHEEL_TURN_GEAR_RATIO);
-    inputs.steerMotorVelocityRadPerSec = Units.rotationsToRadians(steerMotorVelocity.getValueAsDouble())
-        / Constants.WHEEL_TURN_GEAR_RATIO;
-    inputs.steerMotorAppliedVolts = steerMotorAppliedVolts.getValueAsDouble();
-    inputs.steerMotorCurrentAmps = steerMotorStatorCurrent.getValueAsDouble();
-    inputs.steerMotorFaults = steerMotorFaults.getValue();
-    inputs.steerMotorTemp = steerMotorTemp.getValueAsDouble();
-  }
+        inputs.steerMotorPosition = Rotation2d
+                .fromRotations(steerMotorPosition.getValueAsDouble() / Constants.WHEEL_TURN_GEAR_RATIO)
+                .plus(Rotation2d.fromRadians(0));
+        inputs.steerMotorVelocityRadPerSec = Units.rotationsToRadians(steerMotorVelocity.getValueAsDouble())
+                / Constants.WHEEL_TURN_GEAR_RATIO;
+        inputs.steerMotorAppliedVolts = steerMotorAppliedVolts.getValueAsDouble();
+        inputs.steerMotorCurrentAmps = steerMotorStatorCurrent.getValueAsDouble();
+        inputs.steerMotorFaults = steerMotorFaults.getValue();
+        inputs.steerMotorTemp = steerMotorTemp.getValueAsDouble();
+    }
 }

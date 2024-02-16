@@ -53,32 +53,32 @@ public class IndexedSwerveModule {
 
         io.updateInputs(inputs);
         Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
-        // On first cycle, reset relative turn encoder
-        // Wait until absolute angle is nonzero in case it wasn't initialized yet
-        if (turnRelativeOffset == null && inputs.cancoderAbsolutePosition.getRadians() != 0.0) {
-            turnRelativeOffset = inputs.cancoderAbsolutePosition.minus(inputs.steerMotorPosition);
+
+        // On first cycle, reset relative turn encoder.
+        // Wait until absolute angle is nonzero in case it wasn't initialized yet.
+        if (turnRelativeOffset == null && inputs.cancoderOffsetPosition.getRadians() != 0.0) {
+            turnRelativeOffset = inputs.cancoderOffsetPosition.minus(inputs.steerMotorPosition);
         }
 
-        // Run closed loop turn control
+        // Run closed loop turn control.
         if (angleSetpoint != null) {
-            io.setTurnVoltage(
-                    turnFeedback.calculate(getAngle().getRadians(), angleSetpoint.getRadians()));
 
-            // Run closed loop drive control
-            // Only allowed if closed loop turn control is running
+            io.setTurnVoltage(turnFeedback.calculate(getAngle().getRadians(), angleSetpoint.getRadians()));
+
+            // Run closed loop drive control.
+            // Only allowed if closed loop turn control is running.
             if (speedSetpoint != null) {
-                // Scale velocity based on turn error
-                //
+
+                // Scale velocity based on turn error.
                 // When the error is 90°, the velocity setpoint should be 0. As the wheel turns
                 // towards the setpoint, its velocity should increase. This is achieved by
                 // taking the component of the velocity in the direction of the setpoint.
                 double adjustSpeedSetpoint = speedSetpoint * Math.cos(turnFeedback.getPositionError());
 
-                // Run drive controller
+                // Run drive controller/
                 double velocityRadPerSec = adjustSpeedSetpoint / Constants.WHEEL_RADIUS;
-                io.setDriveVoltage(
-                        driveFeedforward.calculate(velocityRadPerSec)
-                                + driveFeedback.calculate(inputs.driveMotorVelocityRadPerSec, velocityRadPerSec));
+                io.setDriveVoltage(driveFeedforward.calculate(velocityRadPerSec)
+                        + driveFeedback.calculate(inputs.driveMotorVelocityRadPerSec, velocityRadPerSec));
             }
         }
     }

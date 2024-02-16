@@ -7,6 +7,10 @@ public interface SwerveModuleIo {
 
   @AutoLog
   static class SwerveModuleIoInputs {
+    
+    public Rotation2d cancoderOffsetPosition = new Rotation2d();
+    public Rotation2d cancoderAbsolutePosition = new Rotation2d();
+
     public double driveMotorPositionRad;
     public double driveMotorVelocityRadPerSec;
     public double driveMotorAppliedVolts;
@@ -14,7 +18,6 @@ public interface SwerveModuleIo {
     public int driveMotorFaults;
     public double driveMotorTemp;
 
-    public Rotation2d cancoderAbsolutePosition = new Rotation2d();
     public Rotation2d steerMotorPosition = new Rotation2d();
     public double steerMotorVelocityRadPerSec;
     public double steerMotorAppliedVolts;
