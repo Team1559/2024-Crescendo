@@ -91,7 +91,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 
         // Set Drive TalonFXConfiguration.
         MotorOutputConfigs driveMotorOutputConfigs = new MotorOutputConfigs();
-        driveMotorOutputConfigs.NeutralMode = Constants.WHEEL_BRAKE_MODE;
+        driveMotorOutputConfigs.NeutralMode = Constants.SWERVE_WHEEL_BRAKE_MODE;
         // Inverted to match our Swerve Drive Module Gear Box & Motors.
         driveMotorOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
         driveMotor.getConfigurator().apply(driveMotorOutputConfigs);
@@ -103,7 +103,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 
         // Set Steer MotorOutputConfigs.
         MotorOutputConfigs steerMotorOutputConfigs = new MotorOutputConfigs();
-        steerMotorOutputConfigs.NeutralMode = Constants.WHEEL_BRAKE_MODE;
+        steerMotorOutputConfigs.NeutralMode = Constants.SWERVE_WHEEL_BRAKE_MODE;
         // Inverted to match our Swerve Drive Module Gear Box & Motors.
         steerMotorOutputConfigs.Inverted = InvertedValue.CounterClockwise_Positive;
         steerMotor.getConfigurator().apply(steerMotorOutputConfigs);

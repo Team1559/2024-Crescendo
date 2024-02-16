@@ -31,8 +31,7 @@ public final class Constants {
     // ========================= CONSTANTS ======================================
     // ---------- Operation Modes ----------
     public static final OperatingMode CURRENT_OPERATING_MODE = OperatingMode.REAL_WORLD;
-    public static final NeutralModeValue WHEEL_BRAKE_MODE = NeutralModeValue.Brake;
-    public static final boolean FIELD_RELATIVE = false;
+    public static final boolean IS_FIELD_RELATIVE_DRIVING_MODE = false;
 
     // ---------- Alliance ----------
     // This is the side of the field that the aumation path are made for.
@@ -165,6 +164,7 @@ public final class Constants {
     public static final int BACK_RIGHT_DRIVE_MOTOR_ID = 6;
     public static final int BACK_RIGHT_STEER_MOTOR_ID = 7;
     public static final int BACK_RIGHT_CANCODER_ID = 8;
+    public static final NeutralModeValue SWERVE_WHEEL_BRAKE_MODE = NeutralModeValue.Brake;
 
     // ---------- Digital IO Ports ----------
     public static final int AIMER_ENCODER_PORT = 0;
