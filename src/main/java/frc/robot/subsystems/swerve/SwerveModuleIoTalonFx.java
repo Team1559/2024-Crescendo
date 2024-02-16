@@ -56,8 +56,8 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
   public SwerveModuleIoTalonFx(WheelModuleIndex index) {
 
     // Assign Motor and Encoder Ids and configue wheel offset.
-    absoluteEncoderOffset = (Constants.IS_PRACTICE_BOT ? Constants.ABSOLUTE_ENCODER_OFFSETS_PRACTICE
-        : Constants.ABSOLUTE_ENCODER_OFFSETS_REAL)[index.value];
+    absoluteEncoderOffset = (Constants.IS_PRACTICE_BOT ? Constants.SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_PRACTICE
+        : Constants.SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_REAL)[index.value];
 
     switch (index) {
       case FRONT_LEFT:

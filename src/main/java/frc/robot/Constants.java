@@ -87,12 +87,26 @@ public final class Constants {
 
   public static final boolean IS_PRACTICE_BOT = false;
 
-  // FL, FR, BL, BR
-  // 8, 11, 5, 2
-  public static final Rotation2d[] ABSOLUTE_ENCODER_OFFSETS_PRACTICE = { Rotation2d.fromRotations(-0.300293),
-      Rotation2d.fromRotations(-0.228760), Rotation2d.fromRotations(-0.238525), Rotation2d.fromRotations(-0.000732) };
-  public static final Rotation2d[] ABSOLUTE_ENCODER_OFFSETS_REAL = { Rotation2d.fromRotations(-0.023),
-      Rotation2d.fromRotations(0.0045), Rotation2d.fromRotations(-0.444), Rotation2d.fromRotations(-0.135) };
+  // @formatter:off
+  /**
+   * The index of the Rotation matches the Index of the Module in Advaltage Scope.
+   */
+  public static final Rotation2d[] SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_PRACTICE = { 
+    Rotation2d.fromRotations(-0.300293),
+    Rotation2d.fromRotations(-0.228760), 
+    Rotation2d.fromRotations(-0.238525), 
+    Rotation2d.fromRotations(-0.000732) 
+  };
+  /**
+   * The index of the Rotation matches the Index of the Module in Advaltage Scope.
+   */
+  public static final Rotation2d[] SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_REAL = { 
+    Rotation2d.fromRadians(0.120),
+    Rotation2d.fromRadians(-0.023),
+    Rotation2d.fromRadians(2.789),
+    Rotation2d.fromRadians(0.853)
+  };
+  // @formatter:on
 
   // ---------- Game Piece Handling -------
   public static final double INTAKE_FORWARD_VOLTAGE = 6.0;

@@ -1,3 +1,5 @@
+//Actual angle 5 deg. corresponds to reading 153 deg.
+//Actual anlge 55 deg. correspods to reading 103 deg.
 package frc.robot.subsystems.shooter;
 
 import org.littletonrobotics.junction.AutoLog;

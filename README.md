@@ -65,6 +65,8 @@ Available auto routines:
     * `checked`
   * Editor: Format on Save Mode
     * `file`
+  * Editor: Detect Indentation
+    * `off`
 * Open this repo in the latest version the WPILib VS Code
   * When prompted, migrated the code to support the lates vbersion of WPILib
 * Update all Vendor Libraries

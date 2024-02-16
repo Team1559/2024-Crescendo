@@ -80,11 +80,17 @@ public class RobotContainer {
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_LEFT),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
                 feeder = Constants.HAVE_FEEDER
-                        ? new Feeder(new SingleMotorIoSparkMax(Constants.FEEDER_MOTOR_ID, false)) : null;
+                        ? new Feeder(new SingleMotorIoSparkMax(Constants.FEEDER_MOTOR_ID,
+                                false))
+                        : null;
                 intake = Constants.HAVE_INTAKE
-                        ? new Intake(new SingleMotorIoSparkMax(Constants.INTAKE_MOTOR_ID, false)) : null;
+                        ? new Intake(new SingleMotorIoSparkMax(Constants.INTAKE_MOTOR_ID,
+                                false))
+                        : null;
                 vision = Constants.HAVE_VISION
-                        ? new Vision(driveBase.getPoseEstimator(), new VisionIoLimelight(Constants.SHOOTER_CAMERA_NAME)) : null;
+                        ? new Vision(driveBase.getPoseEstimator(),
+                                new VisionIoLimelight(Constants.SHOOTER_CAMERA_NAME))
+                        : null;
                 break;
 
             case SIMULATION:
@@ -96,11 +102,16 @@ public class RobotContainer {
                         new SwerveModuleIoSim(),
                         new SwerveModuleIoSim());
                 feeder = Constants.HAVE_FEEDER
-                        ? new Feeder(new SingleMotorIoSparkMax(Constants.FEEDER_MOTOR_ID, false)) : null;
+                        ? new Feeder(new SingleMotorIoSparkMax(Constants.FEEDER_MOTOR_ID,
+                                false))
+                        : null;
                 intake = Constants.HAVE_INTAKE
-                        ? new Intake(new SingleMotorIoSparkMax(Constants.INTAKE_MOTOR_ID, false)) : null;
+                        ? new Intake(new SingleMotorIoSparkMax(Constants.INTAKE_MOTOR_ID,
+                                false))
+                        : null;
                 vision = Constants.HAVE_VISION
-                        ? new Vision(driveBase.getPoseEstimator(), new VisionIoSimAndReplay()) : null;
+                        ? new Vision(driveBase.getPoseEstimator(), new VisionIoSimAndReplay())
+                        : null;
                 break;
 
             case LOG_REPLAY:
@@ -112,11 +123,14 @@ public class RobotContainer {
                         new SwerveModuleIoReplay(),
                         new SwerveModuleIoReplay());
                 feeder = Constants.HAVE_FEEDER
-                        ? new Feeder(new SingleMotorIoReplay()) : null;
+                        ? new Feeder(new SingleMotorIoReplay())
+                        : null;
                 intake = Constants.HAVE_INTAKE
-                        ? new Intake(new SingleMotorIoReplay()) : null;
+                        ? new Intake(new SingleMotorIoReplay())
+                        : null;
                 vision = Constants.HAVE_VISION
-                        ? new Vision(driveBase.getPoseEstimator(), new VisionIoSimAndReplay()) : null;
+                        ? new Vision(driveBase.getPoseEstimator(), new VisionIoSimAndReplay())
+                        : null;
                 break;
 
             default:
@@ -133,17 +147,19 @@ public class RobotContainer {
 
         // ========================= Autonomous =========================
         // ---------- Create Named Commands for use by Path Planner ----------
-        NamedCommands.registerCommand("Spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
+        NamedCommands.registerCommand("Spin 180",
+                DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
         NamedCommands.registerCommand("StartIntake", LedCommands.blinkCommand(leds, Color.kPurple));
         if (Constants.HAVE_FLYWHEEL) {
-            NamedCommands.registerCommand("Spin Up Flywheel", ShooterCommands.spinUpFlywheelCommand(flywheel));
+            NamedCommands.registerCommand("Spin Up Flywheel",
+                    ShooterCommands.spinUpFlywheelCommand(flywheel));
         }
 
         Command aimCommand = new ConditionalCommand(
                 // Turn to Blue Speaker.
                 DriveCommands.turnToTargetCommand(driveBase, Constants.BLUE_SPEAKER_LOCATION, 4.5),
                 // Turn to Red Speaker.
-                DriveCommands.turnToTargetCommand(driveBase,  Constants.RED_SPEAKER_LOCATION, 4.5),
+                DriveCommands.turnToTargetCommand(driveBase, Constants.RED_SPEAKER_LOCATION, 4.5),
                 () -> DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
         Command autoShootCommand;
         if (Constants.HAVE_SHOOTER) {
@@ -165,10 +181,12 @@ public class RobotContainer {
                         ? controller1.getLeftTriggerAxis()
                         : -controller1.getRightTriggerAxis()));
         if (Constants.HAVE_INTAKE) {
-            intake.setDefaultCommand(ShooterCommands.defaultIntakeCommand(intake, colorSensor));
+            intake.setDefaultCommand(ShooterCommands.defaultIntakeCommand(intake,
+                    colorSensor));
         }
         if (Constants.HAVE_FEEDER) {
-            intake.setDefaultCommand(ShooterCommands.defaultFeederCommand(feeder, colorSensor));
+            intake.setDefaultCommand(ShooterCommands.defaultFeederCommand(feeder,
+                    colorSensor));
         }
         leds.setDefaultCommand(LedCommands.defaultLedCommand(leds));
 
@@ -227,7 +245,8 @@ public class RobotContainer {
                 Color.kDarkViolet, Color.kDarkViolet, Color.kDarkViolet }, true));
         controller1.start().and(controller1.y()).onTrue(leds.setDynamicPatternCommand(new Color[] {
                 Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kBlack,
-                Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack, Color.kBlack }, false));
+                Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack, Color.kBlack },
+                false));
         controller1.leftBumper().onTrue(leds.changeBrightnessCommand(true));
         controller1.rightBumper().onTrue(leds.changeBrightnessCommand(false));
         controller1.leftBumper().and(controller1.rightBumper()).onTrue(leds.setColorCommand(Color.kBlack));
