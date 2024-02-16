@@ -1,7 +1,12 @@
 package frc.robot;
 
+import static frc.robot.util.SupplierUtil.not;
+
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -16,10 +21,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.LedCommands;
 import frc.robot.commands.ShooterCommands;
+import frc.robot.constants.NewConstants;
 import frc.robot.subsystems.base.DriveBase;
 import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
-import frc.robot.subsystems.sinigle_motor.SingleMotorIoReplay;
-import frc.robot.subsystems.sinigle_motor.SingleMotorIoSparkMax;
 import frc.robot.subsystems.gyro.GyroIoPigeon2;
 import frc.robot.subsystems.gyro.GyroIoSimAndReplay;
 import frc.robot.subsystems.led.Leds;
@@ -28,6 +32,8 @@ import frc.robot.subsystems.shooter.ColorSensor;
 import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.Intake;
+import frc.robot.subsystems.sinigle_motor.SingleMotorIoReplay;
+import frc.robot.subsystems.sinigle_motor.SingleMotorIoSparkMax;
 import frc.robot.subsystems.swerve_module.SwerveModuleIoReplay;
 import frc.robot.subsystems.swerve_module.SwerveModuleIoSim;
 import frc.robot.subsystems.swerve_module.SwerveModuleIoTalonFx;
@@ -35,9 +41,6 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIoLimelight;
 import frc.robot.subsystems.vision.VisionIoSimAndReplay;
 import frc.robot.util.KColor;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
-import static frc.robot.util.SupplierUtil.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -68,7 +71,7 @@ public class RobotContainer {
     public RobotContainer() {
 
         // ----- Initialize Subsystems with Simulation and/or Log Replay Modes -----
-        switch (Constants.CURRENT_OPERATING_MODE) {
+        switch (NewConstants.get().getCurrentOperatingMode()) {
 
             case REAL_WORLD:
                 // Real robot, instantiate hardware IO implementations
@@ -122,7 +125,8 @@ public class RobotContainer {
                 break;
 
             default:
-                throw new RuntimeException("Unknown Run Mode: " + Constants.CURRENT_OPERATING_MODE);
+                throw new RuntimeException(
+                        "Unknown Run Mode: " + NewConstants.get().getCurrentOperatingMode());
         }
 
         // ----- Initialize Subsystems without Simulation and/or Log Replay Modes -----

@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.constants.NewConstants;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -30,8 +31,9 @@ public final class Constants {
 
     // ========================= CONSTANTS ======================================
     // ---------- Operation Modes ----------
-    public static final OperatingMode CURRENT_OPERATING_MODE = OperatingMode.REAL_WORLD;
-    public static final boolean IS_FIELD_RELATIVE_DRIVING_MODE = false;
+    // public static final OperatingMode CURRENT_OPERATING_MODE =
+    // OperatingMode.REAL_WORLD;
+    // public static final boolean IS_FIELD_RELATIVE_DRIVING_MODE = false;
 
     // ---------- Alliance ----------
     // This is the side of the field that the aumation path are made for.
@@ -81,31 +83,29 @@ public final class Constants {
     public static final double WHEEL_TURN_GEAR_RATIO = 12.8;
 
     // ---------- Wheel Rotation Offsets ----------
-    // Note: Chaning the Offset by Pie (180 degrees) will invert the direction the
-    // wheel spins.
-
-    public static final boolean IS_PRACTICE_BOT = false;
-
-  // @formatter:off
-  /**
-   * The index of the Rotation matches the Index of the Module in Advaltage Scope.
-   */
-  public static final Rotation2d[] SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_PRACTICE = { 
-    Rotation2d.fromRotations(-0.300293),
-    Rotation2d.fromRotations(-0.228760), 
-    Rotation2d.fromRotations(-0.238525), 
-    Rotation2d.fromRotations(-0.000732) 
-  };
-  /**
-   * The index of the Rotation matches the Index of the Module in Advaltage Scope.
-   */
-  public static final Rotation2d[] SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_REAL = { 
-    Rotation2d.fromRadians(0.120),
-    Rotation2d.fromRadians(-0.023),
-    Rotation2d.fromRadians(2.789),
-    Rotation2d.fromRadians(0.853)
-  };
-  // @formatter:on
+    // Note: Offsetting by 180 degrees will invert the direction the wheel spins.
+    /**
+     * The index of the Rotation matches the Index of the Module in Advaltage Scope.
+     */
+    public static final Rotation2d[] SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_GAME_ROBOT = {
+            Rotation2d.fromRadians(0.120),
+            Rotation2d.fromRadians(-0.023),
+            Rotation2d.fromRadians(2.789),
+            Rotation2d.fromRadians(0.853)
+    };
+    /**
+     * The index of the Rotation matches the Index of the Module in Advaltage Scope.
+     */
+    public static final Rotation2d[] SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_TEST_ROBOT = {
+            Rotation2d.fromRotations(-0.300293),
+            Rotation2d.fromRotations(-0.228760),
+            Rotation2d.fromRotations(-0.238525),
+            Rotation2d.fromRotations(-0.000732)
+    };
+    public static final Supplier<Rotation2d[]> SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_SUPPLIER = () -> {
+        return NewConstants.IS_RUNNING_TEST_ROBOT ? SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_TEST_ROBOT
+                : SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_GAME_ROBOT;
+    };
 
     // ---------- Game Piece Handling -------
     public static final double INTAKE_FORWARD_VOLTAGE = 6.0;

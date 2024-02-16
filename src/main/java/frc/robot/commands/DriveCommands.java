@@ -15,6 +15,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
+import frc.robot.constants.NewConstants;
 import frc.robot.subsystems.base.DriveBase;
 import frc.robot.subsystems.shooter.Flywheel;
 
@@ -81,7 +82,7 @@ public class DriveCommands {
                         scaledYVelocity = linearVelocity.getY() * Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND;
 
                 // Run Velocities.
-                if (Constants.IS_FIELD_RELATIVE_DRIVING_MODE) {
+                if (NewConstants.get().isDrivingModeFieldRelative()) {
                     driveBase.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(scaledXVelocity, scaledYVelocity,
                             omega, driveBase.getRotation()));
                 } else {
@@ -143,7 +144,7 @@ public class DriveCommands {
                     ;
 
                     // Run Velocities.
-                    if (Constants.IS_FIELD_RELATIVE_DRIVING_MODE) {
+                    if (NewConstants.get().isDrivingModeFieldRelative()) {
                         driveBase.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(scaledXVelocity, scaledYVelocity,
                                 scaledOmegaVelocity, driveBase.getRotation()));
                     } else {

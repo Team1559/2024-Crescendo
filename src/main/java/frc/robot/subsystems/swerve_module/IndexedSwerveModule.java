@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants;
+import frc.robot.constants.NewConstants;
 
 public class IndexedSwerveModule {
 
@@ -30,7 +31,7 @@ public class IndexedSwerveModule {
 
         // Switch constants based on mode (the physics simulator is treated as a
         // separate robot with different tuning)
-        switch (Constants.CURRENT_OPERATING_MODE) {
+        switch (NewConstants.get().getCurrentOperatingMode()) {
             case REAL_WORLD:
             case LOG_REPLAY:
                 driveFeedforward = new SimpleMotorFeedforward(0.1, 0.13);
@@ -43,7 +44,8 @@ public class IndexedSwerveModule {
                 turnFeedback = new PIDController(10.0, 0.0, 0.0);
                 break;
             default:
-                throw new RuntimeException("Unknown Run Mode: " + Constants.CURRENT_OPERATING_MODE);
+                throw new RuntimeException(
+                        "Unknown Run Mode: " + NewConstants.get().getCurrentOperatingMode());
         }
 
         turnFeedback.enableContinuousInput(-Math.PI, Math.PI);
