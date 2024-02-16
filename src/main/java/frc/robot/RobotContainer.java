@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -85,7 +86,7 @@ public class RobotContainer {
                         : null;
                 intake = Constants.HAVE_INTAKE
                         ? new Intake(new SingleMotorIoSparkMax(Constants.INTAKE_MOTOR_ID,
-                                false))
+                                Constants.IS_INTAKE_INVERTED))
                         : null;
                 vision = Constants.HAVE_VISION
                         ? new Vision(driveBase.getPoseEstimator(),
@@ -107,7 +108,7 @@ public class RobotContainer {
                         : null;
                 intake = Constants.HAVE_INTAKE
                         ? new Intake(new SingleMotorIoSparkMax(Constants.INTAKE_MOTOR_ID,
-                                false))
+                                Constants.IS_INTAKE_INVERTED))
                         : null;
                 vision = Constants.HAVE_VISION
                         ? new Vision(driveBase.getPoseEstimator(), new VisionIoSimAndReplay())
@@ -252,10 +253,14 @@ public class RobotContainer {
         controller1.leftBumper().and(controller1.rightBumper()).onTrue(leds.setColorCommand(Color.kBlack));
 
         // Controller 2 Configure Buttons
-        if (Constants.HAVE_SHOOTER) {
+        if (Constants.HAVE_INTAKE)
             controller2.a().whileTrue(new StartEndCommand(intake::start, intake::stop, intake));
+        if (Constants.HAVE_FLYWHEEL)
             controller2.b().whileTrue(new StartEndCommand(flywheel::start, flywheel::stop, flywheel));
+        if (Constants.HAVE_FEEDER)
             controller2.y().whileTrue(new StartEndCommand(feeder::start, feeder::stop, feeder));
+        controller2.x().onTrue(colorSensor.getProximityCommand());
+        if (Constants.HAVE_AIMER) {
             controller2.povUp().onTrue(new InstantCommand(() -> {
                 double currentAngle = aimer.getAngle();
                 double targetAngle = currentAngle + 5;
