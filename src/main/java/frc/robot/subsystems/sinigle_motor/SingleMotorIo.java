@@ -1,4 +1,4 @@
-package frc.robot.subsystems.general;
+package frc.robot.subsystems.sinigle_motor;
 
 import org.littletonrobotics.junction.AutoLog;
 

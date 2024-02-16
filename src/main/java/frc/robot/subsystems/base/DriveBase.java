@@ -25,8 +25,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.gyro.GyroIo;
 import frc.robot.subsystems.gyro.GyroIoInputsAutoLogged;
-import frc.robot.subsystems.swerve.IndexedSwerveModule;
-import frc.robot.subsystems.swerve.SwerveModuleIo;
+import frc.robot.subsystems.swerve_module.IndexedSwerveModule;
+import frc.robot.subsystems.swerve_module.SwerveModuleIo;
 import frc.robot.util.LocalAdStarAk;
 
 public class DriveBase extends SubsystemBase {
