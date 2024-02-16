@@ -1,5 +1,6 @@
 package frc.robot.constants;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 
 public abstract class NewConstants {
@@ -19,6 +20,9 @@ public abstract class NewConstants {
     // ========================= Static Methods ================================
     public static NewConstants get() {
         System.out.println("roboRIO Serial Number: " + RobotController.getSerialNumber());
+        System.out.println("Event Name: " + DriverStation.getEventName());
+        System.out.println("Match Number: " + DriverStation.getMatchNumber());
+        System.out.println("Match Type: " + DriverStation.getMatchType());
         return IS_RUNNING_TEST_ROBOT ? TEST_ROBOT_CONSTANTS : GAME_ROBOT_CONSTANTS;
     }
 
