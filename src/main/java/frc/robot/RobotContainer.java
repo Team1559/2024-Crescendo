@@ -24,6 +24,7 @@ import frc.robot.commands.LedCommands;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.subsystems.base.DriveBase;
 import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
+import frc.robot.subsystems.climber.Traverser;
 import frc.robot.subsystems.gyro.GyroIoPigeon2;
 import frc.robot.subsystems.gyro.GyroIoSimAndReplay;
 import frc.robot.subsystems.led.Leds;
@@ -64,6 +65,7 @@ public class RobotContainer {
     private final Intake intake;
     private final Leds leds;
     private final Vision vision;
+    private final Traverser traverser;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -92,6 +94,10 @@ public class RobotContainer {
                 vision = CONSTANTS.hasVisionSubsystem()
                         ? new Vision(driveBase.poseEstimator, new VisionIoLimelight(Constants.SHOOTER_CAMERA_NAME))
                         : null;
+                traverser = CONSTANTS.hasTraverserSubsystem()
+                        ? new Traverser(new SingleMotorIoSparkMax(CONSTANTS.getTraverserMotorId(),
+                                CONSTANTS.isTraverserInverted()))
+                        : null;
                 break;
 
             case SIMULATION:
@@ -113,6 +119,10 @@ public class RobotContainer {
                 vision = CONSTANTS.hasVisionSubsystem()
                         ? new Vision(driveBase.poseEstimator, new VisionIoSimAndReplay())
                         : null;
+                traverser = CONSTANTS.hasTraverserSubsystem()
+                        ? new Traverser(new SingleMotorIoSparkMax(CONSTANTS.getTraverserMotorId(),
+                                CONSTANTS.isTraverserInverted()))
+                        : null;
                 break;
 
             case LOG_REPLAY:
@@ -127,6 +137,9 @@ public class RobotContainer {
                 intake = CONSTANTS.hasIntakeSubsystem() ? new Intake(new SingleMotorIoReplay()) : null;
                 vision = CONSTANTS.hasVisionSubsystem()
                         ? new Vision(driveBase.poseEstimator, new VisionIoSimAndReplay())
+                        : null;
+                traverser = CONSTANTS.hasTraverserSubsystem()
+                        ? new Traverser(new SingleMotorIoReplay())
                         : null;
                 break;
 

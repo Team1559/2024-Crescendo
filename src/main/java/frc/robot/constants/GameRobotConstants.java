@@ -48,6 +48,11 @@ public class GameRobotConstants extends AbstractConstants {
         return false;
     }
 
+    @Override
+    public boolean hasTraverserSubsystem() {
+        return false;
+    }
+
     // ---------- Hardware ----------
     // --- roboRIO ---
     @Override
@@ -65,4 +70,27 @@ public class GameRobotConstants extends AbstractConstants {
                 Rotation2d.fromRadians(0.853)
         };
     }
+
+    // --- Traverser ---
+    @Override
+    public double getTraverserFowardVoltage() {
+        return 6.0;
+    }
+
+    @Override
+    public double getTraverserReverseVoltage() {
+        return -6.0;
+    }
+
+    @Override
+    public int getTraverserMotorId() {
+        throw new UnsupportedOperationException("No Motor ID for Traverser");
+        // TODO: Add ID
+    }
+
+    @Override
+    public boolean isTraverserInverted() {
+        return true;
+    }
+
 }

@@ -56,7 +56,18 @@ public abstract class AbstractConstants {
 
     public abstract boolean hasVisionSubsystem();
 
+    public abstract boolean hasTraverserSubsystem();
+
     // ---------- Hardware ----------
+    // --- Traverser ---
+    public abstract double getTraverserFowardVoltage();
+
+    public abstract double getTraverserReverseVoltage();
+
+    public abstract int getTraverserMotorId();
+
+    public abstract boolean isTraverserInverted();
+
     // --- roboRIO ---
     public abstract String getRoboRioSerialNumber();
 

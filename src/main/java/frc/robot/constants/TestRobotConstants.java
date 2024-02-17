@@ -38,6 +38,11 @@ public class TestRobotConstants extends AbstractConstants {
     }
 
     @Override
+    public boolean hasTraverserSubsystem() {
+        return false;
+    }
+
+    @Override
     public boolean hasShooterSubsystemGroup() {
         return hasAimerSubsystem() && hasColorSensorSubsystem() && hasFeederSubsystem() && hasFlywheelSubsystem()
                 && hasIntakeSubsystem();
@@ -65,4 +70,26 @@ public class TestRobotConstants extends AbstractConstants {
                 Rotation2d.fromRotations(-0.000732)
         };
     }
+
+    // --- Traverser ---
+    @Override
+    public double getTraverserFowardVoltage() {
+        throw new UnsupportedOperationException("Unimplemented method 'getTraverserFowardVoltage'");
+    }
+
+    @Override
+    public double getTraverserReverseVoltage() {
+        throw new UnsupportedOperationException("Unimplemented method 'getTraverserReverseVoltage'");
+    }
+
+    @Override
+    public int getTraverserMotorId() {
+        throw new UnsupportedOperationException("Unimplemented method 'getTraverserMotorId'");
+    }
+
+    @Override
+    public boolean isTraverserInverted() {
+        throw new UnsupportedOperationException("Unimplemented method 'isTraverserInverted'");
+    }
+
 }
