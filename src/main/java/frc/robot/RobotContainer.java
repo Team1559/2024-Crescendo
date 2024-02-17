@@ -231,49 +231,54 @@ public class RobotContainer {
                         () -> -controller1.getLeftY(), () -> -controller1.getLeftX(),
                         Constants.AMP_LOCATION_SUPPLIER));
 
-        // ---------- Configure Light Buttons (Controller 1) ----------
-        controller1.start().and(controller1.a()).onTrue(leds.setColorCommand(Color.kDarkGreen));
-        controller1.start().and(controller1.b()).onTrue(leds.setStaticPatternCommand(
-                new Color[] { KColor.ALLIANCE_RED, KColor.ALLIANCE_RED, Color.kBlack, Color.kBlack }));
-        controller1.start().and(controller1.x()).onTrue(leds.setDynamicPatternCommand(new Color[] {
-                KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE,
-                Color.kDarkViolet, Color.kDarkViolet, Color.kDarkViolet }, true));
-        controller1.start().and(controller1.y()).onTrue(leds.setDynamicPatternCommand(new Color[] {
-                Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kBlack,
-                Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack, Color.kBlack },
-                false));
-        controller1.leftBumper().onTrue(leds.changeBrightnessCommand(true));
-        controller1.rightBumper().onTrue(leds.changeBrightnessCommand(false));
-        controller1.leftBumper().and(controller1.rightBumper()).onTrue(leds.setColorCommand(Color.kBlack));
-
-        // ---------- Configure D-PAD for Tele-Op (Controller 1) ----------
+        // ---------- Configure D-PAD for Tele-Op (Controller 2) ----------
         controller2.povUp().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(1, 0, 0)));
         controller2.povDown().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(-1, 0, 0)));
         controller2.povRight().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(0, -1, 0)));
         controller2.povLeft().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(0, 1, 0)));
 
+        // ---------- Configure Light Buttons (Controller 2) ----------
+        controller2.a().and(controller2.back()).and(not(controller2.start()))
+                .onTrue(leds.setColorCommand(Color.kDarkGreen));
+        controller2.b().and(controller2.back()).and(not(controller2.start())).onTrue(leds.setStaticPatternCommand(
+                new Color[] { KColor.ALLIANCE_RED, KColor.ALLIANCE_RED, Color.kBlack, Color.kBlack }));
+        controller2.x().and(controller2.back()).and(not(controller2.start()))
+                .onTrue(leds.setDynamicPatternCommand(new Color[] {
+                        KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE,
+                        Color.kDarkViolet, Color.kDarkViolet, Color.kDarkViolet }, true));
+        controller2.y().and(controller2.back()).and(not(controller2.start()))
+                .onTrue(leds.setDynamicPatternCommand(new Color[] {
+                        Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kBlack,
+                        Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack, Color.kBlack },
+                        false));
+        controller2.leftBumper().and(controller2.back()).and(not(controller2.start()))
+                .onTrue(leds.changeBrightnessCommand(true));
+        controller2.rightBumper().and(controller2.back()).and(not(controller2.start()))
+                .onTrue(leds.changeBrightnessCommand(false));
+        controller2.back().and(controller2.start()).onTrue(leds.turnOffCommand());
+
         // ---------- Configure Subsystem Debug Buttons (Controller 2) ----------
         if (CONSTANTS.hasIntakeSubsystem()) {
-            controller2.a().and(not(controller2.start()))
+            controller2.a().and(not(controller2.start())).and(not(controller2.back()))
                     .whileTrue(new StartEndCommand(intake::start, intake::stop, intake));
             controller2.a().and(controller2.start())
                     .whileTrue(new StartEndCommand(intake::reverse, intake::stop, intake));
         }
         if (CONSTANTS.hasFeederSubsystem()) {
-            controller2.b().and(not(controller2.start()))
+            controller2.b().and(not(controller2.start())).and(not(controller2.back()))
                     .whileTrue(new StartEndCommand(feeder::start, feeder::stop, feeder));
             controller2.b().and(controller2.start())
                     .whileTrue(new StartEndCommand(feeder::reverse, feeder::stop, feeder));
         }
         if (CONSTANTS.hasFlywheelSubsystem()) {
-            controller2.y().and(not(controller2.start()))
+            controller2.y().and(not(controller2.start())).and(not(controller2.back()))
                     .whileTrue(new StartEndCommand(flywheel::start, flywheel::stop, flywheel));
             controller2.y().and(controller2.start())
                     .whileTrue(new StartEndCommand(flywheel::reverse, flywheel::stop, flywheel));
         }
         if (CONSTANTS.hasAimerSubsystem()) {
-            controller2.rightTrigger().onTrue(new InstantCommand(() -> aimer.setTargetAngle(aimer.getAngle() + 5)));
-            controller2.leftTrigger().onTrue(new InstantCommand(() -> aimer.setTargetAngle(aimer.getAngle() - 5)));
+            controller2.rightBumper().onTrue(new InstantCommand(() -> aimer.setTargetAngle(aimer.getAngle() + 5)));
+            controller2.leftBumper().onTrue(new InstantCommand(() -> aimer.setTargetAngle(aimer.getAngle() - 5)));
         }
     }
 
