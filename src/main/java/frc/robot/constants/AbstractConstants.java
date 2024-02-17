@@ -2,6 +2,7 @@ package frc.robot.constants;
 
 import java.util.Objects;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.RobotController;
@@ -29,8 +30,7 @@ public abstract class AbstractConstants {
                 || !RobotController.getSerialNumber().equals(TEST_ROBOT_CONSTANTS.getRoboRioSerialNumber())
                 || DriverStation.getMatchType() != MatchType.None
                 || DriverStation.getMatchNumber() != 0
-                || DriverStation.getEventName() == null
-                || Objects.equals(DriverStation.getEventName(), "");
+                || !Objects.equals(DriverStation.getEventName(), "");
     }
 
     // ========================= Methods =======================================
@@ -57,5 +57,15 @@ public abstract class AbstractConstants {
     public abstract boolean hasVisionSubsystem();
 
     // ---------- Hardware ----------
+    // --- roboRIO ---
     public abstract String getRoboRioSerialNumber();
+
+    // --- Swerve ---
+    /**
+     * The index of the Rotation matches the Index of the Module in Advaltage Scope.
+     * <p>
+     * Note: Offsetting by 180 degrees will invert the direction the wheel spins.
+     * </p>
+     */
+    public abstract Rotation2d[] getSwerveModuleEncoderOffsets();
 }

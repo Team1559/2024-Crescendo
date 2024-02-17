@@ -5,12 +5,10 @@ import java.util.function.Supplier;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.robot.constants.AbstractConstants;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -71,31 +69,6 @@ public final class Constants {
             27.0) * (45.0 / 15.0); // L2 Gear ratio
     // public static final double WHEEL_DRIVE_GEAR_RATIO = 6.12; // L3 Gear ratio
     public static final double WHEEL_TURN_GEAR_RATIO = 12.8;
-
-    // ---------- Wheel Rotation Offsets ----------
-    // Note: Offsetting by 180 degrees will invert the direction the wheel spins.
-    /**
-     * The index of the Rotation matches the Index of the Module in Advaltage Scope.
-     */
-    public static final Rotation2d[] SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_GAME_ROBOT = {
-            Rotation2d.fromRadians(0.120),
-            Rotation2d.fromRadians(-0.023),
-            Rotation2d.fromRadians(2.789),
-            Rotation2d.fromRadians(0.853)
-    };
-    /**
-     * The index of the Rotation matches the Index of the Module in Advaltage Scope.
-     */
-    public static final Rotation2d[] SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_TEST_ROBOT = {
-            Rotation2d.fromRotations(-0.300293),
-            Rotation2d.fromRotations(-0.228760),
-            Rotation2d.fromRotations(-0.238525),
-            Rotation2d.fromRotations(-0.000732)
-    };
-    public static final Supplier<Rotation2d[]> SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_SUPPLIER = () -> {
-        return AbstractConstants.isGameRobot() ? SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_GAME_ROBOT
-                : SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_TEST_ROBOT;
-    };
 
     // ---------- Game Piece Handling -------
     public static final double INTAKE_FORWARD_VOLTAGE = 6.0;

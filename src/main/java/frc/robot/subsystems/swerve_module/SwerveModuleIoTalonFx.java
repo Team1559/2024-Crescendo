@@ -1,5 +1,7 @@
 package frc.robot.subsystems.swerve_module;
 
+import static frc.robot.constants.AbstractConstants.CONSTANTS;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -56,7 +58,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
     public SwerveModuleIoTalonFx(WheelModuleIndex index) {
 
         // Assign Motor and Encoder Ids and configue wheel offset.
-        absoluteEncoderOffset = Constants.SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_SUPPLIER.get()[index.value];
+        absoluteEncoderOffset = CONSTANTS.getSwerveModuleEncoderOffsets()[index.value];
 
         switch (index) {
             case FRONT_LEFT:

@@ -1,5 +1,7 @@
 package frc.robot.constants;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+
 public class GameRobotConstants extends AbstractConstants {
 
     // ========================= CONSTANTS ======================================
@@ -47,8 +49,20 @@ public class GameRobotConstants extends AbstractConstants {
     }
 
     // ---------- Hardware ----------
+    // --- roboRIO ---
     @Override
     public String getRoboRioSerialNumber() {
         return "";
+    }
+
+    // --- Swerve ---
+    @Override
+    public Rotation2d[] getSwerveModuleEncoderOffsets() {
+        return new Rotation2d[] {
+                Rotation2d.fromRadians(0.120),
+                Rotation2d.fromRadians(-0.023),
+                Rotation2d.fromRadians(2.789),
+                Rotation2d.fromRadians(0.853)
+        };
     }
 }
