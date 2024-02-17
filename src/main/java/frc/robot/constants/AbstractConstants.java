@@ -29,8 +29,7 @@ public abstract class AbstractConstants {
                 || !RobotController.getSerialNumber().equals(TEST_ROBOT_CONSTANTS.getRoboRioSerialNumber())
                 || DriverStation.getMatchType() != MatchType.None
                 || DriverStation.getMatchNumber() != 0
-                || DriverStation.getEventName() == null
-                || Objects.equals(DriverStation.getEventName(), "");
+                || !Objects.equals(DriverStation.getEventName(), "");
     }
 
     // ========================= Methods =======================================

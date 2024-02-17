@@ -22,12 +22,12 @@ public class GameRobotConstants extends AbstractConstants {
 
     @Override
     public boolean hasFeederSubsystem() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean hasFlywheelSubsystem() {
-        return false;
+        return true;
     }
 
     @Override

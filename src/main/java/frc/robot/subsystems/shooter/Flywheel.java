@@ -159,7 +159,7 @@ public class Flywheel extends SubsystemBase {
     /**
      * Reverse the Flywheels
      */
-    public void reverseFlywheel() {
+    public void reverse() {
         startFlywheel(Constants.FLYWHEEL_REVERSE_VOLTAGE);
     }
 
@@ -177,7 +177,7 @@ public class Flywheel extends SubsystemBase {
     }
 
     public Command reverseFlywheelCommand() {
-        return new InstantCommand(this::reverseFlywheel, this);
+        return new InstantCommand(this::reverse, this);
     }
 
 }

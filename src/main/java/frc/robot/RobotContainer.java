@@ -152,10 +152,12 @@ public class RobotContainer {
                         ? controller1.getLeftTriggerAxis()
                         : -controller1.getRightTriggerAxis()));
         if (CONSTANTS.hasIntakeSubsystem() && CONSTANTS.hasColorSensorSubsystem()) {
-            intake.setDefaultCommand(ShooterCommands.defaultIntakeCommand(intake, colorSensor));
+            // intake.setDefaultCommand(ShooterCommands.defaultIntakeCommand(intake,
+            // colorSensor));
         }
         if (CONSTANTS.hasFeederSubsystem() && CONSTANTS.hasColorSensorSubsystem()) {
-            intake.setDefaultCommand(ShooterCommands.defaultFeederCommand(feeder, colorSensor));
+            // intake.setDefaultCommand(ShooterCommands.defaultFeederCommand(feeder,
+            // colorSensor));
         }
         leds.setDefaultCommand(LedCommands.defaultLedCommand(leds));
         if (CONSTANTS.hasFlywheelSubsystem()) {
@@ -239,13 +241,22 @@ public class RobotContainer {
 
         // ---------- Configure Subsystem Debug Buttons (Controller 2) ----------
         if (CONSTANTS.hasIntakeSubsystem()) {
-            controller2.a().whileTrue(new StartEndCommand(intake::start, intake::stop, intake));
-        }
-        if (CONSTANTS.hasFlywheelSubsystem()) {
-            controller2.b().whileTrue(new StartEndCommand(flywheel::start, flywheel::stop, flywheel));
+            controller2.a().and(not(controller2.start()))
+                    .whileTrue(new StartEndCommand(intake::start, intake::stop, intake));
+            controller2.a().and(controller2.start())
+                    .whileTrue(new StartEndCommand(intake::reverse, intake::stop, intake));
         }
         if (CONSTANTS.hasFeederSubsystem()) {
-            controller2.y().whileTrue(new StartEndCommand(feeder::start, feeder::stop, feeder));
+            controller2.b().and(not(controller2.start()))
+                    .whileTrue(new StartEndCommand(feeder::start, feeder::stop, feeder));
+            controller2.b().and(controller2.start())
+                    .whileTrue(new StartEndCommand(feeder::reverse, feeder::stop, feeder));
+        }
+        if (CONSTANTS.hasFlywheelSubsystem()) {
+            controller2.y().and(not(controller2.start()))
+                    .whileTrue(new StartEndCommand(flywheel::start, flywheel::stop, flywheel));
+            controller2.y().and(controller2.start())
+                    .whileTrue(new StartEndCommand(flywheel::reverse, flywheel::stop, flywheel));
         }
         if (CONSTANTS.hasAimerSubsystem()) {
             controller2.rightTrigger().onTrue(new InstantCommand(() -> aimer.setTargetAngle(aimer.getAngle() + 5)));

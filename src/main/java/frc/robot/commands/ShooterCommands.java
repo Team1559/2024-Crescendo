@@ -48,7 +48,7 @@ public class ShooterCommands {
         Command reverseShooterCommand = new Command() {
             @Override
             public void execute() {
-                flywheel.reverseFlywheel();
+                flywheel.reverse();
                 feeder.reverse();
                 intake.reverse();
                 leds.setDynamicPattern(new Color[] { Color.kRed, Color.kRed, Color.kBlack, Color.kBlack }, true);
