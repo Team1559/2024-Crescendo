@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -75,15 +76,15 @@ public final class Constants {
     public static final double INTAKE_REVERSE_VOLTAGE = -6.0;
     public static final double FEEDER_FORWARD_VOLTAGE = 6.0; // TODO: Configure Value.
     public static final double FEEDER_REVERSE_VOLTAGE = -FEEDER_FORWARD_VOLTAGE;
-    public static final double FLYWHEEL_FOWARDS_VOLTAGE = 12; // TODO: Configure Value
+    public static final double FLYWHEEL_FOWARDS_VOLTAGE = 9.0; // TODO: Configure Value
     public static final double FLYWHEEL_REVERSE_VOLTAGE = -6.0; // TODO: Configure Value.
-
-    public static final double AIMER_KP = 0; // TODO
+    // TODO - Revert Flywheel Voltage to 12
+    public static final double AIMER_KP = .4;
     public static final double AIMER_KI = 0;
     public static final double AIMER_KD = 0;
-    public static final double AIMER_ANGLE_OFFSET = 0; // TODO/calibrate
-    public static final double AIMER_LOWER_ANGLE = 0;
-    public static final double AIMER_UPPER_ANGLE = 70;
+    public static final Rotation2d AIMER_ANGLE_OFFSET = Rotation2d.fromRadians(2.599); // TODO/calibrate
+    public static final double AIMER_LOWER_ANGLE = 1;
+    public static final double AIMER_UPPER_ANGLE = 45;
 
     // ---------- Hardware Config ----------
     // --- Aimer ---
@@ -127,7 +128,7 @@ public final class Constants {
     public static final int ADDRESSABLE_LED_LENGTH = 144;
 
     // ---------- Color Sensor ----------
-    public static final int COLOR_SENSOR_PROXIMITY_THRESHOLD = 300; // TODO: Configure Value.
+    public static final int COLOR_SENSOR_PROXIMITY_THRESHOLD = 1500; // TODO: Configure Value.
 
     // ---------- Power Constants ----------
     public static final int NEO_SPARK_BRUSHLESS_CURRENT_LIMIT = 24;

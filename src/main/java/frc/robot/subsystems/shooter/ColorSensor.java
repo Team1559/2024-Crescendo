@@ -1,6 +1,7 @@
 package frc.robot.subsystems.shooter;
 
 import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.ColorSensorV3;
 
@@ -35,6 +36,8 @@ public class ColorSensor extends SubsystemBase {
     @Override
     public void periodic() {
         updateInputs();
+        isObjectDetected();
+        Logger.processInputs("Shooter/Color Sensor", inputs);
     }
 
     private void updateInputs() {
@@ -72,6 +75,7 @@ public class ColorSensor extends SubsystemBase {
      * @return True if an object is detected
      */
     public boolean isObjectDetected() {
+        inputs.isObjectDetected = colorSensor.getProximity() > Constants.COLOR_SENSOR_PROXIMITY_THRESHOLD;
         return colorSensor.getProximity() > Constants.COLOR_SENSOR_PROXIMITY_THRESHOLD;
     }
 

@@ -14,7 +14,7 @@ public class GameRobotConstants extends AbstractConstants {
     // ---------- Capabilities Flags --------
     @Override
     public boolean hasAimerSubsystem() {
-        return false;
+        return true;
     }
 
     @Override

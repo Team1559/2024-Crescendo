@@ -50,6 +50,11 @@ public class Flywheel extends SubsystemBase {
     private final FlywheelInputsAutoLogged inputs = new FlywheelInputsAutoLogged();
 
     private double currentVoltage;
+    /**
+     * Null when both wheels run, true when right wheel runs, false when left wheel
+     * runs.
+     */
+    private Boolean runOneWheelFlag;
 
     public Flywheel() {
 
@@ -94,8 +99,13 @@ public class Flywheel extends SubsystemBase {
     @Override
     public void periodic() {
         // Set Voltages
-        flywheelMotorL.setControl(new VoltageOut(currentVoltage));
-        flywheelMotorR.setControl(new VoltageOut(currentVoltage));
+        if (runOneWheelFlag == null || runOneWheelFlag) {
+            flywheelMotorR.setControl(new VoltageOut(-currentVoltage));// TODO - This should not have to be negated but
+                                                                       // inverting the motor does nothing
+        }
+        if (runOneWheelFlag == null || !runOneWheelFlag) {
+            flywheelMotorL.setControl(new VoltageOut(currentVoltage));
+        }
 
         // Log inputs
         updateInputs();
@@ -138,6 +148,12 @@ public class Flywheel extends SubsystemBase {
      */
     public void startFlywheel(double voltage) {
         currentVoltage = voltage;
+        runOneWheelFlag = null;
+    }
+
+    public void startOneFlywheel(boolean runRightWheel) {
+        currentVoltage = Constants.FLYWHEEL_FOWARDS_VOLTAGE;
+        runOneWheelFlag = runRightWheel;
     }
 
     /**
@@ -180,4 +196,7 @@ public class Flywheel extends SubsystemBase {
         return new InstantCommand(this::reverse, this);
     }
 
+    public Command startOneFlywheelCommand(boolean runRightWheel) {
+        return new InstantCommand(() -> startOneFlywheel(runRightWheel), this);
+    }
 }

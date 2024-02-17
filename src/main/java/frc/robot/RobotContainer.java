@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -275,10 +275,21 @@ public class RobotContainer {
                     .whileTrue(new StartEndCommand(flywheel::start, flywheel::stop, flywheel));
             controller2.y().and(controller2.start())
                     .whileTrue(new StartEndCommand(flywheel::reverse, flywheel::stop, flywheel));
+            controller2.leftBumper().and(controller2.start()).whileTrue(new StartEndCommand(() -> {
+                flywheel.startOneFlywheel(false);
+            }, flywheel::stop, flywheel));
+            controller2.rightBumper().and(controller2.start()).whileTrue(new StartEndCommand(() -> {
+                flywheel.startOneFlywheel(true);
+            }, flywheel::stop, flywheel));
+        }
+        if (CONSTANTS.hasTraverserSubsystem()) {
+            // TODO
         }
         if (CONSTANTS.hasAimerSubsystem()) {
-            controller2.rightBumper().onTrue(new InstantCommand(() -> aimer.setTargetAngle(aimer.getAngle() + 5)));
-            controller2.leftBumper().onTrue(new InstantCommand(() -> aimer.setTargetAngle(aimer.getAngle() - 5)));
+            controller2.rightBumper().and(not(controller2.start()))
+                    .whileTrue(new RunCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(1))));
+            controller2.leftBumper().and(not(controller2.start()))
+                    .whileTrue(new RunCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(-1))));
         }
     }
 
