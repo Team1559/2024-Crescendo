@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import static frc.robot.constants.AbstractConstants.CONSTANTS;
+
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -15,7 +17,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
-import frc.robot.constants.NewConstants;
 import frc.robot.subsystems.base.DriveBase;
 import frc.robot.subsystems.shooter.Flywheel;
 
@@ -82,7 +83,7 @@ public class DriveCommands {
                         scaledYVelocity = linearVelocity.getY() * Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND;
 
                 // Run Velocities.
-                if (NewConstants.get().isDrivingModeFieldRelative()) {
+                if (CONSTANTS.isDrivingModeFieldRelative()) {
                     driveBase.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(scaledXVelocity, scaledYVelocity,
                             omega, driveBase.getRotation()));
                 } else {
@@ -139,12 +140,13 @@ public class DriveCommands {
 
                     // Scale Velocities to between 0 and Max.
                     double scaledXVelocity = linearVelocity.getX() * Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND,
-                            scaledYVelocity = linearVelocity.getY() * Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND,
+                            scaledYVelocity = linearVelocity.getY()
+                                    * Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND,
                             scaledOmegaVelocity = omega * Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS;
                     ;
 
                     // Run Velocities.
-                    if (NewConstants.get().isDrivingModeFieldRelative()) {
+                    if (CONSTANTS.isDrivingModeFieldRelative()) {
                         driveBase.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(scaledXVelocity, scaledYVelocity,
                                 scaledOmegaVelocity, driveBase.getRotation()));
                     } else {

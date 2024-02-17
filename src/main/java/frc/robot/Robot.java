@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static frc.robot.constants.AbstractConstants.CONSTANTS;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -9,7 +11,6 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.constants.NewConstants;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -34,7 +35,7 @@ public class Robot extends LoggedRobot {
     public void robotInit() {
 
         // Set up data receivers & replay source
-        switch (NewConstants.get().getCurrentOperatingMode()) {
+        switch (CONSTANTS.getCurrentOperatingMode()) {
 
             case REAL_WORLD:
                 // Running on a real robot, log to a USB stick ("/U/logs")
@@ -56,7 +57,7 @@ public class Robot extends LoggedRobot {
                 break;
 
             default:
-                throw new RuntimeException("Unknown Run Mode: " + NewConstants.get().getCurrentOperatingMode());
+                throw new RuntimeException("Unknown Run Mode: " + CONSTANTS.getCurrentOperatingMode());
         }
 
         // See http://bit.ly/3YIzFZ6 for more information on timestamps in AdvantageKit.

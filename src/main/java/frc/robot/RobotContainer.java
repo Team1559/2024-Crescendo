@@ -1,5 +1,6 @@
 package frc.robot;
 
+import static frc.robot.constants.AbstractConstants.CONSTANTS;
 import static frc.robot.util.SupplierUtil.not;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -21,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.LedCommands;
 import frc.robot.commands.ShooterCommands;
-import frc.robot.constants.NewConstants;
 import frc.robot.subsystems.base.DriveBase;
 import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
 import frc.robot.subsystems.gyro.GyroIoPigeon2;
@@ -71,7 +71,7 @@ public class RobotContainer {
     public RobotContainer() {
 
         // ----- Initialize Subsystems with Simulation and/or Log Replay Modes -----
-        switch (NewConstants.get().getCurrentOperatingMode()) {
+        switch (CONSTANTS.getCurrentOperatingMode()) {
 
             case REAL_WORLD:
                 // Real robot, instantiate hardware IO implementations
@@ -81,13 +81,15 @@ public class RobotContainer {
                         new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_RIGHT),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_LEFT),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
-                feeder = Constants.HAVE_FEEDER
-                        ? new Feeder(new SingleMotorIoSparkMax(Constants.FEEDER_MOTOR_ID, Constants.IS_FEEDER_INVERTED))
+                feeder = CONSTANTS.hasFeederSubsystem()
+                        ? new Feeder(new SingleMotorIoSparkMax(Constants.FEEDER_MOTOR_ID,
+                                Constants.IS_FEEDER_INVERTED))
                         : null;
-                intake = Constants.HAVE_INTAKE
-                        ? new Intake(new SingleMotorIoSparkMax(Constants.INTAKE_MOTOR_ID, Constants.IS_INTAKE_INVERTED))
+                intake = CONSTANTS.hasIntakeSubsystem()
+                        ? new Intake(new SingleMotorIoSparkMax(Constants.INTAKE_MOTOR_ID,
+                                Constants.IS_INTAKE_INVERTED))
                         : null;
-                vision = Constants.HAVE_VISION
+                vision = CONSTANTS.hasVisionSubsystem()
                         ? new Vision(driveBase.poseEstimator, new VisionIoLimelight(Constants.SHOOTER_CAMERA_NAME))
                         : null;
                 break;
@@ -100,13 +102,16 @@ public class RobotContainer {
                         new SwerveModuleIoSim(),
                         new SwerveModuleIoSim(),
                         new SwerveModuleIoSim());
-                feeder = Constants.HAVE_FEEDER
-                        ? new Feeder(new SingleMotorIoSparkMax(Constants.FEEDER_MOTOR_ID, Constants.IS_FEEDER_INVERTED))
+                feeder = CONSTANTS.hasFeederSubsystem()
+                        ? new Feeder(new SingleMotorIoSparkMax(Constants.FEEDER_MOTOR_ID,
+                                Constants.IS_FEEDER_INVERTED))
                         : null;
-                intake = Constants.HAVE_INTAKE
-                        ? new Intake(new SingleMotorIoSparkMax(Constants.INTAKE_MOTOR_ID, Constants.IS_INTAKE_INVERTED))
+                intake = CONSTANTS.hasIntakeSubsystem()
+                        ? new Intake(new SingleMotorIoSparkMax(Constants.INTAKE_MOTOR_ID,
+                                Constants.IS_INTAKE_INVERTED))
                         : null;
-                vision = Constants.HAVE_VISION ? new Vision(driveBase.poseEstimator, new VisionIoSimAndReplay())
+                vision = CONSTANTS.hasVisionSubsystem()
+                        ? new Vision(driveBase.poseEstimator, new VisionIoSimAndReplay())
                         : null;
                 break;
 
@@ -118,21 +123,22 @@ public class RobotContainer {
                         new SwerveModuleIoReplay(),
                         new SwerveModuleIoReplay(),
                         new SwerveModuleIoReplay());
-                feeder = Constants.HAVE_FEEDER ? new Feeder(new SingleMotorIoReplay()) : null;
-                intake = Constants.HAVE_INTAKE ? new Intake(new SingleMotorIoReplay()) : null;
-                vision = Constants.HAVE_VISION ? new Vision(driveBase.poseEstimator, new VisionIoSimAndReplay())
+                feeder = CONSTANTS.hasFeederSubsystem() ? new Feeder(new SingleMotorIoReplay()) : null;
+                intake = CONSTANTS.hasIntakeSubsystem() ? new Intake(new SingleMotorIoReplay()) : null;
+                vision = CONSTANTS.hasVisionSubsystem()
+                        ? new Vision(driveBase.poseEstimator, new VisionIoSimAndReplay())
                         : null;
                 break;
 
             default:
                 throw new RuntimeException(
-                        "Unknown Run Mode: " + NewConstants.get().getCurrentOperatingMode());
+                        "Unknown Run Mode: " + CONSTANTS.getCurrentOperatingMode());
         }
 
         // ----- Initialize Subsystems without Simulation and/or Log Replay Modes -----
-        aimer = Constants.HAVE_AIMER ? new Aimer() : null;
-        colorSensor = Constants.HAVE_COLOR_SENSOR ? new ColorSensor() : null;
-        flywheel = Constants.HAVE_FLYWHEEL ? new Flywheel() : null;
+        aimer = CONSTANTS.hasAimerSubsystem() ? new Aimer() : null;
+        colorSensor = CONSTANTS.hasColorSensorSubsystem() ? new ColorSensor() : null;
+        flywheel = CONSTANTS.hasFlywheelSubsystem() ? new Flywheel() : null;
         // We can safely emit LED instructions even if there are no LEDs.
         // (The LED control hardware is built into the RoboRio so always "exists".)
         leds = new Leds();
@@ -145,18 +151,18 @@ public class RobotContainer {
                 () -> controller1.getLeftTriggerAxis() > controller1.getRightTriggerAxis()
                         ? controller1.getLeftTriggerAxis()
                         : -controller1.getRightTriggerAxis()));
-        if (Constants.HAVE_INTAKE && Constants.HAVE_COLOR_SENSOR) {
+        if (CONSTANTS.hasIntakeSubsystem() && CONSTANTS.hasColorSensorSubsystem()) {
             intake.setDefaultCommand(ShooterCommands.defaultIntakeCommand(intake, colorSensor));
         }
-        if (Constants.HAVE_FEEDER && Constants.HAVE_COLOR_SENSOR) {
+        if (CONSTANTS.hasFeederSubsystem() && CONSTANTS.hasColorSensorSubsystem()) {
             intake.setDefaultCommand(ShooterCommands.defaultFeederCommand(feeder, colorSensor));
         }
         leds.setDefaultCommand(LedCommands.defaultLedCommand(leds));
-        if (Constants.HAVE_FLYWHEEL) {
+        if (CONSTANTS.hasFlywheelSubsystem()) {
             flywheel.setDefaultCommand(ShooterCommands.defaultFlywheelCommand(flywheel)); // @formatter:off I finished this code before Xander and Brenan finished talking about if this is the right way to do it. @formatter:on
         }
         // ---------- Configure Command Triggers ----------
-        if (Constants.HAVE_COLOR_SENSOR) {
+        if (CONSTANTS.hasColorSensorSubsystem()) {
             new Trigger((colorSensor::isObjectDetected)).whileTrue(leds.setColorCommand(Color.kDarkOrange));
         }
 
@@ -164,7 +170,7 @@ public class RobotContainer {
         // ---------- Create Named Commands for use by Path Planner ----------
         NamedCommands.registerCommand("Spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
         NamedCommands.registerCommand("StartIntake", LedCommands.blinkCommand(leds, Color.kPurple));
-        if (Constants.HAVE_FLYWHEEL) {
+        if (CONSTANTS.hasFlywheelSubsystem()) {
             NamedCommands.registerCommand("Spin Up Flywheel", ShooterCommands.spinUpFlywheelCommand(flywheel));
         }
 
@@ -175,7 +181,7 @@ public class RobotContainer {
                 DriveCommands.turnToTargetCommand(driveBase, Constants.RED_SPEAKER_LOCATION, 4.5),
                 () -> DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
         Command autoShootCommand;
-        if (Constants.HAVE_SHOOTER) {
+        if (CONSTANTS.hasShooterSubsystemGroup()) {
             autoShootCommand = ShooterCommands.shootAutonomousCommand(feeder, leds, colorSensor);
         } else {
             autoShootCommand = LedCommands.blinkCommand(leds, Color.kOrange);
@@ -190,7 +196,7 @@ public class RobotContainer {
         Command teleOpShootCommand;
         Command reverseShooterCommand;
         Command stopIntakeFeederCommand;
-        if (Constants.HAVE_SHOOTER) {
+        if (CONSTANTS.hasShooterSubsystemGroup()) {
             teleOpShootCommand = ShooterCommands.shootTeleopCommand(flywheel, feeder, leds, colorSensor);
             reverseShooterCommand = ShooterCommands.reverseShooterCommand(flywheel, feeder, intake, leds);
             stopIntakeFeederCommand = ShooterCommands.stopIntakeFeederCommand(intake, feeder, leds);
@@ -232,16 +238,16 @@ public class RobotContainer {
         controller2.povLeft().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(0, 1, 0)));
 
         // ---------- Configure Subsystem Debug Buttons (Controller 2) ----------
-        if (Constants.HAVE_INTAKE) {
+        if (CONSTANTS.hasIntakeSubsystem()) {
             controller2.a().whileTrue(new StartEndCommand(intake::start, intake::stop, intake));
         }
-        if (Constants.HAVE_FLYWHEEL) {
+        if (CONSTANTS.hasFlywheelSubsystem()) {
             controller2.b().whileTrue(new StartEndCommand(flywheel::start, flywheel::stop, flywheel));
         }
-        if (Constants.HAVE_FEEDER) {
+        if (CONSTANTS.hasFeederSubsystem()) {
             controller2.y().whileTrue(new StartEndCommand(feeder::start, feeder::stop, feeder));
         }
-        if (Constants.HAVE_AIMER) {
+        if (CONSTANTS.hasAimerSubsystem()) {
             controller2.rightTrigger().onTrue(new InstantCommand(() -> aimer.setTargetAngle(aimer.getAngle() + 5)));
             controller2.leftTrigger().onTrue(new InstantCommand(() -> aimer.setTargetAngle(aimer.getAngle() - 5)));
         }

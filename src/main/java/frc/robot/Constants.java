@@ -10,7 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.robot.constants.NewConstants;
+import frc.robot.constants.AbstractConstants;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -23,18 +23,7 @@ import frc.robot.constants.NewConstants;
 @SuppressWarnings("unused") // < -- Never do this (Gets rid of dead code warnings)
 public final class Constants {
 
-    // ========================= Enums ==========================================
-    public static enum OperatingMode {
-        REAL_WORLD,
-        SIMULATION,
-        LOG_REPLAY
-    }
-
     // ========================= CONSTANTS ======================================
-    // ---------- Operation Modes ----------
-    // public static final OperatingMode CURRENT_OPERATING_MODE =
-    // OperatingMode.REAL_WORLD;
-    // public static final boolean IS_FIELD_RELATIVE_DRIVING_MODE = false;
 
     // ---------- Alliance ----------
     // This is the side of the field that the aumation path are made for.
@@ -104,7 +93,7 @@ public final class Constants {
             Rotation2d.fromRotations(-0.000732)
     };
     public static final Supplier<Rotation2d[]> SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_SUPPLIER = () -> {
-        return NewConstants.isGameRobot() ? SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_GAME_ROBOT
+        return AbstractConstants.isGameRobot() ? SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_GAME_ROBOT
                 : SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_TEST_ROBOT;
     };
 
@@ -122,16 +111,6 @@ public final class Constants {
     public static final double AIMER_ANGLE_OFFSET = 0; // TODO/calibrate
     public static final double AIMER_LOWER_ANGLE = 0;
     public static final double AIMER_UPPER_ANGLE = 70;
-
-    // ---------- Hardware Flags --------
-    public static final boolean HAVE_AIMER = false;
-    public static final boolean HAVE_COLOR_SENSOR = false;
-    public static final boolean HAVE_FEEDER = false;
-    public static final boolean HAVE_FLYWHEEL = false;// TODO: Reset to Game Robot
-    public static final boolean HAVE_INTAKE = false;
-    public static final boolean HAVE_VISION = true;
-    public static final boolean HAVE_SHOOTER = HAVE_FEEDER && HAVE_INTAKE && HAVE_AIMER && HAVE_FLYWHEEL
-            && HAVE_COLOR_SENSOR;
 
     // ---------- Hardware Config ----------
     // --- Aimer ---

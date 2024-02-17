@@ -1,5 +1,7 @@
 package frc.robot.subsystems.swerve_module;
 
+import static frc.robot.constants.AbstractConstants.CONSTANTS;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -8,7 +10,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants;
-import frc.robot.constants.NewConstants;
 
 public class IndexedSwerveModule {
 
@@ -31,7 +32,7 @@ public class IndexedSwerveModule {
 
         // Switch constants based on mode (the physics simulator is treated as a
         // separate robot with different tuning)
-        switch (NewConstants.get().getCurrentOperatingMode()) {
+        switch (CONSTANTS.getCurrentOperatingMode()) {
             case REAL_WORLD:
             case LOG_REPLAY:
                 driveFeedforward = new SimpleMotorFeedforward(0.1, 0.13);
@@ -45,7 +46,7 @@ public class IndexedSwerveModule {
                 break;
             default:
                 throw new RuntimeException(
-                        "Unknown Run Mode: " + NewConstants.get().getCurrentOperatingMode());
+                        "Unknown Run Mode: " + CONSTANTS.getCurrentOperatingMode());
         }
 
         turnFeedback.enableContinuousInput(-Math.PI, Math.PI);

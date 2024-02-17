@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.RobotController;
 
-public abstract class NewConstants {
+public abstract class AbstractConstants {
 
     // ========================= Enums =========================================
     public static enum OperatingMode {
@@ -16,9 +16,11 @@ public abstract class NewConstants {
     }
 
     // ========================= Static CONSTANTS ==============================
-    public static final boolean FORCE_GAME_ROBOT_CONSTANTS = false;
-    private static final NewConstants GAME_ROBOT_CONSTANTS = new GameRobotConstants();
-    private static final NewConstants TEST_ROBOT_CONSTANTS = new TestRobotConstants();
+    private static final boolean FORCE_GAME_ROBOT_CONSTANTS = false;
+    private static final AbstractConstants GAME_ROBOT_CONSTANTS = new GameRobotConstants();
+    private static final AbstractConstants TEST_ROBOT_CONSTANTS = new TestRobotConstants();
+
+    public static final AbstractConstants CONSTANTS = isGameRobot() ? GAME_ROBOT_CONSTANTS : TEST_ROBOT_CONSTANTS;
 
     // ========================= Static Methods ================================
     public static boolean isGameRobot() {
@@ -31,14 +33,6 @@ public abstract class NewConstants {
                 || Objects.equals(DriverStation.getEventName(), "");
     }
 
-    public static NewConstants get() {
-        if (isGameRobot()) {
-            return GAME_ROBOT_CONSTANTS;
-        } else {
-            return TEST_ROBOT_CONSTANTS;
-        }
-    }
-
     // ========================= Methods =======================================
     // ---------- Operation Modes ----------
     public OperatingMode getCurrentOperatingMode() {
@@ -46,6 +40,21 @@ public abstract class NewConstants {
     }
 
     public abstract boolean isDrivingModeFieldRelative();
+
+    // ---------- Capabilities Flags --------
+    public abstract boolean hasAimerSubsystem();
+
+    public abstract boolean hasColorSensorSubsystem();
+
+    public abstract boolean hasFeederSubsystem();
+
+    public abstract boolean hasFlywheelSubsystem();
+
+    public abstract boolean hasIntakeSubsystem();
+
+    public abstract boolean hasShooterSubsystemGroup();
+
+    public abstract boolean hasVisionSubsystem();
 
     // ---------- Hardware ----------
     public abstract String getRoboRioSerialNumber();
