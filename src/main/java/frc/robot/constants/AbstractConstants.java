@@ -1,11 +1,6 @@
 package frc.robot.constants;
 
-import java.util.Objects;
-
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.MatchType;
-import edu.wpi.first.wpilibj.RobotController;
 
 public abstract class AbstractConstants {
 
@@ -25,12 +20,14 @@ public abstract class AbstractConstants {
 
     // ========================= Static Methods ================================
     public static boolean isGameRobot() {
-        return FORCE_GAME_ROBOT_CONSTANTS
-                || RobotController.getSerialNumber().equals(GAME_ROBOT_CONSTANTS.getRoboRioSerialNumber())
-                || !RobotController.getSerialNumber().equals(TEST_ROBOT_CONSTANTS.getRoboRioSerialNumber())
-                || DriverStation.getMatchType() != MatchType.None
-                || DriverStation.getMatchNumber() != 0
-                || !Objects.equals(DriverStation.getEventName(), "");
+        String robotSerialNumber = System.getenv("serialnum");
+
+        boolean isGameRobot = FORCE_GAME_ROBOT_CONSTANTS
+                || robotSerialNumber.equals(GAME_ROBOT_CONSTANTS.getRoboRioSerialNumber())
+                || !robotSerialNumber.equals(TEST_ROBOT_CONSTANTS.getRoboRioSerialNumber());
+        System.out.println("Serial number: " + robotSerialNumber);
+        System.out.println("isGameRobot: " + isGameRobot);
+        return isGameRobot;
     }
 
     // ========================= Methods =======================================
