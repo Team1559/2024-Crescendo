@@ -1,4 +1,4 @@
-package frc.robot.subsystems.sinigle_motor;
+package frc.robot.subsystems.single_motor;
 
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
