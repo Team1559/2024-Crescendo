@@ -20,6 +20,7 @@ import frc.robot.constants.NewConstants;
  * anything
  * functional in this class.
  */
+@SuppressWarnings("unused") // < -- Never do this (Gets rid of dead code warnings)
 public final class Constants {
 
     // ========================= Enums ==========================================
@@ -103,8 +104,8 @@ public final class Constants {
             Rotation2d.fromRotations(-0.000732)
     };
     public static final Supplier<Rotation2d[]> SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_SUPPLIER = () -> {
-        return NewConstants.IS_RUNNING_TEST_ROBOT ? SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_TEST_ROBOT
-                : SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_GAME_ROBOT;
+        return NewConstants.isGameRobot() ? SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_GAME_ROBOT
+                : SWIRVE_MODULE_ABSOLUTE_ENCODER_OFFSETS_TEST_ROBOT;
     };
 
     // ---------- Game Piece Handling -------
@@ -124,11 +125,11 @@ public final class Constants {
 
     // ---------- Hardware Flags --------
     public static final boolean HAVE_AIMER = false;
-    public static final boolean HAVE_COLOR_SENSOR = true;
+    public static final boolean HAVE_COLOR_SENSOR = false;
     public static final boolean HAVE_FEEDER = false;
-    public static final boolean HAVE_FLYWHEEL = false;
-    public static final boolean HAVE_INTAKE = true;
-    public static final boolean HAVE_VISION = false;
+    public static final boolean HAVE_FLYWHEEL = false;// TODO: Reset to Game Robot
+    public static final boolean HAVE_INTAKE = false;
+    public static final boolean HAVE_VISION = true;
     public static final boolean HAVE_SHOOTER = HAVE_FEEDER && HAVE_INTAKE && HAVE_AIMER && HAVE_FLYWHEEL
             && HAVE_COLOR_SENSOR;
 

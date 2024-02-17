@@ -8,4 +8,10 @@ public class TestRobotConstants extends NewConstants {
     public boolean isDrivingModeFieldRelative() {
         return false;
     }
+
+    // ---------- Hardware ----------
+    @Override
+    public String getRoboRioSerialNumber() {
+        return "03282BB6";
+    }
 }

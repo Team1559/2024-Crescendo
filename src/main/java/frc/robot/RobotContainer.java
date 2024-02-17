@@ -137,7 +137,30 @@ public class RobotContainer {
         // (The LED control hardware is built into the RoboRio so always "exists".)
         leds = new Leds();
 
-        // ========================= Autonomous =========================
+        // ========================= Auto & Tele-Op ============================
+        // ---------- Configure Default Commands ----------
+        driveBase.setDefaultCommand(DriveCommands.manualDriveDefaultCommand(driveBase,
+                () -> -controller1.getLeftY(),
+                () -> -controller1.getLeftX(),
+                () -> controller1.getLeftTriggerAxis() > controller1.getRightTriggerAxis()
+                        ? controller1.getLeftTriggerAxis()
+                        : -controller1.getRightTriggerAxis()));
+        if (Constants.HAVE_INTAKE && Constants.HAVE_COLOR_SENSOR) {
+            intake.setDefaultCommand(ShooterCommands.defaultIntakeCommand(intake, colorSensor));
+        }
+        if (Constants.HAVE_FEEDER && Constants.HAVE_COLOR_SENSOR) {
+            intake.setDefaultCommand(ShooterCommands.defaultFeederCommand(feeder, colorSensor));
+        }
+        leds.setDefaultCommand(LedCommands.defaultLedCommand(leds));
+        if (Constants.HAVE_FLYWHEEL) {
+            flywheel.setDefaultCommand(ShooterCommands.defaultFlywheelCommand(flywheel)); // @formatter:off I finished this code before Xander and Brenan finished talking about if this is the right way to do it. @formatter:on
+        }
+        // ---------- Configure Command Triggers ----------
+        if (Constants.HAVE_COLOR_SENSOR) {
+            new Trigger((colorSensor::isObjectDetected)).whileTrue(leds.setColorCommand(Color.kDarkOrange));
+        }
+
+        // ========================= Autonomous ================================
         // ---------- Create Named Commands for use by Path Planner ----------
         NamedCommands.registerCommand("Spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
         NamedCommands.registerCommand("StartIntake", LedCommands.blinkCommand(leds, Color.kPurple));
@@ -162,27 +185,7 @@ public class RobotContainer {
         // ---------- Set-up Autonomous Choices ----------
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
-        // ========================= Tele-Op =========================
-        // ---------- Configure Default Commands for Tele-Op ----------
-        driveBase.setDefaultCommand(DriveCommands.manualDriveDefaultCommand(driveBase,
-                () -> -controller1.getLeftY(),
-                () -> -controller1.getLeftX(),
-                () -> controller1.getLeftTriggerAxis() > controller1.getRightTriggerAxis()
-                        ? controller1.getLeftTriggerAxis()
-                        : -controller1.getRightTriggerAxis()));
-        if (Constants.HAVE_INTAKE) { // TODO: What will happen if the color sensor is null?
-            intake.setDefaultCommand(ShooterCommands.defaultIntakeCommand(intake, colorSensor));
-        }
-        if (Constants.HAVE_FEEDER) { // TODO: What will happen if the color sensor is null?
-            intake.setDefaultCommand(ShooterCommands.defaultFeederCommand(feeder, colorSensor));
-        }
-        leds.setDefaultCommand(LedCommands.defaultLedCommand(leds));
-
-        // ---------- Configure Command Triggers ----------
-        if (Constants.HAVE_COLOR_SENSOR) {
-            new Trigger((colorSensor::isObjectDetected)).whileTrue(leds.setColorCommand(Color.kDarkOrange));
-        }
-
+        // ========================= Tele-Op ===================================
         // ---------- Configure Buttons for SubSystem Actions (Controller 1) ----------
         Command teleOpShootCommand;
         Command reverseShooterCommand;

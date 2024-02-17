@@ -117,3 +117,11 @@ wpi.java.configureTestTasks(test)
 tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
 }
+
+sourceSets {
+    main {
+        java {
+            srcDir 'build/generated/sources/annotationProcessor/java/main'
+        }
+    }
+}

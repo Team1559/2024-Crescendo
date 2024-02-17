@@ -122,6 +122,7 @@ public class DriveBase extends SubsystemBase {
     public void periodic() {
 
         gyroIO.updateInputs(gyroInputs);
+        getPose(); // Logs Robot Estimated Positio;
         Logger.processInputs("Drive/Gyro", gyroInputs);
 
         for (IndexedSwerveModule module : modules) {
@@ -149,7 +150,7 @@ public class DriveBase extends SubsystemBase {
     // ========================= Functions =====================================
 
     /** Returns the current odometry pose. */
-    @AutoLogOutput(key = "Odometry/Robot")
+    @AutoLogOutput(key = "EstimatedPosition")
     public Pose2d getPose() {
         return poseEstimator.getEstimatedPosition();
     }

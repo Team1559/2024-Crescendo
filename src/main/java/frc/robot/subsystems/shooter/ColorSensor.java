@@ -1,16 +1,16 @@
 package frc.robot.subsystems.shooter;
 
+import org.littletonrobotics.junction.AutoLog;
+
+import com.revrobotics.ColorSensorV3;
+
+import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
-import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.util.Color;
-
-import org.littletonrobotics.junction.AutoLog;
-
-import com.revrobotics.ColorSensorV3;
 
 public class ColorSensor extends SubsystemBase {
 
@@ -62,7 +62,6 @@ public class ColorSensor extends SubsystemBase {
      * @return Proximity read.
      */
     public int getProximity() {
-        System.out.println("Proximity " + colorSensor.getProximity());
         return colorSensor.getProximity();
     }
 
