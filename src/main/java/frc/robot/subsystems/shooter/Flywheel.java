@@ -59,8 +59,10 @@ public class Flywheel extends SubsystemBase {
     public Flywheel() {
 
         // ---------- Configure Motors ----------
-        flywheelMotorL.setInverted(true);
-        flywheelMotorR.setInverted(false);
+        // TODO: Determine why these aren't being respected.
+        // (Velecity is being inverted in #periodic() as a workaround.)
+        // flywheelMotorL.setInverted(true);
+        // flywheelMotorR.setInverted(false);
         flywheelMotorL.setNeutralMode(NeutralModeValue.Coast);
         flywheelMotorR.setNeutralMode(NeutralModeValue.Coast);
 
@@ -100,8 +102,8 @@ public class Flywheel extends SubsystemBase {
     public void periodic() {
         // Set Voltages
         if (runOneWheelFlag == null || runOneWheelFlag) {
-            flywheelMotorR.setControl(new VoltageOut(-currentVoltage));// TODO - This should not have to be negated but
-                                                                       // inverting the motor does nothing
+            // TODO: Removbe this workaround to the inveted config not taking.
+            flywheelMotorR.setControl(new VoltageOut(-currentVoltage));
         }
         if (runOneWheelFlag == null || !runOneWheelFlag) {
             flywheelMotorL.setControl(new VoltageOut(currentVoltage));
@@ -146,21 +148,21 @@ public class Flywheel extends SubsystemBase {
      * 
      * @param voltage Set Flywheels to this voltage
      */
-    public void startFlywheel(double voltage) {
+    public void start(double voltage) {
         currentVoltage = voltage;
         runOneWheelFlag = null;
-    }
-
-    public void startOneFlywheel(boolean runRightWheel) {
-        currentVoltage = Constants.FLYWHEEL_FOWARDS_VOLTAGE;
-        runOneWheelFlag = runRightWheel;
     }
 
     /**
      * Start the Flywheels with default volage
      */
     public void start() {
-        startFlywheel(Constants.FLYWHEEL_FOWARDS_VOLTAGE);
+        start(Constants.FLYWHEEL_FOWARDS_VOLTAGE);
+    }
+
+    public void startOneMotor(boolean runRightWheel) {
+        start(Constants.FLYWHEEL_FOWARDS_VOLTAGE);
+        runOneWheelFlag = runRightWheel;
     }
 
     /**
@@ -176,27 +178,27 @@ public class Flywheel extends SubsystemBase {
      * Reverse the Flywheels
      */
     public void reverse() {
-        startFlywheel(Constants.FLYWHEEL_REVERSE_VOLTAGE);
+        start(Constants.FLYWHEEL_REVERSE_VOLTAGE);
     }
 
     // ========================= Commands =========================
-    public Command startFlywheelCommand(double voltage) {
-        return new InstantCommand(() -> startFlywheel(voltage), this);
-    }
-
-    public Command startFlywheelCommand() {
+    public Command startCommand() {
         return new InstantCommand(this::start, this);
     }
 
-    public Command stopFlywheelCommand() {
+    public Command startCommand(double voltage) {
+        return new InstantCommand(() -> start(voltage), this);
+    }
+
+    public Command startOneMotorCommand(boolean runRightWheel) {
+        return new InstantCommand(() -> startOneMotor(runRightWheel), this);
+    }
+
+    public Command stopCommand() {
         return new InstantCommand(this::stop, this);
     }
 
-    public Command reverseFlywheelCommand() {
+    public Command reverseCommand() {
         return new InstantCommand(this::reverse, this);
-    }
-
-    public Command startOneFlywheelCommand(boolean runRightWheel) {
-        return new InstantCommand(() -> startOneFlywheel(runRightWheel), this);
     }
 }

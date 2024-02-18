@@ -18,6 +18,11 @@ public class TestRobotConstants extends AbstractConstants {
     }
 
     @Override
+    public boolean hasClimberSubsystem() {
+        return false;
+    }
+
+    @Override
     public boolean hasColorSensorSubsystem() {
         return false;
     }

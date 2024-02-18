@@ -18,6 +18,11 @@ public class GameRobotConstants extends AbstractConstants {
     }
 
     @Override
+    public boolean hasClimberSubsystem() {
+        return false;
+    }
+
+    @Override
     public boolean hasColorSensorSubsystem() {
         return true;
     }
@@ -79,13 +84,13 @@ public class GameRobotConstants extends AbstractConstants {
 
     @Override
     public double getTraverserReverseVoltage() {
-        return -6.0;
+        return -getTraverserFowardVoltage();
     }
 
     @Override
     public int getTraverserMotorId() {
-        throw new UnsupportedOperationException("No Motor ID for Traverser");
         // TODO: Add ID
+        throw new UnsupportedOperationException("No Motor ID for Traverser");
     }
 
     @Override

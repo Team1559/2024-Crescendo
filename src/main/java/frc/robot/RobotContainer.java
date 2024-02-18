@@ -52,8 +52,12 @@ import frc.robot.util.KColor;
  */
 public class RobotContainer {
 
+    /** This Controller is used by the Driver. */
     private final CommandXboxController controller1 = new CommandXboxController(0);
+    /** This Controller is used by the Co-Pilot. */
     private final CommandXboxController controller2 = new CommandXboxController(1);
+    /** This Controller is used by the Technician. */
+    private final CommandXboxController controller3 = new CommandXboxController(2);
     private final LoggedDashboardChooser<Command> autoChooser;
 
     private final DriveBase driveBase;
@@ -144,8 +148,7 @@ public class RobotContainer {
                 break;
 
             default:
-                throw new RuntimeException(
-                        "Unknown Run Mode: " + CONSTANTS.getCurrentOperatingMode());
+                throw new RuntimeException("Unknown Run Mode: " + CONSTANTS.getCurrentOperatingMode());
         }
 
         // ----- Initialize Subsystems without Simulation and/or Log Replay Modes -----
@@ -176,6 +179,7 @@ public class RobotContainer {
         if (CONSTANTS.hasFlywheelSubsystem()) {
             flywheel.setDefaultCommand(ShooterCommands.defaultFlywheelCommand(flywheel)); // @formatter:off I finished this code before Xander and Brenan finished talking about if this is the right way to do it. @formatter:on
         }
+
         // ---------- Configure Command Triggers ----------
         if (CONSTANTS.hasColorSensorSubsystem()) {
             new Trigger((colorSensor::isObjectDetected)).whileTrue(leds.setColorCommand(Color.kDarkOrange));
@@ -207,7 +211,7 @@ public class RobotContainer {
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
         // ========================= Tele-Op ===================================
-        // ---------- Configure Buttons for SubSystem Actions (Controller 1) ----------
+        // ---------- Configure Controller 1 for Driver ----------
         Command teleOpShootCommand;
         Command reverseShooterCommand;
         Command stopIntakeFeederCommand;
@@ -231,65 +235,77 @@ public class RobotContainer {
                         () -> -controller1.getLeftY(), () -> -controller1.getLeftX(),
                         Constants.AMP_LOCATION_SUPPLIER));
 
-        // ---------- Configure D-PAD for Tele-Op (Controller 2) ----------
-        controller2.povUp().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(1, 0, 0)));
-        controller2.povDown().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(-1, 0, 0)));
-        controller2.povRight().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(0, -1, 0)));
-        controller2.povLeft().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(0, 1, 0)));
+        // ---------- Configure Controller 2 for Co-Pilot ----------
+        // TODO.
 
-        // ---------- Configure Light Buttons (Controller 2) ----------
-        controller2.a().and(controller2.back()).and(not(controller2.start()))
+        // ---------- Configure Controller 3 for Technician ----------
+        // ----- Swirve Drive Commands -----
+        controller3.povUp().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(1, 0, 0)));
+        controller3.povDown().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(-1, 0, 0)));
+        controller3.povRight().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(0, -1, 0)));
+        controller3.povLeft().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(0, 1, 0)));
+
+        // ----- Light Commands -----
+        controller3.a().and(controller3.back()).and(not(controller3.start()))
                 .onTrue(leds.setColorCommand(Color.kDarkGreen));
-        controller2.b().and(controller2.back()).and(not(controller2.start())).onTrue(leds.setStaticPatternCommand(
+        controller3.b().and(controller3.back()).and(not(controller3.start())).onTrue(leds.setStaticPatternCommand(
                 new Color[] { KColor.ALLIANCE_RED, KColor.ALLIANCE_RED, Color.kBlack, Color.kBlack }));
-        controller2.x().and(controller2.back()).and(not(controller2.start()))
+        controller3.x().and(controller3.back()).and(not(controller3.start()))
                 .onTrue(leds.setDynamicPatternCommand(new Color[] {
                         KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE,
                         Color.kDarkViolet, Color.kDarkViolet, Color.kDarkViolet }, true));
-        controller2.y().and(controller2.back()).and(not(controller2.start()))
+        controller3.y().and(controller3.back()).and(not(controller3.start()))
                 .onTrue(leds.setDynamicPatternCommand(new Color[] {
                         Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kBlack,
                         Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack, Color.kBlack },
                         false));
-        controller2.leftBumper().and(controller2.back()).and(not(controller2.start()))
+        controller3.leftBumper().and(controller3.back()).and(not(controller3.start()))
                 .onTrue(leds.changeBrightnessCommand(true));
-        controller2.rightBumper().and(controller2.back()).and(not(controller2.start()))
+        controller3.rightBumper().and(controller3.back()).and(not(controller3.start()))
                 .onTrue(leds.changeBrightnessCommand(false));
-        controller2.back().and(controller2.start()).onTrue(leds.turnOffCommand());
+        controller3.back().and(controller3.start()).onTrue(leds.turnOffCommand());
 
-        // ---------- Configure Subsystem Debug Buttons (Controller 2) ----------
-        if (CONSTANTS.hasIntakeSubsystem()) {
-            controller2.a().and(not(controller2.start())).and(not(controller2.back()))
-                    .whileTrue(new StartEndCommand(intake::start, intake::stop, intake));
-            controller2.a().and(controller2.start())
-                    .whileTrue(new StartEndCommand(intake::reverse, intake::stop, intake));
+        // ----- Subsystem Commands -----
+        if (CONSTANTS.hasAimerSubsystem()) {
+            controller3.rightBumper().and(not(controller3.start()))
+                    .whileTrue(new RunCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(1))));
+            controller3.leftBumper().and(not(controller3.start()))
+                    .whileTrue(new RunCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(-1))));
         }
-        if (CONSTANTS.hasFeederSubsystem()) {
-            controller2.b().and(not(controller2.start())).and(not(controller2.back()))
-                    .whileTrue(new StartEndCommand(feeder::start, feeder::stop, feeder));
-            controller2.b().and(controller2.start())
-                    .whileTrue(new StartEndCommand(feeder::reverse, feeder::stop, feeder));
-        }
-        if (CONSTANTS.hasFlywheelSubsystem()) {
-            controller2.y().and(not(controller2.start())).and(not(controller2.back()))
-                    .whileTrue(new StartEndCommand(flywheel::start, flywheel::stop, flywheel));
-            controller2.y().and(controller2.start())
-                    .whileTrue(new StartEndCommand(flywheel::reverse, flywheel::stop, flywheel));
-            controller2.leftBumper().and(controller2.start()).whileTrue(new StartEndCommand(() -> {
-                flywheel.startOneFlywheel(false);
-            }, flywheel::stop, flywheel));
-            controller2.rightBumper().and(controller2.start()).whileTrue(new StartEndCommand(() -> {
-                flywheel.startOneFlywheel(true);
-            }, flywheel::stop, flywheel));
-        }
-        if (CONSTANTS.hasTraverserSubsystem()) {
+
+        if (CONSTANTS.hasClimberSubsystem()) {
             // TODO
         }
-        if (CONSTANTS.hasAimerSubsystem()) {
-            controller2.rightBumper().and(not(controller2.start()))
-                    .whileTrue(new RunCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(1))));
-            controller2.leftBumper().and(not(controller2.start()))
-                    .whileTrue(new RunCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(-1))));
+
+        if (CONSTANTS.hasFeederSubsystem()) {
+            controller3.b().and(not(controller3.start())).and(not(controller3.back()))
+                    .whileTrue(new StartEndCommand(feeder::start, feeder::stop, feeder));
+            controller3.b().and(controller3.start())
+                    .whileTrue(new StartEndCommand(feeder::reverse, feeder::stop, feeder));
+        }
+
+        if (CONSTANTS.hasFlywheelSubsystem()) {
+            controller3.y().and(not(controller3.start())).and(not(controller3.back()))
+                    .whileTrue(new StartEndCommand(flywheel::start, flywheel::stop, flywheel));
+            controller3.y().and(controller3.start())
+                    .whileTrue(new StartEndCommand(flywheel::reverse, flywheel::stop, flywheel));
+            controller3.leftBumper().and(controller3.start()).whileTrue(new StartEndCommand(() -> {
+                flywheel.startOneMotor(false);
+            }, flywheel::stop, flywheel));
+            controller3.rightBumper().and(controller3.start()).whileTrue(new StartEndCommand(() -> {
+                flywheel.startOneMotor(true);
+            }, flywheel::stop, flywheel));
+        }
+
+        if (CONSTANTS.hasIntakeSubsystem()) {
+            controller3.a().and(not(controller3.start())).and(not(controller3.back()))
+                    .whileTrue(new StartEndCommand(intake::start, intake::stop, intake));
+            controller3.a().and(controller3.start())
+                    .whileTrue(new StartEndCommand(intake::reverse, intake::stop, intake));
+        }
+
+        if (CONSTANTS.hasTraverserSubsystem()) {
+            // TODO
         }
     }
 

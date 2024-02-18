@@ -40,7 +40,7 @@ public class ShooterCommands {
     }
 
     public static Command defaultFlywheelCommand(Flywheel flywheel) {
-        return new SequentialCommandGroup(new WaitCommand(.5), flywheel.stopFlywheelCommand());
+        return new SequentialCommandGroup(new WaitCommand(.5), flywheel.stopCommand());
     }
     // ========================= Other Commands =========================
 
@@ -82,13 +82,13 @@ public class ShooterCommands {
     return new SequentialCommandGroup(
       // Should have already been started in Aim command.
       // But including here, just in case.
-      flywheel.startFlywheelCommand(),
+      flywheel.startCommand(),
       feeder.startCommand(),
       leds.setColorCommand(Color.kMediumSpringGreen),
       colorSensor.waitForNoObjectCommand(),
       new WaitCommand(.25),
       feeder.stopCommand(),
-      flywheel.stopFlywheelCommand()
+      flywheel.stopCommand()
     );
     //@formatter:on
     }
@@ -96,7 +96,7 @@ public class ShooterCommands {
     public static Command spinUpFlywheelCommand(Flywheel flywheel) {
     //@formatter:off
     return new SequentialCommandGroup(
-      flywheel.startFlywheelCommand(), 
+      flywheel.startCommand(), 
       new WaitCommand(0.5)
       );
       //@formattter:on
