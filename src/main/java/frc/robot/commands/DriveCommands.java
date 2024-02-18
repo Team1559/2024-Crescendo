@@ -228,7 +228,7 @@ public class DriveCommands {
     // public static PIDCommand turnToTargetPidCommand(DriveBase driveBase,
     // Translation2d target, double speed)
 
-    public static Command turnToTargetCommand(DriveBase driveBase, Translation2d target, double speed) {
+    public static Command turnToTargetCommand(DriveBase driveBase, Supplier<Translation2d> target, double speed) {
 
         Command spinCommand = new Command() {
 
@@ -237,7 +237,7 @@ public class DriveCommands {
             @Override
             public void initialize() {
                 // Rotating plus 180 degrees to postion the back of the robot to the target.
-                Rotation2d rotation = driveBase.getRotationToTarget(target).plus(Rotation2d.fromDegrees(180));
+                Rotation2d rotation = driveBase.getRotationToTarget(target.get()).plus(Rotation2d.fromDegrees(180));
                 spinCommand = spinCommand(driveBase, rotation, speed);
                 spinCommand.initialize();
             }

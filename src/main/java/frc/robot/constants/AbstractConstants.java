@@ -3,6 +3,8 @@ package frc.robot.constants;
 import java.util.Objects;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
@@ -81,6 +83,23 @@ public abstract class AbstractConstants {
     public abstract boolean hasTraverserSubsystem();
 
     public abstract boolean hasVisionSubsystem();
+
+    // ---------- Game Objects ----------
+    public Translation2d getSpeakerLocation() {
+        if (getAssignedAlliance() == Alliance.Blue) {
+            return new Translation2d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42));
+        } else {
+            return new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42));
+        }
+    }
+
+    public Translation2d getAmpLocation() {
+        if (getAssignedAlliance() == Alliance.Blue) {
+            return new Translation2d(Units.inchesToMeters(72.5), Units.inchesToMeters(323.00));
+        } else {
+            return new Translation2d(Units.inchesToMeters(578.77), Units.inchesToMeters(323.00));
+        }
+    }
 
     // ---------- Hardware ----------
     // --- roboRIO ---

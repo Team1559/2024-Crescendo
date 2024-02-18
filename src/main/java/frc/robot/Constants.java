@@ -1,16 +1,10 @@
 package frc.robot;
 
-import static frc.robot.constants.AbstractConstants.CONSTANTS;
-
-import java.util.function.Supplier;
-
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -24,23 +18,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 public final class Constants {
 
     // ========================= CONSTANTS ======================================
-
-    // ---------- Game Objects ----------
-    public static final Translation2d BLUE_SPEAKER_LOCATION = new Translation2d(Units.inchesToMeters(-1.5),
-            Units.inchesToMeters(218.42));
-    public static final Translation2d RED_SPEAKER_LOCATION = new Translation2d(Units.inchesToMeters(652.73),
-            Units.inchesToMeters(218.42));
-    public static final Translation2d BLUE_AMP_LOCATION = new Translation2d(Units.inchesToMeters(72.5),
-            Units.inchesToMeters(323.00));
-    public static final Translation2d RED_AMP_LOCATION = new Translation2d(Units.inchesToMeters(578.77),
-            Units.inchesToMeters(323.00));
-    public static final Supplier<Translation2d> SPEAKER_LOCATION_SUPPLIER = () -> {
-        return CONSTANTS.getAssignedAlliance() == Alliance.Blue ? BLUE_SPEAKER_LOCATION : RED_SPEAKER_LOCATION;
-    };
-    public static final Supplier<Translation2d> AMP_LOCATION_SUPPLIER = () -> {
-        return CONSTANTS.getAssignedAlliance() == Alliance.Blue ? BLUE_AMP_LOCATION : RED_AMP_LOCATION;
-    };
-
     // ---------- Robot Measurements ----------
     // Middle of front wheel to middle of back wheel.
     public static final double TRACK_WIDTH_X = Units.inchesToMeters(24.0);

@@ -10,10 +10,8 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -193,19 +191,14 @@ public class RobotContainer {
             NamedCommands.registerCommand("Spin Up Flywheel", ShooterCommands.spinUpFlywheelCommand(flywheel));
         }
 
-        Command aimCommand = new ConditionalCommand(
-                // Turn to Blue Speaker.
-                DriveCommands.turnToTargetCommand(driveBase, Constants.BLUE_SPEAKER_LOCATION, 4.5),
-                // Turn to Red Speaker.
-                DriveCommands.turnToTargetCommand(driveBase, Constants.RED_SPEAKER_LOCATION, 4.5),
-                () -> DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
+        Command aimAtSpeakerCommand = DriveCommands.turnToTargetCommand(driveBase, CONSTANTS::getSpeakerLocation, 4.5);
         Command autoShootCommand;
         if (CONSTANTS.hasShooterSubsystemGroup()) {
             autoShootCommand = ShooterCommands.shootAutonomousCommand(feeder, leds, colorSensor);
         } else {
             autoShootCommand = LedCommands.blinkCommand(leds, Color.kOrange);
         }
-        NamedCommands.registerCommand("Auto Shoot", new SequentialCommandGroup(aimCommand, autoShootCommand));
+        NamedCommands.registerCommand("Auto Shoot", new SequentialCommandGroup(aimAtSpeakerCommand, autoShootCommand));
 
         // ---------- Set-up Autonomous Choices ----------
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -228,12 +221,10 @@ public class RobotContainer {
 
         controller1.b().and(not(controller1.rightBumper()))
                 .whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel,
-                        () -> -controller1.getLeftY(), () -> -controller1.getLeftX(),
-                        Constants.SPEAKER_LOCATION_SUPPLIER));
+                        () -> -controller1.getLeftY(), () -> -controller1.getLeftX(), CONSTANTS::getSpeakerLocation));
         controller1.b().and(controller1.rightBumper())
                 .whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel,
-                        () -> -controller1.getLeftY(), () -> -controller1.getLeftX(),
-                        Constants.AMP_LOCATION_SUPPLIER));
+                        () -> -controller1.getLeftY(), () -> -controller1.getLeftX(), CONSTANTS::getAmpLocation));
 
         // ---------- Configure Controller 2 for Co-Pilot ----------
         // TODO.
