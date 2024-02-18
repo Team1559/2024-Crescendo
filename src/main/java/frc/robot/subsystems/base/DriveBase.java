@@ -1,5 +1,7 @@
 package frc.robot.subsystems.base;
 
+import static frc.robot.constants.AbstractConstants.CONSTANTS;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -107,8 +109,8 @@ public class DriveBase extends SubsystemBase {
                         Constants.DRIVE_BASE_RADIUS,
                         new ReplanningConfig()),
                 // Flips path if aliance is on red side.
-                () -> Constants.FLIP_PATH_IF_ALLIANCE_IS_NOT_DEFAULT && DriverStation.getAlliance().isPresent()
-                        && DriverStation.getAlliance().get() != Constants.DEFAULT_ALLIANCE,
+                () -> CONSTANTS.getAssignedAlliance() != CONSTANTS.getDefaultAllianceForAuto()
+                        && CONSTANTS.shouldFlipPathIfAssignedAllianceIsNotDefault(),
                 this);
         Pathfinding.setPathfinder(new LocalAdStarAk());
         PathPlannerLogging.setLogActivePathCallback(

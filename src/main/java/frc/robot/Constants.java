@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static frc.robot.constants.AbstractConstants.CONSTANTS;
+
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -8,7 +10,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
@@ -24,10 +25,7 @@ public final class Constants {
 
     // ========================= CONSTANTS ======================================
 
-    // ---------- Alliance ----------
-    // This is the side of the field that the aumation path are made for.
-    public static final Alliance DEFAULT_ALLIANCE = Alliance.Blue;
-    public static final boolean FLIP_PATH_IF_ALLIANCE_IS_NOT_DEFAULT = true;
+    // ---------- Game Objects ----------
     public static final Translation2d BLUE_SPEAKER_LOCATION = new Translation2d(Units.inchesToMeters(-1.5),
             Units.inchesToMeters(218.42));
     public static final Translation2d RED_SPEAKER_LOCATION = new Translation2d(Units.inchesToMeters(652.73),
@@ -36,14 +34,11 @@ public final class Constants {
             Units.inchesToMeters(323.00));
     public static final Translation2d RED_AMP_LOCATION = new Translation2d(Units.inchesToMeters(578.77),
             Units.inchesToMeters(323.00));
-    public static final Supplier<Boolean> IS_ON_BLUE_ALLIANCE = () -> {
-        return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue;
-    };
     public static final Supplier<Translation2d> SPEAKER_LOCATION_SUPPLIER = () -> {
-        return IS_ON_BLUE_ALLIANCE.get() ? BLUE_SPEAKER_LOCATION : RED_SPEAKER_LOCATION;
+        return CONSTANTS.getAssignedAlliance() == Alliance.Blue ? BLUE_SPEAKER_LOCATION : RED_SPEAKER_LOCATION;
     };
     public static final Supplier<Translation2d> AMP_LOCATION_SUPPLIER = () -> {
-        return IS_ON_BLUE_ALLIANCE.get() ? BLUE_AMP_LOCATION : RED_AMP_LOCATION;
+        return CONSTANTS.getAssignedAlliance() == Alliance.Blue ? BLUE_AMP_LOCATION : RED_AMP_LOCATION;
     };
 
     // ---------- Robot Measurements ----------

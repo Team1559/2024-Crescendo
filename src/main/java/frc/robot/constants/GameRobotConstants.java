@@ -11,6 +11,11 @@ public class GameRobotConstants extends AbstractConstants {
         return true;
     }
 
+    // ---------- Alliance ----------
+    public boolean shouldFlipPathIfAssignedAllianceIsNotDefault() {
+        return true;
+    }
+
     // ---------- Capabilities Flags --------
     @Override
     public boolean hasAimerSubsystem() {
@@ -62,7 +67,7 @@ public class GameRobotConstants extends AbstractConstants {
     // --- roboRIO ---
     @Override
     public String getRoboRioSerialNumber() {
-        return "";
+        return ""; // TODO.
     }
 
     // --- Swerve ---

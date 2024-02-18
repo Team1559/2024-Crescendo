@@ -11,6 +11,11 @@ public class TestRobotConstants extends AbstractConstants {
         return false;
     }
 
+    // ---------- Alliance ----------
+    public boolean shouldFlipPathIfAssignedAllianceIsNotDefault() {
+        return true;
+    }
+
     // ---------- Capabilities Flags --------
     @Override
     public boolean hasAimerSubsystem() {

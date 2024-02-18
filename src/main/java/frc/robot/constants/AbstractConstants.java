@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
 
 public abstract class AbstractConstants {
@@ -43,6 +44,24 @@ public abstract class AbstractConstants {
     }
 
     public abstract boolean isDrivingModeFieldRelative();
+
+    // ---------- Alliance ----------
+    /**
+     * @return The assigned Alliance or the {@link #getDefaultAllianceForAuto}, if
+     *         no alliance is set.
+     */
+    public Alliance getAssignedAlliance() {
+        return DriverStation.getAlliance().orElse(getDefaultAllianceForAuto());
+    };
+
+    /**
+     * @return The side of the field that the automation paths are made for.
+     */
+    public Alliance getDefaultAllianceForAuto() {
+        return Alliance.Blue;
+    }
+
+    public abstract boolean shouldFlipPathIfAssignedAllianceIsNotDefault();
 
     // ---------- Capabilities Flags --------
     public abstract boolean hasAimerSubsystem();
