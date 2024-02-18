@@ -8,19 +8,15 @@ import edu.wpi.first.units.Measure;
 
 public class GameRobotConstants extends AbstractConstants {
 
-    // ========================= CONSTANTS ======================================
-    // -------------------- Operation Modes --------------------
-    @Override
-    public boolean isDrivingModeFieldRelative() {
-        return true;
-    }
-
-    // -------------------- Alliance --------------------
+    // ==================== Methods (Ctrl + K, Ctrl + 8 to fold regions) =======
+    // #region: --------------- Alliance ---------------------------------------
     public boolean shouldFlipPathIfAssignedAllianceIsNotDefault() {
         return true;
     }
 
-    // -------------------- Capabilities Flags --------------------
+    // #endregion
+
+    // #region: --------------- Capability Flags -------------------------------
     @Override
     public boolean hasAimerSubsystem() {
         return true;
@@ -67,14 +63,18 @@ public class GameRobotConstants extends AbstractConstants {
         return false;
     }
 
-    // -------------------- Hardware --------------------
-    // -------- roboRIO --------
+    // #endregion
+
+    // #region: --------------- Hardware ---------------------------------------
+    // #region: -------- roboRIO --------
     @Override
     public String getRoboRioSerialNumber() {
         return ""; // TODO.
     }
 
-    // -------- Swerve --------
+    // #endregion
+
+    // #region: -------- Swerve --------
     @Override
     public Rotation2d[] getSwerveModuleEncoderOffsets() {
         return new Rotation2d[] {
@@ -85,7 +85,9 @@ public class GameRobotConstants extends AbstractConstants {
         };
     }
 
-    // -------- Traverser --------
+    // #endregion
+
+    // #region: -------- Traverser --------
     @Override
     public double getTraverserFowardVoltage() {
         return 6.0;
@@ -107,7 +109,17 @@ public class GameRobotConstants extends AbstractConstants {
         return true;
     }
 
-    // -------------------- Physical Measurements --------------------
+    // #endregion
+
+    // #region: --------------- Operation Modes --------------------------------
+    @Override
+    public boolean isDrivingModeFieldRelative() {
+        return true;
+    }
+
+    // #endregion
+
+    // #region: --------------- Physical Measurements --------------------------
     @Override
     public Measure<Distance> getWheelDistanceFrontToBack() {
         return Inches.of(24); // TODO: Measure.
@@ -117,4 +129,6 @@ public class GameRobotConstants extends AbstractConstants {
     public Measure<Distance> getWheelDistanceLeftToRight() {
         return Inches.of(24); // TODO: Measure.
     }
+
+    // #endregion
 }

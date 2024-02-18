@@ -8,19 +8,15 @@ import edu.wpi.first.units.Measure;
 
 public class TestRobotConstants extends AbstractConstants {
 
-    // ========================= CONSTANTS ======================================
-    // -------------------- Operation Modes --------------------
-    @Override
-    public boolean isDrivingModeFieldRelative() {
-        return false;
-    }
-
-    // -------------------- Alliance --------------------
+    // ==================== Methods (Ctrl + K, Ctrl + 8 to fold regions) =======
+    // #region: --------------- Alliance ---------------------------------------
     public boolean shouldFlipPathIfAssignedAllianceIsNotDefault() {
         return true;
     }
 
-    // -------------------- Capabilities Flags --------------------
+    // #endregion
+
+    // #region: --------------- Capability Flags -------------------------------
     @Override
     public boolean hasAimerSubsystem() {
         return false;
@@ -67,14 +63,18 @@ public class TestRobotConstants extends AbstractConstants {
         return true;
     }
 
-    // -------------------- Hardware --------------------
-    // ----- roboRIO -----
+    // #endregion
+
+    // #region: --------------- Hardware ---------------------------------------
+    // #region: ----- roboRIO -----
     @Override
     public String getRoboRioSerialNumber() {
         return "03282BB6";
     }
 
-    // ----- Swerve -----
+    // #endregion
+
+    // #region: ----- Swerve -----
     @Override
     public Rotation2d[] getSwerveModuleEncoderOffsets() {
         return new Rotation2d[] {
@@ -85,7 +85,9 @@ public class TestRobotConstants extends AbstractConstants {
         };
     }
 
-    // ----- Traverser -----
+    // #endregion
+
+    // #region: ----- Traverser -----
     @Override
     public double getTraverserFowardVoltage() {
         throw new UnsupportedOperationException("Unimplemented method 'getTraverserFowardVoltage'");
@@ -106,7 +108,17 @@ public class TestRobotConstants extends AbstractConstants {
         throw new UnsupportedOperationException("Unimplemented method 'isTraverserInverted'");
     }
 
-    // -------------------- Physical Measurements --------------------
+    // #endregion
+
+    // #region: --------------- Operation Modes --------------------------------
+    @Override
+    public boolean isDrivingModeFieldRelative() {
+        return false;
+    }
+
+    // #endregion
+
+    // #region: --------------- Physical Measurements --------------------------
     @Override
     public Measure<Distance> getWheelDistanceFrontToBack() {
         return Inches.of(24);
@@ -116,4 +128,6 @@ public class TestRobotConstants extends AbstractConstants {
     public Measure<Distance> getWheelDistanceLeftToRight() {
         return Inches.of(24);
     }
+
+    // #endregion
 }

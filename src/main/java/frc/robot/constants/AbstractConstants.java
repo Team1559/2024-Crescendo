@@ -43,15 +43,8 @@ public abstract class AbstractConstants {
                 || !Objects.equals(DriverStation.getEventName(), "");
     }
 
-    // ========================= Methods =======================================
-    // ---------- Operation Modes ----------
-    public OperatingMode getCurrentOperatingMode() {
-        return OperatingMode.REAL_WORLD;
-    }
-
-    public abstract boolean isDrivingModeFieldRelative();
-
-    // -------------------- Alliance --------------------
+    // ==================== Methods (Ctrl + K, Ctrl + 8 to fold regions) =======
+    // #region: --------------- Alliance ---------------------------------------
     /**
      * @return The assigned Alliance or the {@link #getDefaultAllianceForAuto}, if
      *         no alliance is set.
@@ -69,7 +62,9 @@ public abstract class AbstractConstants {
 
     public abstract boolean shouldFlipPathIfAssignedAllianceIsNotDefault();
 
-    // -------------------- Capabilities Flags --------------------
+    // #endregion
+
+    // #region: --------------- Capability Flags -------------------------------
     public abstract boolean hasAimerSubsystem();
 
     public abstract boolean hasClimberSubsystem();
@@ -88,7 +83,9 @@ public abstract class AbstractConstants {
 
     public abstract boolean hasVisionSubsystem();
 
-    // -------------------- Game Objects --------------------
+    // #endregion
+
+    // #region: --------------- Game Objects -----------------------------------
     public Translation2d getSpeakerLocation() {
         if (getAssignedAlliance() == Alliance.Blue) {
             return new Translation2d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42));
@@ -105,11 +102,15 @@ public abstract class AbstractConstants {
         }
     }
 
-    // -------------------- Hardware --------------------
-    // ----- roboRIO -----
+    // #endregion
+
+    // #region: --------------- Hardware ---------------------------------------
+    // #region: ----- roboRIO -----
     public abstract String getRoboRioSerialNumber();
 
-    // ----- Swerve --------
+    // #endregion
+
+    // #region: ----- Swerve --------
     /**
      * The index of the Rotation matches the Index of the Module in Advaltage Scope.
      * <p>
@@ -118,7 +119,9 @@ public abstract class AbstractConstants {
      */
     public abstract Rotation2d[] getSwerveModuleEncoderOffsets();
 
-    // ----- Traverser -----
+    // #endregion
+
+    // #region: ----- Traverser -----
     public abstract double getTraverserFowardVoltage();
 
     public abstract double getTraverserReverseVoltage();
@@ -127,7 +130,18 @@ public abstract class AbstractConstants {
 
     public abstract boolean isTraverserInverted();
 
-    // -------------------- Physical Measurements --------------------
+    // #endregion
+
+    // #region: --------------- Operation Modes --------------------------------
+    public OperatingMode getCurrentOperatingMode() {
+        return OperatingMode.REAL_WORLD;
+    }
+
+    public abstract boolean isDrivingModeFieldRelative();
+
+    // #endregion
+
+    // #region: --------------- Physical Measurements --------------------------
     /**
      * @return The distance between the middle of the front wheel to middle of the
      *         back wheel (X coordinates).
@@ -144,4 +158,6 @@ public abstract class AbstractConstants {
         return Meters.of(Math.hypot(getWheelDistanceFrontToBack().divide(2).in(Meters),
                 getWheelDistanceLeftToRight().divide(2).in(Meters)));
     }
+
+    // #endregion
 }
