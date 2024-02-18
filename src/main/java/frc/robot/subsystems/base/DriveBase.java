@@ -111,7 +111,7 @@ public class DriveBase extends SubsystemBase {
                 () -> kinematics.toChassisSpeeds(getModuleStates()),
                 this::runVelocity,
                 new HolonomicPathFollowerConfig(Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND,
-                        CONSTANTS.getWheelRadius().in(Meters), new ReplanningConfig()),
+                        CONSTANTS.getDriveBaseWheelRadius().in(Meters), new ReplanningConfig()),
                 // Flips path if aliance is on red side.
                 () -> CONSTANTS.getAssignedAlliance() != CONSTANTS.getDefaultAllianceForAuto()
                         && CONSTANTS.shouldFlipPathIfAssignedAllianceIsNotDefault(),

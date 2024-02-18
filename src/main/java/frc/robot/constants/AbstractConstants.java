@@ -142,6 +142,11 @@ public abstract class AbstractConstants {
     // #endregion
 
     // #region: --------------- Physical Measurements --------------------------
+    public Measure<Distance> getDriveBaseWheelRadius() {
+        return Meters.of(Math.hypot(getWheelDistanceFrontToBack().divide(2).in(Meters),
+                getWheelDistanceLeftToRight().divide(2).in(Meters)));
+    }
+
     /**
      * @return The distance between the middle of the front wheel to middle of the
      *         back wheel (X coordinates).
@@ -154,10 +159,6 @@ public abstract class AbstractConstants {
      */
     public abstract Measure<Distance> getWheelDistanceLeftToRight();
 
-    public Measure<Distance> getWheelRadius() {
-        return Meters.of(Math.hypot(getWheelDistanceFrontToBack().divide(2).in(Meters),
-                getWheelDistanceLeftToRight().divide(2).in(Meters)));
-    }
-
+    public abstract Measure<Distance> getWheelRadius();
     // #endregion
 }

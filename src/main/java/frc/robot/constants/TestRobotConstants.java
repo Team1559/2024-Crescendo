@@ -129,5 +129,9 @@ public class TestRobotConstants extends AbstractConstants {
         return Inches.of(24);
     }
 
+    public Measure<Distance> getWheelRadius() {
+        return Inches.of(2);
+    }
+
     // #endregion
 }

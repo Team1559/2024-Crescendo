@@ -7,7 +7,6 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -30,7 +29,6 @@ public final class Constants {
     public static final double ADVANTAGE_DEFAULT_LOG_FREQUENCY = 50.0;
 
     // ---------- Wheel & GHear Measurements ----------
-    public static final double WHEEL_RADIUS = Units.inchesToMeters(2);
     public static final double WHEEL_DRIVE_GEAR_RATIO_L3 = (50.0 / 14.0) * (16.0 /
             28.0) * (45.0 / 15.0); // L3 Gear ratio
     public static final double WHEEL_DRIVE_GEAR_RATIO_L2 = (50.0 / 14.0) * (17.0 /

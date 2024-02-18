@@ -130,5 +130,9 @@ public class GameRobotConstants extends AbstractConstants {
         return Inches.of(24); // TODO: Measure.
     }
 
+    public Measure<Distance> getWheelRadius() {
+        return Inches.of(2);
+    }
+
     // #endregion
 }
