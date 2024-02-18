@@ -139,6 +139,17 @@ public class TestRobotConstants extends AbstractConstants {
 
     // #region: --------------- Physical Measurements --------------------------
     @Override
+    public double getGearRatioOfDriveWheel() {
+        // L2 Gear ratio.
+        return (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
+    }
+
+    @Override
+    public double getGearRatioOfTurnWheel() {
+        return 12.8;
+    }
+
+    @Override
     public Measure<Distance> getWheelDistanceFrontToBack() {
         return Inches.of(24);
     }

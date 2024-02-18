@@ -184,19 +184,19 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         // Inverted driveMotorPosition so that autonomous sees the robot moving in the
         // correct direction.
         inputs.driveMotorPositionRad = Units.rotationsToRadians(-driveMotorPosition.getValueAsDouble())
-                / Constants.WHEEL_DRIVE_GEAR_RATIO_L3;
+                / CONSTANTS.getGearRatioOfDriveWheel();
         inputs.driveMotorVelocityRadPerSec = Units.rotationsToRadians(driveMotorVelocity.getValueAsDouble())
-                / Constants.WHEEL_DRIVE_GEAR_RATIO_L3;
+                / CONSTANTS.getGearRatioOfDriveWheel();
         inputs.driveMotorAppliedVolts = driveMotorAppliedVolts.getValueAsDouble();
         inputs.driveMotorCurrentAmps = driveMotorCurrent.getValueAsDouble();
         inputs.driveMotorFaults = driveMotorFaults.getValue();
         inputs.driveMotorTemp = driveMotorTemp.getValueAsDouble();
 
         inputs.steerMotorPosition = Rotation2d
-                .fromRotations(steerMotorPosition.getValueAsDouble() / Constants.WHEEL_TURN_GEAR_RATIO)
+                .fromRotations(steerMotorPosition.getValueAsDouble() / CONSTANTS.getGearRatioOfTurnWheel())
                 .plus(Rotation2d.fromRadians(0));
         inputs.steerMotorVelocityRadPerSec = Units.rotationsToRadians(steerMotorVelocity.getValueAsDouble())
-                / Constants.WHEEL_TURN_GEAR_RATIO;
+                / CONSTANTS.getGearRatioOfTurnWheel();
         inputs.steerMotorAppliedVolts = steerMotorAppliedVolts.getValueAsDouble();
         inputs.steerMotorCurrentAmps = steerMotorStatorCurrent.getValueAsDouble();
         inputs.steerMotorFaults = steerMotorFaults.getValue();

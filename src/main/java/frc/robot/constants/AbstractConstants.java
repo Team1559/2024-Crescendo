@@ -159,6 +159,10 @@ public abstract class AbstractConstants {
                 getWheelDistanceLeftToRight().divide(2).in(Meters)));
     }
 
+    public abstract double getGearRatioOfDriveWheel();
+
+    public abstract double getGearRatioOfTurnWheel();
+
     /**
      * @return The distance between the middle of the front wheel to middle of the
      *         back wheel (X coordinates).

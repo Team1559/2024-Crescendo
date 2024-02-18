@@ -20,14 +20,6 @@ public final class Constants {
     public static final double ADVANTAGE_ODOMETRY_LOG_FREQUENCY = 100.0;
     public static final double ADVANTAGE_DEFAULT_LOG_FREQUENCY = 50.0;
 
-    // ---------- Wheel & GHear Measurements ----------
-    public static final double WHEEL_DRIVE_GEAR_RATIO_L3 = (50.0 / 14.0) * (16.0 /
-            28.0) * (45.0 / 15.0); // L3 Gear ratio
-    public static final double WHEEL_DRIVE_GEAR_RATIO_L2 = (50.0 / 14.0) * (17.0 /
-            27.0) * (45.0 / 15.0); // L2 Gear ratio
-    // public static final double WHEEL_DRIVE_GEAR_RATIO = 6.12; // L3 Gear ratio
-    public static final double WHEEL_TURN_GEAR_RATIO = 12.8;
-
     // ---------- Game Piece Handling -------
     public static final double INTAKE_FORWARD_VOLTAGE = 6.0;
     public static final double INTAKE_REVERSE_VOLTAGE = -6.0;
