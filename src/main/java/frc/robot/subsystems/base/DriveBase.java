@@ -1,5 +1,6 @@
 package frc.robot.subsystems.base;
 
+import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.constants.AbstractConstants.CONSTANTS;
 
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -57,10 +58,14 @@ public class DriveBase extends SubsystemBase {
     /** Returns an array of module translations. */
     public static Translation2d[] getModuleTranslations() {
         return new Translation2d[] {
-                new Translation2d(Constants.TRACK_WIDTH_X / 2.0, Constants.TRACK_WIDTH_Y / 2.0),
-                new Translation2d(Constants.TRACK_WIDTH_X / 2.0, -Constants.TRACK_WIDTH_Y / 2.0),
-                new Translation2d(-Constants.TRACK_WIDTH_X / 2.0, Constants.TRACK_WIDTH_Y / 2.0),
-                new Translation2d(-Constants.TRACK_WIDTH_X / 2.0, -Constants.TRACK_WIDTH_Y / 2.0)
+                new Translation2d(CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
+                        CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0),
+                new Translation2d(CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
+                        -CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0),
+                new Translation2d(-CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
+                        CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0),
+                new Translation2d(-CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
+                        -CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0)
         };
     }
 
@@ -106,8 +111,7 @@ public class DriveBase extends SubsystemBase {
                 () -> kinematics.toChassisSpeeds(getModuleStates()),
                 this::runVelocity,
                 new HolonomicPathFollowerConfig(Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND,
-                        Constants.DRIVE_BASE_RADIUS,
-                        new ReplanningConfig()),
+                        CONSTANTS.getWheelRadius().in(Meters), new ReplanningConfig()),
                 // Flips path if aliance is on red side.
                 () -> CONSTANTS.getAssignedAlliance() != CONSTANTS.getDefaultAllianceForAuto()
                         && CONSTANTS.shouldFlipPathIfAssignedAllianceIsNotDefault(),

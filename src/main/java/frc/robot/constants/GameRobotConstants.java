@@ -1,22 +1,26 @@
 package frc.robot.constants;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 
 public class GameRobotConstants extends AbstractConstants {
 
     // ========================= CONSTANTS ======================================
-    // ---------- Operation Modes ----------
+    // -------------------- Operation Modes --------------------
     @Override
     public boolean isDrivingModeFieldRelative() {
         return true;
     }
 
-    // ---------- Alliance ----------
+    // -------------------- Alliance --------------------
     public boolean shouldFlipPathIfAssignedAllianceIsNotDefault() {
         return true;
     }
 
-    // ---------- Capabilities Flags --------
+    // -------------------- Capabilities Flags --------------------
     @Override
     public boolean hasAimerSubsystem() {
         return true;
@@ -63,14 +67,14 @@ public class GameRobotConstants extends AbstractConstants {
         return false;
     }
 
-    // ---------- Hardware ----------
-    // --- roboRIO ---
+    // -------------------- Hardware --------------------
+    // -------- roboRIO --------
     @Override
     public String getRoboRioSerialNumber() {
         return ""; // TODO.
     }
 
-    // --- Swerve ---
+    // -------- Swerve --------
     @Override
     public Rotation2d[] getSwerveModuleEncoderOffsets() {
         return new Rotation2d[] {
@@ -81,7 +85,7 @@ public class GameRobotConstants extends AbstractConstants {
         };
     }
 
-    // --- Traverser ---
+    // -------- Traverser --------
     @Override
     public double getTraverserFowardVoltage() {
         return 6.0;
@@ -103,4 +107,14 @@ public class GameRobotConstants extends AbstractConstants {
         return true;
     }
 
+    // -------------------- Physical Measurements --------------------
+    @Override
+    public Measure<Distance> getWheelDistanceFrontToBack() {
+        return Inches.of(24); // TODO: Measure.
+    }
+
+    @Override
+    public Measure<Distance> getWheelDistanceLeftToRight() {
+        return Inches.of(24); // TODO: Measure.
+    }
 }

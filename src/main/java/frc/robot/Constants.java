@@ -1,5 +1,8 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Meters;
+import static frc.robot.constants.AbstractConstants.CONSTANTS;
+
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -18,19 +21,11 @@ import edu.wpi.first.math.util.Units;
 public final class Constants {
 
     // ========================= CONSTANTS ======================================
-    // ---------- Robot Measurements ----------
-    // Middle of front wheel to middle of back wheel.
-    public static final double TRACK_WIDTH_X = Units.inchesToMeters(24.0);
-    // Middle of left wheel to middle of right wheel.
-    public static final double TRACK_WIDTH_Y = Units.inchesToMeters(24.0);
-    public static final double DRIVE_BASE_RADIUS = Math.hypot(Constants.TRACK_WIDTH_X / 2.0,
-            Constants.TRACK_WIDTH_Y / 2.0);
-
     // ---------- Driving Config ----------
     public static final double JOYSTICK_DEADBAND = 0.2;
     public static final double MAX_LINEAR_SPEED_IN_METERS_PER_SECOND = 3.0;
     public static final double MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS = Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND
-            / DRIVE_BASE_RADIUS;
+            / CONSTANTS.getWheelRadius().in(Meters);
     public static final double ADVANTAGE_ODOMETRY_LOG_FREQUENCY = 100.0;
     public static final double ADVANTAGE_DEFAULT_LOG_FREQUENCY = 50.0;
 

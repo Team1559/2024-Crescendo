@@ -1,10 +1,14 @@
 package frc.robot.constants;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import java.util.Objects;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
@@ -47,7 +51,7 @@ public abstract class AbstractConstants {
 
     public abstract boolean isDrivingModeFieldRelative();
 
-    // ---------- Alliance ----------
+    // -------------------- Alliance --------------------
     /**
      * @return The assigned Alliance or the {@link #getDefaultAllianceForAuto}, if
      *         no alliance is set.
@@ -65,7 +69,7 @@ public abstract class AbstractConstants {
 
     public abstract boolean shouldFlipPathIfAssignedAllianceIsNotDefault();
 
-    // ---------- Capabilities Flags --------
+    // -------------------- Capabilities Flags --------------------
     public abstract boolean hasAimerSubsystem();
 
     public abstract boolean hasClimberSubsystem();
@@ -84,7 +88,7 @@ public abstract class AbstractConstants {
 
     public abstract boolean hasVisionSubsystem();
 
-    // ---------- Game Objects ----------
+    // -------------------- Game Objects --------------------
     public Translation2d getSpeakerLocation() {
         if (getAssignedAlliance() == Alliance.Blue) {
             return new Translation2d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42));
@@ -101,11 +105,11 @@ public abstract class AbstractConstants {
         }
     }
 
-    // ---------- Hardware ----------
-    // --- roboRIO ---
+    // -------------------- Hardware --------------------
+    // ----- roboRIO -----
     public abstract String getRoboRioSerialNumber();
 
-    // --- Swerve ---
+    // ----- Swerve --------
     /**
      * The index of the Rotation matches the Index of the Module in Advaltage Scope.
      * <p>
@@ -114,7 +118,7 @@ public abstract class AbstractConstants {
      */
     public abstract Rotation2d[] getSwerveModuleEncoderOffsets();
 
-    // --- Traverser ---
+    // ----- Traverser -----
     public abstract double getTraverserFowardVoltage();
 
     public abstract double getTraverserReverseVoltage();
@@ -122,4 +126,22 @@ public abstract class AbstractConstants {
     public abstract int getTraverserMotorId();
 
     public abstract boolean isTraverserInverted();
+
+    // -------------------- Physical Measurements --------------------
+    /**
+     * @return The distance between the middle of the front wheel to middle of the
+     *         back wheel (X coordinates).
+     */
+    public abstract Measure<Distance> getWheelDistanceFrontToBack();
+
+    /**
+     * @return The distance between the middle of the left wheel to middle of the
+     *         right wheel (y coordinates).
+     */
+    public abstract Measure<Distance> getWheelDistanceLeftToRight();
+
+    public Measure<Distance> getWheelRadius() {
+        return Meters.of(Math.hypot(getWheelDistanceFrontToBack().divide(2).in(Meters),
+                getWheelDistanceLeftToRight().divide(2).in(Meters)));
+    }
 }

@@ -1,22 +1,26 @@
 package frc.robot.constants;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 
 public class TestRobotConstants extends AbstractConstants {
 
     // ========================= CONSTANTS ======================================
-    // ---------- Operation Modes ----------
+    // -------------------- Operation Modes --------------------
     @Override
     public boolean isDrivingModeFieldRelative() {
         return false;
     }
 
-    // ---------- Alliance ----------
+    // -------------------- Alliance --------------------
     public boolean shouldFlipPathIfAssignedAllianceIsNotDefault() {
         return true;
     }
 
-    // ---------- Capabilities Flags --------
+    // -------------------- Capabilities Flags --------------------
     @Override
     public boolean hasAimerSubsystem() {
         return false;
@@ -63,14 +67,14 @@ public class TestRobotConstants extends AbstractConstants {
         return true;
     }
 
-    // ---------- Hardware ----------
-    // --- roboRIO ---
+    // -------------------- Hardware --------------------
+    // ----- roboRIO -----
     @Override
     public String getRoboRioSerialNumber() {
         return "03282BB6";
     }
 
-    // --- Swerve ---
+    // ----- Swerve -----
     @Override
     public Rotation2d[] getSwerveModuleEncoderOffsets() {
         return new Rotation2d[] {
@@ -81,7 +85,7 @@ public class TestRobotConstants extends AbstractConstants {
         };
     }
 
-    // --- Traverser ---
+    // ----- Traverser -----
     @Override
     public double getTraverserFowardVoltage() {
         throw new UnsupportedOperationException("Unimplemented method 'getTraverserFowardVoltage'");
@@ -102,4 +106,14 @@ public class TestRobotConstants extends AbstractConstants {
         throw new UnsupportedOperationException("Unimplemented method 'isTraverserInverted'");
     }
 
+    // -------------------- Physical Measurements --------------------
+    @Override
+    public Measure<Distance> getWheelDistanceFrontToBack() {
+        return Inches.of(24);
+    }
+
+    @Override
+    public Measure<Distance> getWheelDistanceLeftToRight() {
+        return Inches.of(24);
+    }
 }
