@@ -85,6 +85,19 @@ public class GameRobotConstants extends AbstractConstants {
     // #endregion
 
     // #region: --------------- Hardware ---------------------------------------
+    // #region: ----- Aimer -----
+    @Override
+    public int getAimerMotorIdLeft() {
+        return 23;
+    }
+
+    @Override
+    public int getAimerMotorIdRight() {
+        return 22;
+    }
+
+    // #endregion
+
     // #region: -------- roboRIO --------
     @Override
     public String getRoboRioSerialNumber() {

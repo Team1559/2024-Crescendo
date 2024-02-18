@@ -36,9 +36,6 @@ public final class Constants {
     public static final double AIMER_UPPER_ANGLE = 45;
 
     // ---------- Hardware Config ----------
-    // --- Aimer ---
-    public static final int AIMER_LEFT_MOTOR_ID = 23;
-    public static final int AIMER_RIGHT_MOTOR_ID = 22;
     // --- Camera ---
     public static final String SHOOTER_CAMERA_NAME = "limelight";
     // --- Canivore ---

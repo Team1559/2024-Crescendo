@@ -2,6 +2,8 @@
 //Actual anlge 55 deg. correspods to reading 103 deg.
 package frc.robot.subsystems.shooter;
 
+import static frc.robot.constants.AbstractConstants.CONSTANTS;
+
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -33,8 +35,8 @@ public class Aimer extends SubsystemBase {
         public Rotation2d targetAngle;
     }
 
-    private final CANSparkMax motorL = new CANSparkMax(Constants.AIMER_LEFT_MOTOR_ID, MotorType.kBrushless);
-    private final CANSparkMax motorR = new CANSparkMax(Constants.AIMER_RIGHT_MOTOR_ID, MotorType.kBrushless);
+    private final CANSparkMax motorL = new CANSparkMax(CONSTANTS.getAimerMotorIdLeft(), MotorType.kBrushless);
+    private final CANSparkMax motorR = new CANSparkMax(CONSTANTS.getAimerMotorIdRight(), MotorType.kBrushless);
     private final DutyCycleEncoder encoder = new DutyCycleEncoder(Constants.AIMER_ENCODER_PORT);
     private final PIDController controller = new PIDController(Constants.AIMER_KP, Constants.AIMER_KI,
             Constants.AIMER_KD);

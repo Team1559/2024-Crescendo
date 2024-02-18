@@ -117,6 +117,13 @@ public abstract class AbstractConstants {
     // #endregion
 
     // #region: --------------- Hardware ---------------------------------------
+    // #region: ----- Aimer -----
+    public abstract int getAimerMotorIdLeft();
+
+    public abstract int getAimerMotorIdRight();
+
+    // #endregion
+
     // #region: ----- roboRIO -----
     public abstract String getRoboRioSerialNumber();
 

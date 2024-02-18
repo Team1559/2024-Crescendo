@@ -85,6 +85,19 @@ public class TestRobotConstants extends AbstractConstants {
     // #endregion
 
     // #region: --------------- Hardware ---------------------------------------
+    // #region: ----- Aimer -----
+    @Override
+    public int getAimerMotorIdLeft() {
+        throw new UnsupportedOperationException("Unimplemented method 'getAimerMotorIdLeft'");
+    }
+
+    @Override
+    public int getAimerMotorIdRight() {
+        throw new UnsupportedOperationException("Unimplemented method 'getAimerMotorIdRight'");
+    }
+
+    // #endregion
+
     // #region: ----- roboRIO -----
     @Override
     public String getRoboRioSerialNumber() {
