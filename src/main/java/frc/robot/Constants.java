@@ -1,8 +1,5 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Meters;
-import static frc.robot.constants.AbstractConstants.CONSTANTS;
-
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -20,11 +17,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public final class Constants {
 
     // ========================= CONSTANTS ======================================
-    // ---------- Driving Config ----------
-    public static final double JOYSTICK_DEADBAND = 0.2;
-    public static final double MAX_LINEAR_SPEED_IN_METERS_PER_SECOND = 3.0;
-    public static final double MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS = Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND
-            / CONSTANTS.getWheelRadius().in(Meters);
     public static final double ADVANTAGE_ODOMETRY_LOG_FREQUENCY = 100.0;
     public static final double ADVANTAGE_DEFAULT_LOG_FREQUENCY = 50.0;
 

@@ -40,7 +40,7 @@ public class ShooterCommands {
     }
 
     public static Command defaultFlywheelCommand(Flywheel flywheel) {
-        return new SequentialCommandGroup(new WaitCommand(.5), flywheel.stopCommand());
+        return new SequentialCommandGroup(new WaitCommand(2), flywheel.stopCommand());
     }
     // ========================= Other Commands =========================
 

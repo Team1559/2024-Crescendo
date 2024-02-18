@@ -1,6 +1,7 @@
 package frc.robot.subsystems.base;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static frc.robot.constants.AbstractConstants.CONSTANTS;
 
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -25,7 +26,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.subsystems.gyro.GyroIo;
 import frc.robot.subsystems.gyro.GyroIoInputsAutoLogged;
 import frc.robot.subsystems.swerve_module.IndexedSwerveModule;
@@ -110,7 +110,7 @@ public class DriveBase extends SubsystemBase {
                 this::setPose,
                 () -> kinematics.toChassisSpeeds(getModuleStates()),
                 this::runVelocity,
-                new HolonomicPathFollowerConfig(Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND,
+                new HolonomicPathFollowerConfig(CONSTANTS.getMaxLinearSpeed().in(MetersPerSecond),
                         CONSTANTS.getDriveBaseWheelRadius().in(Meters), new ReplanningConfig()),
                 // Flips path if aliance is on red side.
                 () -> CONSTANTS.getAssignedAlliance() != CONSTANTS.getDefaultAllianceForAuto()
@@ -183,7 +183,7 @@ public class DriveBase extends SubsystemBase {
         // Calculate module setpoints
         ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
         SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
-        SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND);
+        SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, CONSTANTS.getMaxLinearSpeed());
 
         // Send setpoints to modules
         SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];

@@ -175,7 +175,7 @@ public class RobotContainer {
         }
         leds.setDefaultCommand(LedCommands.defaultLedCommand(leds));
         if (CONSTANTS.hasFlywheelSubsystem()) {
-            flywheel.setDefaultCommand(ShooterCommands.defaultFlywheelCommand(flywheel)); // @formatter:off I finished this code before Xander and Brenan finished talking about if this is the right way to do it. @formatter:on
+            flywheel.setDefaultCommand(ShooterCommands.defaultFlywheelCommand(flywheel));
         }
 
         // ---------- Configure Command Triggers ----------

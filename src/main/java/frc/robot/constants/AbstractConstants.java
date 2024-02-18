@@ -7,8 +7,10 @@ import java.util.Objects;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
@@ -83,6 +85,16 @@ public abstract class AbstractConstants {
 
     public abstract boolean hasVisionSubsystem();
 
+    // #endregion
+
+    // #region: --------------- Driving Configurations -------------------------
+    public double getJoystickDeadband() {
+        return 0.2;
+    }
+
+    public abstract Measure<Velocity<Angle>> getMaxAngularSpeed();
+
+    public abstract Measure<Velocity<Distance>> getMaxLinearSpeed();
     // #endregion
 
     // #region: --------------- Game Objects -----------------------------------
