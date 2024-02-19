@@ -2,8 +2,6 @@ package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Meters;
 
-import java.util.Objects;
-
 import org.opencv.core.Mat.Tuple2;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -17,7 +15,6 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.DriverStation.MatchType;
 
 public abstract class AbstractConstants {
 
@@ -64,10 +61,7 @@ public abstract class AbstractConstants {
 
         return FORCE_GAME_ROBOT_CONSTANTS
                 || roboRioSerialNumber.equalsIgnoreCase(GAME_ROBOT_CONSTANTS.getRoboRioSerialNumber())
-                || !roboRioSerialNumber.equalsIgnoreCase(TEST_ROBOT_CONSTANTS.getRoboRioSerialNumber())
-                || DriverStation.getMatchType() != MatchType.None
-                || DriverStation.getMatchNumber() != 0
-                || !Objects.equals(DriverStation.getEventName(), "");
+                || !roboRioSerialNumber.equalsIgnoreCase(TEST_ROBOT_CONSTANTS.getRoboRioSerialNumber());
     }
 
     // ==================== Methods (Ctrl + K, Ctrl + 8 to fold regions) =======
