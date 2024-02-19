@@ -159,11 +159,11 @@ public class Flywheel extends SubsystemBase {
      * Start the Flywheels with default volage
      */
     public void start() {
-        start(Constants.FLYWHEEL_FOWARDS_VOLTAGE);
+        start(CONSTANTS.getFlywheelForwardVoltage());
     }
 
     public void startOneMotor(boolean runRightWheel) {
-        start(Constants.FLYWHEEL_FOWARDS_VOLTAGE);
+        start();
         runOneWheelFlag = runRightWheel;
     }
 
@@ -180,7 +180,7 @@ public class Flywheel extends SubsystemBase {
      * Reverse the Flywheels
      */
     public void reverse() {
-        start(Constants.FLYWHEEL_REVERSE_VOLTAGE);
+        start(CONSTANTS.getFlywheelReverseVoltage());
     }
 
     // ========================= Commands =========================

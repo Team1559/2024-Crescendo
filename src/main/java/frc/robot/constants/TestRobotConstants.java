@@ -140,6 +140,16 @@ public class TestRobotConstants extends AbstractConstants {
         throw new UnsupportedOperationException("Unimplemented method 'isFeederMortorInverted'");
     }
 
+    @Override
+    public double getFeederForwardVoltage() {
+        throw new UnsupportedOperationException("Unimplemented method 'getFeederForwardVoltage'");
+    }
+
+    @Override
+    public double getFeederReverseVoltage() {
+        throw new UnsupportedOperationException("Unimplemented method 'getFeederReverseVoltage'");
+    }
+
     // #endregion
 
     // #region: ----- Flywheel -----
@@ -154,6 +164,16 @@ public class TestRobotConstants extends AbstractConstants {
         throw new UnsupportedOperationException("Unimplemented method 'getFlywheelMotorIdRight'");
     }
 
+    @Override
+    public double getFlywheelForwardVoltage() {
+        throw new UnsupportedOperationException("Unimplemented method 'getFlywheelForwardVoltage'");
+    }
+
+    @Override
+    public double getFlywheelReverseVoltage() {
+        throw new UnsupportedOperationException("Unimplemented method 'getFlywheelReverseVoltage'");
+    }
+
     // #endregion
 
     // #region: ----- Intake -----
@@ -166,6 +186,16 @@ public class TestRobotConstants extends AbstractConstants {
     @Override
     public boolean isIntakeMortorInverted() {
         throw new UnsupportedOperationException("Unimplemented method 'isIntakeMortorInverted'");
+    }
+
+    @Override
+    public double getIntakeForwardVoltage() {
+        throw new UnsupportedOperationException("Unimplemented method 'getIntakeForwardVoltage'");
+    }
+
+    @Override
+    public double getIntakeReverseVoltage() {
+        throw new UnsupportedOperationException("Unimplemented method 'getIntakeReverseVoltage'");
     }
 
     // #endregion

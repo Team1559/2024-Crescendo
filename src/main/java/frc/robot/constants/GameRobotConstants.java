@@ -139,6 +139,18 @@ public class GameRobotConstants extends AbstractConstants {
         return true;
     }
 
+    @Override
+    public double getFeederForwardVoltage() {
+        // TODO: Configure Value.
+        return 6;
+    }
+
+    @Override
+    public double getFeederReverseVoltage() {
+        // TODO: Configure Value.
+        return -getFeederForwardVoltage();
+    }
+
     // #endregion
 
     // #region: ----- Flywheel -----
@@ -152,6 +164,18 @@ public class GameRobotConstants extends AbstractConstants {
         return 25;
     }
 
+    @Override
+    public double getFlywheelForwardVoltage() {
+        // TODO: Configure Value.
+        return 9;
+    }
+
+    @Override
+    public double getFlywheelReverseVoltage() {
+        // TODO: Configure Value.
+        return -6;
+    }
+
     // #endregion
 
     // #region: ----- Intake -----
@@ -163,6 +187,18 @@ public class GameRobotConstants extends AbstractConstants {
     @Override
     public boolean isIntakeMortorInverted() {
         return true;
+    }
+
+    @Override
+    public double getIntakeForwardVoltage() {
+        // TODO: Configure Value.
+        return 6;
+    }
+
+    @Override
+    public double getIntakeReverseVoltage() {
+        // TODO: Configure Value.
+        return -getFeederForwardVoltage();
     }
 
     // #endregion

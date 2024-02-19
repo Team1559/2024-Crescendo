@@ -172,12 +172,20 @@ public abstract class AbstractConstants {
 
     public abstract boolean isFeederMortorInverted();
 
+    public abstract double getFeederForwardVoltage();
+
+    public abstract double getFeederReverseVoltage();
+
     // #endregion
 
     // #region: ----- Flywheel -----
     public abstract int getFlywheelMotorIdLeft();
 
     public abstract int getFlywheelMotorIdRight();
+
+    public abstract double getFlywheelForwardVoltage();
+
+    public abstract double getFlywheelReverseVoltage();
 
     // #endregion
 
@@ -192,6 +200,10 @@ public abstract class AbstractConstants {
     public abstract int getIntakeMotorId();
 
     public abstract boolean isIntakeMortorInverted();
+
+    public abstract double getIntakeForwardVoltage();
+
+    public abstract double getIntakeReverseVoltage();
 
     // #endregion
 
