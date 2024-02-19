@@ -99,21 +99,6 @@ public class TestRobotConstants extends AbstractConstants {
     }
 
     @Override
-    public int getAimerEncoderPort() {
-        throw new UnsupportedOperationException("Unimplemented method 'getAimerEncoderPort'");
-    }
-
-    @Override
-    public int getAimerMotorIdLeft() {
-        throw new UnsupportedOperationException("Unimplemented method 'getAimerMotorIdLeft'");
-    }
-
-    @Override
-    public int getAimerMotorIdRight() {
-        throw new UnsupportedOperationException("Unimplemented method 'getAimerMotorIdRight'");
-    }
-
-    @Override
     public PID getAimerPid() {
         throw new UnsupportedOperationException("Unimplemented method 'getAimerPid'");
     }
@@ -144,11 +129,6 @@ public class TestRobotConstants extends AbstractConstants {
     // #region: ----- Feeder -----
 
     @Override
-    public int getFeederMotorId() {
-        throw new UnsupportedOperationException("Unimplemented method 'getFeederMotorId'");
-    }
-
-    @Override
     public boolean isFeederMortorInverted() {
         throw new UnsupportedOperationException("Unimplemented method 'isFeederMortorInverted'");
     }
@@ -168,16 +148,6 @@ public class TestRobotConstants extends AbstractConstants {
     // #region: ----- Flywheel -----
 
     @Override
-    public int getFlywheelMotorIdLeft() {
-        throw new UnsupportedOperationException("Unimplemented method 'getFlywheelMotorIdLeft'");
-    }
-
-    @Override
-    public int getFlywheelMotorIdRight() {
-        throw new UnsupportedOperationException("Unimplemented method 'getFlywheelMotorIdRight'");
-    }
-
-    @Override
     public double getFlywheelForwardVoltage() {
         throw new UnsupportedOperationException("Unimplemented method 'getFlywheelForwardVoltage'");
     }
@@ -190,11 +160,6 @@ public class TestRobotConstants extends AbstractConstants {
     // #endregion
 
     // #region: ----- Intake -----
-
-    @Override
-    public int getIntakeMotorId() {
-        throw new UnsupportedOperationException("Unimplemented method 'getIntakeMotorId'");
-    }
 
     @Override
     public boolean isIntakeMortorInverted() {
@@ -251,11 +216,6 @@ public class TestRobotConstants extends AbstractConstants {
     @Override
     public double getTraverserReverseVoltage() {
         throw new UnsupportedOperationException("Unimplemented method 'getTraverserReverseVoltage'");
-    }
-
-    @Override
-    public int getTraverserMotorId() {
-        throw new UnsupportedOperationException("Unimplemented method 'getTraverserMotorId'");
     }
 
     @Override
