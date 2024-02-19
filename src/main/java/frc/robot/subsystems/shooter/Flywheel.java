@@ -1,5 +1,7 @@
 package frc.robot.subsystems.shooter;
 
+import static frc.robot.constants.AbstractConstants.CONSTANTS;
+
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -44,8 +46,8 @@ public class Flywheel extends SubsystemBase {
     private final StatusSignal<Double> flywheelLMotorTemp, flywheelRMotorTemp;
     private final StatusSignal<Integer> flywheelLFaults, flywheelRFaults;
 
-    private final TalonFX flywheelMotorL = new TalonFX(Constants.FLYWHEEL_LEFT_MOTOR_ID);
-    private final TalonFX flywheelMotorR = new TalonFX(Constants.FLYWHEEL_RIGHT_MOTOR_ID);
+    private final TalonFX flywheelMotorL = new TalonFX(CONSTANTS.getFlywheelMotorIdLeft());
+    private final TalonFX flywheelMotorR = new TalonFX(CONSTANTS.getFlywheelMotorIdRight());
 
     private final FlywheelInputsAutoLogged inputs = new FlywheelInputsAutoLogged();
 

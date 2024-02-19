@@ -82,7 +82,7 @@ public class RobotContainer {
             case REAL_WORLD:
                 // Real robot, instantiate hardware IO implementations
                 driveBase = new DriveBase(
-                        new GyroIoPigeon2(),
+                        new GyroIoPigeon2(CONSTANTS.getGyroId(), CONSTANTS.getCanivoreBusId()),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_LEFT),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_RIGHT),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_LEFT),
@@ -216,7 +216,7 @@ public class RobotContainer {
         // #endregion
 
         // #region: ==================== Tele-Op ===============================
-        // ---------- Configure Controller 1 for Driver ----------
+        // #region: ---------- Configure Controller 1 for Driver ----------
         Command teleOpShootCommand;
         Command reverseShooterCommand;
         Command stopIntakeFeederCommand;
@@ -238,10 +238,14 @@ public class RobotContainer {
                 .whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel,
                         () -> -controller1.getLeftY(), () -> -controller1.getLeftX(), CONSTANTS::getAmpLocation));
 
-        // ---------- Configure Controller 2 for Co-Pilot ----------
+        // #endregion
+
+        // #region: ---------- Configure Controller 2 for Co-Pilot ----------
         // TODO.
 
-        // ---------- Configure Controller 3 for Technician ----------
+        // #endregion
+
+        // #region: ---------- Configure Controller 3 for Technician ----------
         // ----- Swirve Drive Commands -----
         controller3.povUp().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(1, 0, 0)));
         controller3.povDown().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(-1, 0, 0)));

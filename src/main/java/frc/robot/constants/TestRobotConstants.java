@@ -114,6 +114,22 @@ public class TestRobotConstants extends AbstractConstants {
 
     // #endregion
 
+    // #region: ----- Flywheel -----
+
+    @Override
+    public int getFlywheelMotorIdLeft() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getFlywheelMotorIdLeft'");
+    }
+
+    @Override
+    public int getFlywheelMotorIdRight() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getFlywheelMotorIdRight'");
+    }
+
+    // #endregion
+
     // #region: ----- roboRIO -----
     @Override
     public String getRoboRioSerialNumber() {
@@ -155,8 +171,6 @@ public class TestRobotConstants extends AbstractConstants {
     public boolean isTraverserInverted() {
         throw new UnsupportedOperationException("Unimplemented method 'isTraverserInverted'");
     }
-
-    // #endregion
 
     // #endregion
 

@@ -132,9 +132,23 @@ public abstract class AbstractConstants {
     // #endregion
 
     // #region: ----- Feeder -----
-    public abstract int getFeederMotorId(); // 21;
+    public abstract int getFeederMotorId();
 
-    public abstract boolean isFeederMortorInverted(); // true;
+    public abstract boolean isFeederMortorInverted();
+
+    // #endregion
+
+    // #region: ----- Flywheel -----
+    public abstract int getFlywheelMotorIdLeft();
+
+    public abstract int getFlywheelMotorIdRight();
+
+    // #endregion
+
+    // #region: ----- Gyro -----
+    public int getGyroId() {
+        return 12;
+    }
 
     // #endregion
 

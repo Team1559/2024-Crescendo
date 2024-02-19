@@ -111,6 +111,19 @@ public class GameRobotConstants extends AbstractConstants {
 
     // #endregion
 
+    // #region: ----- Flywheel -----
+    @Override
+    public int getFlywheelMotorIdLeft() {
+        return 24;
+    }
+
+    @Override
+    public int getFlywheelMotorIdRight() {
+        return 25;
+    }
+
+    // #endregion
+
     // #region: -------- roboRIO --------
     @Override
     public String getRoboRioSerialNumber() {

@@ -36,11 +36,6 @@ public final class Constants {
     public static final double AIMER_UPPER_ANGLE = 45;
 
     // ---------- Hardware Config ----------
-    // --- Flywheel ----
-    public static final int FLYWHEEL_LEFT_MOTOR_ID = 24;
-    public static final int FLYWHEEL_RIGHT_MOTOR_ID = 25;
-    // --- Gyro ---
-    public static final int BASE_GYRO_ID = 12;
     // --- Intake ---
     public static final int INTAKE_MOTOR_ID = 20;
     public static final boolean IS_INTAKE_INVERTED = true;
