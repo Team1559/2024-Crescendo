@@ -90,13 +90,11 @@ public class TestRobotConstants extends AbstractConstants {
     // #region: ----- Aimer -----
     @Override
     public Tuple2<Rotation2d> getAimerAngleRange() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getAimerAngleRange'");
     }
 
     @Override
     public Rotation2d getAimerEncoderOffset() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getAimerEncoderOffset'");
     }
 
@@ -117,8 +115,15 @@ public class TestRobotConstants extends AbstractConstants {
 
     @Override
     public PID getAimerPid() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getAimerPid'");
+    }
+
+    // #endregion
+
+    // #region: ----- Color Sensor -----
+    @Override
+    public int getColorSensorProximityThreshold() {
+        throw new UnsupportedOperationException("Unimplemented method 'getColorSensorProximityThreshold'");
     }
 
     // #endregion
@@ -127,13 +132,11 @@ public class TestRobotConstants extends AbstractConstants {
 
     @Override
     public int getFeederMotorId() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getFeederMotorId'");
     }
 
     @Override
     public boolean isFeederMortorInverted() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'isFeederMortorInverted'");
     }
 
@@ -143,13 +146,11 @@ public class TestRobotConstants extends AbstractConstants {
 
     @Override
     public int getFlywheelMotorIdLeft() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getFlywheelMotorIdLeft'");
     }
 
     @Override
     public int getFlywheelMotorIdRight() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getFlywheelMotorIdRight'");
     }
 
@@ -159,14 +160,20 @@ public class TestRobotConstants extends AbstractConstants {
 
     @Override
     public int getIntakeMotorId() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getIntakeMotorId'");
     }
 
     @Override
     public boolean isIntakeMortorInverted() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'isIntakeMortorInverted'");
+    }
+
+    // #endregion
+
+    // #region: ----- LEDs -----
+    @Override
+    public int getLedLenth() {
+        return 144;
     }
 
     // #endregion

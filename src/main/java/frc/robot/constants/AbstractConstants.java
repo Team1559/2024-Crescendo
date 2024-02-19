@@ -152,6 +152,11 @@ public abstract class AbstractConstants {
 
     // #endregion
 
+    // #region: ----- Color Sensor -----
+    public abstract int getColorSensorProximityThreshold(); // 1500; // TODO: Configure Value.
+
+    // #endregion
+
     // #region: ----- Feeder -----
     public abstract int getFeederMotorId();
 
@@ -177,6 +182,15 @@ public abstract class AbstractConstants {
     public abstract int getIntakeMotorId();
 
     public abstract boolean isIntakeMortorInverted();
+
+    // #endregion
+
+    // #region: ----- LEDs -----
+    public int getLedPort() {
+        return 0;
+    }
+
+    public abstract int getLedLenth(); // 144
 
     // #endregion
 

@@ -43,13 +43,6 @@ public final class Constants {
     public static final int BACK_RIGHT_CANCODER_ID = 8;
     public static final NeutralModeValue SWERVE_WHEEL_BRAKE_MODE = NeutralModeValue.Brake;
 
-    // ---------- Adressable LEDs ----------
-    public static final int ADDRESSABLE_LED_PORT = 0;
-    public static final int ADDRESSABLE_LED_LENGTH = 144;
-
-    // ---------- Color Sensor ----------
-    public static final int COLOR_SENSOR_PROXIMITY_THRESHOLD = 1500; // TODO: Configure Value.
-
     // ---------- Power Constants ----------
     public static final int NEO_SPARK_BRUSHLESS_CURRENT_LIMIT = 24;
     public static final int NEO_SPARK_BRUSHLESS_CURRENT_SECONDARY_LIMIT = 80;

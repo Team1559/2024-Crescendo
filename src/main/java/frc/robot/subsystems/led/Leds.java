@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 
 public class Leds extends SubsystemBase {
 
@@ -62,9 +61,9 @@ public class Leds extends SubsystemBase {
      * starts LEDs.
      */
     public Leds() {
-        addressableLED = new AddressableLED(Constants.ADDRESSABLE_LED_PORT);
-        addressableLED.setLength(Constants.ADDRESSABLE_LED_LENGTH);
-        ledBuffer = new AddressableLEDBuffer(Constants.ADDRESSABLE_LED_LENGTH);
+        addressableLED = new AddressableLED(CONSTANTS.getLedPort());
+        addressableLED.setLength(CONSTANTS.getLedLenth());
+        ledBuffer = new AddressableLEDBuffer(CONSTANTS.getLedLenth());
         addressableLED.start();
     }
 

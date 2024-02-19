@@ -113,8 +113,17 @@ public class GameRobotConstants extends AbstractConstants {
         return 22;
     }
 
+    @Override
     public PID getAimerPid() {
         return new PID(0.4, 0, 0);
+    }
+
+    // #endregion
+
+    // #region: ----- Color Sensor -----
+    @Override
+    public int getColorSensorProximityThreshold() {
+        return 1500; // TODO: Configure Value.
     }
 
     // #endregion
@@ -154,6 +163,14 @@ public class GameRobotConstants extends AbstractConstants {
     @Override
     public boolean isIntakeMortorInverted() {
         return true;
+    }
+
+    // #endregion
+
+    // #region: ----- LEDs -----
+    @Override
+    public int getLedLenth() {
+        return 144; // TODO.
     }
 
     // #endregion
