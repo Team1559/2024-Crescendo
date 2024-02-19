@@ -19,8 +19,8 @@ public class SingleMotorIoSparkMax implements SingleMotorIo {
         motor = new CANSparkMax(motorId, MotorType.kBrushless);
         motor.setInverted(inverted);
         motor.setIdleMode(IdleMode.kBrake);
-        motor.setSmartCurrentLimit(CONSTANTS.getNeoBrushlessCurrentLimit());
-        motor.setSecondaryCurrentLimit(CONSTANTS.getNeoBrushlessCurrentSecondaryLimit());
+        motor.setSmartCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentLimit());
+        motor.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
     }
 
     public void updateInputs(SingleMotorIoInputs inputs) {

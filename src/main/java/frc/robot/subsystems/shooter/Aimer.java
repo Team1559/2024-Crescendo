@@ -49,10 +49,10 @@ public class Aimer extends SubsystemBase {
         motorR.setInverted(true);
         motorL.setIdleMode(IdleMode.kBrake);
         motorR.setIdleMode(IdleMode.kBrake);
-        motorL.setSmartCurrentLimit(CONSTANTS.getNeoBrushlessCurrentLimit());
-        motorR.setSmartCurrentLimit(CONSTANTS.getNeoBrushlessCurrentLimit());
-        motorL.setSecondaryCurrentLimit(CONSTANTS.getNeoBrushlessCurrentSecondaryLimit());
-        motorL.setSecondaryCurrentLimit(CONSTANTS.getNeoBrushlessCurrentSecondaryLimit());
+        motorL.setSmartCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentLimit());
+        motorR.setSmartCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentLimit());
+        motorL.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
+        motorL.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
     }
 
     @Override

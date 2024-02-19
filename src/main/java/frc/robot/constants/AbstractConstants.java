@@ -283,19 +283,19 @@ public abstract class AbstractConstants {
 
     // #endregion
 
-    // #region: ----- NEO Brushless Motor -----
+    // #region: ----- NEO 550 Brushless Motor -----
 
     /**
      * @return Value as Amps.
      */
-    public int getNeoBrushlessCurrentLimit() {
+    public int getNeo550BrushlessCurrentLimit() {
         return 24;
     }
 
     /**
      * @return Value as Amps.
      */
-    public int getNeoBrushlessCurrentSecondaryLimit() {
+    public int getNeo550BrushlessCurrentSecondaryLimit() {
         return 80;
     }
 

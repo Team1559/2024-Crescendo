@@ -171,14 +171,19 @@ public class RobotContainer {
                 () -> controller1.getLeftTriggerAxis() > controller1.getRightTriggerAxis()
                         ? controller1.getLeftTriggerAxis()
                         : -controller1.getRightTriggerAxis()));
-        if (CONSTANTS.hasIntakeSubsystem() && CONSTANTS.hasColorSensorSubsystem()) {
-            // intake.setDefaultCommand(ShooterCommands.defaultIntakeCommand(intake,
-            // colorSensor));
-        }
-        if (CONSTANTS.hasFeederSubsystem() && CONSTANTS.hasColorSensorSubsystem()) {
-            // intake.setDefaultCommand(ShooterCommands.defaultFeederCommand(feeder,
-            // colorSensor));
-        }
+        /*
+         * TODO: Need to decvide if the Intake and Feeder Motors run by default.
+         * See: https://www.revrobotics.com/neo-550-brushless-motor-locked-rotor-testing
+         * 
+         * if (CONSTANTS.hasIntakeSubsystem() && CONSTANTS.hasColorSensorSubsystem()) {
+         * intake.setDefaultCommand(ShooterCommands.defaultIntakeCommand(intake,
+         * colorSensor));
+         * }
+         * if (CONSTANTS.hasFeederSubsystem() && CONSTANTS.hasColorSensorSubsystem()) {
+         * intake.setDefaultCommand(ShooterCommands.defaultFeederCommand(feeder,
+         * colorSensor));
+         * }
+         */
         leds.setDefaultCommand(LedCommands.defaultLedCommand(leds));
         if (CONSTANTS.hasFlywheelSubsystem()) {
             flywheel.setDefaultCommand(ShooterCommands.defaultFlywheelCommand(flywheel));
