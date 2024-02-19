@@ -301,11 +301,20 @@ public abstract class AbstractConstants {
 
     // #endregion
 
-    // #region: ----- Talon FX Motor Controller -----
+    // #region: --------------- Operation Modes --------------------------------
+    public OperatingMode getCurrentOperatingMode() {
+        return OperatingMode.REAL_WORLD;
+    }
+
+    public abstract boolean isDrivingModeFieldRelative();
+
+    // #endregion
+
+    // #region: --------------- PathPlanner Settings ---------------------------
     /**
      * @return Value in Times per Second.
      */
-    public double getTalonFxStatusSignalUpdateFrequencyDefault() {
+    public double getPathPlannerLogUpdateFrequencyDefault() {
         return 50;
     }
 
@@ -314,18 +323,9 @@ public abstract class AbstractConstants {
      * 
      * @return Value in Times per Second.
      */
-    public double getTalonFxStatusSignalUpdateFrequencyForOdometry() {
+    public double getPathPlannerLogFrequencyForOdometry() {
         return 100;
     }
-
-    // #endregion
-
-    // #region: --------------- Operation Modes --------------------------------
-    public OperatingMode getCurrentOperatingMode() {
-        return OperatingMode.REAL_WORLD;
-    }
-
-    public abstract boolean isDrivingModeFieldRelative();
 
     // #endregion
 

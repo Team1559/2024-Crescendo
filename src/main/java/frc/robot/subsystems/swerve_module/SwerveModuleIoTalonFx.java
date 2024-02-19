@@ -144,9 +144,9 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 
         // Set Update frequency.
         BaseStatusSignal.setUpdateFrequencyForAll( // Required for odometry, use faster rate
-                CONSTANTS.getTalonFxStatusSignalUpdateFrequencyForOdometry(), driveMotorPosition, steerMotorPosition);
+                CONSTANTS.getPathPlannerLogFrequencyForOdometry(), driveMotorPosition, steerMotorPosition);
         BaseStatusSignal.setUpdateFrequencyForAll(
-                CONSTANTS.getTalonFxStatusSignalUpdateFrequencyDefault(),
+                CONSTANTS.getPathPlannerLogUpdateFrequencyDefault(),
                 driveMotorVelocity,
                 driveMotorAppliedVolts,
                 driveMotorCurrent,
