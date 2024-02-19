@@ -36,13 +36,6 @@ public final class Constants {
     public static final double AIMER_UPPER_ANGLE = 45;
 
     // ---------- Hardware Config ----------
-    // --- Camera ---
-    public static final String SHOOTER_CAMERA_NAME = "limelight";
-    // --- Canivore ---
-    public static final String CANIVORE_BUS_ID = "1559Canivore";
-    // --- Feeder ---
-    public static final int FEEDER_MOTOR_ID = 21;
-    public static final boolean IS_FEEDER_INVERTED = true;
     // --- Flywheel ----
     public static final int FLYWHEEL_LEFT_MOTOR_ID = 24;
     public static final int FLYWHEEL_RIGHT_MOTOR_ID = 25;

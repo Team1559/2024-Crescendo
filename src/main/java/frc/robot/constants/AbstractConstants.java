@@ -124,6 +124,20 @@ public abstract class AbstractConstants {
 
     // #endregion
 
+    // #region: ----- Canivore -----
+    public String getCanivoreBusId() {
+        return "1559Canivore";
+    }
+
+    // #endregion
+
+    // #region: ----- Feeder -----
+    public abstract int getFeederMotorId(); // 21;
+
+    public abstract boolean isFeederMortorInverted(); // true;
+
+    // #endregion
+
     // #region: ----- roboRIO -----
     public abstract String getRoboRioSerialNumber();
 
@@ -148,6 +162,11 @@ public abstract class AbstractConstants {
     public abstract int getTraverserMotorId();
 
     public abstract boolean isTraverserInverted();
+
+    // #endregion
+
+    // #region: ----- Vision -----
+    public abstract String getCameraName();
 
     // #endregion
 

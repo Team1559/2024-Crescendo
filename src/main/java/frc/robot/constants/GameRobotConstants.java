@@ -98,6 +98,19 @@ public class GameRobotConstants extends AbstractConstants {
 
     // #endregion
 
+    // #region: ----- Feeder -----
+    @Override
+    public int getFeederMotorId() {
+        return 21;
+    }
+
+    @Override
+    public boolean isFeederMortorInverted() {
+        return true;
+    }
+
+    // #endregion
+
     // #region: -------- roboRIO --------
     @Override
     public String getRoboRioSerialNumber() {
@@ -139,6 +152,16 @@ public class GameRobotConstants extends AbstractConstants {
     @Override
     public boolean isTraverserInverted() {
         return true;
+    }
+
+    // #endregion
+
+    // #region: ----- Vision -----
+
+    @Override
+    public String getCameraName() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getCameraNameBack'");
     }
 
     // #endregion

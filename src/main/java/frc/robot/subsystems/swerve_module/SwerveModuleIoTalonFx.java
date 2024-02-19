@@ -62,24 +62,24 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 
         switch (index) {
             case FRONT_LEFT:
-                driveMotor = new TalonFX(Constants.FRONT_LEFT_DRIVE_MOTOR_ID, Constants.CANIVORE_BUS_ID);
-                steerMotor = new TalonFX(Constants.FRONT_LEFT_STEER_MOTOR_ID, Constants.CANIVORE_BUS_ID);
-                cancoder = new CANcoder(Constants.FRONT_LEFT_CANCODER_ID, Constants.CANIVORE_BUS_ID);
+                driveMotor = new TalonFX(Constants.FRONT_LEFT_DRIVE_MOTOR_ID, CONSTANTS.getCanivoreBusId());
+                steerMotor = new TalonFX(Constants.FRONT_LEFT_STEER_MOTOR_ID, CONSTANTS.getCanivoreBusId());
+                cancoder = new CANcoder(Constants.FRONT_LEFT_CANCODER_ID, CONSTANTS.getCanivoreBusId());
                 break;
             case FRONT_RIGHT:
-                driveMotor = new TalonFX(Constants.FRONT_RIGHT_DRIVE_MOTOR_ID, Constants.CANIVORE_BUS_ID);
-                steerMotor = new TalonFX(Constants.FRONT_RIGHT_STEER_MOTOR_ID, Constants.CANIVORE_BUS_ID);
-                cancoder = new CANcoder(Constants.FRONT_RIGHT_CANCODER_ID, Constants.CANIVORE_BUS_ID);
+                driveMotor = new TalonFX(Constants.FRONT_RIGHT_DRIVE_MOTOR_ID, CONSTANTS.getCanivoreBusId());
+                steerMotor = new TalonFX(Constants.FRONT_RIGHT_STEER_MOTOR_ID, CONSTANTS.getCanivoreBusId());
+                cancoder = new CANcoder(Constants.FRONT_RIGHT_CANCODER_ID, CONSTANTS.getCanivoreBusId());
                 break;
             case BACK_LEFT:
-                driveMotor = new TalonFX(Constants.BACK_LEFT_DRIVE_MOTOR_ID, Constants.CANIVORE_BUS_ID);
-                steerMotor = new TalonFX(Constants.BACK_LEFT_STEER_MOTOR_ID, Constants.CANIVORE_BUS_ID);
-                cancoder = new CANcoder(Constants.BACK_LEFT_CANCODER_ID, Constants.CANIVORE_BUS_ID);
+                driveMotor = new TalonFX(Constants.BACK_LEFT_DRIVE_MOTOR_ID, CONSTANTS.getCanivoreBusId());
+                steerMotor = new TalonFX(Constants.BACK_LEFT_STEER_MOTOR_ID, CONSTANTS.getCanivoreBusId());
+                cancoder = new CANcoder(Constants.BACK_LEFT_CANCODER_ID, CONSTANTS.getCanivoreBusId());
                 break;
             case BACK_RIGHT:
-                driveMotor = new TalonFX(Constants.BACK_RIGHT_DRIVE_MOTOR_ID, Constants.CANIVORE_BUS_ID);
-                steerMotor = new TalonFX(Constants.BACK_RIGHT_STEER_MOTOR_ID, Constants.CANIVORE_BUS_ID);
-                cancoder = new CANcoder(Constants.BACK_RIGHT_CANCODER_ID, Constants.CANIVORE_BUS_ID);
+                driveMotor = new TalonFX(Constants.BACK_RIGHT_DRIVE_MOTOR_ID, CONSTANTS.getCanivoreBusId());
+                steerMotor = new TalonFX(Constants.BACK_RIGHT_STEER_MOTOR_ID, CONSTANTS.getCanivoreBusId());
+                cancoder = new CANcoder(Constants.BACK_RIGHT_CANCODER_ID, CONSTANTS.getCanivoreBusId());
                 break;
             default:
                 throw new RuntimeException("Invalid module index: " + index);

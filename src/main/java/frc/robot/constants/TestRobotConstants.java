@@ -98,6 +98,22 @@ public class TestRobotConstants extends AbstractConstants {
 
     // #endregion
 
+    // #region: ----- Feeder -----
+
+    @Override
+    public int getFeederMotorId() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getFeederMotorId'");
+    }
+
+    @Override
+    public boolean isFeederMortorInverted() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isFeederMortorInverted'");
+    }
+
+    // #endregion
+
     // #region: ----- roboRIO -----
     @Override
     public String getRoboRioSerialNumber() {
@@ -138,6 +154,16 @@ public class TestRobotConstants extends AbstractConstants {
     @Override
     public boolean isTraverserInverted() {
         throw new UnsupportedOperationException("Unimplemented method 'isTraverserInverted'");
+    }
+
+    // #endregion
+
+    // #endregion
+
+    // #region: ----- Vision -----
+    @Override
+    public String getCameraName() {
+        return "limelight";
     }
 
     // #endregion

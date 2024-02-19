@@ -74,7 +74,9 @@ public class RobotContainer {
      */
     public RobotContainer() {
 
-        // ----- Initialize Subsystems with Simulation and/or Log Replay Modes -----
+        // #region: ==================== Initialize Subsystems =================
+
+        // #region: Initialize Subsystems with Simulation and/or Log Replay Mode
         switch (CONSTANTS.getCurrentOperatingMode()) {
 
             case REAL_WORLD:
@@ -86,15 +88,15 @@ public class RobotContainer {
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_LEFT),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
                 feeder = CONSTANTS.hasFeederSubsystem()
-                        ? new Feeder(new SingleMotorIoSparkMax(Constants.FEEDER_MOTOR_ID,
-                                Constants.IS_FEEDER_INVERTED))
+                        ? new Feeder(new SingleMotorIoSparkMax(CONSTANTS.getFeederMotorId(),
+                                CONSTANTS.isFeederMortorInverted()))
                         : null;
                 intake = CONSTANTS.hasIntakeSubsystem()
                         ? new Intake(new SingleMotorIoSparkMax(Constants.INTAKE_MOTOR_ID,
                                 Constants.IS_INTAKE_INVERTED))
                         : null;
                 vision = CONSTANTS.hasVisionSubsystem()
-                        ? new Vision(driveBase.poseEstimator, new VisionIoLimelight(Constants.SHOOTER_CAMERA_NAME))
+                        ? new Vision(driveBase.poseEstimator, new VisionIoLimelight(CONSTANTS.getCameraName()))
                         : null;
                 traverser = CONSTANTS.hasTraverserSubsystem()
                         ? new Traverser(new SingleMotorIoSparkMax(CONSTANTS.getTraverserMotorId(),
@@ -111,8 +113,8 @@ public class RobotContainer {
                         new SwerveModuleIoSim(),
                         new SwerveModuleIoSim());
                 feeder = CONSTANTS.hasFeederSubsystem()
-                        ? new Feeder(new SingleMotorIoSparkMax(Constants.FEEDER_MOTOR_ID,
-                                Constants.IS_FEEDER_INVERTED))
+                        ? new Feeder(new SingleMotorIoSparkMax(CONSTANTS.getFeederMotorId(),
+                                CONSTANTS.isFeederMortorInverted()))
                         : null;
                 intake = CONSTANTS.hasIntakeSubsystem()
                         ? new Intake(new SingleMotorIoSparkMax(Constants.INTAKE_MOTOR_ID,
@@ -149,7 +151,9 @@ public class RobotContainer {
                 throw new RuntimeException("Unknown Run Mode: " + CONSTANTS.getCurrentOperatingMode());
         }
 
-        // ----- Initialize Subsystems without Simulation and/or Log Replay Modes -----
+        // #endregion
+
+        // #region: Initialize Subsystems without Simulation and/or Log Replay Mode
         aimer = CONSTANTS.hasAimerSubsystem() ? new Aimer() : null;
         colorSensor = CONSTANTS.hasColorSensorSubsystem() ? new ColorSensor() : null;
         flywheel = CONSTANTS.hasFlywheelSubsystem() ? new Flywheel() : null;
@@ -157,8 +161,10 @@ public class RobotContainer {
         // (The LED control hardware is built into the RoboRio so always "exists".)
         leds = new Leds();
 
-        // ========================= Auto & Tele-Op ============================
-        // ---------- Configure Default Commands ----------
+        // #endregion
+
+        // #region: ==================== Default Commands & Triggers ===========
+        // #region: ---------- Configure Default Commands ----------
         driveBase.setDefaultCommand(DriveCommands.manualDriveDefaultCommand(driveBase,
                 () -> -controller1.getLeftY(),
                 () -> -controller1.getLeftX(),
@@ -178,12 +184,16 @@ public class RobotContainer {
             flywheel.setDefaultCommand(ShooterCommands.defaultFlywheelCommand(flywheel));
         }
 
-        // ---------- Configure Command Triggers ----------
+        // #endregion
+
+        // #region: ---------- Configure Command Triggers ----------
         if (CONSTANTS.hasColorSensorSubsystem()) {
             new Trigger((colorSensor::isObjectDetected)).whileTrue(leds.setColorCommand(Color.kDarkOrange));
         }
 
-        // ========================= Autonomous ================================
+        // #endregion
+
+        // #region: ==================== Autonomous ============================
         // ---------- Create Named Commands for use by Path Planner ----------
         NamedCommands.registerCommand("Spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
         NamedCommands.registerCommand("StartIntake", LedCommands.blinkCommand(leds, Color.kPurple));
@@ -203,7 +213,9 @@ public class RobotContainer {
         // ---------- Set-up Autonomous Choices ----------
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
-        // ========================= Tele-Op ===================================
+        // #endregion
+
+        // #region: ==================== Tele-Op ===============================
         // ---------- Configure Controller 1 for Driver ----------
         Command teleOpShootCommand;
         Command reverseShooterCommand;
@@ -298,6 +310,8 @@ public class RobotContainer {
         if (CONSTANTS.hasTraverserSubsystem()) {
             // TODO
         }
+
+        // #endregion
     }
 
     /**

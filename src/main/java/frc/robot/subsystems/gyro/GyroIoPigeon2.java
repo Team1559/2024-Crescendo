@@ -1,5 +1,7 @@
 package frc.robot.subsystems.gyro;
 
+import static frc.robot.constants.AbstractConstants.CONSTANTS;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
@@ -13,7 +15,7 @@ import frc.robot.Constants;
 /** IO implementation for Pigeon2 */
 public class GyroIoPigeon2 implements GyroIo {
 
-    private final Pigeon2 pigeon = new Pigeon2(Constants.BASE_GYRO_ID, Constants.CANIVORE_BUS_ID);
+    private final Pigeon2 pigeon = new Pigeon2(Constants.BASE_GYRO_ID, CONSTANTS.getCanivoreBusId());
     private final StatusSignal<Double> yaw = pigeon.getYaw();
     private final StatusSignal<Double> yawVelocity = pigeon.getAngularVelocityZWorld();
 
