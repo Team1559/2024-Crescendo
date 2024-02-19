@@ -12,7 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -168,9 +168,7 @@ public class RobotContainer {
         driveBase.setDefaultCommand(DriveCommands.manualDriveDefaultCommand(driveBase,
                 () -> -controller1.getLeftY(),
                 () -> -controller1.getLeftX(),
-                () -> controller1.getLeftTriggerAxis() > controller1.getRightTriggerAxis()
-                        ? controller1.getLeftTriggerAxis()
-                        : -controller1.getRightTriggerAxis()));
+                () -> -controller1.getRightX()));
         /*
          * TODO: Need to decvide if the Intake and Feeder Motors run by default.
          * See: https://www.revrobotics.com/neo-550-brushless-motor-locked-rotor-testing
@@ -283,10 +281,15 @@ public class RobotContainer {
 
         // #region: ----- Subsystem Commands -----
         if (CONSTANTS.hasAimerSubsystem()) {
-            controller3.rightBumper().and(not(controller3.start()))
-                    .whileTrue(new RunCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(1))));
-            controller3.leftBumper().and(not(controller3.start()))
-                    .whileTrue(new RunCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(-1))));
+            controller3.rightBumper().and(not(controller3.start())).and(not(controller3.back()))
+                    .onTrue(new InstantCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(1))));
+            controller3.leftBumper().and(not(controller3.start())).and(not(controller3.back()))
+                    .onTrue(new InstantCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(-1))));
+
+            controller3.rightBumper().and(controller3.back()).and(not(controller3.start()))
+                    .onTrue(new InstantCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(.1))));
+            controller3.leftBumper().and(controller3.back()).and(not(controller3.start()))
+                    .onTrue(new InstantCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(-.1))));
         }
 
         if (CONSTANTS.hasClimberSubsystem()) {

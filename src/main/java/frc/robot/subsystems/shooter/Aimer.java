@@ -24,7 +24,8 @@ public class Aimer extends SubsystemBase {
     @AutoLog
     static class AimerInputs {
 
-        public Rotation2d currentAngle;
+        public double currentAnlgeDegrees;
+        public double targetAnlgeDegrees;
 
         public double lAppliedOutput, rAppliedOutput;
         public double lOutputCurrent, rOutputCurrent;
@@ -63,7 +64,7 @@ public class Aimer extends SubsystemBase {
 
         // Set Voltages
         if (controller.getSetpoint() != 0) {
-            double output = controller.calculate(inputs.currentAngle.getDegrees());
+            double output = controller.calculate(inputs.currentAnlgeDegrees);
             motorL.setVoltage(output);
             motorR.setVoltage(output);
         }
@@ -71,7 +72,8 @@ public class Aimer extends SubsystemBase {
 
     private void updateInputs() {
 
-        inputs.currentAngle = getAngle();
+        inputs.currentAnlgeDegrees = getAngle().getDegrees();
+        inputs.targetAnlgeDegrees = controller.getSetpoint();
 
         inputs.lAppliedOutput = motorL.getAppliedOutput();
         inputs.lOutputCurrent = motorL.getOutputCurrent();

@@ -136,6 +136,14 @@ public abstract class AbstractConstants {
     // #endregion
 
     // #region: --------------- Hardware ---------------------------------------
+
+    // #region: ----- Climber --------
+    public abstract int getClimberMotorIdLeft();
+
+    public abstract int getClimberMotorIdRight();
+
+    public abstract PID getClimberPid();
+
     // #region: ----- Aimer -----
     public abstract Tuple2<Rotation2d> getAimerAngleRange();
 
@@ -159,7 +167,7 @@ public abstract class AbstractConstants {
     // #endregion
 
     // #region: ----- Color Sensor -----
-    public abstract int getColorSensorProximityThreshold(); // 1500; // TODO: Configure Value.
+    public abstract int getColorSensorProximityThreshold();
 
     // #endregion
 
