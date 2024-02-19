@@ -1,7 +1,6 @@
 package frc.robot;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -25,23 +24,6 @@ public final class Constants {
     public static final double FEEDER_REVERSE_VOLTAGE = -FEEDER_FORWARD_VOLTAGE;
     public static final double FLYWHEEL_FOWARDS_VOLTAGE = 9.0; // TODO: Configure Value
     public static final double FLYWHEEL_REVERSE_VOLTAGE = -6.0; // TODO: Configure Value.
-    // TODO - Revert Flywheel Voltage to 12
-
-    // ---------- Hardware Config ----------
-    // --- Swerve Drives ---
-    public static final int FRONT_LEFT_DRIVE_MOTOR_ID = 0;
-    public static final int FRONT_LEFT_STEER_MOTOR_ID = 1;
-    public static final int FRONT_LEFT_CANCODER_ID = 2;
-    public static final int FRONT_RIGHT_DRIVE_MOTOR_ID = 3;
-    public static final int FRONT_RIGHT_STEER_MOTOR_ID = 4;
-    public static final int FRONT_RIGHT_CANCODER_ID = 5;
-    public static final int BACK_LEFT_DRIVE_MOTOR_ID = 9;
-    public static final int BACK_LEFT_STEER_MOTOR_ID = 10;
-    public static final int BACK_LEFT_CANCODER_ID = 11;
-    public static final int BACK_RIGHT_DRIVE_MOTOR_ID = 6;
-    public static final int BACK_RIGHT_STEER_MOTOR_ID = 7;
-    public static final int BACK_RIGHT_CANCODER_ID = 8;
-    public static final NeutralModeValue SWERVE_WHEEL_BRAKE_MODE = NeutralModeValue.Brake;
 
     // ---------- Power Constants ----------
     public static final int NEO_SPARK_BRUSHLESS_CURRENT_LIMIT = 24;

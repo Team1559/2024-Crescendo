@@ -11,6 +11,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -62,24 +63,36 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 
         switch (index) {
             case FRONT_LEFT:
-                driveMotor = new TalonFX(Constants.FRONT_LEFT_DRIVE_MOTOR_ID, CONSTANTS.getCanivoreBusId());
-                steerMotor = new TalonFX(Constants.FRONT_LEFT_STEER_MOTOR_ID, CONSTANTS.getCanivoreBusId());
-                cancoder = new CANcoder(Constants.FRONT_LEFT_CANCODER_ID, CONSTANTS.getCanivoreBusId());
+                driveMotor = new TalonFX(CONSTANTS.getSwirveModuleHardwareIdsFrontLeft().DRIVE_MOTOR_ID,
+                        CONSTANTS.getCanivoreBusId());
+                steerMotor = new TalonFX(CONSTANTS.getSwirveModuleHardwareIdsFrontLeft().STEER_MOTOR_ID,
+                        CONSTANTS.getCanivoreBusId());
+                cancoder = new CANcoder(CONSTANTS.getSwirveModuleHardwareIdsFrontLeft().CANCODER_ID,
+                        CONSTANTS.getCanivoreBusId());
                 break;
             case FRONT_RIGHT:
-                driveMotor = new TalonFX(Constants.FRONT_RIGHT_DRIVE_MOTOR_ID, CONSTANTS.getCanivoreBusId());
-                steerMotor = new TalonFX(Constants.FRONT_RIGHT_STEER_MOTOR_ID, CONSTANTS.getCanivoreBusId());
-                cancoder = new CANcoder(Constants.FRONT_RIGHT_CANCODER_ID, CONSTANTS.getCanivoreBusId());
+                driveMotor = new TalonFX(CONSTANTS.getSwirveModuleHardwareIdsFrontRight().DRIVE_MOTOR_ID,
+                        CONSTANTS.getCanivoreBusId());
+                steerMotor = new TalonFX(CONSTANTS.getSwirveModuleHardwareIdsFrontRight().STEER_MOTOR_ID,
+                        CONSTANTS.getCanivoreBusId());
+                cancoder = new CANcoder(CONSTANTS.getSwirveModuleHardwareIdsFrontRight().CANCODER_ID,
+                        CONSTANTS.getCanivoreBusId());
                 break;
             case BACK_LEFT:
-                driveMotor = new TalonFX(Constants.BACK_LEFT_DRIVE_MOTOR_ID, CONSTANTS.getCanivoreBusId());
-                steerMotor = new TalonFX(Constants.BACK_LEFT_STEER_MOTOR_ID, CONSTANTS.getCanivoreBusId());
-                cancoder = new CANcoder(Constants.BACK_LEFT_CANCODER_ID, CONSTANTS.getCanivoreBusId());
+                driveMotor = new TalonFX(CONSTANTS.getSwirveModuleHardwareIdsBackLeft().DRIVE_MOTOR_ID,
+                        CONSTANTS.getCanivoreBusId());
+                steerMotor = new TalonFX(CONSTANTS.getSwirveModuleHardwareIdsBackLeft().STEER_MOTOR_ID,
+                        CONSTANTS.getCanivoreBusId());
+                cancoder = new CANcoder(CONSTANTS.getSwirveModuleHardwareIdsBackLeft().CANCODER_ID,
+                        CONSTANTS.getCanivoreBusId());
                 break;
             case BACK_RIGHT:
-                driveMotor = new TalonFX(Constants.BACK_RIGHT_DRIVE_MOTOR_ID, CONSTANTS.getCanivoreBusId());
-                steerMotor = new TalonFX(Constants.BACK_RIGHT_STEER_MOTOR_ID, CONSTANTS.getCanivoreBusId());
-                cancoder = new CANcoder(Constants.BACK_RIGHT_CANCODER_ID, CONSTANTS.getCanivoreBusId());
+                driveMotor = new TalonFX(CONSTANTS.getSwirveModuleHardwareIdsBackRight().DRIVE_MOTOR_ID,
+                        CONSTANTS.getCanivoreBusId());
+                steerMotor = new TalonFX(CONSTANTS.getSwirveModuleHardwareIdsBackRight().STEER_MOTOR_ID,
+                        CONSTANTS.getCanivoreBusId());
+                cancoder = new CANcoder(CONSTANTS.getSwirveModuleHardwareIdsBackRight().CANCODER_ID,
+                        CONSTANTS.getCanivoreBusId());
                 break;
             default:
                 throw new RuntimeException("Invalid module index: " + index);
@@ -92,7 +105,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 
         // Set Drive TalonFXConfiguration.
         MotorOutputConfigs driveMotorOutputConfigs = new MotorOutputConfigs();
-        driveMotorOutputConfigs.NeutralMode = Constants.SWERVE_WHEEL_BRAKE_MODE;
+        driveMotorOutputConfigs.NeutralMode = NeutralModeValue.Brake;
         // Inverted to match our Swerve Drive Module Gear Box & Motors.
         driveMotorOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
         driveMotor.getConfigurator().apply(driveMotorOutputConfigs);
@@ -104,7 +117,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 
         // Set Steer MotorOutputConfigs.
         MotorOutputConfigs steerMotorOutputConfigs = new MotorOutputConfigs();
-        steerMotorOutputConfigs.NeutralMode = Constants.SWERVE_WHEEL_BRAKE_MODE;
+        steerMotorOutputConfigs.NeutralMode = NeutralModeValue.Brake;
         // Inverted to match our Swerve Drive Module Gear Box & Motors.
         steerMotorOutputConfigs.Inverted = InvertedValue.CounterClockwise_Positive;
         steerMotor.getConfigurator().apply(steerMotorOutputConfigs);

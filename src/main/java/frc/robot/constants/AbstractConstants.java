@@ -26,7 +26,7 @@ public abstract class AbstractConstants {
         LOG_REPLAY
     }
 
-    // ========================= Static Classes ===============================-
+    // ========================= Static Classes ================================
     public static class PID {
         public final double P, I, D;
 
@@ -34,6 +34,16 @@ public abstract class AbstractConstants {
             P = p;
             I = i;
             D = d;
+        }
+    }
+
+    public static class SwirveModuleHardwareIds {
+        public final int DRIVE_MOTOR_ID, STEER_MOTOR_ID, CANCODER_ID;
+
+        SwirveModuleHardwareIds(int driveMotorId, int steerMotorId, int cancoderId) {
+            DRIVE_MOTOR_ID = driveMotorId;
+            STEER_MOTOR_ID = steerMotorId;
+            CANCODER_ID = cancoderId;
         }
     }
 
@@ -207,6 +217,22 @@ public abstract class AbstractConstants {
      * </p>
      */
     public abstract Rotation2d[] getSwerveModuleEncoderOffsets();
+
+    public SwirveModuleHardwareIds getSwirveModuleHardwareIdsFrontLeft() {
+        return new SwirveModuleHardwareIds(0, 1, 2);
+    }
+
+    public SwirveModuleHardwareIds getSwirveModuleHardwareIdsFrontRight() {
+        return new SwirveModuleHardwareIds(3, 4, 5);
+    }
+
+    public SwirveModuleHardwareIds getSwirveModuleHardwareIdsBackLeft() {
+        return new SwirveModuleHardwareIds(9, 10, 11);
+    }
+
+    public SwirveModuleHardwareIds getSwirveModuleHardwareIdsBackRight() {
+        return new SwirveModuleHardwareIds(6, 7, 8);
+    }
 
     // #endregion
 
