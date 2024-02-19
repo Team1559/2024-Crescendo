@@ -283,7 +283,11 @@ public class RobotContainer {
             }, flywheel::stop, flywheel));
         }
         if (CONSTANTS.hasTraverserSubsystem()) {
-            // TODO
+            controller2.x().onTrue(new StartEndCommand(() -> {
+                traverser.start();
+            }, () -> {
+                traverser.stop();
+            }));
         }
         if (CONSTANTS.hasAimerSubsystem()) {
             controller2.rightBumper().and(not(controller2.start()))
