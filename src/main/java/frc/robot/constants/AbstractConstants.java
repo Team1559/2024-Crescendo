@@ -152,6 +152,13 @@ public abstract class AbstractConstants {
 
     // #endregion
 
+    // #region: ----- Intake -----
+    public abstract int getIntakeMotorId();
+
+    public abstract boolean isIntakeMortorInverted();
+
+    // #endregion
+
     // #region: ----- roboRIO -----
     public abstract String getRoboRioSerialNumber();
 

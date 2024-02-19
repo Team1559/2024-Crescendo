@@ -36,9 +36,6 @@ public final class Constants {
     public static final double AIMER_UPPER_ANGLE = 45;
 
     // ---------- Hardware Config ----------
-    // --- Intake ---
-    public static final int INTAKE_MOTOR_ID = 20;
-    public static final boolean IS_INTAKE_INVERTED = true;
     // --- Swerve Drives ---
     public static final int FRONT_LEFT_DRIVE_MOTOR_ID = 0;
     public static final int FRONT_LEFT_STEER_MOTOR_ID = 1;

@@ -92,8 +92,8 @@ public class RobotContainer {
                                 CONSTANTS.isFeederMortorInverted()))
                         : null;
                 intake = CONSTANTS.hasIntakeSubsystem()
-                        ? new Intake(new SingleMotorIoSparkMax(Constants.INTAKE_MOTOR_ID,
-                                Constants.IS_INTAKE_INVERTED))
+                        ? new Intake(new SingleMotorIoSparkMax(CONSTANTS.getIntakeMotorId(),
+                                CONSTANTS.isIntakeMortorInverted()))
                         : null;
                 vision = CONSTANTS.hasVisionSubsystem()
                         ? new Vision(driveBase.poseEstimator, new VisionIoLimelight(CONSTANTS.getCameraName()))
@@ -117,8 +117,8 @@ public class RobotContainer {
                                 CONSTANTS.isFeederMortorInverted()))
                         : null;
                 intake = CONSTANTS.hasIntakeSubsystem()
-                        ? new Intake(new SingleMotorIoSparkMax(Constants.INTAKE_MOTOR_ID,
-                                Constants.IS_INTAKE_INVERTED))
+                        ? new Intake(new SingleMotorIoSparkMax(CONSTANTS.getIntakeMotorId(),
+                                CONSTANTS.isIntakeMortorInverted()))
                         : null;
                 vision = CONSTANTS.hasVisionSubsystem()
                         ? new Vision(driveBase.poseEstimator, new VisionIoSimAndReplay())
@@ -246,13 +246,15 @@ public class RobotContainer {
         // #endregion
 
         // #region: ---------- Configure Controller 3 for Technician ----------
-        // ----- Swirve Drive Commands -----
+        // #region: ----- Swirve Drive Commands -----
         controller3.povUp().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(1, 0, 0)));
         controller3.povDown().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(-1, 0, 0)));
         controller3.povRight().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(0, -1, 0)));
         controller3.povLeft().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(0, 1, 0)));
 
-        // ----- Light Commands -----
+        // #endregion
+
+        // #region: ----- Light Commands -----
         controller3.a().and(controller3.back()).and(not(controller3.start()))
                 .onTrue(leds.setColorCommand(Color.kDarkGreen));
         controller3.b().and(controller3.back()).and(not(controller3.start())).onTrue(leds.setStaticPatternCommand(
@@ -272,7 +274,9 @@ public class RobotContainer {
                 .onTrue(leds.changeBrightnessCommand(false));
         controller3.back().and(controller3.start()).onTrue(leds.turnOffCommand());
 
-        // ----- Subsystem Commands -----
+        // #endregion
+
+        // #region: ----- Subsystem Commands -----
         if (CONSTANTS.hasAimerSubsystem()) {
             controller3.rightBumper().and(not(controller3.start()))
                     .whileTrue(new RunCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(1))));

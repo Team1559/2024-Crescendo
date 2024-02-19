@@ -130,6 +130,22 @@ public class TestRobotConstants extends AbstractConstants {
 
     // #endregion
 
+    // #region: ----- Intake -----
+
+    @Override
+    public int getIntakeMotorId() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getIntakeMotorId'");
+    }
+
+    @Override
+    public boolean isIntakeMortorInverted() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isIntakeMortorInverted'");
+    }
+
+    // #endregion
+
     // #region: ----- roboRIO -----
     @Override
     public String getRoboRioSerialNumber() {

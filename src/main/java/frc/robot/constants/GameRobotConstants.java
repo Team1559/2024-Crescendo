@@ -124,6 +124,19 @@ public class GameRobotConstants extends AbstractConstants {
 
     // #endregion
 
+    // #region: ----- Intake -----
+    @Override
+    public int getIntakeMotorId() {
+        return 20;
+    }
+
+    @Override
+    public boolean isIntakeMortorInverted() {
+        return true;
+    }
+
+    // #endregion
+
     // #region: -------- roboRIO --------
     @Override
     public String getRoboRioSerialNumber() {
