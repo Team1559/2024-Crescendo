@@ -126,9 +126,7 @@ public class DriveBase extends SubsystemBase {
 
     @Override
     public void periodic() {
-
         gyroIO.updateInputs(gyroInputs);
-        getPose(); // Logs Robot Estimated Positio; (TODO: Is this needed?)
         Logger.processInputs("Drive/Gyro", gyroInputs);
 
         for (IndexedSwerveModule module : modules) {
@@ -151,6 +149,7 @@ public class DriveBase extends SubsystemBase {
         // Update odometry
         updateModulePositions();
         poseEstimator.update(gyroInputs.yawPosition, modulePositions);
+        getPose(); // Logs Robot Estimated Positio;
     }
 
     // ========================= Functions =====================================
@@ -212,7 +211,7 @@ public class DriveBase extends SubsystemBase {
     /**
      * This gets the rotation from the current position to the target position, and
      * it's trying to point the front of the robot to the target.
-     * 
+     *
      * @param target
      * @return
      */

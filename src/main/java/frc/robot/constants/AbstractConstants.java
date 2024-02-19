@@ -2,8 +2,6 @@ package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Meters;
 
-import java.util.Objects;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
@@ -13,7 +11,6 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.DriverStation.MatchType;
 
 public abstract class AbstractConstants {
 
@@ -33,16 +30,15 @@ public abstract class AbstractConstants {
 
     // ========================= Static Methods ================================
     public static boolean isGameRobot() {
-
         String roboRioSerialNumber = System.getenv("serialnum");
         roboRioSerialNumber = roboRioSerialNumber == null ? "" : roboRioSerialNumber.trim();
 
-        return FORCE_GAME_ROBOT_CONSTANTS
-                || roboRioSerialNumber.equalsIgnoreCase(GAME_ROBOT_CONSTANTS.getRoboRioSerialNumber())
-                || !roboRioSerialNumber.equalsIgnoreCase(TEST_ROBOT_CONSTANTS.getRoboRioSerialNumber())
-                || DriverStation.getMatchType() != MatchType.None
-                || DriverStation.getMatchNumber() != 0
-                || !Objects.equals(DriverStation.getEventName(), "");
+        boolean isGameRobot = FORCE_GAME_ROBOT_CONSTANTS
+                || roboRioSerialNumber.equals(GAME_ROBOT_CONSTANTS.getRoboRioSerialNumber())
+                || !roboRioSerialNumber.equals(TEST_ROBOT_CONSTANTS.getRoboRioSerialNumber());
+        System.out.println("Serial number: " + roboRioSerialNumber);
+        System.out.println("isGameRobot: " + isGameRobot);
+        return isGameRobot;
     }
 
     // ==================== Methods (Ctrl + K, Ctrl + 8 to fold regions) =======
