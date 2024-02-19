@@ -6,7 +6,7 @@ Contains constants that need to be updated per robot. i.e.
 
 # Tele-Op
 ## Controller 1
-Controller 1 is used for driving and performing game actions.
+This Controller is used by the Driver.
 * **Driving:**
     * [Left Joystick]
 * **Spinning:** Triggers
@@ -20,7 +20,10 @@ Controller 1 is used for driving and performing game actions.
     * [D-Pad Up] = Reverse Shooter
 
 ## Controller 2
-Controller 2 is used for support the software team in configuration and debugging tasks.
+This Controller is used by the Co-Pilot.
+
+## Controller 3
+This Controller is used by the Technician.
 * **Driving:**
     * `[D-Pad]` Provides isolated directional commands
 * **LEDs:** (On Hold)
@@ -38,8 +41,10 @@ Controller 2 is used for support the software team in configuration and debuggin
     * `[B + Start]` Runs the Feeder in Reverse
     * `[Y]` Runs the Flywheel
     * `[Y + Start]` Runs the Flywheel in Reverse
-    * `[Right Bumper]` Moves the Aimer UP 5 degrees
+    * `[Left Bumper + Start]` Runs just the left Flywheel motor
+    * `[Right Bumper + Start]` Runs just the left Flywheel motor
     * `[Left Bumper]` Moves the Aimer DOWN 5 degrees
+    * `[Right Bumper]` Moves the Aimer UP 5 degrees
 
 # Autonomous
 During auto, the intake and flywheel run continuously to enable faster collecting and shooting of Notes.

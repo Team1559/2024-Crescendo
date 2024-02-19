@@ -1,5 +1,9 @@
 package frc.robot.subsystems.base;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static frc.robot.constants.AbstractConstants.CONSTANTS;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -22,7 +26,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.subsystems.gyro.GyroIo;
 import frc.robot.subsystems.gyro.GyroIoInputsAutoLogged;
 import frc.robot.subsystems.swerve_module.IndexedSwerveModule;
@@ -55,10 +58,14 @@ public class DriveBase extends SubsystemBase {
     /** Returns an array of module translations. */
     public static Translation2d[] getModuleTranslations() {
         return new Translation2d[] {
-                new Translation2d(Constants.TRACK_WIDTH_X / 2.0, Constants.TRACK_WIDTH_Y / 2.0),
-                new Translation2d(Constants.TRACK_WIDTH_X / 2.0, -Constants.TRACK_WIDTH_Y / 2.0),
-                new Translation2d(-Constants.TRACK_WIDTH_X / 2.0, Constants.TRACK_WIDTH_Y / 2.0),
-                new Translation2d(-Constants.TRACK_WIDTH_X / 2.0, -Constants.TRACK_WIDTH_Y / 2.0)
+                new Translation2d(CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
+                        CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0),
+                new Translation2d(CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
+                        -CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0),
+                new Translation2d(-CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
+                        CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0),
+                new Translation2d(-CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
+                        -CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0)
         };
     }
 
@@ -103,12 +110,11 @@ public class DriveBase extends SubsystemBase {
                 this::setPose,
                 () -> kinematics.toChassisSpeeds(getModuleStates()),
                 this::runVelocity,
-                new HolonomicPathFollowerConfig(Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND,
-                        Constants.DRIVE_BASE_RADIUS,
-                        new ReplanningConfig()),
+                new HolonomicPathFollowerConfig(CONSTANTS.getMaxLinearSpeed().in(MetersPerSecond),
+                        CONSTANTS.getDriveBaseWheelRadius().in(Meters), new ReplanningConfig()),
                 // Flips path if aliance is on red side.
-                () -> Constants.FLIP_PATH_IF_ALLIANCE_IS_NOT_DEFAULT && DriverStation.getAlliance().isPresent()
-                        && DriverStation.getAlliance().get() != Constants.DEFAULT_ALLIANCE,
+                () -> CONSTANTS.getAssignedAlliance() != CONSTANTS.getDefaultAllianceForAuto()
+                        && CONSTANTS.shouldFlipPathIfAssignedAllianceIsNotDefault(),
                 this);
         Pathfinding.setPathfinder(new LocalAdStarAk());
         PathPlannerLogging.setLogActivePathCallback(
@@ -120,7 +126,6 @@ public class DriveBase extends SubsystemBase {
 
     @Override
     public void periodic() {
-
         gyroIO.updateInputs(gyroInputs);
         Logger.processInputs("Drive/Gyro", gyroInputs);
 
@@ -177,7 +182,7 @@ public class DriveBase extends SubsystemBase {
         // Calculate module setpoints
         ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
         SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
-        SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND);
+        SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, CONSTANTS.getMaxLinearSpeed());
 
         // Send setpoints to modules
         SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];

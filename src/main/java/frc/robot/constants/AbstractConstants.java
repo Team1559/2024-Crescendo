@@ -1,6 +1,16 @@
 package frc.robot.constants;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Velocity;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public abstract class AbstractConstants {
 
@@ -20,26 +30,42 @@ public abstract class AbstractConstants {
 
     // ========================= Static Methods ================================
     public static boolean isGameRobot() {
-        String robotSerialNumber = System.getenv("serialnum");
+        String roboRioSerialNumber = System.getenv("serialnum");
+        roboRioSerialNumber = roboRioSerialNumber == null ? "" : roboRioSerialNumber.trim();
 
         boolean isGameRobot = FORCE_GAME_ROBOT_CONSTANTS
-                || robotSerialNumber.equals(GAME_ROBOT_CONSTANTS.getRoboRioSerialNumber())
-                || !robotSerialNumber.equals(TEST_ROBOT_CONSTANTS.getRoboRioSerialNumber());
-        System.out.println("Serial number: " + robotSerialNumber);
+                || roboRioSerialNumber.equals(GAME_ROBOT_CONSTANTS.getRoboRioSerialNumber())
+                || !roboRioSerialNumber.equals(TEST_ROBOT_CONSTANTS.getRoboRioSerialNumber());
+        System.out.println("Serial number: " + roboRioSerialNumber);
         System.out.println("isGameRobot: " + isGameRobot);
         return isGameRobot;
     }
 
-    // ========================= Methods =======================================
-    // ---------- Operation Modes ----------
-    public OperatingMode getCurrentOperatingMode() {
-        return OperatingMode.REAL_WORLD;
+    // ==================== Methods (Ctrl + K, Ctrl + 8 to fold regions) =======
+    // #region: --------------- Alliance ---------------------------------------
+    /**
+     * @return The assigned Alliance or the {@link #getDefaultAllianceForAuto}, if
+     *         no alliance is set.
+     */
+    public Alliance getAssignedAlliance() {
+        return DriverStation.getAlliance().orElse(getDefaultAllianceForAuto());
+    };
+
+    /**
+     * @return The side of the field that the automation paths are made for.
+     */
+    public Alliance getDefaultAllianceForAuto() {
+        return Alliance.Blue;
     }
 
-    public abstract boolean isDrivingModeFieldRelative();
+    public abstract boolean shouldFlipPathIfAssignedAllianceIsNotDefault();
 
-    // ---------- Capabilities Flags --------
+    // #endregion
+
+    // #region: --------------- Capability Flags -------------------------------
     public abstract boolean hasAimerSubsystem();
+
+    public abstract boolean hasClimberSubsystem();
 
     public abstract boolean hasColorSensorSubsystem();
 
@@ -51,13 +77,83 @@ public abstract class AbstractConstants {
 
     public abstract boolean hasShooterSubsystemGroup();
 
+    public abstract boolean hasTraverserSubsystem();
+
     public abstract boolean hasVisionSubsystem();
 
-    // ---------- Hardware ----------
-    // --- roboRIO ---
+    // #endregion
+
+    // #region: --------------- Driving Configurations -------------------------
+    public double getJoystickDeadband() {
+        return 0.2;
+    }
+
+    public abstract Measure<Velocity<Angle>> getMaxAngularSpeed();
+
+    public abstract Measure<Velocity<Distance>> getMaxLinearSpeed();
+    // #endregion
+
+    // #region: --------------- Game Objects -----------------------------------
+    public Translation2d getSpeakerLocation() {
+        if (getAssignedAlliance() == Alliance.Blue) {
+            return new Translation2d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42));
+        } else {
+            return new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42));
+        }
+    }
+
+    public Translation2d getAmpLocation() {
+        if (getAssignedAlliance() == Alliance.Blue) {
+            return new Translation2d(Units.inchesToMeters(72.5), Units.inchesToMeters(323.00));
+        } else {
+            return new Translation2d(Units.inchesToMeters(578.77), Units.inchesToMeters(323.00));
+        }
+    }
+
+    // #endregion
+
+    // #region: --------------- Hardware ---------------------------------------
+    // #region: ----- Aimer -----
+    public abstract int getAimerMotorIdLeft();
+
+    public abstract int getAimerMotorIdRight();
+
+    // #endregion
+
+    // #region: ----- Canivore -----
+    public String getCanivoreBusId() {
+        return "1559Canivore";
+    }
+
+    // #endregion
+
+    // #region: ----- Feeder -----
+    public abstract int getFeederMotorId();
+
+    public abstract boolean isFeederMortorInverted();
+
+    // #endregion
+
+    // #region: ----- Flywheel -----
+    public abstract int getFlywheelMotorIdLeft();
+
+    public abstract int getFlywheelMotorIdRight();
+
+    // #endregion
+
+    // #region: ----- Gyro -----
+    public int getGyroId() {
+        return 12;
+    }
+
+    // #endregion
+
+    // #region: ----- roboRIO -----
     public abstract String getRoboRioSerialNumber();
 
-    // --- Swerve ---
+    // #endregion
+
+    // #region: ----- Swerve --------
     /**
      * The index of the Rotation matches the Index of the Module in Advaltage Scope.
      * <p>
@@ -65,4 +161,56 @@ public abstract class AbstractConstants {
      * </p>
      */
     public abstract Rotation2d[] getSwerveModuleEncoderOffsets();
+
+    // #endregion
+
+    // #region: ----- Traverser -----
+    public abstract double getTraverserFowardVoltage();
+
+    public abstract double getTraverserReverseVoltage();
+
+    public abstract int getTraverserMotorId();
+
+    public abstract boolean isTraverserInverted();
+
+    // #endregion
+
+    // #region: ----- Vision -----
+    public abstract String getCameraName();
+
+    // #endregion
+
+    // #region: --------------- Operation Modes --------------------------------
+    public OperatingMode getCurrentOperatingMode() {
+        return OperatingMode.REAL_WORLD;
+    }
+
+    public abstract boolean isDrivingModeFieldRelative();
+
+    // #endregion
+
+    // #region: --------------- Physical Measurements --------------------------
+    public Measure<Distance> getDriveBaseWheelRadius() {
+        return Meters.of(Math.hypot(getWheelDistanceFrontToBack().divide(2).in(Meters),
+                getWheelDistanceLeftToRight().divide(2).in(Meters)));
+    }
+
+    public abstract double getGearRatioOfDriveWheel();
+
+    public abstract double getGearRatioOfTurnWheel();
+
+    /**
+     * @return The distance between the middle of the front wheel to middle of the
+     *         back wheel (X coordinates).
+     */
+    public abstract Measure<Distance> getWheelDistanceFrontToBack();
+
+    /**
+     * @return The distance between the middle of the left wheel to middle of the
+     *         right wheel (y coordinates).
+     */
+    public abstract Measure<Distance> getWheelDistanceLeftToRight();
+
+    public abstract Measure<Distance> getWheelRadius();
+    // #endregion
 }
