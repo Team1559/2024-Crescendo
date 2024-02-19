@@ -82,7 +82,7 @@ public class RobotContainer {
             case REAL_WORLD:
                 // Real robot, instantiate hardware IO implementations
                 driveBase = new DriveBase(
-                        new GyroIoPigeon2(CONSTANTS.getGyroId(), CONSTANTS.getCanivoreBusId()),
+                        new GyroIoPigeon2(CONSTANTS.getGyroId(), CONSTANTS.getCanivoreId()),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_LEFT),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_RIGHT),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_LEFT),

@@ -99,21 +99,6 @@ public class GameRobotConstants extends AbstractConstants {
     }
 
     @Override
-    public int getAimerEncoderPort() {
-        return 0;
-    }
-
-    @Override
-    public int getAimerMotorIdLeft() {
-        return 23;
-    }
-
-    @Override
-    public int getAimerMotorIdRight() {
-        return 22;
-    }
-
-    @Override
     public PID getAimerPid() {
         return new PID(0.4, 0, 0);
     }
@@ -129,11 +114,6 @@ public class GameRobotConstants extends AbstractConstants {
     // #endregion
 
     // #region: ----- Feeder -----
-    @Override
-    public int getFeederMotorId() {
-        return 21;
-    }
-
     @Override
     public boolean isFeederMortorInverted() {
         return true;
@@ -155,16 +135,6 @@ public class GameRobotConstants extends AbstractConstants {
 
     // #region: ----- Flywheel -----
     @Override
-    public int getFlywheelMotorIdLeft() {
-        return 24;
-    }
-
-    @Override
-    public int getFlywheelMotorIdRight() {
-        return 25;
-    }
-
-    @Override
     public double getFlywheelForwardVoltage() {
         // TODO: Configure Value.
         return 9;
@@ -179,11 +149,6 @@ public class GameRobotConstants extends AbstractConstants {
     // #endregion
 
     // #region: ----- Intake -----
-    @Override
-    public int getIntakeMotorId() {
-        return 20;
-    }
-
     @Override
     public boolean isIntakeMortorInverted() {
         return true;
@@ -241,12 +206,6 @@ public class GameRobotConstants extends AbstractConstants {
     @Override
     public double getTraverserReverseVoltage() {
         return -getTraverserFowardVoltage();
-    }
-
-    @Override
-    public int getTraverserMotorId() {
-        // TODO: Add ID
-        throw new UnsupportedOperationException("No Motor ID for Traverser");
     }
 
     @Override

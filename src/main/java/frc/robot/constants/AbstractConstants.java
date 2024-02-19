@@ -2,6 +2,11 @@ package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Meters;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.opencv.core.Mat.Tuple2;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -23,6 +28,11 @@ public abstract class AbstractConstants {
         REAL_WORLD,
         SIMULATION,
         LOG_REPLAY
+    }
+
+    private static enum RoboRioPortArrays {
+        DIO,
+        PWM
     }
 
     // ========================= Static Classes ================================
@@ -53,6 +63,10 @@ public abstract class AbstractConstants {
 
     public static final AbstractConstants CONSTANTS = isGameRobot() ? GAME_ROBOT_CONSTANTS : TEST_ROBOT_CONSTANTS;
 
+    // ========================= Static Variables ==============================
+    private static final Map<String, Set<Integer>> uniqueCanBusIds = new HashMap<>();
+    private static final Map<RoboRioPortArrays, Set<Integer>> uniqueRoboRioPorts = new HashMap();
+
     // ========================= Static Methods ================================
     public static boolean isGameRobot() {
 
@@ -62,6 +76,47 @@ public abstract class AbstractConstants {
         return FORCE_GAME_ROBOT_CONSTANTS
                 || roboRioSerialNumber.equalsIgnoreCase(GAME_ROBOT_CONSTANTS.getRoboRioSerialNumber())
                 || !roboRioSerialNumber.equalsIgnoreCase(TEST_ROBOT_CONSTANTS.getRoboRioSerialNumber());
+    }
+
+    private static int uniqueCanBusId(int id) {
+        return uniqueCanBusId(id, null);
+    }
+
+    private static int uniqueCanBusId(int id, String canivoreId) {
+
+        canivoreId = canivoreId == null ? "" : canivoreId;
+
+        Set<Integer> ids = uniqueCanBusIds.get(canivoreId);
+        if (ids == null) {
+            ids = new HashSet<>() {
+                {
+                    add(id);
+                }
+            };
+            uniqueCanBusIds.put(canivoreId, ids);
+        } else if (!ids.add(id)) {
+            throw new RuntimeException(
+                    "Duplicate ID (" + id + ") on " + (canivoreId.isEmpty() ? "default" : canivoreId) + " CAN Bus!");
+        }
+
+        return id;
+    }
+
+    private static int uniqueRoboRioPort(int port, RoboRioPortArrays portArray) {
+
+        Set<Integer> ports = uniqueRoboRioPorts.get(portArray);
+        if (ports == null) {
+            ports = new HashSet<>() {
+                {
+                    add(port);
+                }
+            };
+            uniqueRoboRioPorts.put(portArray, ports);
+        } else if (!ports.add(port)) {
+            throw new RuntimeException("Duplicate roboRIO Port (" + port + ")!");
+        }
+
+        return port;
     }
 
     // ==================== Methods (Ctrl + K, Ctrl + 8 to fold regions) =======
@@ -141,18 +196,24 @@ public abstract class AbstractConstants {
 
     public abstract Rotation2d getAimerEncoderOffset();
 
-    public abstract int getAimerEncoderPort();
+    public int getAimerEncoderPort() {
+        return uniqueRoboRioPort(0, RoboRioPortArrays.DIO);
+    }
 
-    public abstract int getAimerMotorIdLeft();
+    public int getAimerMotorIdLeft() {
+        return uniqueCanBusId(23, getCanivoreId());
+    }
 
-    public abstract int getAimerMotorIdRight();
+    public int getAimerMotorIdRight() {
+        return uniqueCanBusId(22, getCanivoreId());
+    }
 
     public abstract PID getAimerPid();
 
     // #endregion
 
     // #region: ----- Canivore -----
-    public String getCanivoreBusId() {
+    public String getCanivoreId() {
         return "1559Canivore";
     }
 
@@ -164,7 +225,9 @@ public abstract class AbstractConstants {
     // #endregion
 
     // #region: ----- Feeder -----
-    public abstract int getFeederMotorId();
+    public int getFeederMotorId() {
+        return uniqueCanBusId(21, getCanivoreId());
+    }
 
     public abstract boolean isFeederMortorInverted();
 
@@ -175,9 +238,13 @@ public abstract class AbstractConstants {
     // #endregion
 
     // #region: ----- Flywheel -----
-    public abstract int getFlywheelMotorIdLeft();
+    public int getFlywheelMotorIdLeft() {
+        return uniqueCanBusId(24, getCanivoreId());
+    }
 
-    public abstract int getFlywheelMotorIdRight();
+    public int getFlywheelMotorIdRight() {
+        return uniqueCanBusId(25, getCanivoreId());
+    }
 
     public abstract double getFlywheelForwardVoltage();
 
@@ -187,13 +254,15 @@ public abstract class AbstractConstants {
 
     // #region: ----- Gyro -----
     public int getGyroId() {
-        return 12;
+        return uniqueCanBusId(12, getCanivoreId());
     }
 
     // #endregion
 
     // #region: ----- Intake -----
-    public abstract int getIntakeMotorId();
+    public int getIntakeMotorId() {
+        return uniqueCanBusId(20, getCanivoreId());
+    }
 
     public abstract boolean isIntakeMortorInverted();
 
@@ -205,7 +274,7 @@ public abstract class AbstractConstants {
 
     // #region: ----- LEDs -----
     public int getLedPort() {
-        return 0;
+        return uniqueRoboRioPort(0, RoboRioPortArrays.PWM);
     }
 
     public abstract int getLedLenth(); // 144
@@ -227,19 +296,23 @@ public abstract class AbstractConstants {
     public abstract Rotation2d[] getSwerveModuleEncoderOffsets();
 
     public SwirveModuleHardwareIds getSwirveModuleHardwareIdsFrontLeft() {
-        return new SwirveModuleHardwareIds(0, 1, 2);
+        return new SwirveModuleHardwareIds(uniqueCanBusId(0, getCanivoreId()), uniqueCanBusId(1, getCanivoreId()),
+                uniqueCanBusId(2, getCanivoreId()));
     }
 
     public SwirveModuleHardwareIds getSwirveModuleHardwareIdsFrontRight() {
-        return new SwirveModuleHardwareIds(3, 4, 5);
+        return new SwirveModuleHardwareIds(uniqueCanBusId(3, getCanivoreId()), uniqueCanBusId(4, getCanivoreId()),
+                uniqueCanBusId(5, getCanivoreId()));
     }
 
     public SwirveModuleHardwareIds getSwirveModuleHardwareIdsBackLeft() {
-        return new SwirveModuleHardwareIds(9, 10, 11);
+        return new SwirveModuleHardwareIds(uniqueCanBusId(9, getCanivoreId()), uniqueCanBusId(10, getCanivoreId()),
+                uniqueCanBusId(11, getCanivoreId()));
     }
 
     public SwirveModuleHardwareIds getSwirveModuleHardwareIdsBackRight() {
-        return new SwirveModuleHardwareIds(6, 7, 8);
+        return new SwirveModuleHardwareIds(uniqueCanBusId(6, getCanivoreId()), uniqueCanBusId(7, getCanivoreId()),
+                uniqueCanBusId(8, getCanivoreId()));
     }
 
     // #endregion
@@ -249,7 +322,10 @@ public abstract class AbstractConstants {
 
     public abstract double getTraverserReverseVoltage();
 
-    public abstract int getTraverserMotorId();
+    public int getTraverserMotorId() {
+        // TODO: Add ID
+        throw new UnsupportedOperationException("No Motor ID for Traverser");
+    }
 
     public abstract boolean isTraverserInverted();
 
