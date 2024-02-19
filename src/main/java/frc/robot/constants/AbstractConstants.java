@@ -6,6 +6,8 @@ import java.util.Objects;
 
 import org.opencv.core.Mat.Tuple2;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
@@ -266,19 +268,23 @@ public abstract class AbstractConstants {
 
     // #region: --------------- Motor / Motor Controller Settings --------------
 
-    // #region: ----- Talon FX Motor Controller -----
-    /**
-     * @return Value in Times per Second.
-     */
-    public double getTalonFxStatusSignalUpdateFrequencyDefault() {
-        return 50;
-    }
+    // #region: ----- Falcon 500 Motor -----
 
     /**
-     * @return Value in Times per Second.
+     * Allow 40A continuous, 80A momentary supply current. See: <a href=
+     * "https://api.ctr-electronics.com/phoenix6/release/java/com/ctre/phoenix6/configs/CurrentLimitsConfigs.html">CTR
+     * Electronics: CurrentLimitsConfigs</a>
+     * 
+     * @return A {@link CurrentLimitsConfigs} object with the default Current
+     *         limits.
      */
-    public double getTalonFxStatusSignalUpdateFrequencyForOdometry() {
-        return 100;
+    public CurrentLimitsConfigs getFalcon500CurrentLimitsConfigs() {
+        CurrentLimitsConfigs limits = new CurrentLimitsConfigs();
+        limits.SupplyCurrentLimitEnable = true;
+        limits.SupplyCurrentLimit = 40.0;
+        limits.SupplyCurrentThreshold = 80.0;
+        limits.SupplyTimeThreshold = 0.5;
+        return limits;
     }
 
     // #endregion
@@ -297,6 +303,25 @@ public abstract class AbstractConstants {
      */
     public int getNeoBrushlessCurrentSecondaryLimit() {
         return 80;
+    }
+
+    // #endregion
+
+    // #region: ----- Talon FX Motor Controller -----
+    /**
+     * @return Value in Times per Second.
+     */
+    public double getTalonFxStatusSignalUpdateFrequencyDefault() {
+        return 50;
+    }
+
+    /**
+     * This higher rate is needed by PathPlanner.
+     * 
+     * @return Value in Times per Second.
+     */
+    public double getTalonFxStatusSignalUpdateFrequencyForOdometry() {
+        return 100;
     }
 
     // #endregion

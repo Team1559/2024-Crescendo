@@ -15,7 +15,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import frc.robot.Constants;
 import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
 
 /**
@@ -100,7 +99,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 
         // Set Drive TalonFXConfiguration.
         TalonFXConfiguration driveTalonFXConfiguration = new TalonFXConfiguration();
-        driveTalonFXConfiguration.CurrentLimits = Constants.getDefaultCurrentLimitsConfig();
+        driveTalonFXConfiguration.CurrentLimits = CONSTANTS.getFalcon500CurrentLimitsConfigs();
         driveMotor.getConfigurator().apply(driveTalonFXConfiguration);
 
         // Set Drive TalonFXConfiguration.
@@ -112,7 +111,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 
         // Set Steer MotorOutputConfigs.
         TalonFXConfiguration steerTalonFXConfiguration = new TalonFXConfiguration();
-        steerTalonFXConfiguration.CurrentLimits = Constants.getDefaultCurrentLimitsConfig();
+        steerTalonFXConfiguration.CurrentLimits = CONSTANTS.getFalcon500CurrentLimitsConfigs();
         steerMotor.getConfigurator().apply(steerTalonFXConfiguration);
 
         // Set Steer MotorOutputConfigs.
