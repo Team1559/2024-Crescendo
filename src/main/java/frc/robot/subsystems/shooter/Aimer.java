@@ -2,6 +2,8 @@
 //Actual anlge 55 deg. correspods to reading 103 deg.
 package frc.robot.subsystems.shooter;
 
+import static frc.robot.constants.AbstractConstants.CONSTANTS;
+
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -16,7 +18,6 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 
 public class Aimer extends SubsystemBase {
 
@@ -33,11 +34,11 @@ public class Aimer extends SubsystemBase {
         public Rotation2d targetAngle;
     }
 
-    private final CANSparkMax motorL = new CANSparkMax(Constants.AIMER_LEFT_MOTOR_ID, MotorType.kBrushless);
-    private final CANSparkMax motorR = new CANSparkMax(Constants.AIMER_RIGHT_MOTOR_ID, MotorType.kBrushless);
-    private final DutyCycleEncoder encoder = new DutyCycleEncoder(Constants.AIMER_ENCODER_PORT);
-    private final PIDController controller = new PIDController(Constants.AIMER_KP, Constants.AIMER_KI,
-            Constants.AIMER_KD);
+    private final CANSparkMax motorL = new CANSparkMax(CONSTANTS.getAimerMotorIdLeft(), MotorType.kBrushless);
+    private final CANSparkMax motorR = new CANSparkMax(CONSTANTS.getAimerMotorIdRight(), MotorType.kBrushless);
+    private final DutyCycleEncoder encoder = new DutyCycleEncoder(CONSTANTS.getAimerEncoderPort());
+    private final PIDController controller = new PIDController(CONSTANTS.getAimerPid().P, CONSTANTS.getAimerPid().I,
+            CONSTANTS.getAimerPid().D);
     private final AimerInputsAutoLogged inputs = new AimerInputsAutoLogged();
 
     /**
@@ -48,10 +49,10 @@ public class Aimer extends SubsystemBase {
         motorR.setInverted(true);
         motorL.setIdleMode(IdleMode.kBrake);
         motorR.setIdleMode(IdleMode.kBrake);
-        motorL.setSmartCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_LIMIT);
-        motorR.setSmartCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_LIMIT);
-        motorL.setSecondaryCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_SECONDARY_LIMIT);
-        motorL.setSecondaryCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_SECONDARY_LIMIT);
+        motorL.setSmartCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentLimit());
+        motorR.setSmartCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentLimit());
+        motorL.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
+        motorL.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
     }
 
     @Override
@@ -88,10 +89,9 @@ public class Aimer extends SubsystemBase {
 
     // ========================= Functions =========================
     public void setTargetAngle(Rotation2d angle) {
-        System.out.println("Set Angle: " + angle);
-        double targetAngle = MathUtil.clamp(angle.getDegrees(), Constants.AIMER_LOWER_ANGLE,
-                Constants.AIMER_UPPER_ANGLE);
-        System.out.println(targetAngle);
+
+        double targetAngle = MathUtil.clamp(angle.getDegrees(), CONSTANTS.getAimerAngleRange().get_0().getDegrees(),
+                CONSTANTS.getAimerAngleRange().get_1().getDegrees());
         controller.setSetpoint(targetAngle);
     }
 
@@ -104,9 +104,8 @@ public class Aimer extends SubsystemBase {
     }
 
     public Rotation2d getAngle() {
-        // Neg. encoder position and add offset so that the angle is effectively
-        // inverted
-        return Rotation2d.fromRotations(-encoder.getAbsolutePosition()).plus(Constants.AIMER_ANGLE_OFFSET);
+        // Invert angle as encoder is mounted "backwards".
+        return Rotation2d.fromRotations(-encoder.getAbsolutePosition()).plus(CONSTANTS.getAimerEncoderOffset());
     }
 
     // ========================= Commands =========================

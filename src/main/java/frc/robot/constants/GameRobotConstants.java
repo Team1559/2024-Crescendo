@@ -1,20 +1,38 @@
 package frc.robot.constants;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Second;
+
+import org.opencv.core.Mat.Tuple2;
+
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Velocity;
 
 public class GameRobotConstants extends AbstractConstants {
 
-    // ========================= CONSTANTS ======================================
-    // ---------- Operation Modes ----------
-    @Override
-    public boolean isDrivingModeFieldRelative() {
+    // ==================== Methods (Ctrl + K, Ctrl + 8 to fold regions) =======
+    // #region: --------------- Alliance ---------------------------------------
+    public boolean shouldFlipPathIfAssignedAllianceIsNotDefault() {
         return true;
     }
 
-    // ---------- Capabilities Flags --------
+    // #endregion
+
+    // #region: --------------- Capability Flags -------------------------------
     @Override
     public boolean hasAimerSubsystem() {
         return true;
+    }
+
+    @Override
+    public boolean hasClimberSubsystem() {
+        return false;
     }
 
     @Override
@@ -53,14 +71,155 @@ public class GameRobotConstants extends AbstractConstants {
         return false;
     }
 
-    // ---------- Hardware ----------
-    // --- roboRIO ---
-    @Override
-    public String getRoboRioSerialNumber() {
-        return "";
+    // #endregion
+
+    // #region: --------------- Driving Configurations -------------------------
+    public Measure<Velocity<Angle>> getMaxAngularSpeed() {
+        // TODO: Tune.
+        return Radians.of(getMaxLinearSpeed().in(MetersPerSecond) / CONSTANTS.getWheelRadius().in(Meters)).per(Second);
     }
 
-    // --- Swerve ---
+    public Measure<Velocity<Distance>> getMaxLinearSpeed() {
+        // TODO: Tune.
+        return MetersPerSecond.of(3);
+    }
+
+    // #endregion
+
+    // #region: --------------- Hardware ---------------------------------------
+    // #region: ----- Aimer -----
+    @Override
+    public Tuple2<Rotation2d> getAimerAngleRange() {
+        return new Tuple2<Rotation2d>(Rotation2d.fromDegrees(1), Rotation2d.fromDegrees(45));
+    }
+
+    @Override
+    public Rotation2d getAimerEncoderOffset() {
+        return Rotation2d.fromRadians(2.599);
+    }
+
+    @Override
+    public int getAimerEncoderPort() {
+        return 0;
+    }
+
+    @Override
+    public int getAimerMotorIdLeft() {
+        return 23;
+    }
+
+    @Override
+    public int getAimerMotorIdRight() {
+        return 22;
+    }
+
+    @Override
+    public PID getAimerPid() {
+        return new PID(0.4, 0, 0);
+    }
+
+    // #endregion
+
+    // #region: ----- Color Sensor -----
+    @Override
+    public int getColorSensorProximityThreshold() {
+        return 1500; // TODO: Configure Value.
+    }
+
+    // #endregion
+
+    // #region: ----- Feeder -----
+    @Override
+    public int getFeederMotorId() {
+        return 21;
+    }
+
+    @Override
+    public boolean isFeederMortorInverted() {
+        return true;
+    }
+
+    @Override
+    public double getFeederForwardVoltage() {
+        // TODO: Configure Value.
+        return 6;
+    }
+
+    @Override
+    public double getFeederReverseVoltage() {
+        // TODO: Configure Value.
+        return -getFeederForwardVoltage();
+    }
+
+    // #endregion
+
+    // #region: ----- Flywheel -----
+    @Override
+    public int getFlywheelMotorIdLeft() {
+        return 24;
+    }
+
+    @Override
+    public int getFlywheelMotorIdRight() {
+        return 25;
+    }
+
+    @Override
+    public double getFlywheelForwardVoltage() {
+        // TODO: Configure Value.
+        return 9;
+    }
+
+    @Override
+    public double getFlywheelReverseVoltage() {
+        // TODO: Configure Value.
+        return -6;
+    }
+
+    // #endregion
+
+    // #region: ----- Intake -----
+    @Override
+    public int getIntakeMotorId() {
+        return 20;
+    }
+
+    @Override
+    public boolean isIntakeMortorInverted() {
+        return true;
+    }
+
+    @Override
+    public double getIntakeForwardVoltage() {
+        // TODO: Configure Value.
+        return 6;
+    }
+
+    @Override
+    public double getIntakeReverseVoltage() {
+        // TODO: Configure Value.
+        return -getFeederForwardVoltage();
+    }
+
+    // #endregion
+
+    // #region: ----- LEDs -----
+    @Override
+    public int getLedLenth() {
+        return 144; // TODO.
+    }
+
+    // #endregion
+
+    // #region: -------- roboRIO --------
+    @Override
+    public String getRoboRioSerialNumber() {
+        return ""; // TODO.
+    }
+
+    // #endregion
+
+    // #region: -------- Swerve --------
     @Override
     public Rotation2d[] getSwerveModuleEncoderOffsets() {
         return new Rotation2d[] {
@@ -71,7 +230,9 @@ public class GameRobotConstants extends AbstractConstants {
         };
     }
 
-    // --- Traverser ---
+    // #endregion
+
+    // #region: -------- Traverser --------
     @Override
     public double getTraverserFowardVoltage() {
         return 6.0;
@@ -79,13 +240,13 @@ public class GameRobotConstants extends AbstractConstants {
 
     @Override
     public double getTraverserReverseVoltage() {
-        return -6.0;
+        return -getTraverserFowardVoltage();
     }
 
     @Override
     public int getTraverserMotorId() {
-        throw new UnsupportedOperationException("No Motor ID for Traverser");
         // TODO: Add ID
+        throw new UnsupportedOperationException("No Motor ID for Traverser");
     }
 
     @Override
@@ -93,4 +254,50 @@ public class GameRobotConstants extends AbstractConstants {
         return true;
     }
 
+    // #endregion
+
+    // #region: ----- Vision -----
+
+    @Override
+    public String getCameraName() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getCameraNameBack'");
+    }
+
+    // #endregion
+
+    // #region: --------------- Operation Modes --------------------------------
+    @Override
+    public boolean isDrivingModeFieldRelative() {
+        return true;
+    }
+
+    // #endregion
+
+    // #region: --------------- Physical Measurements --------------------------
+    @Override
+    public double getGearRatioOfDriveWheel() {
+        // L3 Gear ratio.
+        return (50.0 / 14.0) * (16.0 / 28.0) * (45.0 / 15.0);
+    }
+
+    @Override
+    public double getGearRatioOfTurnWheel() {
+        return 12.8;
+    }
+
+    @Override
+    public Measure<Distance> getWheelDistanceFrontToBack() {
+        return Inches.of(24); // TODO: Measure.
+    }
+
+    @Override
+    public Measure<Distance> getWheelDistanceLeftToRight() {
+        return Inches.of(24); // TODO: Measure.
+    }
+
+    public Measure<Distance> getWheelRadius() {
+        return Inches.of(2);
+    }
+    // #endregion
 }

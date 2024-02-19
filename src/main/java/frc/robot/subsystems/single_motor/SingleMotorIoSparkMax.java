@@ -1,10 +1,10 @@
 package frc.robot.subsystems.single_motor;
 
+import static frc.robot.constants.AbstractConstants.CONSTANTS;
+
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
-
-import frc.robot.Constants;
 
 public class SingleMotorIoSparkMax implements SingleMotorIo {
     private final CANSparkMax motor;
@@ -19,8 +19,8 @@ public class SingleMotorIoSparkMax implements SingleMotorIo {
         motor = new CANSparkMax(motorId, MotorType.kBrushless);
         motor.setInverted(inverted);
         motor.setIdleMode(IdleMode.kBrake);
-        motor.setSmartCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_LIMIT);
-        motor.setSecondaryCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_SECONDARY_LIMIT);
+        motor.setSmartCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentLimit());
+        motor.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
     }
 
     public void updateInputs(SingleMotorIoInputs inputs) {

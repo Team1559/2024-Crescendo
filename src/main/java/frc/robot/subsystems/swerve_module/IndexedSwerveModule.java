@@ -1,5 +1,6 @@
 package frc.robot.subsystems.swerve_module;
 
+import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.constants.AbstractConstants.CONSTANTS;
 
 import org.littletonrobotics.junction.Logger;
@@ -9,7 +10,6 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.Constants;
 
 public class IndexedSwerveModule {
 
@@ -79,7 +79,7 @@ public class IndexedSwerveModule {
                 double adjustSpeedSetpoint = speedSetpoint * Math.cos(turnFeedback.getPositionError());
 
                 // Run drive controller/
-                double velocityRadPerSec = adjustSpeedSetpoint / Constants.WHEEL_RADIUS;
+                double velocityRadPerSec = adjustSpeedSetpoint / CONSTANTS.getWheelRadius().in(Meters);
                 io.setDriveVoltage(driveFeedforward.calculate(velocityRadPerSec)
                         + driveFeedback.calculate(inputs.driveMotorVelocityRadPerSec, velocityRadPerSec));
             }
@@ -136,12 +136,12 @@ public class IndexedSwerveModule {
 
     /** Returns the current drive position of the module in meters. */
     public double getPositionMeters() {
-        return inputs.driveMotorPositionRad * Constants.WHEEL_RADIUS;
+        return inputs.driveMotorPositionRad * CONSTANTS.getWheelRadius().in(Meters);
     }
 
     /** Returns the current drive velocity of the module in meters per second. */
     public double getVelocityMetersPerSec() {
-        return inputs.driveMotorVelocityRadPerSec * Constants.WHEEL_RADIUS;
+        return inputs.driveMotorVelocityRadPerSec * CONSTANTS.getWheelRadius().in(Meters);
     }
 
     /** Returns the module position. */

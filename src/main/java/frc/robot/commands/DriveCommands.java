@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static frc.robot.constants.AbstractConstants.CONSTANTS;
 
 import java.util.function.DoubleSupplier;
@@ -14,9 +16,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.Constants;
 import frc.robot.subsystems.base.DriveBase;
 import frc.robot.subsystems.shooter.Flywheel;
 
@@ -39,7 +44,8 @@ public class DriveCommands {
 
             @Override
             public void initialize() {
-                pid = new PIDController(Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS / 90 /* degrees */, 0, 0);
+                // TODO: Use same units when calculating KP.
+                pid = new PIDController(CONSTANTS.getMaxAngularSpeed().in(RadiansPerSecond) / 90 /* degrees */, 0, 0);
                 pid.setSetpoint(0); // Degrees from target.
                 pid.setTolerance(1/* degree(s) */);
                 pid.enableContinuousInput(-180, 180); // Degrees.
@@ -52,7 +58,7 @@ public class DriveCommands {
                 // Apply deadband.
                 double linearMagnitude = MathUtil.applyDeadband(
                         Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
-                        Constants.JOYSTICK_DEADBAND);
+                        CONSTANTS.getJoystickDeadband());
 
                 // Square values, to accelerate mor gradually.
                 linearMagnitude = linearMagnitude * linearMagnitude;
@@ -74,13 +80,13 @@ public class DriveCommands {
                 // but the PIDController wants our "position".
                 double omega = pid.calculate(-degreesToTarget);
 
-                omega = MathUtil.clamp(omega,
-                        -Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS,
-                        Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS);
+                omega = MathUtil.clamp(omega, // TODO: Use same units when calculating KP.
+                        -CONSTANTS.getMaxAngularSpeed().in(RadiansPerSecond),
+                        CONSTANTS.getMaxAngularSpeed().in(RadiansPerSecond));
 
                 // Scale Velocities to between 0 and Max.
-                double scaledXVelocity = linearVelocity.getX() * Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND,
-                        scaledYVelocity = linearVelocity.getY() * Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND;
+                double scaledXVelocity = linearVelocity.getX() * CONSTANTS.getMaxLinearSpeed().in(MetersPerSecond),
+                        scaledYVelocity = linearVelocity.getY() * CONSTANTS.getMaxLinearSpeed().in(MetersPerSecond);
 
                 // Run Velocities.
                 if (CONSTANTS.isDrivingModeFieldRelative()) {
@@ -106,7 +112,6 @@ public class DriveCommands {
             @Override
             public void end(boolean interrupted) {
                 // No need to tell the motors to stop, because the default command will kick in.
-                // TODO: Create a default command for the Flywheel, that will stop the flywheel
                 // if it has not been given a command for a X second(s).
                 pid.close();
             }
@@ -126,8 +131,8 @@ public class DriveCommands {
                     // Apply deadband.
                     double linearMagnitude = MathUtil.applyDeadband(
                             Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
-                            Constants.JOYSTICK_DEADBAND);
-                    double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), Constants.JOYSTICK_DEADBAND);
+                            CONSTANTS.getJoystickDeadband());
+                    double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), CONSTANTS.getJoystickDeadband());
 
                     // Square values, to accelerate mor gradually.
                     linearMagnitude = linearMagnitude * linearMagnitude;
@@ -139,11 +144,11 @@ public class DriveCommands {
                             .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d())).getTranslation();
 
                     // Scale Velocities to between 0 and Max.
-                    double scaledXVelocity = linearVelocity.getX() * Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND,
-                            scaledYVelocity = linearVelocity.getY()
-                                    * Constants.MAX_LINEAR_SPEED_IN_METERS_PER_SECOND,
-                            scaledOmegaVelocity = omega * Constants.MAX_ANGULAR_SPEED_IN_RADS_PER_SECONDS;
-                    ;
+                    Measure<Velocity<Distance>> scaledXVelocity = CONSTANTS.getMaxLinearSpeed()
+                            .times(linearVelocity.getX());
+                    Measure<Velocity<Distance>> scaledYVelocity = CONSTANTS.getMaxLinearSpeed()
+                            .times(linearVelocity.getY());
+                    Measure<Velocity<Angle>> scaledOmegaVelocity = CONSTANTS.getMaxAngularSpeed().times(omega);
 
                     // Run Velocities.
                     if (CONSTANTS.isDrivingModeFieldRelative()) {
@@ -228,7 +233,7 @@ public class DriveCommands {
     // public static PIDCommand turnToTargetPidCommand(DriveBase driveBase,
     // Translation2d target, double speed)
 
-    public static Command turnToTargetCommand(DriveBase driveBase, Translation2d target, double speed) {
+    public static Command turnToTargetCommand(DriveBase driveBase, Supplier<Translation2d> target, double speed) {
 
         Command spinCommand = new Command() {
 
@@ -237,7 +242,7 @@ public class DriveCommands {
             @Override
             public void initialize() {
                 // Rotating plus 180 degrees to postion the back of the robot to the target.
-                Rotation2d rotation = driveBase.getRotationToTarget(target).plus(Rotation2d.fromDegrees(180));
+                Rotation2d rotation = driveBase.getRotationToTarget(target.get()).plus(Rotation2d.fromDegrees(180));
                 spinCommand = spinCommand(driveBase, rotation, speed);
                 spinCommand.initialize();
             }
