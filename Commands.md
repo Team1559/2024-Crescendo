@@ -53,22 +53,21 @@ Class|Description
 ## Command Methods
 We generally don't use these; instead, instantiate one of the command classes directly, as this makes reading the code more clear and learning the command types easier.
 
-Method|Description
-------|-----------
-[Command Methods](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/Command.html)		|
-withTimeout                    |Returns a version of `cmd` that is interrupted after the specified number of seconds.
-until or withInterrupt     |Returns a version of `cmd` that is interrupted when the boolean supplier returns true.
-beforeStarting                 |Creates a SequentialCommandGroup that will run the provided Commands or function and then `cmd`.
-andThen                        |Creates a SequentialCommandGroup that will run `cmd` and then the provided Commands or function.
-alongWith                      |Creates a ParallelCommandGroup containing `cmd` and the supplied commands.
-raceWith                       |Creates a ParallelRaceCommandGroup containing `cmd` and the supplied commands.
-deadlineWith                   |Creates a ParallelDeadlineCommandGroup containing `cmd` and the supplied commands, where `cmd` is the deadline.
-repeatedly                     |Returns a version of `cmd` that will be run repeatedly, forever.
-asProxy                        |Returns `cmd` wrapped in a ProxyCommand.
-unless                         |Returns a version of `cmd` that will not run if provided boolean supplier returns true.
-withInterruptBehavior          |Returns a version of `cmd` with the specified interruption behavior. Call with `kCancelIncoming` to make this command non-interruptible.
-finallyDo                      |Returns a version of `cmd` that runs the provided function when the command ends. The function will receive a boolean interrupted parameter, like the `end` method.
-handleInterrupt                |Returns a version of this command that will call the provided function when the command is interrupted.
+[Command](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/Command.html) Methods|Description
+--------------------------------------------------------------------------------------------------------------------|-----------
+withTimeout             |Returns a version of Command that is interrupted after the specified number of seconds.
+until or withInterrupt  |Returns a version of Command that is interrupted when the boolean supplier returns true.
+beforeStarting          |Creates a SequentialCommandGroup that will run the provided Commands or function and then Command.
+andThen                 |Creates a SequentialCommandGroup that will run Command and then the provided Commands or function.
+alongWith               |Creates a ParallelCommandGroup containing Command and the supplied commands.
+raceWith                |Creates a ParallelRaceCommandGroup containing Command and the supplied commands.
+deadlineWith            |Creates a ParallelDeadlineCommandGroup containing Command and the supplied commands, where Command is the deadline.
+repeatedly              |Returns a version of Command that will be run repeatedly, forever.
+asProxy                 |Returns Command wrapped in a ProxyCommand.
+unless                  |Returns a version of Command that will not run if provided boolean supplier returns true.
+withInterruptBehavior   |Returns a version of Command with the specified interruption behavior. Call with `kCancelIncoming` to make this command non-interruptible.
+finallyDo               |Returns a version of Command that runs the provided function when the command ends. The function will receive a boolean interrupted parameter, like the `end` method.
+handleInterrupt         |Returns a version of this command that will call the provided function when the command is interrupted.
 
 [Commands](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/Commands.html) Methods|Preferred Equivalence
 ------|---------------------

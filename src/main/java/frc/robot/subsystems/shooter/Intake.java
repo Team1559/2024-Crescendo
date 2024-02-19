@@ -1,8 +1,8 @@
 package frc.robot.subsystems.shooter;
 
 import frc.robot.Constants;
-import frc.robot.subsystems.general.SingleMotorIo;
-import frc.robot.subsystems.general.SingleMotorSubsystem;
+import frc.robot.subsystems.single_motor.SingleMotorIo;
+import frc.robot.subsystems.single_motor.SingleMotorSubsystem;
 
 public class Intake extends SingleMotorSubsystem {
     public Intake(SingleMotorIo io) {

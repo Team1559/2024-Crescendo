@@ -4,31 +4,50 @@ Contains constants that need to be updated per robot. i.e.
 * Hardware Ids
 * Constraints and Tuning Parameters
 
-
 # Tele-Op
-* **Driving:** Left Joystick
-  * [D-Pad + Back] isolates directional commands for tuning
+## Controller 1
+This Controller is used by the Driver.
+* **Driving:**
+    * [Left Joystick]
 * **Spinning:** Triggers
-  * [Left Trigger] = Spin Counter-Clockwise
-  * [Right Trigger] = Spin Clockwise
+    * [Left Trigger] = Spin Counter-Clockwise
+    * [Right Trigger] = Spin Clockwise
 * **Shooting:** Letter Buttons
-  * [Y + B] = Fire
-  * [B] = Aim at speaker. Robot rotates to maintain aim; aimer tracks the target; flywheels run at speaker speed.
-  * [B + Right Bumper] = Aim at amp. Robot rotates to maintain aim; aimer is at amp position; flywheels run at amp speed.
-* **LEDs:** (On Hold)
-  * [Start + A] = Solid $\color{green}Green$
-  * [Start + B] = Solid $\color{red}Red$ and **Black** pattern
-  * [Start + X] = $\color{blue}Blue$ and $\color{purple}Purple$ pattern moving in one direction
-  * [Start + Y] = $\color{yellow}Yellow$ and **Black** pattern moving in the other direction
-  * [Start + Left Bumber] = <span style="font-size:smaller;">Decrease Brightness</span>
-  * [Start + Right Bumber] = <span style="font-size:larger;">Increase Brightness</span>
-  * [Left + Right Bumber] = Turn Off LEDs
+    * [Y + B] = Fire
+    * [B] = Aim at speaker. Robot rotates to maintain aim; aimer tracks the target; flywheels run at speaker speed.
+    * [B + Right Bumper] = Aim at amp. Robot rotates to maintain aim; aimer is at amp position; flywheels run at amp speed.
 * **Emergency:**
-  * [D-Pad Up] = Reverse Shooter
+    * [D-Pad Up] = Reverse Shooter
+
+## Controller 2
+This Controller is used by the Co-Pilot.
+
+## Controller 3
+This Controller is used by the Technician.
+* **Driving:**
+    * `[D-Pad]` Provides isolated directional commands
+* **LEDs:** (On Hold)
+    * `[A + Back]` = Solid $\color{green}Green$
+    * `[B + Back]` = Solid $\color{red}Red$ and **Black** pattern
+    * `[X + Back]` = $\color{blue}Blue$ and $\color{purple}Purple$ pattern moving in one direction
+    * `[Y + Back]` = $\color{yellow}Yellow$ and **Black** pattern moving in the other direction
+    * `[Left Bumber + Back]` = <span style="font-size:smaller;">Decrease Brightness</span>
+    * `[Right Bumber + Back]` = <span style="font-size:larger;">Increase Brightness</span>
+    * `[Back + Start]` = Turn Off LEDs
+* **Subsystems:**
+    * `[A]` Runs the Intake
+    * `[A + Start]` Runs the Intake in Reverse
+    * `[B]` Runs the Feeder
+    * `[B + Start]` Runs the Feeder in Reverse
+    * `[Y]` Runs the Flywheel
+    * `[Y + Start]` Runs the Flywheel in Reverse
+    * `[Left Bumper + Start]` Runs just the left Flywheel motor
+    * `[Right Bumper + Start]` Runs just the left Flywheel motor
+    * `[Left Bumper]` Moves the Aimer DOWN 5 degrees
+    * `[Right Bumper]` Moves the Aimer UP 5 degrees
+
 # Autonomous
-
 During auto, the intake and flywheel run continuously to enable faster collecting and shooting of Notes.
-
 See PathPlanner for the auto routes. We should print those out for use at competition.
 
 Available auto routines:
@@ -65,6 +84,8 @@ Available auto routines:
     * `checked`
   * Editor: Format on Save Mode
     * `file`
+  * Editor: Detect Indentation
+    * `off`
 * Open this repo in the latest version the WPILib VS Code
   * When prompted, migrated the code to support the lates vbersion of WPILib
 * Update all Vendor Libraries

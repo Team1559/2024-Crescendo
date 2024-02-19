@@ -1,5 +1,7 @@
 package frc.robot.subsystems.shooter;
 
+import static frc.robot.constants.AbstractConstants.CONSTANTS;
+
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -44,18 +46,25 @@ public class Flywheel extends SubsystemBase {
     private final StatusSignal<Double> flywheelLMotorTemp, flywheelRMotorTemp;
     private final StatusSignal<Integer> flywheelLFaults, flywheelRFaults;
 
-    private final TalonFX flywheelMotorL = new TalonFX(Constants.FLYWHEEL_LEFT_MOTOR_ID);
-    private final TalonFX flywheelMotorR = new TalonFX(Constants.FLYWHEEL_RIGHT_MOTOR_ID);
+    private final TalonFX flywheelMotorL = new TalonFX(CONSTANTS.getFlywheelMotorIdLeft());
+    private final TalonFX flywheelMotorR = new TalonFX(CONSTANTS.getFlywheelMotorIdRight());
 
     private final FlywheelInputsAutoLogged inputs = new FlywheelInputsAutoLogged();
 
     private double currentVoltage;
+    /**
+     * Null when both wheels run, true when right wheel runs, false when left wheel
+     * runs.
+     */
+    private Boolean runOneWheelFlag;
 
     public Flywheel() {
 
         // ---------- Configure Motors ----------
-        flywheelMotorL.setInverted(true);
-        flywheelMotorR.setInverted(false);
+        // TODO: Determine why these aren't being respected.
+        // (Velecity is being inverted in #periodic() as a workaround.)
+        // flywheelMotorL.setInverted(true);
+        // flywheelMotorR.setInverted(false);
         flywheelMotorL.setNeutralMode(NeutralModeValue.Coast);
         flywheelMotorR.setNeutralMode(NeutralModeValue.Coast);
 
@@ -94,8 +103,13 @@ public class Flywheel extends SubsystemBase {
     @Override
     public void periodic() {
         // Set Voltages
-        flywheelMotorL.setControl(new VoltageOut(currentVoltage));
-        flywheelMotorR.setControl(new VoltageOut(currentVoltage));
+        if (runOneWheelFlag == null || runOneWheelFlag) {
+            // TODO: Removbe this workaround to the inveted config not taking.
+            flywheelMotorR.setControl(new VoltageOut(-currentVoltage));
+        }
+        if (runOneWheelFlag == null || !runOneWheelFlag) {
+            flywheelMotorL.setControl(new VoltageOut(currentVoltage));
+        }
 
         // Log inputs
         updateInputs();
@@ -136,15 +150,21 @@ public class Flywheel extends SubsystemBase {
      * 
      * @param voltage Set Flywheels to this voltage
      */
-    public void startFlywheel(double voltage) {
+    public void start(double voltage) {
         currentVoltage = voltage;
+        runOneWheelFlag = null;
     }
 
     /**
      * Start the Flywheels with default volage
      */
     public void start() {
-        startFlywheel(Constants.FLYWHEEL_FOWARDS_VOLTAGE);
+        start(Constants.FLYWHEEL_FOWARDS_VOLTAGE);
+    }
+
+    public void startOneMotor(boolean runRightWheel) {
+        start(Constants.FLYWHEEL_FOWARDS_VOLTAGE);
+        runOneWheelFlag = runRightWheel;
     }
 
     /**
@@ -159,25 +179,28 @@ public class Flywheel extends SubsystemBase {
     /**
      * Reverse the Flywheels
      */
-    public void reverseFlywheel() {
-        startFlywheel(Constants.FLYWHEEL_REVERSE_VOLTAGE);
+    public void reverse() {
+        start(Constants.FLYWHEEL_REVERSE_VOLTAGE);
     }
 
     // ========================= Commands =========================
-    public Command startFlywheelCommand(double voltage) {
-        return new InstantCommand(() -> startFlywheel(voltage), this);
-    }
-
-    public Command startFlywheelCommand() {
+    public Command startCommand() {
         return new InstantCommand(this::start, this);
     }
 
-    public Command stopFlywheelCommand() {
+    public Command startCommand(double voltage) {
+        return new InstantCommand(() -> start(voltage), this);
+    }
+
+    public Command startOneMotorCommand(boolean runRightWheel) {
+        return new InstantCommand(() -> startOneMotor(runRightWheel), this);
+    }
+
+    public Command stopCommand() {
         return new InstantCommand(this::stop, this);
     }
 
-    public Command reverseFlywheelCommand() {
-        return new InstantCommand(this::reverseFlywheel, this);
+    public Command reverseCommand() {
+        return new InstantCommand(this::reverse, this);
     }
-
 }
