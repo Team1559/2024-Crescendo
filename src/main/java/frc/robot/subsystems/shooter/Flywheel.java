@@ -89,7 +89,7 @@ public class Flywheel extends SubsystemBase {
 
         // ---------- Optimize Bus Utilization ----------
         BaseStatusSignal.setUpdateFrequencyForAll(
-                Constants.ADVANTAGE_DEFAULT_LOG_FREQUENCY,
+                CONSTANTS.getTalonFxStatusSignalUpdateFrequencyDefault(),
                 flywheelLMotorVoltage, flywheelRMotorVoltage,
                 flywheelLSupplyCurrent, flywheelRSupplyCurrent,
                 flywheelLSupplyVoltage, flywheelRSupplyVoltage,

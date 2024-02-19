@@ -264,6 +264,43 @@ public abstract class AbstractConstants {
 
     // #endregion
 
+    // #region: --------------- Motor / Motor Controller Settings --------------
+
+    // #region: ----- Talon FX Motor Controller -----
+    /**
+     * @return Value in Times per Second.
+     */
+    public double getTalonFxStatusSignalUpdateFrequencyDefault() {
+        return 50;
+    }
+
+    /**
+     * @return Value in Times per Second.
+     */
+    public double getTalonFxStatusSignalUpdateFrequencyForOdometry() {
+        return 100;
+    }
+
+    // #endregion
+
+    // #region: ----- NEO Brushless Motor -----
+
+    /**
+     * @return Value as Amps.
+     */
+    public int getNeoBrushlessCurrentLimit() {
+        return 24;
+    }
+
+    /**
+     * @return Value as Amps.
+     */
+    public int getNeoBrushlessCurrentSecondaryLimit() {
+        return 80;
+    }
+
+    // #endregion
+
     // #region: --------------- Operation Modes --------------------------------
     public OperatingMode getCurrentOperatingMode() {
         return OperatingMode.REAL_WORLD;

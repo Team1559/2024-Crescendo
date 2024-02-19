@@ -13,14 +13,6 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 @SuppressWarnings("unused") // < -- Never do this (Gets rid of dead code warnings)
 public final class Constants {
 
-    // ========================= CONSTANTS ======================================
-    public static final double ADVANTAGE_ODOMETRY_LOG_FREQUENCY = 100.0;
-    public static final double ADVANTAGE_DEFAULT_LOG_FREQUENCY = 50.0;
-
-    // ---------- Power Constants ----------
-    public static final int NEO_SPARK_BRUSHLESS_CURRENT_LIMIT = 24;
-    public static final int NEO_SPARK_BRUSHLESS_CURRENT_SECONDARY_LIMIT = 80;
-
     // ========================= Configuration Objects ========================
     /**
      * Allow 40A continuous, 80A momentary supply current. See: <a href=

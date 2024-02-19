@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 
 public class Aimer extends SubsystemBase {
 
@@ -50,10 +49,10 @@ public class Aimer extends SubsystemBase {
         motorR.setInverted(true);
         motorL.setIdleMode(IdleMode.kBrake);
         motorR.setIdleMode(IdleMode.kBrake);
-        motorL.setSmartCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_LIMIT);
-        motorR.setSmartCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_LIMIT);
-        motorL.setSecondaryCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_SECONDARY_LIMIT);
-        motorL.setSecondaryCurrentLimit(Constants.NEO_SPARK_BRUSHLESS_CURRENT_SECONDARY_LIMIT);
+        motorL.setSmartCurrentLimit(CONSTANTS.getNeoBrushlessCurrentLimit());
+        motorR.setSmartCurrentLimit(CONSTANTS.getNeoBrushlessCurrentLimit());
+        motorL.setSecondaryCurrentLimit(CONSTANTS.getNeoBrushlessCurrentSecondaryLimit());
+        motorL.setSecondaryCurrentLimit(CONSTANTS.getNeoBrushlessCurrentSecondaryLimit());
     }
 
     @Override
