@@ -3,8 +3,6 @@ package frc.robot;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean constants. This class should not be used for any other
@@ -28,12 +26,6 @@ public final class Constants {
     public static final double FLYWHEEL_FOWARDS_VOLTAGE = 9.0; // TODO: Configure Value
     public static final double FLYWHEEL_REVERSE_VOLTAGE = -6.0; // TODO: Configure Value.
     // TODO - Revert Flywheel Voltage to 12
-    public static final double AIMER_KP = .4;
-    public static final double AIMER_KI = 0;
-    public static final double AIMER_KD = 0;
-    public static final Rotation2d AIMER_ANGLE_OFFSET = Rotation2d.fromRadians(2.599); // TODO/calibrate
-    public static final double AIMER_LOWER_ANGLE = 1;
-    public static final double AIMER_UPPER_ANGLE = 45;
 
     // ---------- Hardware Config ----------
     // --- Swerve Drives ---
@@ -50,9 +42,6 @@ public final class Constants {
     public static final int BACK_RIGHT_STEER_MOTOR_ID = 7;
     public static final int BACK_RIGHT_CANCODER_ID = 8;
     public static final NeutralModeValue SWERVE_WHEEL_BRAKE_MODE = NeutralModeValue.Brake;
-
-    // ---------- Digital IO Ports ----------
-    public static final int AIMER_ENCODER_PORT = 0;
 
     // ---------- Adressable LEDs ----------
     public static final int ADDRESSABLE_LED_PORT = 0;

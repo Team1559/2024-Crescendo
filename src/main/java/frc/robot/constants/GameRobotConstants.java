@@ -6,6 +6,8 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Second;
 
+import org.opencv.core.Mat.Tuple2;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
@@ -87,6 +89,21 @@ public class GameRobotConstants extends AbstractConstants {
     // #region: --------------- Hardware ---------------------------------------
     // #region: ----- Aimer -----
     @Override
+    public Tuple2<Rotation2d> getAimerAngleRange() {
+        return new Tuple2<Rotation2d>(Rotation2d.fromDegrees(1), Rotation2d.fromDegrees(45));
+    }
+
+    @Override
+    public Rotation2d getAimerEncoderOffset() {
+        return Rotation2d.fromRadians(2.599);
+    }
+
+    @Override
+    public int getAimerEncoderPort() {
+        return 0;
+    }
+
+    @Override
     public int getAimerMotorIdLeft() {
         return 23;
     }
@@ -94,6 +111,10 @@ public class GameRobotConstants extends AbstractConstants {
     @Override
     public int getAimerMotorIdRight() {
         return 22;
+    }
+
+    public PID getAimerPid() {
+        return new PID(0.4, 0, 0);
     }
 
     // #endregion

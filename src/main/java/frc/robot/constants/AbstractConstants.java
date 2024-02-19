@@ -4,6 +4,8 @@ import static edu.wpi.first.units.Units.Meters;
 
 import java.util.Objects;
 
+import org.opencv.core.Mat.Tuple2;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
@@ -22,6 +24,17 @@ public abstract class AbstractConstants {
         REAL_WORLD,
         SIMULATION,
         LOG_REPLAY
+    }
+
+    // ========================= Static Classes ===============================-
+    public static class PID {
+        public final double P, I, D;
+
+        PID(double p, double i, double d) {
+            P = p;
+            I = i;
+            D = d;
+        }
     }
 
     // ========================= Static CONSTANTS ==============================
@@ -118,9 +131,17 @@ public abstract class AbstractConstants {
 
     // #region: --------------- Hardware ---------------------------------------
     // #region: ----- Aimer -----
+    public abstract Tuple2<Rotation2d> getAimerAngleRange();
+
+    public abstract Rotation2d getAimerEncoderOffset();
+
+    public abstract int getAimerEncoderPort();
+
     public abstract int getAimerMotorIdLeft();
 
     public abstract int getAimerMotorIdRight();
+
+    public abstract PID getAimerPid();
 
     // #endregion
 

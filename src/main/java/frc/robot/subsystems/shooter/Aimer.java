@@ -37,9 +37,9 @@ public class Aimer extends SubsystemBase {
 
     private final CANSparkMax motorL = new CANSparkMax(CONSTANTS.getAimerMotorIdLeft(), MotorType.kBrushless);
     private final CANSparkMax motorR = new CANSparkMax(CONSTANTS.getAimerMotorIdRight(), MotorType.kBrushless);
-    private final DutyCycleEncoder encoder = new DutyCycleEncoder(Constants.AIMER_ENCODER_PORT);
-    private final PIDController controller = new PIDController(Constants.AIMER_KP, Constants.AIMER_KI,
-            Constants.AIMER_KD);
+    private final DutyCycleEncoder encoder = new DutyCycleEncoder(CONSTANTS.getAimerEncoderPort());
+    private final PIDController controller = new PIDController(CONSTANTS.getAimerPid().P, CONSTANTS.getAimerPid().I,
+            CONSTANTS.getAimerPid().D);
     private final AimerInputsAutoLogged inputs = new AimerInputsAutoLogged();
 
     /**
@@ -90,10 +90,9 @@ public class Aimer extends SubsystemBase {
 
     // ========================= Functions =========================
     public void setTargetAngle(Rotation2d angle) {
-        System.out.println("Set Angle: " + angle);
-        double targetAngle = MathUtil.clamp(angle.getDegrees(), Constants.AIMER_LOWER_ANGLE,
-                Constants.AIMER_UPPER_ANGLE);
-        System.out.println(targetAngle);
+
+        double targetAngle = MathUtil.clamp(angle.getDegrees(), CONSTANTS.getAimerAngleRange().get_0().getDegrees(),
+                CONSTANTS.getAimerAngleRange().get_1().getDegrees());
         controller.setSetpoint(targetAngle);
     }
 
@@ -106,9 +105,8 @@ public class Aimer extends SubsystemBase {
     }
 
     public Rotation2d getAngle() {
-        // Neg. encoder position and add offset so that the angle is effectively
-        // inverted
-        return Rotation2d.fromRotations(-encoder.getAbsolutePosition()).plus(Constants.AIMER_ANGLE_OFFSET);
+        // Invert angle as encoder is mounted "backwards".
+        return Rotation2d.fromRotations(-encoder.getAbsolutePosition()).plus(CONSTANTS.getAimerEncoderOffset());
     }
 
     // ========================= Commands =========================

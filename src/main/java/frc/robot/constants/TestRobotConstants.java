@@ -6,6 +6,8 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Second;
 
+import org.opencv.core.Mat.Tuple2;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
@@ -87,6 +89,23 @@ public class TestRobotConstants extends AbstractConstants {
     // #region: --------------- Hardware ---------------------------------------
     // #region: ----- Aimer -----
     @Override
+    public Tuple2<Rotation2d> getAimerAngleRange() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAimerAngleRange'");
+    }
+
+    @Override
+    public Rotation2d getAimerEncoderOffset() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAimerEncoderOffset'");
+    }
+
+    @Override
+    public int getAimerEncoderPort() {
+        throw new UnsupportedOperationException("Unimplemented method 'getAimerEncoderPort'");
+    }
+
+    @Override
     public int getAimerMotorIdLeft() {
         throw new UnsupportedOperationException("Unimplemented method 'getAimerMotorIdLeft'");
     }
@@ -94,6 +113,12 @@ public class TestRobotConstants extends AbstractConstants {
     @Override
     public int getAimerMotorIdRight() {
         throw new UnsupportedOperationException("Unimplemented method 'getAimerMotorIdRight'");
+    }
+
+    @Override
+    public PID getAimerPid() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAimerPid'");
     }
 
     // #endregion
