@@ -8,8 +8,6 @@
 ## Default Commands
 These Commands will run, unless another command is called on the subsystem(s).
 
-* **Run Intake**
-    * The Intake and Feeder motors will run, until the Color Sensor detects a Note
 * **LEDs: Team Color**
     * The LEDs will display the team color
 * **Stop Flywheel**
@@ -47,8 +45,7 @@ These Commands are triggered by the controllers.
 
 ## Intake Commands
 Since the Intake operates automatically as a default command, these commands are only for abnormal situations.
-* **Stop Intake & Feeder**
-    * (The Flywheel will also be stopped, if running)
+* **Run Intake & Feeder**
 * **Reverse Intake & Feeder**
     * (The Flywheel will be stopped, if running)
 
@@ -60,8 +57,8 @@ Since the Intake operates automatically as a default command, these commands are
     * LEDs will flash $\color{violet}Purple$
         * Once the Color Sensor no longer sees the Note
     * The Flywheel will stop
-* **Stop Intake & Feeder**
-    * (The Flywheel will also be stopped, if running)
+* **Stop Flywheel & Feeder**
+    * (The intkake will also be stopped, if running)
 * **Reverse Flywheel & Feeder**
     * (The Intake will be stopped, if running)
 
