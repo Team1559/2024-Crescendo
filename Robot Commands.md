@@ -1,6 +1,10 @@
 
 # Robot Commands
 
+## Controllers
+* **Controller_1:** Driver Controller
+* **Controller_2:** Co-Pilot Controller
+
 ## Default Commands
 These Commands will run, unless another command is called on the subsystem(s).
 
@@ -19,6 +23,7 @@ These are Commands that are triggered by things other then the controllers.
     * While the Color Sensor detects a Note, the LEDs will be $\color{orange}Orange$
 * **Thermal Cutoffs**
     * Any Motor exceeding their recommended temperature range, will be disabled until its temperature returns to a safe range
+        * (For safety)
     * LEDs will flash $\color{yellow}Yellow$ while the motor is disabled
 
 # Controller Commands
