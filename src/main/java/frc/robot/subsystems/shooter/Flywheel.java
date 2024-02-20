@@ -101,7 +101,8 @@ public class Flywheel extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // Set Voltages
+
+        // Set Voltages.
         if (runOneWheelFlag == null || runOneWheelFlag) {
             // TODO: Removbe this workaround to the inveted config not taking.
             flywheelMotorR.setControl(new VoltageOut(-currentVoltage));
@@ -111,7 +112,7 @@ public class Flywheel extends SubsystemBase {
                     new VoltageOut(currentVoltage * CONSTANTS.getFlywheelMotorPowerDifferentialPercentage()));
         }
 
-        // Log inputs
+        // Log Inputs.
         updateInputs();
         Logger.processInputs("Shooter/Flywheel", inputs);
     }

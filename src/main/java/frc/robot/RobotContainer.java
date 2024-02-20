@@ -31,8 +31,8 @@ import frc.robot.subsystems.shooter.ColorSensor;
 import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.Intake;
+import frc.robot.subsystems.single_motor.SingleMotorIoNeo550Brushless;
 import frc.robot.subsystems.single_motor.SingleMotorIoReplay;
-import frc.robot.subsystems.single_motor.SingleMotorIoSparkMax;
 import frc.robot.subsystems.swerve_module.SwerveModuleIoReplay;
 import frc.robot.subsystems.swerve_module.SwerveModuleIoSim;
 import frc.robot.subsystems.swerve_module.SwerveModuleIoTalonFx;
@@ -88,18 +88,18 @@ public class RobotContainer {
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_LEFT),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
                 feeder = CONSTANTS.hasFeederSubsystem()
-                        ? new Feeder(new SingleMotorIoSparkMax(CONSTANTS.getFeederMotorId(),
+                        ? new Feeder(new SingleMotorIoNeo550Brushless(CONSTANTS.getFeederMotorId(),
                                 CONSTANTS.isFeederMortorInverted()))
                         : null;
                 intake = CONSTANTS.hasIntakeSubsystem()
-                        ? new Intake(new SingleMotorIoSparkMax(CONSTANTS.getIntakeMotorId(),
+                        ? new Intake(new SingleMotorIoNeo550Brushless(CONSTANTS.getIntakeMotorId(),
                                 CONSTANTS.isIntakeMortorInverted()))
                         : null;
                 vision = CONSTANTS.hasVisionSubsystem()
                         ? new Vision(driveBase.poseEstimator, new VisionIoLimelight(CONSTANTS.getCameraName()))
                         : null;
                 traverser = CONSTANTS.hasTraverserSubsystem()
-                        ? new Traverser(new SingleMotorIoSparkMax(CONSTANTS.getTraverserMotorId(),
+                        ? new Traverser(new SingleMotorIoNeo550Brushless(CONSTANTS.getTraverserMotorId(),
                                 CONSTANTS.isTraverserInverted()))
                         : null;
                 break;
@@ -113,18 +113,18 @@ public class RobotContainer {
                         new SwerveModuleIoSim(),
                         new SwerveModuleIoSim());
                 feeder = CONSTANTS.hasFeederSubsystem()
-                        ? new Feeder(new SingleMotorIoSparkMax(CONSTANTS.getFeederMotorId(),
+                        ? new Feeder(new SingleMotorIoNeo550Brushless(CONSTANTS.getFeederMotorId(),
                                 CONSTANTS.isFeederMortorInverted()))
                         : null;
                 intake = CONSTANTS.hasIntakeSubsystem()
-                        ? new Intake(new SingleMotorIoSparkMax(CONSTANTS.getIntakeMotorId(),
+                        ? new Intake(new SingleMotorIoNeo550Brushless(CONSTANTS.getIntakeMotorId(),
                                 CONSTANTS.isIntakeMortorInverted()))
                         : null;
                 vision = CONSTANTS.hasVisionSubsystem()
                         ? new Vision(driveBase.poseEstimator, new VisionIoSimAndReplay())
                         : null;
                 traverser = CONSTANTS.hasTraverserSubsystem()
-                        ? new Traverser(new SingleMotorIoSparkMax(CONSTANTS.getTraverserMotorId(),
+                        ? new Traverser(new SingleMotorIoNeo550Brushless(CONSTANTS.getTraverserMotorId(),
                                 CONSTANTS.isTraverserInverted()))
                         : null;
                 break;
@@ -193,6 +193,13 @@ public class RobotContainer {
         if (CONSTANTS.hasColorSensorSubsystem()) {
             new Trigger((colorSensor::isObjectDetected)).whileTrue(leds.setColorCommand(Color.kDarkOrange));
         }
+        if (CONSTANTS.hasIntakeSubsystem()) {
+            new Trigger(intake::isTemperatureTooHigh).whileTrue(intake.stopCommand());
+        }
+        if (CONSTANTS.hasFeederSubsystem()) {
+            new Trigger(feeder::isTemperatureTooHigh).whileTrue(feeder.stopCommand());
+        }
+        // TODO: Add All other Motor High Tempeature Cutoffs.
 
         // #endregion
 

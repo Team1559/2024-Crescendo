@@ -6,8 +6,13 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
-public class SingleMotorIoSparkMax implements SingleMotorIo {
-    private final CANSparkMax motor;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Temperature;
+import edu.wpi.first.units.Units;
+
+public abstract class SingleMotorIoSparkMax implements SingleMotorIo {
+
+    protected final CANSparkMax motor;
 
     /**
      * Create a new subsystem for a single SparkMax-controlled motor in voltage mode
@@ -29,6 +34,10 @@ public class SingleMotorIoSparkMax implements SingleMotorIo {
         inputs.motorTemp = motor.getMotorTemperature();
         inputs.faults = motor.getFaults();
         inputs.velocity = motor.getEncoder().getVelocity();
+    }
+
+    public Measure<Temperature> getTemperature() {
+        return Units.Celsius.of(motor.getMotorTemperature());
     }
 
     public void setVoltage(double voltage) {

@@ -102,11 +102,11 @@ public class ShooterCommands {
       //@formattter:on
   }
 
-  public static Command stopIntakeFeederCommand(Intake intake, Feeder feeder, Leds leds) {
-    return new InstantCommand(() -> {
+    public static Command stopIntakeFeederCommand(Intake intake, Feeder feeder, Leds leds) {
+        return new InstantCommand(() -> {
       intake.stop();
       feeder.stop();
       leds.setDynamicPattern(new Color[] { Color.kRed, Color.kRed, Color.kBlack, Color.kBlack }, true);
     }, intake, feeder);
-  }
+    }
 }
