@@ -61,6 +61,7 @@ public class RobotContainer {
     private final DriveBase driveBase;
 
     private final Aimer aimer;
+    // TODO: Add Climber variable.
     private final ColorSensor colorSensor;
     private final Feeder feeder;
     private final Flywheel flywheel;
