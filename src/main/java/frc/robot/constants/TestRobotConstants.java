@@ -107,8 +107,12 @@ public class TestRobotConstants extends AbstractConstants {
 
     // #region: ----- Climber -----
     @Override
+    public double getClimberMaxHeight() {
+        throw new UnsupportedOperationException("Unimplemented method 'getClimberMaxHeight'");
+    }
+
+    @Override
     public PID getClimberPid() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getClimberPid'");
     }
 
@@ -266,12 +270,6 @@ public class TestRobotConstants extends AbstractConstants {
 
     public Measure<Distance> getWheelRadius() {
         return Inches.of(2);
-    }
-
-    @Override
-    public double getClimberMaxHeight() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getClimberMaxHeight'");
     }
 
     // #endregion
