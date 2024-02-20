@@ -87,7 +87,7 @@ public class ShooterCommands {
       leds.setColorCommand(Color.kMediumSpringGreen),
       colorSensor.waitForNoObjectCommand(),
       new WaitCommand(.25),
-      feeder.stopCommand(),
+      feeder.stopCommand(), // TODO: N/A as the Default Feeder Command is to spin.
       flywheel.stopCommand()
     );
     //@formatter:on
