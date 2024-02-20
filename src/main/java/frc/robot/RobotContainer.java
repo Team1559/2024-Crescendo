@@ -257,7 +257,7 @@ public class RobotContainer {
         // #endregion
 
         // #region: ---------- Configure Controller 3 for Technician ----------
-        // #region: ----- Swirve Drive Commands -----
+        // #region: ----- Swerve Drive Commands -----
         controller3.povUp().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(1, 0, 0)));
         controller3.povDown().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(-1, 0, 0)));
         controller3.povRight().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(0, -1, 0)));
