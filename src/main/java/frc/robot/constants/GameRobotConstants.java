@@ -92,6 +92,12 @@ public class GameRobotConstants extends AbstractConstants {
         return new PID(1, 0, 0);
     }
 
+    @Override
+    public double getClimberMaxHeight() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getClimberMaxHeight'");
+    }
+
     // #endregion
 
     // #region: ----- Aimer -----

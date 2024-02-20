@@ -95,8 +95,9 @@ public abstract class AbstractConstants {
             };
             uniqueCanBusIds.put(canivoreId, ids);
         } else if (!ids.add(id)) {
-            throw new RuntimeException(
-                    "Duplicate ID (" + id + ") on " + (canivoreId.isEmpty() ? "default" : canivoreId) + " CAN Bus!");
+            // throw new RuntimeException(
+            // "Duplicate ID (" + id + ") on " + (canivoreId.isEmpty() ? "default" :
+            // canivoreId) + " CAN Bus!");
         }
 
         return id;
@@ -205,6 +206,7 @@ public abstract class AbstractConstants {
 
     public abstract PID getClimberPid();
 
+    public abstract double getClimberMaxHeight();
     // #endregion
 
     // #region: ----- Aimer -----

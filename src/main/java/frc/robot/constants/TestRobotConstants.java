@@ -268,5 +268,11 @@ public class TestRobotConstants extends AbstractConstants {
         return Inches.of(2);
     }
 
+    @Override
+    public double getClimberMaxHeight() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getClimberMaxHeight'");
+    }
+
     // #endregion
 }
