@@ -193,11 +193,19 @@ public abstract class AbstractConstants {
     // #region: --------------- Hardware ---------------------------------------
 
     // #region: ----- Climber --------
-    public abstract int getClimberMotorIdLeft();
+    public int getClimberMotorIdLeft() {
+        // TODO: Add ID
+        throw new UnsupportedOperationException("No Motor ID for Left Climber motor");
+    }
 
-    public abstract int getClimberMotorIdRight();
+    public int getClimberMotorIdRight() {
+        // TODO: Add ID
+        throw new UnsupportedOperationException("No Motor ID for Right Climber motor");
+    }
 
     public abstract PID getClimberPid();
+
+    // #endregion
 
     // #region: ----- Aimer -----
     public abstract Tuple2<Rotation2d> getAimerAngleRange();
@@ -257,6 +265,8 @@ public abstract class AbstractConstants {
     public abstract double getFlywheelForwardVoltage();
 
     public abstract double getFlywheelReverseVoltage();
+
+    public abstract double getFlywheelMotorPowerDifferentialPercentage();
 
     // #endregion
 

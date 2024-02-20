@@ -88,19 +88,11 @@ public class GameRobotConstants extends AbstractConstants {
 
     // #region: ----- Climber --------
     @Override
-    public int getClimberMotorIdLeft() {
-        // TODO: Add ID
-        throw new UnsupportedOperationException("No Motor ID for Left Climber motor");
-    }
-
-    public int getClimberMotorIdRight() {
-        // TODO: Add ID
-        throw new UnsupportedOperationException("No Motor ID for Right Climber motor");
-    }
-
     public PID getClimberPid() {
         return new PID(1, 0, 0);
     }
+
+    // #endregion
 
     // #region: ----- Aimer -----
     @Override
@@ -159,6 +151,12 @@ public class GameRobotConstants extends AbstractConstants {
     public double getFlywheelReverseVoltage() {
         // TODO: Configure Value.
         return -6;
+    }
+
+    @Override
+    public double getFlywheelMotorPowerDifferentialPercentage() {
+        // TODO: Tune.
+        return 0.75;
     }
 
     // #endregion
@@ -228,11 +226,6 @@ public class GameRobotConstants extends AbstractConstants {
         return true;
     }
 
-    @Override
-    public int getTraverserMotorId() {
-        // TODO: Add ID
-        throw new UnsupportedOperationException("No Motor ID for Traverser");
-    }
     // #endregion
 
     // #region: ----- Vision -----

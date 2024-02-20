@@ -104,20 +104,16 @@ public class TestRobotConstants extends AbstractConstants {
     }
 
     // #endregion
+
     // #region: ----- Climber -----
     @Override
-    public int getClimberMotorIdLeft() {
-        // TODO Add ID
-        throw new UnsupportedOperationException("Unimplemented method 'getClimberMotorIdLeft'");
-    }
-
-    @Override
-    public int getClimberMotorIdRight() {
-        // TODO Add ID
-        throw new UnsupportedOperationException("Unimplemented method 'getClimberMotorIdRight'");
+    public PID getClimberPid() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getClimberPid'");
     }
 
     // #endregion
+
     // #region: ----- Color Sensor -----
     @Override
     public int getColorSensorProximityThreshold() {
@@ -155,6 +151,11 @@ public class TestRobotConstants extends AbstractConstants {
     @Override
     public double getFlywheelReverseVoltage() {
         throw new UnsupportedOperationException("Unimplemented method 'getFlywheelReverseVoltage'");
+    }
+
+    @Override
+    public double getFlywheelMotorPowerDifferentialPercentage() {
+        throw new UnsupportedOperationException("Unimplemented method 'getFlywheelMotorPowerDifferentialPercentage'");
     }
 
     // #endregion
@@ -266,11 +267,6 @@ public class TestRobotConstants extends AbstractConstants {
     public Measure<Distance> getWheelRadius() {
         return Inches.of(2);
     }
-    // #endregion
 
-    @Override
-    public PID getClimberPid() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getClimberPid'");
-    }
+    // #endregion
 }

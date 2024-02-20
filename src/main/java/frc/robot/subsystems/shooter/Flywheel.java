@@ -107,7 +107,8 @@ public class Flywheel extends SubsystemBase {
             flywheelMotorR.setControl(new VoltageOut(-currentVoltage));
         }
         if (runOneWheelFlag == null || !runOneWheelFlag) {
-            flywheelMotorL.setControl(new VoltageOut(currentVoltage * .75));
+            flywheelMotorL.setControl(
+                    new VoltageOut(currentVoltage * CONSTANTS.getFlywheelMotorPowerDifferentialPercentage()));
         }
 
         // Log inputs
