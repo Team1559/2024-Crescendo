@@ -121,7 +121,7 @@ public class GameRobotConstants extends AbstractConstants {
     // #region: ----- Color Sensor -----
     @Override
     public int getColorSensorProximityThreshold() {
-        return 1500; // TODO: Configure Value.
+        return 200; // TODO: Configure Value.
     }
 
     // #endregion
@@ -135,7 +135,7 @@ public class GameRobotConstants extends AbstractConstants {
     @Override
     public double getFeederForwardVoltage() {
         // TODO: Configure Value.
-        return 6;
+        return 4;
     }
 
     @Override

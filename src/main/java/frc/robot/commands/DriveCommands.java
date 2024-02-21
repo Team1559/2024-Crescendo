@@ -49,7 +49,8 @@ public class DriveCommands {
                 pid.setSetpoint(0); // Degrees from target.
                 pid.setTolerance(1/* degree(s) */);
                 pid.enableContinuousInput(-180, 180); // Degrees.
-                flywheel.start();
+                if (CONSTANTS.hasFlywheelSubsystem())
+                    flywheel.start();
             }
 
             @Override
@@ -118,6 +119,8 @@ public class DriveCommands {
 
         };
         aimingDrive.addRequirements(driveBase);
+        if (CONSTANTS.hasFlywheelSubsystem())
+            aimingDrive.addRequirements(flywheel);
         return aimingDrive;
     }
 

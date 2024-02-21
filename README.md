@@ -6,7 +6,7 @@ Contains constants that need to be updated per robot. i.e.
 
 # Tele-Op
 ## Controller 1
-This Controller is used by the Driver.
+This Controller is used by the Pilot.
 * **Driving:**
     * [Left Joystick]
 * **Spinning:** Triggers

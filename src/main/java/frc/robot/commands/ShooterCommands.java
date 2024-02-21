@@ -93,6 +93,22 @@ public class ShooterCommands {
     //@formatter:on
     }
 
+    public static Command shootWithSpinupCommand(Flywheel flywheel, Feeder feeder, Leds leds, ColorSensor colorSensor) {
+    //@formatter:off
+    return new SequentialCommandGroup(
+      // Only used when shooting without aiming
+      flywheel.startCommand(),
+      new WaitCommand(.25),
+      feeder.startCommand(),
+      leds.setColorCommand(Color.kMediumSpringGreen),
+      colorSensor.waitForNoObjectCommand(),
+      new WaitCommand(.25),
+      feeder.stopCommand(), // TODO: N/A as the Default Feeder Command is to spin.
+      flywheel.stopCommand()
+    );
+    //@formatter:on
+    }
+
     public static Command spinUpFlywheelCommand(Flywheel flywheel) {
     //@formatter:off
     return new SequentialCommandGroup(

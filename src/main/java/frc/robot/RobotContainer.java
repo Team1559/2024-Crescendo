@@ -13,6 +13,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -51,11 +52,11 @@ import frc.robot.util.KColor;
 public class RobotContainer {
 
     /** This Controller is used by the Driver. */
-    private final CommandXboxController controller1 = new CommandXboxController(0);
+    private final CommandXboxController controller0 = new CommandXboxController(0);
     /** This Controller is used by the Co-Pilot. */
-    private final CommandXboxController controller2 = new CommandXboxController(1);
+    private final CommandXboxController controller1 = new CommandXboxController(1);
     /** This Controller is used by the Technician. */
-    private final CommandXboxController controller3 = new CommandXboxController(2);
+    private final CommandXboxController controller2 = new CommandXboxController(2);
     private final LoggedDashboardChooser<Command> autoChooser;
 
     private final DriveBase driveBase;
@@ -166,9 +167,9 @@ public class RobotContainer {
         // #region: ==================== Default Commands & Triggers ===========
         // #region: ---------- Configure Default Commands ----------
         driveBase.setDefaultCommand(DriveCommands.manualDriveDefaultCommand(driveBase,
-                () -> -controller1.getLeftY(),
-                () -> -controller1.getLeftX(),
-                () -> -controller1.getRightX()));
+                () -> -controller0.getLeftY(),
+                () -> -controller0.getLeftX(),
+                () -> -controller0.getRightX()));
         /*
          * TODO: Need to decvide if the Intake and Feeder Motors run by default.
          * See: https://www.revrobotics.com/neo-550-brushless-motor-locked-rotor-testing
@@ -226,7 +227,7 @@ public class RobotContainer {
         // #endregion
 
         // #region: ==================== Tele-Op ===============================
-        // #region: ---------- Configure Controller 1 for Driver ----------
+        // #region: ---------- Configure Controller 0 for Pilot ----------
         Command teleOpShootCommand;
         Command reverseShooterCommand;
         Command stopIntakeFeederCommand;
@@ -239,63 +240,83 @@ public class RobotContainer {
             reverseShooterCommand = LedCommands.blinkCommand(leds, Color.kTomato);
             stopIntakeFeederCommand = LedCommands.blinkCommand(leds, Color.kDarkKhaki);
         }
-        controller1.y().and(controller1.b()).onTrue(teleOpShootCommand);
-
-        controller1.b().and(not(controller1.rightBumper()))
-                .whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel,
-                        () -> -controller1.getLeftY(), () -> -controller1.getLeftX(), CONSTANTS::getSpeakerLocation));
-        controller1.b().and(controller1.rightBumper())
-                .whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel,
-                        () -> -controller1.getLeftY(), () -> -controller1.getLeftX(), CONSTANTS::getAmpLocation));
+        // TODO reset FO
+        controller0.leftTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel,
+                () -> -controller0.getLeftY(), () -> -controller0.getLeftX(), CONSTANTS::getSpeakerLocation));
+        controller0.rightTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel,
+                () -> -controller0.getLeftY(), () -> -controller0.getLeftX(), CONSTANTS::getAmpLocation));
+        controller0.y().onTrue(driveBase.resetFieldOrientationCommand());
 
         // #endregion
 
-        // #region: ---------- Configure Controller 2 for Co-Pilot ----------
+        // #region: ---------- Configure Controller 1 for Co-Pilot ----------
+        controller1.rightTrigger().and(controller0.leftTrigger().or(controller0.rightTrigger()))
+                .onTrue(teleOpShootCommand);
+        controller1.rightTrigger().and(not(controller0.leftTrigger().or(controller0.rightTrigger())))
+                .onTrue(ShooterCommands.spinUpFlywheelCommand(flywheel));
+
+        if (CONSTANTS.hasIntakeSubsystem()) { // TODO - Make one Command
+            controller1.leftTrigger().and(not(colorSensor::isObjectDetected))
+                    .whileTrue(new StartEndCommand(intake::start, intake::stop, intake));
+            controller1.leftTrigger().and(not(colorSensor::isObjectDetected))
+                    .whileTrue(new StartEndCommand(feeder::start, feeder::stop, feeder));
+            controller1.x().whileTrue(new StartEndCommand(intake::reverse, intake::stop, intake));
+        }
+
+        controller1.a().whileTrue(reverseShooterCommand);
+        controller1.b().onTrue(flywheel.stopCommand());
+
+        if (CONSTANTS.hasAimerSubsystem()) {
+            controller1.rightBumper()
+                    .whileTrue(new RunCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(.5))));
+            controller1.leftBumper()
+                    .whileTrue(new RunCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(-.5))));
+        }
         // TODO.
 
         // #endregion
 
         // #region: ---------- Configure Controller 3 for Technician ----------
         // #region: ----- Swirve Drive Commands -----
-        controller3.povUp().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(1, 0, 0)));
-        controller3.povDown().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(-1, 0, 0)));
-        controller3.povRight().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(0, -1, 0)));
-        controller3.povLeft().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(0, 1, 0)));
+        controller2.povUp().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(1, 0, 0)));
+        controller2.povDown().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(-1, 0, 0)));
+        controller2.povRight().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(0, -1, 0)));
+        controller2.povLeft().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(0, 1, 0)));
 
         // #endregion
 
         // #region: ----- Light Commands -----
-        controller3.a().and(controller3.back()).and(not(controller3.start()))
+        controller2.a().and(controller2.back()).and(not(controller2.start()))
                 .onTrue(leds.setColorCommand(Color.kDarkGreen));
-        controller3.b().and(controller3.back()).and(not(controller3.start())).onTrue(leds.setStaticPatternCommand(
+        controller2.b().and(controller2.back()).and(not(controller2.start())).onTrue(leds.setStaticPatternCommand(
                 new Color[] { KColor.ALLIANCE_RED, KColor.ALLIANCE_RED, Color.kBlack, Color.kBlack }));
-        controller3.x().and(controller3.back()).and(not(controller3.start()))
+        controller2.x().and(controller2.back()).and(not(controller2.start()))
                 .onTrue(leds.setDynamicPatternCommand(new Color[] {
                         KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE, KColor.ALLIANCE_BLUE,
                         Color.kDarkViolet, Color.kDarkViolet, Color.kDarkViolet }, true));
-        controller3.y().and(controller3.back()).and(not(controller3.start()))
+        controller2.y().and(controller2.back()).and(not(controller2.start()))
                 .onTrue(leds.setDynamicPatternCommand(new Color[] {
                         Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kBlack,
                         Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack, Color.kBlack },
                         false));
-        controller3.leftBumper().and(controller3.back()).and(not(controller3.start()))
+        controller2.leftBumper().and(controller2.back()).and(not(controller2.start()))
                 .onTrue(leds.changeBrightnessCommand(true));
-        controller3.rightBumper().and(controller3.back()).and(not(controller3.start()))
+        controller2.rightBumper().and(controller2.back()).and(not(controller2.start()))
                 .onTrue(leds.changeBrightnessCommand(false));
-        controller3.back().and(controller3.start()).onTrue(leds.turnOffCommand());
+        controller2.back().and(controller2.start()).onTrue(leds.turnOffCommand());
 
         // #endregion
 
         // #region: ----- Subsystem Commands -----
         if (CONSTANTS.hasAimerSubsystem()) {
-            controller3.rightBumper().and(not(controller3.start())).and(not(controller3.back()))
+            controller2.rightBumper().and(not(controller2.start())).and(not(controller2.back()))
                     .onTrue(new InstantCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(1))));
-            controller3.leftBumper().and(not(controller3.start())).and(not(controller3.back()))
+            controller2.leftBumper().and(not(controller2.start())).and(not(controller2.back()))
                     .onTrue(new InstantCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(-1))));
 
-            controller3.rightBumper().and(controller3.back()).and(not(controller3.start()))
+            controller2.rightBumper().and(controller2.back()).and(not(controller2.start()))
                     .onTrue(new InstantCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(.1))));
-            controller3.leftBumper().and(controller3.back()).and(not(controller3.start()))
+            controller2.leftBumper().and(controller2.back()).and(not(controller2.start()))
                     .onTrue(new InstantCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(-.1))));
         }
 
@@ -304,34 +325,34 @@ public class RobotContainer {
         }
 
         if (CONSTANTS.hasFeederSubsystem()) {
-            controller3.b().and(not(controller3.start())).and(not(controller3.back()))
+            controller2.b().and(not(controller2.start())).and(not(controller2.back()))
                     .whileTrue(new StartEndCommand(feeder::start, feeder::stop, feeder));
-            controller3.b().and(controller3.start())
+            controller2.b().and(controller2.start())
                     .whileTrue(new StartEndCommand(feeder::reverse, feeder::stop, feeder));
         }
 
         if (CONSTANTS.hasFlywheelSubsystem()) {
-            controller3.y().and(not(controller3.start())).and(not(controller3.back()))
+            controller2.y().and(not(controller2.start())).and(not(controller2.back()))
                     .whileTrue(new StartEndCommand(flywheel::start, flywheel::stop, flywheel));
-            controller3.y().and(controller3.start())
+            controller2.y().and(controller2.start())
                     .whileTrue(new StartEndCommand(flywheel::reverse, flywheel::stop, flywheel));
-            controller3.leftBumper().and(controller3.start()).whileTrue(new StartEndCommand(() -> {
+            controller2.leftBumper().and(controller2.start()).whileTrue(new StartEndCommand(() -> {
                 flywheel.startOneMotor(false);
             }, flywheel::stop, flywheel));
-            controller3.rightBumper().and(controller3.start()).whileTrue(new StartEndCommand(() -> {
+            controller2.rightBumper().and(controller2.start()).whileTrue(new StartEndCommand(() -> {
                 flywheel.startOneMotor(true);
             }, flywheel::stop, flywheel));
         }
 
         if (CONSTANTS.hasIntakeSubsystem()) {
-            controller3.a().and(not(controller3.start())).and(not(controller3.back()))
+            controller2.a().and(not(controller2.start())).and(not(controller2.back()))
                     .whileTrue(new StartEndCommand(intake::start, intake::stop, intake));
-            controller3.a().and(controller3.start())
+            controller2.a().and(controller2.start())
                     .whileTrue(new StartEndCommand(intake::reverse, intake::stop, intake));
         }
 
         if (CONSTANTS.hasTraverserSubsystem()) {
-            controller2.x().onTrue(new StartEndCommand(() -> {
+            controller1.x().onTrue(new StartEndCommand(() -> {
                 traverser.start();
             }, () -> {
                 traverser.stop();
