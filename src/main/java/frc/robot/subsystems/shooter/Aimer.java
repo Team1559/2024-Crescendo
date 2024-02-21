@@ -18,21 +18,21 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.MathUtils;
 
 public class Aimer extends SubsystemBase {
 
     @AutoLog
     static class AimerInputs {
 
-        public double currentAnlgeDegrees;
-        public double targetAnlgeDegrees;
+        public double currentAngleDegrees;
+        public double targetAngleDegrees;
 
         public double lAppliedOutput, rAppliedOutput;
         public double lOutputCurrent, rOutputCurrent;
         public double lMotorTemp, rMotorTemp;
         public int lFaults, rFaults;
         public double lVelocity, rVelocity;
-        public Rotation2d targetAngle;
     }
 
     private final CANSparkMax motorL = new CANSparkMax(CONSTANTS.getAimerMotorIdLeft(), MotorType.kBrushless);
@@ -63,8 +63,8 @@ public class Aimer extends SubsystemBase {
         Logger.processInputs("Shooter/Aimer", inputs);
 
         // Set Voltages
-        if (controller.getSetpoint() != 0) {
-            double output = controller.calculate(inputs.currentAnlgeDegrees);
+        if (controller.getSetpoint() != 0) { // TODO: Determine Acceptable variance.
+            double output = controller.calculate(inputs.currentAngleDegrees);
             motorL.setVoltage(output);
             motorR.setVoltage(output);
         }
@@ -72,8 +72,8 @@ public class Aimer extends SubsystemBase {
 
     private void updateInputs() {
 
-        inputs.currentAnlgeDegrees = getAngle().getDegrees();
-        inputs.targetAnlgeDegrees = controller.getSetpoint();
+        inputs.currentAngleDegrees = MathUtils.round(getAngle().getDegrees(), 2);
+        inputs.targetAngleDegrees = MathUtils.round(getTargetAngle().getDegrees(), 2);
 
         inputs.lAppliedOutput = motorL.getAppliedOutput();
         inputs.lOutputCurrent = motorL.getOutputCurrent();
@@ -86,7 +86,6 @@ public class Aimer extends SubsystemBase {
         inputs.rMotorTemp = motorR.getMotorTemperature();
         inputs.rFaults = motorR.getFaults();
         inputs.rVelocity = motorR.getEncoder().getVelocity();
-        inputs.targetAngle = getTargetAngle();
     }
 
     // ========================= Functions =========================

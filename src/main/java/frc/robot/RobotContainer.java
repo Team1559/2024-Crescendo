@@ -1,26 +1,11 @@
 package frc.robot;
 
 import static frc.robot.constants.AbstractConstants.CONSTANTS;
-import static frc.robot.util.SupplierUtil.not;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.DriveCommands;
-import frc.robot.commands.LedCommands;
-import frc.robot.commands.ShooterCommands;
 import frc.robot.subsystems.base.DriveBase;
 import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
 import frc.robot.subsystems.climber.Traverser;
@@ -40,7 +25,6 @@ import frc.robot.subsystems.swerve_module.SwerveModuleIoTalonFx;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIoLimelight;
 import frc.robot.subsystems.vision.VisionIoSimAndReplay;
-import frc.robot.util.KColor;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -62,6 +46,7 @@ public class RobotContainer {
     private final DriveBase driveBase;
 
     private final Aimer aimer;
+    // TODO: Add Climber variable.
     private final ColorSensor colorSensor;
     private final Feeder feeder;
     private final Flywheel flywheel;
@@ -276,8 +261,7 @@ public class RobotContainer {
 
         // #endregion
 
-        // #region: ---------- Configure Controller 3 for Technician ----------
-        // #region: ----- Swirve Drive Commands -----
+        // #region: ---------- Configure Controller 2 for Technician ----------
         controller2.povUp().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(1, 0, 0)));
         controller2.povDown().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(-1, 0, 0)));
         controller2.povRight().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(0, -1, 0)));
