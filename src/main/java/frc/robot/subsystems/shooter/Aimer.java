@@ -90,7 +90,7 @@ public class Aimer extends SubsystemBase {
         inputs.rVelocity = motorR.getEncoder().getVelocity();
     }
 
-    // ========================= Functions =========================
+    // ========================= Functions =====================================
     public void setTargetAngle(Rotation2d angle) {
 
         double targetAngle = MathUtil.clamp(angle.getDegrees(), CONSTANTS.getAimerAngleRange().get_0().getDegrees(),
@@ -117,7 +117,7 @@ public class Aimer extends SubsystemBase {
         setTargetAngle(angle);
     }
 
-    // ==================get======= Commands =========================
+    // ========================= Commands ======================================
     public Command setTargetAngleCommand(Rotation2d angle) {
         return new InstantCommand(() -> setTargetAngle(angle), this);
     }

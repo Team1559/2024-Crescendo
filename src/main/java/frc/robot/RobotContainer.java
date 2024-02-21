@@ -283,7 +283,7 @@ public class RobotContainer {
         }
 
         if (CONSTANTS.hasAimerSubsystem()) {
-            // TODO: Tie to CP Right Joystick.
+            // TODO: Switch to right joystick.
             controller1.rightBumper()
                     .whileTrue(new RunCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(.5))));
             controller1.leftBumper()
