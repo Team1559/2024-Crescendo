@@ -36,7 +36,7 @@ public class Vision extends SubsystemBase {
     public void periodic() {
         for (VisionIo io : ios) {
             io.updateInputs(inputs);
-            Logger.processInputs("Vision-" + io.name(), inputs);
+            Logger.processInputs("Vision/" + io.name(), inputs);
             if (inputs.havePose) {
                 double[] sd = inputs.estimateStdDevs;
                 Vector<N3> sdVector = VecBuilder.fill(sd[0], sd[1], sd[2]);
