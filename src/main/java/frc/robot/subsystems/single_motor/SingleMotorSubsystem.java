@@ -7,12 +7,14 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SingleMotorSubsystem extends SubsystemBase {
-    private final double forwardsVoltage;
-    private final double reverseVoltage;
-    private double appliedVoltage;
+
+    private final double DEFAULT_FORWARDS_VOLTAGE;
+    private final double DEFAULT_REVERSE_VOLTAGE;
 
     private final SingleMotorIo io;
     private final SingleMotorIoInputsAutoLogged inputs = new SingleMotorIoInputsAutoLogged();
+
+    private double appliedVoltage;
 
     /**
      * Create a new subsystem for a single motor in voltage mode
@@ -25,35 +27,47 @@ public class SingleMotorSubsystem extends SubsystemBase {
     }
 
     protected SingleMotorSubsystem(String name, SingleMotorIo io, double forwardsVoltage, double reverseVoltage) {
+
         super(name);
+
         this.io = io;
-        this.forwardsVoltage = forwardsVoltage;
-        this.reverseVoltage = reverseVoltage;
+        this.DEFAULT_FORWARDS_VOLTAGE = forwardsVoltage;
+        this.DEFAULT_REVERSE_VOLTAGE = reverseVoltage;
+
         this.appliedVoltage = 0;
     }
 
     @Override
     public void periodic() {
+
+        // Set Voltages.
         io.setVoltage(appliedVoltage);
+
+        // Log Inputs.
         io.updateInputs(inputs);
         Logger.processInputs(getName(), inputs);
     }
 
     // ========================= Functions =========================
-    public void start() {
-        setVoltage(forwardsVoltage);
-    }
-
-    public void stop() {
-        setVoltage(0.0);
+    public boolean isTemperatureTooHigh() {
+        // 90% Buffer.
+        return io.getTemperature().gt(io.getMaxSafeTemperature().times(0.9));
     }
 
     public void reverse() {
-        setVoltage(reverseVoltage);
+        setVoltage(DEFAULT_REVERSE_VOLTAGE);
     }
 
     private void setVoltage(double voltage) {
         appliedVoltage = voltage;
+    }
+
+    public void start() {
+        setVoltage(DEFAULT_FORWARDS_VOLTAGE);
+    }
+
+    public void stop() {
+        setVoltage(0.0);
     }
 
     // ========================= Commands =========================
@@ -69,5 +83,4 @@ public class SingleMotorSubsystem extends SubsystemBase {
     public Command reverseCommand() {
         return new InstantCommand(this::reverse, this);
     }
-
 }

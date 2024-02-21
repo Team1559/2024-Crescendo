@@ -15,7 +15,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 
 public class Flywheel extends SubsystemBase {
     @AutoLog
@@ -69,7 +68,7 @@ public class Flywheel extends SubsystemBase {
         flywheelMotorR.setNeutralMode(NeutralModeValue.Coast);
 
         TalonFXConfiguration driveTalonFXConfiguration = new TalonFXConfiguration();
-        driveTalonFXConfiguration.CurrentLimits = Constants.getDefaultCurrentLimitsConfig();
+        driveTalonFXConfiguration.CurrentLimits = CONSTANTS.getFalcon500CurrentLimitsConfigs();
         flywheelMotorL.getConfigurator().apply(driveTalonFXConfiguration);
         flywheelMotorR.getConfigurator().apply(driveTalonFXConfiguration);
 
@@ -89,7 +88,7 @@ public class Flywheel extends SubsystemBase {
 
         // ---------- Optimize Bus Utilization ----------
         BaseStatusSignal.setUpdateFrequencyForAll(
-                Constants.ADVANTAGE_DEFAULT_LOG_FREQUENCY,
+                CONSTANTS.getPathPlannerLogUpdateFrequencyDefault(),
                 flywheelLMotorVoltage, flywheelRMotorVoltage,
                 flywheelLSupplyCurrent, flywheelRSupplyCurrent,
                 flywheelLSupplyVoltage, flywheelRSupplyVoltage,
@@ -102,16 +101,18 @@ public class Flywheel extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // Set Voltages
+
+        // Set Voltages.
         if (runOneWheelFlag == null || runOneWheelFlag) {
             // TODO: Removbe this workaround to the inveted config not taking.
             flywheelMotorR.setControl(new VoltageOut(-currentVoltage));
         }
         if (runOneWheelFlag == null || !runOneWheelFlag) {
-            flywheelMotorL.setControl(new VoltageOut(currentVoltage));
+            flywheelMotorL.setControl(
+                    new VoltageOut(currentVoltage * CONSTANTS.getFlywheelMotorPowerDifferentialPercentage()));
         }
 
-        // Log inputs
+        // Log Inputs.
         updateInputs();
         Logger.processInputs("Shooter/Flywheel", inputs);
     }
@@ -159,12 +160,16 @@ public class Flywheel extends SubsystemBase {
      * Start the Flywheels with default volage
      */
     public void start() {
-        start(Constants.FLYWHEEL_FOWARDS_VOLTAGE);
+        start(CONSTANTS.getFlywheelForwardVoltage());
     }
 
     public void startOneMotor(boolean runRightWheel) {
-        start(Constants.FLYWHEEL_FOWARDS_VOLTAGE);
+        start();
         runOneWheelFlag = runRightWheel;
+    }
+
+    public double getCurrentVoltage() {
+        return currentVoltage;
     }
 
     /**
@@ -180,7 +185,7 @@ public class Flywheel extends SubsystemBase {
      * Reverse the Flywheels
      */
     public void reverse() {
-        start(Constants.FLYWHEEL_REVERSE_VOLTAGE);
+        start(CONSTANTS.getFlywheelReverseVoltage());
     }
 
     // ========================= Commands =========================

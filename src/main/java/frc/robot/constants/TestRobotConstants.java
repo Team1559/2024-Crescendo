@@ -6,6 +6,8 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Second;
 
+import org.opencv.core.Mat.Tuple2;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
@@ -59,12 +61,6 @@ public class TestRobotConstants extends AbstractConstants {
     }
 
     @Override
-    public boolean hasShooterSubsystemGroup() {
-        return hasAimerSubsystem() && hasColorSensorSubsystem() && hasFeederSubsystem() && hasFlywheelSubsystem()
-                && hasIntakeSubsystem();
-    }
-
-    @Override
     public boolean hasVisionSubsystem() {
         return true;
     }
@@ -87,13 +83,39 @@ public class TestRobotConstants extends AbstractConstants {
     // #region: --------------- Hardware ---------------------------------------
     // #region: ----- Aimer -----
     @Override
-    public int getAimerMotorIdLeft() {
-        throw new UnsupportedOperationException("Unimplemented method 'getAimerMotorIdLeft'");
+    public Tuple2<Rotation2d> getAimerAngleRange() {
+        throw new UnsupportedOperationException("Unimplemented method 'getAimerAngleRange'");
     }
 
     @Override
-    public int getAimerMotorIdRight() {
-        throw new UnsupportedOperationException("Unimplemented method 'getAimerMotorIdRight'");
+    public Rotation2d getAimerEncoderOffset() {
+        throw new UnsupportedOperationException("Unimplemented method 'getAimerEncoderOffset'");
+    }
+
+    @Override
+    public PID getAimerPid() {
+        throw new UnsupportedOperationException("Unimplemented method 'getAimerPid'");
+    }
+
+    // #endregion
+
+    // #region: ----- Climber -----
+    @Override
+    public double getClimberMaxHeight() {
+        throw new UnsupportedOperationException("Unimplemented method 'getClimberMaxHeight'");
+    }
+
+    @Override
+    public PID getClimberPid() {
+        throw new UnsupportedOperationException("Unimplemented method 'getClimberPid'");
+    }
+
+    // #endregion
+
+    // #region: ----- Color Sensor -----
+    @Override
+    public int getColorSensorProximityThreshold() {
+        throw new UnsupportedOperationException("Unimplemented method 'getColorSensorProximityThreshold'");
     }
 
     // #endregion
@@ -101,15 +123,18 @@ public class TestRobotConstants extends AbstractConstants {
     // #region: ----- Feeder -----
 
     @Override
-    public int getFeederMotorId() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getFeederMotorId'");
+    public boolean isFeederMortorInverted() {
+        throw new UnsupportedOperationException("Unimplemented method 'isFeederMortorInverted'");
     }
 
     @Override
-    public boolean isFeederMortorInverted() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isFeederMortorInverted'");
+    public double getFeederForwardVoltage() {
+        throw new UnsupportedOperationException("Unimplemented method 'getFeederForwardVoltage'");
+    }
+
+    @Override
+    public double getFeederReverseVoltage() {
+        throw new UnsupportedOperationException("Unimplemented method 'getFeederReverseVoltage'");
     }
 
     // #endregion
@@ -117,15 +142,45 @@ public class TestRobotConstants extends AbstractConstants {
     // #region: ----- Flywheel -----
 
     @Override
-    public int getFlywheelMotorIdLeft() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getFlywheelMotorIdLeft'");
+    public double getFlywheelForwardVoltage() {
+        throw new UnsupportedOperationException("Unimplemented method 'getFlywheelForwardVoltage'");
     }
 
     @Override
-    public int getFlywheelMotorIdRight() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getFlywheelMotorIdRight'");
+    public double getFlywheelReverseVoltage() {
+        throw new UnsupportedOperationException("Unimplemented method 'getFlywheelReverseVoltage'");
+    }
+
+    @Override
+    public double getFlywheelMotorPowerDifferentialPercentage() {
+        throw new UnsupportedOperationException("Unimplemented method 'getFlywheelMotorPowerDifferentialPercentage'");
+    }
+
+    // #endregion
+
+    // #region: ----- Intake -----
+
+    @Override
+    public boolean isIntakeMortorInverted() {
+        throw new UnsupportedOperationException("Unimplemented method 'isIntakeMortorInverted'");
+    }
+
+    @Override
+    public double getIntakeForwardVoltage() {
+        throw new UnsupportedOperationException("Unimplemented method 'getIntakeForwardVoltage'");
+    }
+
+    @Override
+    public double getIntakeReverseVoltage() {
+        throw new UnsupportedOperationException("Unimplemented method 'getIntakeReverseVoltage'");
+    }
+
+    // #endregion
+
+    // #region: ----- LEDs -----
+    @Override
+    public int getLedLenth() {
+        return 144;
     }
 
     // #endregion
@@ -160,11 +215,6 @@ public class TestRobotConstants extends AbstractConstants {
     @Override
     public double getTraverserReverseVoltage() {
         throw new UnsupportedOperationException("Unimplemented method 'getTraverserReverseVoltage'");
-    }
-
-    @Override
-    public int getTraverserMotorId() {
-        throw new UnsupportedOperationException("Unimplemented method 'getTraverserMotorId'");
     }
 
     @Override

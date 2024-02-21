@@ -23,7 +23,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.gyro.GyroIo;
@@ -172,6 +174,12 @@ public class DriveBase extends SubsystemBase {
         }
     }
 
+    public void resetFieldOrientation() {
+        poseEstimator.addVisionMeasurement(
+                new Pose2d(poseEstimator.getEstimatedPosition().getTranslation(), new Rotation2d()),
+                Timer.getFPGATimestamp(), VecBuilder.fill(0, 0, 0));
+    }
+
     /**
      * Runs the drive at the desired velocity.
      *
@@ -249,5 +257,10 @@ public class DriveBase extends SubsystemBase {
         for (int i = 0; i < modules.length; i++) {
             modulePositions[i] = modules[i].getPosition();
         }
+    }
+    // ======= Commands =======
+
+    public Command resetFieldOrientationCommand() {
+        return new InstantCommand(this::resetFieldOrientation);
     }
 }

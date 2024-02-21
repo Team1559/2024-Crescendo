@@ -1,5 +1,7 @@
 package frc.robot.subsystems.shooter;
 
+import static frc.robot.constants.AbstractConstants.CONSTANTS;
+
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -11,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.Constants;
+import frc.robot.constants.AbstractConstants;
 
 public class ColorSensor extends SubsystemBase {
 
@@ -70,13 +72,13 @@ public class ColorSensor extends SubsystemBase {
 
     /**
      * Detect an object by comparing the current proximity to the proximity of the
-     * {@link Constants#COLOR_SENSOR_PROXIMITY_THRESHOLD} constant.
+     * {@link AbstractConstants#getColorSensorProximityThreshold} constant.
      * 
      * @return True if an object is detected
      */
     public boolean isObjectDetected() {
-        inputs.isObjectDetected = colorSensor.getProximity() > Constants.COLOR_SENSOR_PROXIMITY_THRESHOLD;
-        return colorSensor.getProximity() > Constants.COLOR_SENSOR_PROXIMITY_THRESHOLD;
+        inputs.isObjectDetected = colorSensor.getProximity() >= CONSTANTS.getColorSensorProximityThreshold();
+        return inputs.isObjectDetected;
     }
 
     /**

@@ -49,7 +49,8 @@ public class DriveCommands {
                 pid.setSetpoint(0); // Degrees from target.
                 pid.setTolerance(1/* degree(s) */);
                 pid.enableContinuousInput(-180, 180); // Degrees.
-                flywheel.start();
+                if (CONSTANTS.hasFlywheelSubsystem())
+                    flywheel.start();
             }
 
             @Override
@@ -96,6 +97,8 @@ public class DriveCommands {
                     driveBase.runVelocity(new ChassisSpeeds(scaledXVelocity, scaledYVelocity, omega));
                 }
 
+                // TODO: Add Turning LEDs to Green, when close enough to shoot.
+
                 // Log Calculated Values.
                 Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/degreesToTarget", degreesToTarget);
                 Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/vxMetersPerSecond", scaledXVelocity);
@@ -118,6 +121,8 @@ public class DriveCommands {
 
         };
         aimingDrive.addRequirements(driveBase);
+        if (CONSTANTS.hasFlywheelSubsystem())
+            aimingDrive.addRequirements(flywheel);
         return aimingDrive;
     }
 
@@ -128,7 +133,7 @@ public class DriveCommands {
 
         return Commands.run(
                 () -> {
-                    // Apply deadband.
+                    // Apply dead-band.
                     double linearMagnitude = MathUtil.applyDeadband(
                             Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
                             CONSTANTS.getJoystickDeadband());
