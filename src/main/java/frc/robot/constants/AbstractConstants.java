@@ -96,7 +96,7 @@ public abstract class AbstractConstants {
     }
 
     private static int uniqueCanBusId(int id, String canivoreId) {
-
+        System.out.println(id + " - " + canivoreId);
         canivoreId = canivoreId == null ? "" : canivoreId;
 
         Set<Integer> ids = uniqueCanBusIds.get(canivoreId);
@@ -187,20 +187,20 @@ public abstract class AbstractConstants {
     public Translation3d getSpeakerLocation() {
         if (getAssignedAlliance() == Alliance.Blue) {
             return new Translation3d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42),
-                    Units.inchesToMeters(0) /* TODO */);
+                    Units.inchesToMeters(80.5));
         } else {
             return new Translation3d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42),
-                    Units.inchesToMeters(0) /* TODO */);
+                    Units.inchesToMeters(80.5));
         }
     }
 
     public Translation3d getAmpLocation() {
         if (getAssignedAlliance() == Alliance.Blue) {
             return new Translation3d(Units.inchesToMeters(72.5), Units.inchesToMeters(323.00),
-                    Units.inchesToMeters(80.5));
+                    Units.inchesToMeters(44));
         } else {
             return new Translation3d(Units.inchesToMeters(578.77), Units.inchesToMeters(323.00),
-                    Units.inchesToMeters(0) /* TODO */);
+                    Units.inchesToMeters(44));
         }
     }
 

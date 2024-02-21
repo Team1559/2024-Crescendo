@@ -180,7 +180,7 @@ public class TestRobotConstants extends AbstractConstants {
     // #region: ----- LEDs -----
     @Override
     public int getLedLenth() {
-        return 144;
+        return 144 * 2;
     }
 
     // #endregion

@@ -93,9 +93,8 @@ public class Aimer extends SubsystemBase {
     // ========================= Functions =====================================
     public void aimAtTarget(Translation3d target, Translation2d currentPosition) {
         double distance = currentPosition.getDistance(target.toTranslation2d());
-        // TODO: Need to take the Aimer Offset into account.
         Rotation2d angle = new Rotation2d(distance, target.getZ());
-        setTargetAngle(angle);
+        setTargetAngle(angle.minus(Rotation2d.fromDegrees(13)));
     }
 
     public void setTargetAngle(Rotation2d angle) {
