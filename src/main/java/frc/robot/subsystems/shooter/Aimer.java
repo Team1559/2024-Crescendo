@@ -114,8 +114,8 @@ public class Aimer extends SubsystemBase {
 
     public void aimShooterAtSpeaker() {
         double distance = poseEstimator.getEstimatedPosition().getTranslation()
-                .getDistance(CONSTANTS.getSpeakerLocation());
-        Rotation2d target = new Rotation2d(distance, CONSTANTS.SPEAKER_OPENING_HEIGHT_METERS);
+                .getDistance(CONSTANTS.getSpeakerLocation().toTranslation2d());
+        Rotation2d target = new Rotation2d(distance, CONSTANTS.getSpeakerLocation().getZ());
         setTargetAngle(target);
     }
 

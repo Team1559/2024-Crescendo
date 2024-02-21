@@ -12,7 +12,7 @@ import org.opencv.core.Mat.Tuple2;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
@@ -47,12 +47,24 @@ public abstract class AbstractConstants {
     }
 
     public static class SwirveModuleHardwareIds {
+
         public final int DRIVE_MOTOR_ID, STEER_MOTOR_ID, CANCODER_ID;
 
+        /**
+         * Saves these IDs for reference, and ensured uniqueness on the default CAN BUS.
+         */
         SwirveModuleHardwareIds(int driveMotorId, int steerMotorId, int cancoderId) {
-            DRIVE_MOTOR_ID = driveMotorId;
-            STEER_MOTOR_ID = steerMotorId;
-            CANCODER_ID = cancoderId;
+            this(driveMotorId, steerMotorId, cancoderId, null);
+        }
+
+        /**
+         * Saves these IDs for reference, and ensured uniqueness on the CAN BUS with the
+         * given Canivore Id.
+         */
+        SwirveModuleHardwareIds(int driveMotorId, int steerMotorId, int cancoderId, String canivoreId) {
+            DRIVE_MOTOR_ID = uniqueCanBusId(driveMotorId, canivoreId);
+            STEER_MOTOR_ID = uniqueCanBusId(steerMotorId, canivoreId);
+            CANCODER_ID = uniqueCanBusId(cancoderId, canivoreId);
         }
     }
 
@@ -63,8 +75,6 @@ public abstract class AbstractConstants {
 
     public static final boolean TECHNICIAN_CONTROLLER_ENABLED = false;
     public static final AbstractConstants CONSTANTS = isGameRobot() ? GAME_ROBOT_CONSTANTS : TEST_ROBOT_CONSTANTS;
-
-    public static final double SPEAKER_OPENING_HEIGHT_METERS = Units.inchesToMeters(80.5);
 
     // ========================= Static Variables ==============================
     private static final Map<String, Set<Integer>> uniqueCanBusIds = new HashMap<>();
@@ -174,19 +184,23 @@ public abstract class AbstractConstants {
     // #endregion
 
     // #region: --------------- Game Objects -----------------------------------
-    public Translation2d getSpeakerLocation() {
+    public Translation3d getSpeakerLocation() {
         if (getAssignedAlliance() == Alliance.Blue) {
-            return new Translation2d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42));
+            return new Translation3d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42),
+                    Units.inchesToMeters(0) /* TODO */);
         } else {
-            return new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42));
+            return new Translation3d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42),
+                    Units.inchesToMeters(0) /* TODO */);
         }
     }
 
-    public Translation2d getAmpLocation() {
+    public Translation3d getAmpLocation() {
         if (getAssignedAlliance() == Alliance.Blue) {
-            return new Translation2d(Units.inchesToMeters(72.5), Units.inchesToMeters(323.00));
+            return new Translation3d(Units.inchesToMeters(72.5), Units.inchesToMeters(323.00),
+                    Units.inchesToMeters(80.5));
         } else {
-            return new Translation2d(Units.inchesToMeters(578.77), Units.inchesToMeters(323.00));
+            return new Translation3d(Units.inchesToMeters(578.77), Units.inchesToMeters(323.00),
+                    Units.inchesToMeters(0) /* TODO */);
         }
     }
 
@@ -317,23 +331,19 @@ public abstract class AbstractConstants {
     public abstract Rotation2d[] getSwerveModuleEncoderOffsets();
 
     public SwirveModuleHardwareIds getSwirveModuleHardwareIdsFrontLeft() {
-        return new SwirveModuleHardwareIds(uniqueCanBusId(0, getCanivoreId()), uniqueCanBusId(1, getCanivoreId()),
-                uniqueCanBusId(2, getCanivoreId()));
+        return new SwirveModuleHardwareIds(0, 1, 2);
     }
 
     public SwirveModuleHardwareIds getSwirveModuleHardwareIdsFrontRight() {
-        return new SwirveModuleHardwareIds(uniqueCanBusId(3, getCanivoreId()), uniqueCanBusId(4, getCanivoreId()),
-                uniqueCanBusId(5, getCanivoreId()));
+        return new SwirveModuleHardwareIds(3, 4, 5);
     }
 
     public SwirveModuleHardwareIds getSwirveModuleHardwareIdsBackLeft() {
-        return new SwirveModuleHardwareIds(uniqueCanBusId(9, getCanivoreId()), uniqueCanBusId(10, getCanivoreId()),
-                uniqueCanBusId(11, getCanivoreId()));
+        return new SwirveModuleHardwareIds(9, 10, 11);
     }
 
     public SwirveModuleHardwareIds getSwirveModuleHardwareIdsBackRight() {
-        return new SwirveModuleHardwareIds(uniqueCanBusId(6, getCanivoreId()), uniqueCanBusId(7, getCanivoreId()),
-                uniqueCanBusId(8, getCanivoreId()));
+        return new SwirveModuleHardwareIds(6, 7, 8);
     }
 
     // #endregion
