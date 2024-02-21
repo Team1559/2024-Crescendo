@@ -79,7 +79,7 @@ public class ShooterCommands {
 
     public static Command shootTeleopCommand(Flywheel flywheel, Feeder feeder, Leds leds, ColorSensor colorSensor) {
     //@formatter:off
-    return new SequentialCommandGroup(
+    return flywheel.getCurrentVoltage() > 0? new SequentialCommandGroup(
       // Should have already been started in Aim command.
       // But including here, just in case.
       flywheel.startCommand(),
@@ -89,23 +89,15 @@ public class ShooterCommands {
       new WaitCommand(.25),
       feeder.stopCommand(), // TODO: N/A as the Default Feeder Command is to spin.
       flywheel.stopCommand()
-    );
-    //@formatter:on
-    }
-
-    public static Command shootWithSpinupCommand(Flywheel flywheel, Feeder feeder, Leds leds, ColorSensor colorSensor) {
-    //@formatter:off
-    return new SequentialCommandGroup(
-      // Only used when shooting without aiming
-      flywheel.startCommand(),
-      new WaitCommand(.25),
+    ): 
+    new SequentialCommandGroup(
+        spinUpFlywheelCommand(flywheel),
       feeder.startCommand(),
       leds.setColorCommand(Color.kMediumSpringGreen),
       colorSensor.waitForNoObjectCommand(),
       new WaitCommand(.25),
       feeder.stopCommand(), // TODO: N/A as the Default Feeder Command is to spin.
-      flywheel.stopCommand()
-    );
+      flywheel.stopCommand());
     //@formatter:on
     }
 

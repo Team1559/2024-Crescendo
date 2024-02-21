@@ -168,6 +168,10 @@ public class Flywheel extends SubsystemBase {
         runOneWheelFlag = runRightWheel;
     }
 
+    public double getCurrentVoltage() {
+        return currentVoltage;
+    }
+
     /**
      * Stop the Flywheels
      */
