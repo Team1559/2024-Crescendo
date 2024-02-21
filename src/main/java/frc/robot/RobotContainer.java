@@ -13,7 +13,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -158,7 +157,7 @@ public class RobotContainer {
         // #endregion
 
         // #region: Initialize Subsystems without Simulation and/or Log Replay Mode
-        aimer = CONSTANTS.hasAimerSubsystem() ? new Aimer() : null;
+        aimer = CONSTANTS.hasAimerSubsystem() ? new Aimer(driveBase.poseEstimator) : null;
         colorSensor = CONSTANTS.hasColorSensorSubsystem() ? new ColorSensor() : null;
         flywheel = CONSTANTS.hasFlywheelSubsystem() ? new Flywheel() : null;
         /*
@@ -226,11 +225,12 @@ public class RobotContainer {
 
         // #region: ==================== Tele-Op ===============================
         // #region: ---------- Configure Controller 0 for Pilot ----------
-        controller0.leftTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel,
+        // TODO - Seperate Commands for amp and speaker
+        controller0.leftTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel, aimer,
                 () -> -controller0.getLeftY(),
                 () -> -controller0.getLeftX(),
                 CONSTANTS::getSpeakerLocation));
-        controller0.rightTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel,
+        controller0.rightTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel, aimer,
                 () -> -controller0.getLeftY(),
                 () -> -controller0.getLeftX(),
                 CONSTANTS::getAmpLocation));
@@ -282,11 +282,13 @@ public class RobotContainer {
         }
 
         if (CONSTANTS.hasAimerSubsystem()) {
-            // TODO: Switch to right joystick.
-            controller1.rightBumper()
-                    .whileTrue(new RunCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(.5))));
-            controller1.leftBumper()
-                    .whileTrue(new RunCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(-.5))));
+            // Removed because auto aim was added
+            // controller1.rightBumper()
+            // .whileTrue(new RunCommand(() ->
+            // aimer.modifyTargetAngle(Rotation2d.fromDegrees(.5))));
+            // controller1.leftBumper()
+            // .whileTrue(new RunCommand(() ->
+            // aimer.modifyTargetAngle(Rotation2d.fromDegrees(-.5))));
         }
 
         // #endregion

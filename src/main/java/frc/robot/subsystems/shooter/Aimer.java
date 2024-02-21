@@ -13,6 +13,7 @@ import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -41,11 +42,12 @@ public class Aimer extends SubsystemBase {
     private final PIDController controller = new PIDController(CONSTANTS.getAimerPid().P, CONSTANTS.getAimerPid().I,
             CONSTANTS.getAimerPid().D);
     private final AimerInputsAutoLogged inputs = new AimerInputsAutoLogged();
+    private final SwerveDrivePoseEstimator poseEstimator;
 
     /**
      * Create a new subsystem for two motors controlled by CANspark Controller
      **/
-    public Aimer() {
+    public Aimer(SwerveDrivePoseEstimator poseEstimator) {
         motorL.setInverted(false);
         motorR.setInverted(true);
         motorL.setIdleMode(IdleMode.kBrake);
@@ -54,6 +56,7 @@ public class Aimer extends SubsystemBase {
         motorR.setSmartCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentLimit());
         motorL.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
         motorL.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
+        this.poseEstimator = poseEstimator;
     }
 
     @Override
@@ -109,7 +112,14 @@ public class Aimer extends SubsystemBase {
         return Rotation2d.fromRotations(-encoder.getAbsolutePosition()).plus(CONSTANTS.getAimerEncoderOffset());
     }
 
-    // ========================= Commands =========================
+    public void aimShooterAtSpeaker() {
+        double distance = poseEstimator.getEstimatedPosition().getTranslation()
+                .getDistance(CONSTANTS.getSpeakerLocation());
+        Rotation2d target = new Rotation2d(distance, CONSTANTS.SPEAKER_OPENING_HEIGHT_METERS);
+        setTargetAngle(target);
+    }
+
+    // ==================get======= Commands =========================
     public Command setTargetAngleCommand(Rotation2d angle) {
         return new InstantCommand(() -> setTargetAngle(angle), this);
     }

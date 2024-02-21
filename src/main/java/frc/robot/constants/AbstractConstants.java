@@ -64,6 +64,8 @@ public abstract class AbstractConstants {
     public static final boolean TECHNICIAN_CONTROLLER_ENABLED = false;
     public static final AbstractConstants CONSTANTS = isGameRobot() ? GAME_ROBOT_CONSTANTS : TEST_ROBOT_CONSTANTS;
 
+    public static final double SPEAKER_OPENING_HEIGHT_METERS = Units.inchesToMeters(80.5);
+
     // ========================= Static Variables ==============================
     private static final Map<String, Set<Integer>> uniqueCanBusIds = new HashMap<>();
     private static final Map<RoboRioPortArrays, Set<Integer>> uniqueRoboRioPorts = new HashMap();

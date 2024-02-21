@@ -23,6 +23,7 @@ import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.base.DriveBase;
+import frc.robot.subsystems.shooter.Aimer;
 import frc.robot.subsystems.shooter.Flywheel;
 
 public class DriveCommands {
@@ -34,6 +35,7 @@ public class DriveCommands {
     // TODO: Deduplicate code between this and the manualDriveDefaultCommand method.
     public static Command autoAimAndManuallyDriveCommand(DriveBase driveBase,
             Flywheel flywheel,
+            Aimer aimer,
             DoubleSupplier xSupplier,
             DoubleSupplier ySupplier,
             Supplier<Translation2d> target) {
@@ -96,6 +98,8 @@ public class DriveCommands {
                 } else {
                     driveBase.runVelocity(new ChassisSpeeds(scaledXVelocity, scaledYVelocity, omega));
                 }
+
+                aimer.aimShooterAtSpeaker();
 
                 // TODO: Add Turning LEDs to Green, when close enough to shoot.
 
