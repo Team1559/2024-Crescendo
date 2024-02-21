@@ -13,6 +13,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -157,7 +158,7 @@ public class RobotContainer {
         // #endregion
 
         // #region: Initialize Subsystems without Simulation and/or Log Replay Mode
-        aimer = CONSTANTS.hasAimerSubsystem() ? new Aimer(driveBase.poseEstimator) : null;
+        aimer = CONSTANTS.hasAimerSubsystem() ? new Aimer() : null;
         colorSensor = CONSTANTS.hasColorSensorSubsystem() ? new ColorSensor() : null;
         flywheel = CONSTANTS.hasFlywheelSubsystem() ? new Flywheel() : null;
         /*
@@ -282,13 +283,11 @@ public class RobotContainer {
         }
 
         if (CONSTANTS.hasAimerSubsystem()) {
-            // Removed because auto aim was added
-            // controller1.rightBumper()
-            // .whileTrue(new RunCommand(() ->
-            // aimer.modifyTargetAngle(Rotation2d.fromDegrees(.5))));
-            // controller1.leftBumper()
-            // .whileTrue(new RunCommand(() ->
-            // aimer.modifyTargetAngle(Rotation2d.fromDegrees(-.5))));
+            // TODO: Tie to CP Right Joystick.
+            controller1.rightBumper()
+                    .whileTrue(new RunCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(.5))));
+            controller1.leftBumper()
+                    .whileTrue(new RunCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(-.5))));
         }
 
         // #endregion

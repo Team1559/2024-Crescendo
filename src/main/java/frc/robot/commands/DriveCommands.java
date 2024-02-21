@@ -101,7 +101,7 @@ public class DriveCommands {
                     driveBase.runVelocity(new ChassisSpeeds(scaledXVelocity, scaledYVelocity, omega));
                 }
 
-                aimer.aimShooterAtSpeaker();
+                aimer.aimAtTarget(target.get(), driveBase.getPose().getTranslation());
 
                 // TODO: Add Turning LEDs to Green, when close enough to shoot.
 

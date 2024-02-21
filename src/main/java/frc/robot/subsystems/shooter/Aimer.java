@@ -13,8 +13,9 @@ import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -42,12 +43,11 @@ public class Aimer extends SubsystemBase {
     private final PIDController controller = new PIDController(CONSTANTS.getAimerPid().P, CONSTANTS.getAimerPid().I,
             CONSTANTS.getAimerPid().D);
     private final AimerInputsAutoLogged inputs = new AimerInputsAutoLogged();
-    private final SwerveDrivePoseEstimator poseEstimator;
 
     /**
      * Create a new subsystem for two motors controlled by CANspark Controller
      **/
-    public Aimer(SwerveDrivePoseEstimator poseEstimator) {
+    public Aimer() {
         motorL.setInverted(false);
         motorR.setInverted(true);
         motorL.setIdleMode(IdleMode.kBrake);
@@ -56,7 +56,6 @@ public class Aimer extends SubsystemBase {
         motorR.setSmartCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentLimit());
         motorL.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
         motorL.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
-        this.poseEstimator = poseEstimator;
     }
 
     @Override
@@ -112,11 +111,10 @@ public class Aimer extends SubsystemBase {
         return Rotation2d.fromRotations(-encoder.getAbsolutePosition()).plus(CONSTANTS.getAimerEncoderOffset());
     }
 
-    public void aimShooterAtSpeaker() {
-        double distance = poseEstimator.getEstimatedPosition().getTranslation()
-                .getDistance(CONSTANTS.getSpeakerLocation().toTranslation2d());
-        Rotation2d target = new Rotation2d(distance, CONSTANTS.getSpeakerLocation().getZ());
-        setTargetAngle(target);
+    public void aimAtTarget(Translation3d target, Translation2d currentPosition) {
+        double distance = currentPosition.getDistance(target.toTranslation2d());
+        Rotation2d angle = new Rotation2d(distance, target.getZ());
+        setTargetAngle(angle);
     }
 
     // ==================get======= Commands =========================
