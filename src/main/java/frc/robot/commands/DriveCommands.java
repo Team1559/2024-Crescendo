@@ -97,6 +97,8 @@ public class DriveCommands {
                     driveBase.runVelocity(new ChassisSpeeds(scaledXVelocity, scaledYVelocity, omega));
                 }
 
+                // TODO: Add Turning LEDs to Green, when close enough to shoot.
+
                 // Log Calculated Values.
                 Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/degreesToTarget", degreesToTarget);
                 Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/vxMetersPerSecond", scaledXVelocity);
@@ -131,7 +133,7 @@ public class DriveCommands {
 
         return Commands.run(
                 () -> {
-                    // Apply deadband.
+                    // Apply dead-band.
                     double linearMagnitude = MathUtil.applyDeadband(
                             Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
                             CONSTANTS.getJoystickDeadband());

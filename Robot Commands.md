@@ -48,6 +48,7 @@ These Commands are triggered by the controllers.
 ## Intake Commands
 Since the Intake operates automatically as a default command, these commands are only for abnormal situations.
 * **Run Intake & Feeder** `[CP: Left Trigger]`
+    * The Intake and Feeder will stop, when the Color Sensor detects a Note
     * (The Flywheel will be stopped, if running, so that the note is not accidentally shot)
 * **Reverse Intake & Feeder** `[CP: X]`
     * (The Flywheel will be stopped, if running)
@@ -69,3 +70,8 @@ Since the Intake operates automatically as a default command, these commands are
 * **Climber Extend** `[CP: D-Pad Up]`
 * **Climber Retract** `[CP: D-Pad Down]`
 * **Traverse Left / Right** `[CP: D-Pad Left/Right]`
+
+## Aimer Commands
+**Note:** The Aimer will aim automatically, these commands are just for abnormal situations.
+
+* **Aim Up / Down** `[CP: Right Joystick Y]`

@@ -61,6 +61,7 @@ public abstract class AbstractConstants {
     private static final AbstractConstants GAME_ROBOT_CONSTANTS = new GameRobotConstants();
     private static final AbstractConstants TEST_ROBOT_CONSTANTS = new TestRobotConstants();
 
+    public static final boolean TECHNICIAN_CONTROLLER_ENABLED = false;
     public static final AbstractConstants CONSTANTS = isGameRobot() ? GAME_ROBOT_CONSTANTS : TEST_ROBOT_CONSTANTS;
 
     // ========================= Static Variables ==============================
@@ -153,8 +154,6 @@ public abstract class AbstractConstants {
     public abstract boolean hasFlywheelSubsystem();
 
     public abstract boolean hasIntakeSubsystem();
-
-    public abstract boolean hasShooterSubsystemGroup();
 
     public abstract boolean hasTraverserSubsystem();
 

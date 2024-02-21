@@ -54,12 +54,6 @@ public class GameRobotConstants extends AbstractConstants {
     }
 
     @Override
-    public boolean hasShooterSubsystemGroup() {
-        return hasAimerSubsystem() && hasColorSensorSubsystem() && hasFeederSubsystem() && hasFlywheelSubsystem()
-                && hasIntakeSubsystem();
-    }
-
-    @Override
     public boolean hasVisionSubsystem() {
         return false;
     }
