@@ -24,13 +24,13 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 public abstract class AbstractConstants {
 
     // ========================= Enums =========================================
-    public static enum OperatingMode {
+    public enum OperatingMode {
         REAL_WORLD,
         SIMULATION,
         LOG_REPLAY
     }
 
-    private static enum RoboRioPortArrays {
+    private enum RoboRioPortArrays {
         DIO,
         PWM
     }
@@ -46,14 +46,14 @@ public abstract class AbstractConstants {
         }
     }
 
-    public static class SwirveModuleHardwareIds {
+    public static class SwerveModuleHardwareIds {
 
         public final int DRIVE_MOTOR_ID, STEER_MOTOR_ID, CANCODER_ID;
 
         /**
          * Saves these IDs for reference, and ensured uniqueness on the default CAN BUS.
          */
-        SwirveModuleHardwareIds(int driveMotorId, int steerMotorId, int cancoderId) {
+        SwerveModuleHardwareIds(int driveMotorId, int steerMotorId, int cancoderId) {
             this(driveMotorId, steerMotorId, cancoderId, null);
         }
 
@@ -61,7 +61,7 @@ public abstract class AbstractConstants {
          * Saves these IDs for reference, and ensured uniqueness on the CAN BUS with the
          * given Canivore Id.
          */
-        SwirveModuleHardwareIds(int driveMotorId, int steerMotorId, int cancoderId, String canivoreId) {
+        SwerveModuleHardwareIds(int driveMotorId, int steerMotorId, int cancoderId, String canivoreId) {
             DRIVE_MOTOR_ID = uniqueCanBusId(driveMotorId, canivoreId);
             STEER_MOTOR_ID = uniqueCanBusId(steerMotorId, canivoreId);
             CANCODER_ID = uniqueCanBusId(cancoderId, canivoreId);
@@ -76,6 +76,18 @@ public abstract class AbstractConstants {
     public static final boolean TECHNICIAN_CONTROLLER_ENABLED = false;
     public static final AbstractConstants CONSTANTS = isGameRobot() ? GAME_ROBOT_CONSTANTS : TEST_ROBOT_CONSTANTS;
 
+    private static final Translation3d SPEKER_LOCATION_BLUE = new Translation3d(Units.inchesToMeters(-1.5),
+            Units.inchesToMeters(218.42),
+            Units.inchesToMeters(80.5));
+    private static final Translation3d SPEKER_LOCATION_RED = new Translation3d(Units.inchesToMeters(652.73),
+            Units.inchesToMeters(218.42),
+            Units.inchesToMeters(80.5));
+    private static final Translation3d AMP_LOCATION_RED = new Translation3d(Units.inchesToMeters(72.5),
+            Units.inchesToMeters(323.00),
+            Units.inchesToMeters(44));
+    private static final Translation3d AMP_LOCATION_BLUE = new Translation3d(Units.inchesToMeters(578.77),
+            Units.inchesToMeters(323.00),
+            Units.inchesToMeters(44));
     // ========================= Static Variables ==============================
     private static final Map<String, Set<Integer>> uniqueCanBusIds = new HashMap<>();
     private static final Map<RoboRioPortArrays, Set<Integer>> uniqueRoboRioPorts = new HashMap();
@@ -175,7 +187,7 @@ public abstract class AbstractConstants {
 
     // #region: --------------- Driving Configurations -------------------------
     public double getJoystickDeadband() {
-        return 0.2;
+        return 0.05;
     }
 
     public abstract Measure<Velocity<Angle>> getMaxAngularSpeed();
@@ -186,21 +198,17 @@ public abstract class AbstractConstants {
     // #region: --------------- Game Objects -----------------------------------
     public Translation3d getSpeakerLocation() {
         if (getAssignedAlliance() == Alliance.Blue) {
-            return new Translation3d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42),
-                    Units.inchesToMeters(80.5));
+            return CONSTANTS.SPEKER_LOCATION_BLUE;
         } else {
-            return new Translation3d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42),
-                    Units.inchesToMeters(80.5));
+            return CONSTANTS.SPEKER_LOCATION_RED;
         }
     }
 
     public Translation3d getAmpLocation() {
         if (getAssignedAlliance() == Alliance.Blue) {
-            return new Translation3d(Units.inchesToMeters(72.5), Units.inchesToMeters(323.00),
-                    Units.inchesToMeters(44));
+            return CONSTANTS.AMP_LOCATION_RED;
         } else {
-            return new Translation3d(Units.inchesToMeters(578.77), Units.inchesToMeters(323.00),
-                    Units.inchesToMeters(44));
+            return CONSTANTS.AMP_LOCATION_BLUE;
         }
     }
 
@@ -330,20 +338,20 @@ public abstract class AbstractConstants {
      */
     public abstract Rotation2d[] getSwerveModuleEncoderOffsets();
 
-    public SwirveModuleHardwareIds getSwirveModuleHardwareIdsFrontLeft() {
-        return new SwirveModuleHardwareIds(0, 1, 2);
+    public SwerveModuleHardwareIds getSwerveModuleHardwareIdsFrontLeft() {
+        return new SwerveModuleHardwareIds(0, 1, 2);
     }
 
-    public SwirveModuleHardwareIds getSwirveModuleHardwareIdsFrontRight() {
-        return new SwirveModuleHardwareIds(3, 4, 5);
+    public SwerveModuleHardwareIds getSwerveModuleHardwareIdsFrontRight() {
+        return new SwerveModuleHardwareIds(3, 4, 5);
     }
 
-    public SwirveModuleHardwareIds getSwirveModuleHardwareIdsBackLeft() {
-        return new SwirveModuleHardwareIds(9, 10, 11);
+    public SwerveModuleHardwareIds getSwerveModuleHardwareIdsBackLeft() {
+        return new SwerveModuleHardwareIds(9, 10, 11);
     }
 
-    public SwirveModuleHardwareIds getSwirveModuleHardwareIdsBackRight() {
-        return new SwirveModuleHardwareIds(6, 7, 8);
+    public SwerveModuleHardwareIds getSwerveModuleHardwareIdsBackRight() {
+        return new SwerveModuleHardwareIds(6, 7, 8);
     }
 
     // #endregion

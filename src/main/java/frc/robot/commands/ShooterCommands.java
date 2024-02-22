@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -74,7 +76,8 @@ public class ShooterCommands {
                 feeder.stopCommand());
     }
 
-    public static Command shootTeleopCommand(Feeder feeder, Flywheel flywheel, ColorSensor colorSensor, Leds leds) {
+    public static Command shootTeleopCommand(Feeder feeder, Flywheel flywheel, Intake intake, ColorSensor colorSensor,
+            Leds leds) {
 
         SequentialCommandGroup sequentialCommandGroup = new SequentialCommandGroup();
 
@@ -83,10 +86,14 @@ public class ShooterCommands {
         }
 
         sequentialCommandGroup.addCommands(
+                intake.startCommand(),
                 feeder.startCommand(),
                 leds.setColorCommand(Color.kPurple),
                 colorSensor.waitForNoObjectCommand(),
+                new InstantCommand(() -> Logger.recordOutput("Shooting", true)),
                 new WaitCommand(.25),
+                new InstantCommand(() -> Logger.recordOutput("Shooting", false)),
+                intake.stopCommand(),
                 feeder.stopCommand(),
                 flywheel.stopCommand());
 

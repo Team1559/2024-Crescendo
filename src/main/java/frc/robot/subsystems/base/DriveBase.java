@@ -124,6 +124,7 @@ public class DriveBase extends SubsystemBase {
                         activePath.toArray(new Pose2d[activePath.size()])));
         PathPlannerLogging.setLogTargetPoseCallback(
                 targetPose -> Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose));
+        setPose(new Pose2d());
     }
 
     @Override

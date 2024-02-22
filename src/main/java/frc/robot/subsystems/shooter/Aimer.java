@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.MathUtils;
 
 public class Aimer extends SubsystemBase {
 
@@ -74,8 +73,8 @@ public class Aimer extends SubsystemBase {
 
     private void updateInputs() {
 
-        inputs.currentAngleDegrees = MathUtils.round(getAngle().getDegrees(), 2);
-        inputs.targetAngleDegrees = MathUtils.round(getTargetAngle().getDegrees(), 2);
+        inputs.currentAngleDegrees = getAngle().getDegrees();
+        inputs.targetAngleDegrees = getTargetAngle().getDegrees();
 
         inputs.lAppliedOutput = motorL.getAppliedOutput();
         inputs.lOutputCurrent = motorL.getOutputCurrent();
@@ -94,7 +93,8 @@ public class Aimer extends SubsystemBase {
     public void aimAtTarget(Translation3d target, Translation2d currentPosition) {
         double distance = currentPosition.getDistance(target.toTranslation2d());
         Rotation2d angle = new Rotation2d(distance, target.getZ());
-        setTargetAngle(angle.minus(Rotation2d.fromDegrees(13)));
+        setTargetAngle(angle.minus(Rotation2d.fromDegrees(20))); // > 13 < 30
+        Logger.recordOutput("Aimer/DistanceToTarget", distance);
     }
 
     public void setTargetAngle(Rotation2d angle) {
