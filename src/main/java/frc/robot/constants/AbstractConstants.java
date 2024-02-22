@@ -3,6 +3,7 @@ package frc.robot.constants;
 import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.Meters;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -85,17 +86,16 @@ public abstract class AbstractConstants {
 
     private static int uniqueCanBusId(int id, String canivoreId) {
 
+        System.out.println("XXXXXXXXXX " + id + " - " + canivoreId + " XXXXXXXXXX");
         canivoreId = canivoreId == null ? "" : canivoreId;
 
         Set<Integer> ids = uniqueCanBusIds.get(canivoreId);
         if (ids == null) {
-            ids = new HashSet<>() {
-                {
-                    add(id);
-                }
-            };
-            uniqueCanBusIds.put(canivoreId, ids);
+
+            System.out.println("XXXXXXXXXX " + id + " - " + canivoreId + " XXXXXXXXXX - ids == null");
+            uniqueCanBusIds.put(canivoreId, new HashSet<>(Arrays.asList(id)));
         } else if (!ids.add(id)) {
+            System.out.println("XXXXXXXXXX " + id + " - " + canivoreId + " XXXXXXXXXX - else if");
             // TODO: Fix.
             // throw new RuntimeException("Duplicate ID (" + id + ") on " +
             // (canivoreId.isEmpty() ? "default" : canivoreId) + " CAN Bus!");
