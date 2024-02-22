@@ -184,7 +184,7 @@ public class GameRobotConstants extends AbstractConstants {
     // #region: ----- LEDs -----
     @Override
     public int getLedLenth() {
-        return 144;
+        return 144 * 3; // This is the number that WILL be on the robot
     }
 
     // #endregion

@@ -185,7 +185,7 @@ public class RobotContainer {
                 },
                 () -> -controller0.getRightX()));
 
-        // leds.setDefaultCommand(LedCommands.defaultLedCommand(leds));
+        leds.setDefaultCommand(LedCommands.defaultLedCommand(leds));
         if (CONSTANTS.hasFlywheelSubsystem()) {
             flywheel.setDefaultCommand(ShooterCommands.defaultFlywheelCommand(flywheel));
         }
