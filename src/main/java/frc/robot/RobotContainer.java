@@ -177,11 +177,11 @@ public class RobotContainer {
         driveBase.setDefaultCommand(DriveCommands.manualDriveDefaultCommand(driveBase,
                 () -> {
                     return CONSTANTS.getAssignedAlliance() == Alliance.Blue ? -controller0.getLeftY()
-                            : controller0.getLeftY();
+                            : controller0.getLeftY(); // TODO: Figure out why this inversion is needed.
                 },
                 () -> {
                     return CONSTANTS.getAssignedAlliance() == Alliance.Blue ? -controller0.getLeftX()
-                            : controller0.getLeftX();
+                            : controller0.getLeftX(); // TODO: Figure out why this inversion is needed.
                 },
                 () -> -controller0.getRightX()));
 
@@ -235,15 +235,14 @@ public class RobotContainer {
 
         // #region: ==================== Tele-Op ===============================
         // #region: ---------- Configure Controller 0 for Pilot ----------
-        // TODO - Seperate Commands for amp and speaker
         controller0.leftTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel, aimer,
                 () -> {
                     return CONSTANTS.getAssignedAlliance() == Alliance.Blue ? -controller0.getLeftY()
-                            : controller0.getLeftY();
+                            : controller0.getLeftY(); // TODO: Figure out why this inversion is needed.
                 },
                 () -> {
                     return CONSTANTS.getAssignedAlliance() == Alliance.Blue ? -controller0.getLeftX()
-                            : controller0.getLeftX();
+                            : controller0.getLeftX(); // TODO: Figure out why this inversion is needed.
                 },
                 CONSTANTS::getSpeakerLocation));
         controller0.rightTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel, aimer,
