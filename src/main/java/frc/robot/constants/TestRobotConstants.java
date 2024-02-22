@@ -1,7 +1,6 @@
 package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Second;
@@ -69,13 +68,12 @@ public class TestRobotConstants extends AbstractConstants {
 
     // #region: --------------- Driving Configurations -------------------------
     public Measure<Velocity<Angle>> getMaxAngularSpeed() {
-        // TODO: Tune.
-        return Radians.of(getMaxLinearSpeed().in(MetersPerSecond) / CONSTANTS.getWheelRadius().in(Meters)).per(Second);
+        return Radians.of(360).per(Second);
     }
 
     public Measure<Velocity<Distance>> getMaxLinearSpeed() {
         // TODO: Tune.
-        return MetersPerSecond.of(3);
+        return MetersPerSecond.of(10);
     }
 
     // #endregion

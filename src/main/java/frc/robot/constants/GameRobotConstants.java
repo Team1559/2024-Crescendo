@@ -55,7 +55,7 @@ public class GameRobotConstants extends AbstractConstants {
 
     @Override
     public boolean hasVisionSubsystem() {
-        return false;
+        return true;
     }
 
     @Override
@@ -73,7 +73,7 @@ public class GameRobotConstants extends AbstractConstants {
 
     public Measure<Velocity<Distance>> getMaxLinearSpeed() {
         // TODO: Tune.
-        return MetersPerSecond.of(3);
+        return MetersPerSecond.of(5);
     }
 
     // #endregion
@@ -97,7 +97,7 @@ public class GameRobotConstants extends AbstractConstants {
     // #region: ----- Aimer -----
     @Override
     public Tuple2<Rotation2d> getAimerAngleRange() {
-        return new Tuple2<Rotation2d>(Rotation2d.fromDegrees(1), Rotation2d.fromDegrees(45));
+        return new Tuple2<Rotation2d>(Rotation2d.fromDegrees(1), Rotation2d.fromDegrees(40));
     }
 
     @Override
@@ -184,7 +184,7 @@ public class GameRobotConstants extends AbstractConstants {
     // #region: ----- LEDs -----
     @Override
     public int getLedLenth() {
-        return 144; // TODO.
+        return 144 * 3; // This is the number that WILL be on the robot
     }
 
     // #endregion
@@ -233,7 +233,7 @@ public class GameRobotConstants extends AbstractConstants {
     @Override
     public String getCameraName() {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCameraNameBack'");
+        return "limelight";
     }
 
     // #endregion

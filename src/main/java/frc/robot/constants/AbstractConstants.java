@@ -3,6 +3,7 @@ package frc.robot.constants;
 import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.Meters;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -11,7 +12,7 @@ import java.util.Set;
 import org.opencv.core.Mat.Tuple2;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
@@ -24,13 +25,13 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 public abstract class AbstractConstants {
 
     // ========================= Enums =========================================
-    public static enum OperatingMode {
+    public enum OperatingMode {
         REAL_WORLD,
         SIMULATION,
         LOG_REPLAY
     }
 
-    private static enum RoboRioPortArrays {
+    private enum RoboRioPortArrays {
         DIO,
         PWM
     }
@@ -46,13 +47,25 @@ public abstract class AbstractConstants {
         }
     }
 
-    public static class SwirveModuleHardwareIds {
+    public static class SwerveModuleHardwareIds {
+
         public final int DRIVE_MOTOR_ID, STEER_MOTOR_ID, CANCODER_ID;
 
-        SwirveModuleHardwareIds(int driveMotorId, int steerMotorId, int cancoderId) {
-            DRIVE_MOTOR_ID = driveMotorId;
-            STEER_MOTOR_ID = steerMotorId;
-            CANCODER_ID = cancoderId;
+        /**
+         * Saves these IDs for reference, and ensured uniqueness on the default CAN BUS.
+         */
+        SwerveModuleHardwareIds(int driveMotorId, int steerMotorId, int cancoderId) {
+            this(driveMotorId, steerMotorId, cancoderId, null);
+        }
+
+        /**
+         * Saves these IDs for reference, and ensured uniqueness on the CAN BUS with the
+         * given Canivore Id.
+         */
+        SwerveModuleHardwareIds(int driveMotorId, int steerMotorId, int cancoderId, String canivoreId) {
+            DRIVE_MOTOR_ID = uniqueCanBusId(driveMotorId, canivoreId);
+            STEER_MOTOR_ID = uniqueCanBusId(steerMotorId, canivoreId);
+            CANCODER_ID = uniqueCanBusId(cancoderId, canivoreId);
         }
     }
 
@@ -64,6 +77,18 @@ public abstract class AbstractConstants {
     public static final boolean TECHNICIAN_CONTROLLER_ENABLED = false;
     public static final AbstractConstants CONSTANTS = isGameRobot() ? GAME_ROBOT_CONSTANTS : TEST_ROBOT_CONSTANTS;
 
+    private static final Translation3d SPEKER_LOCATION_BLUE = new Translation3d(Units.inchesToMeters(-1.5),
+            Units.inchesToMeters(218.42),
+            Units.inchesToMeters(80.5));
+    private static final Translation3d SPEKER_LOCATION_RED = new Translation3d(Units.inchesToMeters(652.73),
+            Units.inchesToMeters(218.42),
+            Units.inchesToMeters(80.5));
+    private static final Translation3d AMP_LOCATION_RED = new Translation3d(Units.inchesToMeters(72.5),
+            Units.inchesToMeters(323.00),
+            Units.inchesToMeters(44));
+    private static final Translation3d AMP_LOCATION_BLUE = new Translation3d(Units.inchesToMeters(578.77),
+            Units.inchesToMeters(323.00),
+            Units.inchesToMeters(44));
     // ========================= Static Variables ==============================
     private static final Map<String, Set<Integer>> uniqueCanBusIds = new HashMap<>();
     private static final Map<RoboRioPortArrays, Set<Integer>> uniqueRoboRioPorts = new HashMap();
@@ -83,21 +108,17 @@ public abstract class AbstractConstants {
     }
 
     private static int uniqueCanBusId(int id, String canivoreId) {
-
+        System.out.println(id + " - " + canivoreId);
         canivoreId = canivoreId == null ? "" : canivoreId;
 
         Set<Integer> ids = uniqueCanBusIds.get(canivoreId);
         if (ids == null) {
-            ids = new HashSet<>() {
-                {
-                    add(id);
-                }
-            };
-            uniqueCanBusIds.put(canivoreId, ids);
+            uniqueCanBusIds.put(canivoreId, new HashSet<>(Arrays.asList(id)));
         } else if (!ids.add(id)) {
             // TODO: Fix.
-            // throw new RuntimeException("Duplicate ID (" + id + ") on " +
-            // (canivoreId.isEmpty() ? "default" : canivoreId) + " CAN Bus!");
+            // throw new RuntimeException(
+            // "Duplicate ID (" + id + ") on " + (canivoreId.isEmpty() ? "default" :
+            // canivoreId) + " CAN Bus!");
         }
 
         return id;
@@ -162,7 +183,7 @@ public abstract class AbstractConstants {
 
     // #region: --------------- Driving Configurations -------------------------
     public double getJoystickDeadband() {
-        return 0.2;
+        return 0.05;
     }
 
     public abstract Measure<Velocity<Angle>> getMaxAngularSpeed();
@@ -171,19 +192,19 @@ public abstract class AbstractConstants {
     // #endregion
 
     // #region: --------------- Game Objects -----------------------------------
-    public Translation2d getSpeakerLocation() {
+    public Translation3d getSpeakerLocation() {
         if (getAssignedAlliance() == Alliance.Blue) {
-            return new Translation2d(Units.inchesToMeters(-1.5), Units.inchesToMeters(218.42));
+            return CONSTANTS.SPEKER_LOCATION_BLUE;
         } else {
-            return new Translation2d(Units.inchesToMeters(652.73), Units.inchesToMeters(218.42));
+            return CONSTANTS.SPEKER_LOCATION_RED;
         }
     }
 
-    public Translation2d getAmpLocation() {
+    public Translation3d getAmpLocation() {
         if (getAssignedAlliance() == Alliance.Blue) {
-            return new Translation2d(Units.inchesToMeters(72.5), Units.inchesToMeters(323.00));
+            return CONSTANTS.AMP_LOCATION_RED;
         } else {
-            return new Translation2d(Units.inchesToMeters(578.77), Units.inchesToMeters(323.00));
+            return CONSTANTS.AMP_LOCATION_BLUE;
         }
     }
 
@@ -313,24 +334,20 @@ public abstract class AbstractConstants {
      */
     public abstract Rotation2d[] getSwerveModuleEncoderOffsets();
 
-    public SwirveModuleHardwareIds getSwirveModuleHardwareIdsFrontLeft() {
-        return new SwirveModuleHardwareIds(uniqueCanBusId(0, getCanivoreId()), uniqueCanBusId(1, getCanivoreId()),
-                uniqueCanBusId(2, getCanivoreId()));
+    public SwerveModuleHardwareIds getSwerveModuleHardwareIdsFrontLeft() {
+        return new SwerveModuleHardwareIds(0, 1, 2);
     }
 
-    public SwirveModuleHardwareIds getSwirveModuleHardwareIdsFrontRight() {
-        return new SwirveModuleHardwareIds(uniqueCanBusId(3, getCanivoreId()), uniqueCanBusId(4, getCanivoreId()),
-                uniqueCanBusId(5, getCanivoreId()));
+    public SwerveModuleHardwareIds getSwerveModuleHardwareIdsFrontRight() {
+        return new SwerveModuleHardwareIds(3, 4, 5);
     }
 
-    public SwirveModuleHardwareIds getSwirveModuleHardwareIdsBackLeft() {
-        return new SwirveModuleHardwareIds(uniqueCanBusId(9, getCanivoreId()), uniqueCanBusId(10, getCanivoreId()),
-                uniqueCanBusId(11, getCanivoreId()));
+    public SwerveModuleHardwareIds getSwerveModuleHardwareIdsBackLeft() {
+        return new SwerveModuleHardwareIds(9, 10, 11);
     }
 
-    public SwirveModuleHardwareIds getSwirveModuleHardwareIdsBackRight() {
-        return new SwirveModuleHardwareIds(uniqueCanBusId(6, getCanivoreId()), uniqueCanBusId(7, getCanivoreId()),
-                uniqueCanBusId(8, getCanivoreId()));
+    public SwerveModuleHardwareIds getSwerveModuleHardwareIdsBackRight() {
+        return new SwerveModuleHardwareIds(6, 7, 8);
     }
 
     // #endregion
