@@ -131,7 +131,7 @@ public class DriveBase extends SubsystemBase {
     public void periodic() {
 
         gyroIO.updateInputs(gyroInputs);
-        getPose(); // Logs Robot Estimated Positio; (TODO: Is this needed?)
+        getPose(); // Logs Robot Estimated Position; (TODO: Is this needed?)
         Logger.processInputs("Drive/Gyro", gyroInputs);
 
         for (IndexedSwerveModule module : modules) {
