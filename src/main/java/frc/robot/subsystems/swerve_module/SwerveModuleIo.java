@@ -1,7 +1,10 @@
 package frc.robot.subsystems.swerve_module;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Temperature;
 
 public interface SwerveModuleIo {
 
@@ -16,15 +19,20 @@ public interface SwerveModuleIo {
         public double driveMotorAppliedVolts;
         public double driveMotorCurrentAmps;
         public int driveMotorFaults;
-        public double driveMotorTemp;
+        public Measure<Temperature> driveMotorTemp;
 
         public Rotation2d steerMotorPosition = new Rotation2d();
         public double steerMotorVelocityRadPerSec;
         public double steerMotorAppliedVolts;
         public double steerMotorCurrentAmps;
         public int steerMotorFaults;
-        public double steerMotorTemp;
+        public Measure<Temperature> steerMotorTemp;
     }
+
+    /**
+     * @return The maximum safe operating temperature of these motors.
+     */
+    public Measure<Temperature> getMaxSafeMotorTemperature();
 
     /** Run the drive motor at the specified voltage. */
     public void setDriveVoltage(double volts);

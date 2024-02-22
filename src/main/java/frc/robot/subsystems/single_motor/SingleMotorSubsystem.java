@@ -1,5 +1,7 @@
 package frc.robot.subsystems.single_motor;
 
+import static frc.robot.constants.AbstractConstants.CONSTANTS;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -51,7 +53,7 @@ public class SingleMotorSubsystem extends SubsystemBase {
     // ========================= Functions =========================
     public boolean isTemperatureTooHigh() {
         // 90% Buffer.
-        return io.getTemperature().gt(io.getMaxSafeTemperature().times(0.9));
+        return io.getTemperature().gt(io.getMaxSafeTemperature().times(CONSTANTS.SAFE_MOTOR_TEMPERATURE_BUFFER));
     }
 
     public void reverse() {

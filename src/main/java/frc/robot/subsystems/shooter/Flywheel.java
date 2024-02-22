@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter;
 
+import static edu.wpi.first.units.Units.Celsius;
 import static frc.robot.constants.AbstractConstants.CONSTANTS;
 
 import org.littletonrobotics.junction.AutoLog;
@@ -7,14 +8,17 @@ import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Temperature;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.swerve_module.SwerveModuleIoTalonFx;
 
 public class Flywheel extends SubsystemBase {
     @AutoLog
@@ -31,8 +35,8 @@ public class Flywheel extends SubsystemBase {
         public double lVelocity;
         public double rVelocity;
 
-        public double rMotorTemp;
-        public double lMotorTemp;
+        public Measure<Temperature> rMotorTemp;
+        public Measure<Temperature> lMotorTemp;
 
         public int rFaults;
         public int lFaults;
@@ -60,17 +64,12 @@ public class Flywheel extends SubsystemBase {
     public Flywheel() {
 
         // ---------- Configure Motors ----------
-        // TODO: Determine why these aren't being respected.
-        // (Velecity is being inverted in #periodic() as a workaround.)
-        // flywheelMotorL.setInverted(true);
-        // flywheelMotorR.setInverted(false);
-        flywheelMotorL.setNeutralMode(NeutralModeValue.Coast);
-        flywheelMotorR.setNeutralMode(NeutralModeValue.Coast);
-
-        TalonFXConfiguration driveTalonFXConfiguration = new TalonFXConfiguration();
-        driveTalonFXConfiguration.CurrentLimits = CONSTANTS.getFalcon500CurrentLimitsConfigs();
-        flywheelMotorL.getConfigurator().apply(driveTalonFXConfiguration);
-        flywheelMotorR.getConfigurator().apply(driveTalonFXConfiguration);
+        // Only set the Motor Configuration once, to avoid accidentally overriding
+        // configs with defaults.
+        flywheelMotorL.getConfigurator().apply(SwerveModuleIoTalonFx.getDefaultTalonFXConfiguration(
+                InvertedValue.CounterClockwise_Positive /* default */, NeutralModeValue.Coast));
+        flywheelMotorR.getConfigurator().apply(SwerveModuleIoTalonFx.getDefaultTalonFXConfiguration(
+                InvertedValue.Clockwise_Positive /* inverted */, NeutralModeValue.Coast));
 
         // ---------- Define Loggable Fields ----------
         flywheelLMotorVoltage = flywheelMotorL.getMotorVoltage();
@@ -104,8 +103,7 @@ public class Flywheel extends SubsystemBase {
 
         // Set Voltages.
         if (runOneWheelFlag == null || runOneWheelFlag) {
-            // TODO: Removbe this workaround to the inveted config not taking.
-            flywheelMotorR.setControl(new VoltageOut(-currentVoltage));
+            flywheelMotorR.setControl(new VoltageOut(currentVoltage));
         }
         if (runOneWheelFlag == null || !runOneWheelFlag) {
             flywheelMotorL.setControl(
@@ -138,14 +136,27 @@ public class Flywheel extends SubsystemBase {
         inputs.lVelocity = flywheelLVelocity.getValueAsDouble();
         inputs.rVelocity = flywheelRVelocity.getValueAsDouble();
 
-        inputs.lMotorTemp = flywheelLMotorTemp.getValueAsDouble();
-        inputs.rMotorTemp = flywheelRMotorTemp.getValueAsDouble();
+        inputs.lMotorTemp = Celsius.of(flywheelLMotorTemp.getValueAsDouble());
+        inputs.rMotorTemp = Celsius.of(flywheelRMotorTemp.getValueAsDouble());
 
         inputs.lFaults = flywheelLFaults.getValue();
         inputs.rFaults = flywheelRFaults.getValue();
     }
 
     // ========================= Functions =========================
+    /**
+     * @return The Temperature of the hottest motor.
+     */
+    public Measure<Temperature> getMaxTemperature() {
+        return inputs.rMotorTemp.gt(inputs.lMotorTemp) ? inputs.rMotorTemp : inputs.lMotorTemp;
+    }
+
+    public boolean isTemperatureTooHigh() {
+        // 90% Buffer.
+        return getMaxTemperature()
+                .gt(CONSTANTS.getFalcon500MaxTemperature().times(CONSTANTS.SAFE_MOTOR_TEMPERATURE_BUFFER));
+    }
+
     /**
      * Start the Flywheels with a specific voltage
      * 

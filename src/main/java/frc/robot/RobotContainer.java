@@ -190,6 +190,15 @@ public class RobotContainer {
 
         // TODO: Add LEDs Flashing Yellow to all Motor Temperature cutoff commands.
         if (CONSTANTS.hasIntakeSubsystem()) {
+            new Trigger(driveBase::isTemperatureTooHigh).whileTrue(driveBase.stopCommand());
+        }
+        // TODO: Add LEDs Flashing Yellow to all Motor Temperature cutoff commands.
+        if (CONSTANTS.hasIntakeSubsystem()) {
+            new Trigger(flywheel::isTemperatureTooHigh).whileTrue(flywheel.stopCommand());
+        }
+
+        // TODO: Add LEDs Flashing Yellow to all Motor Temperature cutoff commands.
+        if (CONSTANTS.hasIntakeSubsystem()) {
             new Trigger(intake::isTemperatureTooHigh).whileTrue(intake.stopCommand());
         }
         if (CONSTANTS.hasFeederSubsystem()) {
@@ -198,7 +207,6 @@ public class RobotContainer {
         if (CONSTANTS.hasTraverserSubsystem()) {
             new Trigger(traverser::isTemperatureTooHigh).whileTrue(traverser.stopCommand());
         }
-        // TODO: Add All other Motor High Tempeature Cutoffs.
 
         // #endregion
 

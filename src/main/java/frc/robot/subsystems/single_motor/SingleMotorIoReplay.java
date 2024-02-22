@@ -12,7 +12,7 @@ public class SingleMotorIoReplay implements SingleMotorIo {
     }
 
     public Measure<Temperature> getMaxSafeTemperature() {
-        return Units.Celsius.of(0);
+        return Units.Celsius.of(Double.MAX_VALUE);
     }
 
     public Measure<Temperature> getTemperature() {

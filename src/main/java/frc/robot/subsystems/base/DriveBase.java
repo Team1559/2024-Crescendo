@@ -167,6 +167,15 @@ public class DriveBase extends SubsystemBase {
         return poseEstimator.getEstimatedPosition().getRotation();
     }
 
+    public boolean isTemperatureTooHigh() {
+        for (IndexedSwerveModule module : modules) {
+            if (module.isTemperatureTooHigh()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** Runs forwards at the commanded voltage. */
     public void runCharacterizationVolts(double volts) {
         for (int i = 0; i < 4; i++) {
@@ -258,9 +267,16 @@ public class DriveBase extends SubsystemBase {
             modulePositions[i] = modules[i].getPosition();
         }
     }
-    // ======= Commands =======
+
+    // ========================= Commands =====================================
 
     public Command resetFieldOrientationCommand() {
         return new InstantCommand(this::resetFieldOrientation);
     }
+
+    public Command stopCommand() {
+        return new InstantCommand(this::stop);
+    }
+
+    // TODO: Add remaining Instant Commands.
 }
