@@ -67,8 +67,8 @@ public abstract class AbstractConstants {
     public static final AbstractConstants CONSTANTS = isGameRobot() ? GAME_ROBOT_CONSTANTS : TEST_ROBOT_CONSTANTS;
 
     // ========================= Static Variables ==============================
-    private static final Map<String, Set<Integer>> uniqueCanBusIds = new HashMap<>();
-    private static final Map<RoboRioPortArrays, Set<Integer>> uniqueRoboRioPorts = new HashMap();
+    private static Map<String, Set<Integer>> uniqueCanBusIds;
+    private static Map<RoboRioPortArrays, Set<Integer>> uniqueRoboRioPorts;
 
     // ========================= Static Methods ================================
     public static boolean isGameRobot() {
@@ -86,19 +86,15 @@ public abstract class AbstractConstants {
 
     private static int uniqueCanBusId(int id, String canivoreId) {
 
-        System.out.println("XXXXXXXXXX " + id + " - " + canivoreId + " XXXXXXXXXX");
-        canivoreId = canivoreId == null ? "" : canivoreId;
+        uniqueCanBusIds = uniqueCanBusIds == null ? new HashMap<>() : uniqueCanBusIds;
 
+        canivoreId = canivoreId == null ? "" : canivoreId;
         Set<Integer> ids = uniqueCanBusIds.get(canivoreId);
         if (ids == null) {
-
-            System.out.println("XXXXXXXXXX " + id + " - " + canivoreId + " XXXXXXXXXX - ids == null");
             uniqueCanBusIds.put(canivoreId, new HashSet<>(Arrays.asList(id)));
         } else if (!ids.add(id)) {
-            System.out.println("XXXXXXXXXX " + id + " - " + canivoreId + " XXXXXXXXXX - else if");
-            // TODO: Fix.
-            // throw new RuntimeException("Duplicate ID (" + id + ") on " +
-            // (canivoreId.isEmpty() ? "default" : canivoreId) + " CAN Bus!");
+            throw new RuntimeException(
+                    "Duplicate ID (" + id + ") on " + (canivoreId.isEmpty() ? "default" : canivoreId) + " CAN Bus!");
         }
 
         return id;
@@ -106,6 +102,7 @@ public abstract class AbstractConstants {
 
     private static int uniqueRoboRioPort(int port, RoboRioPortArrays portArray) {
 
+        uniqueRoboRioPorts = uniqueRoboRioPorts == null ? new HashMap<>() : uniqueRoboRioPorts;
         Set<Integer> ports = uniqueRoboRioPorts.get(portArray);
         if (ports == null) {
             ports = new HashSet<>() {
@@ -230,7 +227,7 @@ public abstract class AbstractConstants {
     // #endregion
 
     // #region: ----- Canivore -----
-    public String getCanivoreId() {
+    public static String getCanivoreId() {
         return "1559Canivore";
     }
 
@@ -308,7 +305,7 @@ public abstract class AbstractConstants {
     // #region: ----- Swerve --------
     public abstract Map<WheelModuleIndex, Rotation2d> getSwerveModuleEncoderOffsets();
 
-    private Map<WheelModuleIndex, SwerveModuleHardwareIds> swerveModuleHardwareIds = new HashMap<>(4) {
+    private static Map<WheelModuleIndex, SwerveModuleHardwareIds> swerveModuleHardwareIds = new HashMap<>(4) {
         {
             put(WheelModuleIndex.FRONT_LEFT,
                     new SwerveModuleHardwareIds(uniqueCanBusId(0, getCanivoreId()), uniqueCanBusId(1, getCanivoreId()),
