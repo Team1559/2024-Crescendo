@@ -308,26 +308,27 @@ public abstract class AbstractConstants {
     // #region: ----- Swerve --------
     public abstract Map<WheelModuleIndex, Rotation2d> getSwerveModuleEncoderOffsets();
 
+    private Map<WheelModuleIndex, SwerveModuleHardwareIds> swerveModuleHardwareIds = new HashMap<>(4) {
+        {
+            put(WheelModuleIndex.FRONT_LEFT,
+                    new SwerveModuleHardwareIds(uniqueCanBusId(0, getCanivoreId()), uniqueCanBusId(1, getCanivoreId()),
+                            uniqueCanBusId(2, getCanivoreId())));
+
+            put(WheelModuleIndex.FRONT_RIGHT,
+                    new SwerveModuleHardwareIds(uniqueCanBusId(3, getCanivoreId()), uniqueCanBusId(4, getCanivoreId()),
+                            uniqueCanBusId(5, getCanivoreId())));
+
+            put(WheelModuleIndex.BACK_LEFT,
+                    new SwerveModuleHardwareIds(uniqueCanBusId(9, getCanivoreId()), uniqueCanBusId(10, getCanivoreId()),
+                            uniqueCanBusId(11, getCanivoreId())));
+
+            put(WheelModuleIndex.BACK_RIGHT,
+                    new SwerveModuleHardwareIds(uniqueCanBusId(6, getCanivoreId()), uniqueCanBusId(7, getCanivoreId()),
+                            uniqueCanBusId(8, getCanivoreId())));
+        }
+    };
+
     public Map<WheelModuleIndex, SwerveModuleHardwareIds> getSwerveModuleHardwareIds() {
-
-        Map<WheelModuleIndex, SwerveModuleHardwareIds> swerveModuleHardwareIds = new HashMap<>(4);
-
-        swerveModuleHardwareIds.put(WheelModuleIndex.FRONT_LEFT,
-                new SwerveModuleHardwareIds(uniqueCanBusId(0, getCanivoreId()), uniqueCanBusId(1, getCanivoreId()),
-                        uniqueCanBusId(2, getCanivoreId())));
-
-        swerveModuleHardwareIds.put(WheelModuleIndex.FRONT_RIGHT,
-                new SwerveModuleHardwareIds(uniqueCanBusId(3, getCanivoreId()), uniqueCanBusId(4, getCanivoreId()),
-                        uniqueCanBusId(5, getCanivoreId())));
-
-        swerveModuleHardwareIds.put(WheelModuleIndex.BACK_LEFT,
-                new SwerveModuleHardwareIds(uniqueCanBusId(9, getCanivoreId()), uniqueCanBusId(10, getCanivoreId()),
-                        uniqueCanBusId(11, getCanivoreId())));
-
-        swerveModuleHardwareIds.put(WheelModuleIndex.BACK_RIGHT,
-                new SwerveModuleHardwareIds(uniqueCanBusId(6, getCanivoreId()), uniqueCanBusId(7, getCanivoreId()),
-                        uniqueCanBusId(8, getCanivoreId())));
-
         return swerveModuleHardwareIds;
     }
 
