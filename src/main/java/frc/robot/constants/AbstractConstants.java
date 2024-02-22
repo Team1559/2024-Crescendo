@@ -2,6 +2,7 @@ package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Meters;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -101,16 +102,12 @@ public abstract class AbstractConstants {
 
         Set<Integer> ids = uniqueCanBusIds.get(canivoreId);
         if (ids == null) {
-            ids = new HashSet<>() {
-                {
-                    add(id);
-                }
-            };
-            uniqueCanBusIds.put(canivoreId, ids);
+            uniqueCanBusIds.put(canivoreId, new HashSet<>(Arrays.asList(id)));
         } else if (!ids.add(id)) {
             // TODO: Fix.
-            // throw new RuntimeException("Duplicate ID (" + id + ") on " +
-            // (canivoreId.isEmpty() ? "default" : canivoreId) + " CAN Bus!");
+            // throw new RuntimeException(
+            // "Duplicate ID (" + id + ") on " + (canivoreId.isEmpty() ? "default" :
+            // canivoreId) + " CAN Bus!");
         }
 
         return id;
