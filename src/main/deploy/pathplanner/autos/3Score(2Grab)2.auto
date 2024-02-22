@@ -8,7 +8,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Start Flywheel"
+            "name": "Spin Up Flywheel"
           }
         },
         {
@@ -18,21 +18,9 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "MoveDiagonally"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "MoveDiagBack"
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "Auto Shoot"
+            "name": "StartIntake"
           }
         },
         {
@@ -50,25 +38,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "CurveToTop"
+            "pathName": "CurveToBottom"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "Auto Shoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "GoToMid"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "GoBackFromMid"
           }
         }
       ]
