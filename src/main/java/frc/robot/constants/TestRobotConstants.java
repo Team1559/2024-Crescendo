@@ -6,6 +6,9 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Second;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.opencv.core.Mat.Tuple2;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -13,6 +16,7 @@ import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
+import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
 
 public class TestRobotConstants extends AbstractConstants {
 
@@ -195,12 +199,14 @@ public class TestRobotConstants extends AbstractConstants {
 
     // #region: ----- Swerve -----
     @Override
-    public Rotation2d[] getSwerveModuleEncoderOffsets() {
-        return new Rotation2d[] {
-                Rotation2d.fromRotations(-0.300293),
-                Rotation2d.fromRotations(-0.228760),
-                Rotation2d.fromRotations(-0.238525),
-                Rotation2d.fromRotations(-0.000732)
+    public Map<WheelModuleIndex, Rotation2d> getSwerveModuleEncoderOffsets() {
+        return new HashMap<>() {
+            {
+                put(WheelModuleIndex.FRONT_LEFT, Rotation2d.fromRotations(-0.300293));
+                put(WheelModuleIndex.FRONT_RIGHT, Rotation2d.fromRotations(-0.228760));
+                put(WheelModuleIndex.BACK_LEFT, Rotation2d.fromRotations(-0.238525));
+                put(WheelModuleIndex.BACK_RIGHT, Rotation2d.fromRotations(-0.000732));
+            }
         };
     }
 

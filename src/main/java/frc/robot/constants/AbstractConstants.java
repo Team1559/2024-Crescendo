@@ -20,6 +20,7 @@ import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
 
 public abstract class AbstractConstants {
 
@@ -46,10 +47,10 @@ public abstract class AbstractConstants {
         }
     }
 
-    public static class SwirveModuleHardwareIds {
+    public static class SwerveModuleHardwareIds {
         public final int DRIVE_MOTOR_ID, STEER_MOTOR_ID, CANCODER_ID;
 
-        SwirveModuleHardwareIds(int driveMotorId, int steerMotorId, int cancoderId) {
+        SwerveModuleHardwareIds(int driveMotorId, int steerMotorId, int cancoderId) {
             DRIVE_MOTOR_ID = driveMotorId;
             STEER_MOTOR_ID = steerMotorId;
             CANCODER_ID = cancoderId;
@@ -305,32 +306,29 @@ public abstract class AbstractConstants {
     // #endregion
 
     // #region: ----- Swerve --------
-    /**
-     * The index of the Rotation matches the Index of the Module in Advaltage Scope.
-     * <p>
-     * Note: Offsetting by 180 degrees will invert the direction the wheel spins.
-     * </p>
-     */
-    public abstract Rotation2d[] getSwerveModuleEncoderOffsets();
+    public abstract Map<WheelModuleIndex, Rotation2d> getSwerveModuleEncoderOffsets();
 
-    public SwirveModuleHardwareIds getSwirveModuleHardwareIdsFrontLeft() {
-        return new SwirveModuleHardwareIds(uniqueCanBusId(0, getCanivoreId()), uniqueCanBusId(1, getCanivoreId()),
-                uniqueCanBusId(2, getCanivoreId()));
-    }
+    public Map<WheelModuleIndex, SwerveModuleHardwareIds> getSwerveModuleHardwareIds() {
 
-    public SwirveModuleHardwareIds getSwirveModuleHardwareIdsFrontRight() {
-        return new SwirveModuleHardwareIds(uniqueCanBusId(3, getCanivoreId()), uniqueCanBusId(4, getCanivoreId()),
-                uniqueCanBusId(5, getCanivoreId()));
-    }
+        Map<WheelModuleIndex, SwerveModuleHardwareIds> swerveModuleHardwareIds = new HashMap<>(4);
 
-    public SwirveModuleHardwareIds getSwirveModuleHardwareIdsBackLeft() {
-        return new SwirveModuleHardwareIds(uniqueCanBusId(9, getCanivoreId()), uniqueCanBusId(10, getCanivoreId()),
-                uniqueCanBusId(11, getCanivoreId()));
-    }
+        swerveModuleHardwareIds.put(WheelModuleIndex.FRONT_LEFT,
+                new SwerveModuleHardwareIds(uniqueCanBusId(0, getCanivoreId()), uniqueCanBusId(1, getCanivoreId()),
+                        uniqueCanBusId(2, getCanivoreId())));
 
-    public SwirveModuleHardwareIds getSwirveModuleHardwareIdsBackRight() {
-        return new SwirveModuleHardwareIds(uniqueCanBusId(6, getCanivoreId()), uniqueCanBusId(7, getCanivoreId()),
-                uniqueCanBusId(8, getCanivoreId()));
+        swerveModuleHardwareIds.put(WheelModuleIndex.FRONT_RIGHT,
+                new SwerveModuleHardwareIds(uniqueCanBusId(3, getCanivoreId()), uniqueCanBusId(4, getCanivoreId()),
+                        uniqueCanBusId(5, getCanivoreId())));
+
+        swerveModuleHardwareIds.put(WheelModuleIndex.BACK_LEFT,
+                new SwerveModuleHardwareIds(uniqueCanBusId(9, getCanivoreId()), uniqueCanBusId(10, getCanivoreId()),
+                        uniqueCanBusId(11, getCanivoreId())));
+
+        swerveModuleHardwareIds.put(WheelModuleIndex.BACK_RIGHT,
+                new SwerveModuleHardwareIds(uniqueCanBusId(6, getCanivoreId()), uniqueCanBusId(7, getCanivoreId()),
+                        uniqueCanBusId(8, getCanivoreId())));
+
+        return swerveModuleHardwareIds;
     }
 
     // #endregion
