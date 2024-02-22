@@ -14,11 +14,12 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.MathUtils;
 
 public class Aimer extends SubsystemBase {
 
@@ -72,8 +73,8 @@ public class Aimer extends SubsystemBase {
 
     private void updateInputs() {
 
-        inputs.currentAngleDegrees = MathUtils.round(getAngle().getDegrees(), 2);
-        inputs.targetAngleDegrees = MathUtils.round(getTargetAngle().getDegrees(), 2);
+        inputs.currentAngleDegrees = getAngle().getDegrees();
+        inputs.targetAngleDegrees = getTargetAngle().getDegrees();
 
         inputs.lAppliedOutput = motorL.getAppliedOutput();
         inputs.lOutputCurrent = motorL.getOutputCurrent();
@@ -88,7 +89,25 @@ public class Aimer extends SubsystemBase {
         inputs.rVelocity = motorR.getEncoder().getVelocity();
     }
 
-    // ========================= Functions =========================
+    // ========================= Functions =====================================
+    public void aimAtTarget(Translation3d target, Translation2d currentPosition) {
+
+        double distance = currentPosition.getDistance(target.toTranslation2d());
+        Rotation2d angle = new Rotation2d(distance, target.getZ());
+
+        // Add Offset.
+        angle = angle.minus(Rotation2d.fromDegrees(20)); // > 13 && < 30.
+
+        // Flatten Slope.
+        double COEFFICIENT = 1.00; // The Bigger the number (above 1), the flatter the slope.
+        double angleInDegrees = Math.pow(angle.getDegrees(), 1 / COEFFICIENT);
+        angle = Rotation2d.fromDegrees(angleInDegrees);
+
+        Logger.recordOutput("Aimer/DistanceToTarget", distance);
+
+        setTargetAngle(angle);
+    }
+
     public void setTargetAngle(Rotation2d angle) {
 
         double targetAngle = MathUtil.clamp(angle.getDegrees(), CONSTANTS.getAimerAngleRange().get_0().getDegrees(),
@@ -109,7 +128,7 @@ public class Aimer extends SubsystemBase {
         return Rotation2d.fromRotations(-encoder.getAbsolutePosition()).plus(CONSTANTS.getAimerEncoderOffset());
     }
 
-    // ========================= Commands =========================
+    // ========================= Commands ======================================
     public Command setTargetAngleCommand(Rotation2d angle) {
         return new InstantCommand(() -> setTargetAngle(angle), this);
     }

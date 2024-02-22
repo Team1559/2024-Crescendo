@@ -62,35 +62,35 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 
         switch (index) {
             case FRONT_LEFT:
-                driveMotor = new TalonFX(CONSTANTS.getSwirveModuleHardwareIdsFrontLeft().DRIVE_MOTOR_ID,
+                driveMotor = new TalonFX(CONSTANTS.getSwerveModuleHardwareIdsFrontLeft().DRIVE_MOTOR_ID,
                         CONSTANTS.getCanivoreId());
-                steerMotor = new TalonFX(CONSTANTS.getSwirveModuleHardwareIdsFrontLeft().STEER_MOTOR_ID,
+                steerMotor = new TalonFX(CONSTANTS.getSwerveModuleHardwareIdsFrontLeft().STEER_MOTOR_ID,
                         CONSTANTS.getCanivoreId());
-                cancoder = new CANcoder(CONSTANTS.getSwirveModuleHardwareIdsFrontLeft().CANCODER_ID,
+                cancoder = new CANcoder(CONSTANTS.getSwerveModuleHardwareIdsFrontLeft().CANCODER_ID,
                         CONSTANTS.getCanivoreId());
                 break;
             case FRONT_RIGHT:
-                driveMotor = new TalonFX(CONSTANTS.getSwirveModuleHardwareIdsFrontRight().DRIVE_MOTOR_ID,
+                driveMotor = new TalonFX(CONSTANTS.getSwerveModuleHardwareIdsFrontRight().DRIVE_MOTOR_ID,
                         CONSTANTS.getCanivoreId());
-                steerMotor = new TalonFX(CONSTANTS.getSwirveModuleHardwareIdsFrontRight().STEER_MOTOR_ID,
+                steerMotor = new TalonFX(CONSTANTS.getSwerveModuleHardwareIdsFrontRight().STEER_MOTOR_ID,
                         CONSTANTS.getCanivoreId());
-                cancoder = new CANcoder(CONSTANTS.getSwirveModuleHardwareIdsFrontRight().CANCODER_ID,
+                cancoder = new CANcoder(CONSTANTS.getSwerveModuleHardwareIdsFrontRight().CANCODER_ID,
                         CONSTANTS.getCanivoreId());
                 break;
             case BACK_LEFT:
-                driveMotor = new TalonFX(CONSTANTS.getSwirveModuleHardwareIdsBackLeft().DRIVE_MOTOR_ID,
+                driveMotor = new TalonFX(CONSTANTS.getSwerveModuleHardwareIdsBackLeft().DRIVE_MOTOR_ID,
                         CONSTANTS.getCanivoreId());
-                steerMotor = new TalonFX(CONSTANTS.getSwirveModuleHardwareIdsBackLeft().STEER_MOTOR_ID,
+                steerMotor = new TalonFX(CONSTANTS.getSwerveModuleHardwareIdsBackLeft().STEER_MOTOR_ID,
                         CONSTANTS.getCanivoreId());
-                cancoder = new CANcoder(CONSTANTS.getSwirveModuleHardwareIdsBackLeft().CANCODER_ID,
+                cancoder = new CANcoder(CONSTANTS.getSwerveModuleHardwareIdsBackLeft().CANCODER_ID,
                         CONSTANTS.getCanivoreId());
                 break;
             case BACK_RIGHT:
-                driveMotor = new TalonFX(CONSTANTS.getSwirveModuleHardwareIdsBackRight().DRIVE_MOTOR_ID,
+                driveMotor = new TalonFX(CONSTANTS.getSwerveModuleHardwareIdsBackRight().DRIVE_MOTOR_ID,
                         CONSTANTS.getCanivoreId());
-                steerMotor = new TalonFX(CONSTANTS.getSwirveModuleHardwareIdsBackRight().STEER_MOTOR_ID,
+                steerMotor = new TalonFX(CONSTANTS.getSwerveModuleHardwareIdsBackRight().STEER_MOTOR_ID,
                         CONSTANTS.getCanivoreId());
-                cancoder = new CANcoder(CONSTANTS.getSwirveModuleHardwareIdsBackRight().CANCODER_ID,
+                cancoder = new CANcoder(CONSTANTS.getSwerveModuleHardwareIdsBackRight().CANCODER_ID,
                         CONSTANTS.getCanivoreId());
                 break;
             default:

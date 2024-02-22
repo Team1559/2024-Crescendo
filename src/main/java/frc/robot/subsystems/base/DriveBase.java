@@ -124,11 +124,13 @@ public class DriveBase extends SubsystemBase {
                         activePath.toArray(new Pose2d[activePath.size()])));
         PathPlannerLogging.setLogTargetPoseCallback(
                 targetPose -> Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose));
+        setPose(new Pose2d());
     }
 
     @Override
     public void periodic() {
         gyroIO.updateInputs(gyroInputs);
+        getPose(); // Logs Robot Estimated Position; (TODO: Is this needed?)
         Logger.processInputs("Drive/Gyro", gyroInputs);
 
         for (IndexedSwerveModule module : modules) {
