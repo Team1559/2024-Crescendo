@@ -1,5 +1,6 @@
 package frc.robot.constants;
 
+import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.Meters;
 
 import java.util.HashMap;
@@ -9,14 +10,13 @@ import java.util.Set;
 
 import org.opencv.core.Mat.Tuple2;
 
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -356,23 +356,19 @@ public abstract class AbstractConstants {
 
     // #region: --------------- Motor / Motor Controller Settings --------------
 
+    public final double SAFE_MOTOR_TEMPERATURE_BUFFER = 0.9;
+
     // #region: ----- Falcon 500 Motor -----
 
     /**
-     * Allow 40A continuous, 80A momentary supply current. See: <a href=
-     * "https://api.ctr-electronics.com/phoenix6/release/java/com/ctre/phoenix6/configs/CurrentLimitsConfigs.html">CTR
-     * Electronics: CurrentLimitsConfigs</a>
+     * See: <a href=
+     * "https://www.chiefdelphi.com/uploads/short-url/eVYO5tVOYZecwq6Tl2kURlFZFgq.pdf">Falcon
+     * 500 temperature test under maximum load conditions</a>
      * 
-     * @return A {@link CurrentLimitsConfigs} object with the default Current
-     *         limits.
+     * @return 109 degrees C
      */
-    public CurrentLimitsConfigs getFalcon500CurrentLimitsConfigs() {
-        CurrentLimitsConfigs limits = new CurrentLimitsConfigs();
-        limits.SupplyCurrentLimitEnable = true;
-        limits.SupplyCurrentLimit = 40.0;
-        limits.SupplyCurrentThreshold = 80.0;
-        limits.SupplyTimeThreshold = 0.5;
-        return limits;
+    public Measure<Temperature> getFalcon500MaxTemperature() {
+        return Celsius.of(109);
     }
 
     // #endregion

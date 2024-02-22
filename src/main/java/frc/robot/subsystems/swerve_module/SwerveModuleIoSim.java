@@ -1,8 +1,12 @@
 package frc.robot.subsystems.swerve_module;
 
+import static edu.wpi.first.units.Units.Celsius;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Temperature;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
 /**
@@ -25,6 +29,11 @@ public class SwerveModuleIoSim implements SwerveModuleIo {
     private final Rotation2d turnAbsoluteInitPosition = new Rotation2d(Math.random() * 2.0 * Math.PI);
     private double driveAppliedVolts;
     private double turnAppliedVolts;
+
+    @Override
+    public Measure<Temperature> getMaxSafeMotorTemperature() {
+        return Celsius.of(Double.MAX_VALUE);
+    }
 
     @Override
     public void setDriveVoltage(double volts) {

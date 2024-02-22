@@ -10,6 +10,8 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Temperature;
 
 public class IndexedSwerveModule {
 
@@ -134,6 +136,13 @@ public class IndexedSwerveModule {
         }
     }
 
+    /**
+     * @return The Temperature of the hottest motor.
+     */
+    public Measure<Temperature> getMaxTemperature() {
+        return inputs.driveMotorTemp.gt(inputs.steerMotorTemp) ? inputs.driveMotorTemp : inputs.steerMotorTemp;
+    }
+
     /** Returns the current drive position of the module in meters. */
     public double getPositionMeters() {
         return inputs.driveMotorPositionRad * CONSTANTS.getWheelRadius().in(Meters);
@@ -164,5 +173,10 @@ public class IndexedSwerveModule {
     /** Returns the drive velocity in radians/sec. */
     public double getCharacterizationVelocity() {
         return inputs.driveMotorVelocityRadPerSec;
+    }
+
+    public boolean isTemperatureTooHigh() {
+        // 90% Buffer.
+        return getMaxTemperature().gt(io.getMaxSafeMotorTemperature().times(CONSTANTS.SAFE_MOTOR_TEMPERATURE_BUFFER));
     }
 }
