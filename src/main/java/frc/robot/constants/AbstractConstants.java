@@ -95,7 +95,6 @@ public abstract class AbstractConstants {
 
     // ========================= Static Methods ================================
     public static boolean isGameRobot() {
-
         String roboRioSerialNumber = System.getenv("serialnum");
         roboRioSerialNumber = roboRioSerialNumber == null ? "" : roboRioSerialNumber.trim();
 
