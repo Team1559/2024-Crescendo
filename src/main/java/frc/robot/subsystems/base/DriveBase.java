@@ -124,6 +124,8 @@ public class DriveBase extends SubsystemBase {
                         activePath.toArray(new Pose2d[activePath.size()])));
         PathPlannerLogging.setLogTargetPoseCallback(
                 targetPose -> Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose));
+
+        // TODO: Figure out why the robot is not starting at 0,0.
         setPose(new Pose2d());
     }
 
