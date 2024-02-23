@@ -34,7 +34,7 @@ public class GameRobotConstants extends AbstractConstants {
     }
 
     @Override
-    public boolean hasColorSensorSubsystem() {
+    public boolean hasNoteSensorSubsystem() {
         return true;
     }
 

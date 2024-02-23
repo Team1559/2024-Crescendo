@@ -10,7 +10,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -29,10 +28,10 @@ import frc.robot.subsystems.gyro.GyroIoPigeon2;
 import frc.robot.subsystems.gyro.GyroIoSimAndReplay;
 import frc.robot.subsystems.led.Leds;
 import frc.robot.subsystems.shooter.Aimer;
-import frc.robot.subsystems.shooter.ColorSensor;
 import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.Intake;
+import frc.robot.subsystems.shooter.NoteSensor;
 import frc.robot.subsystems.single_motor.SingleMotorIoNeo550Brushless;
 import frc.robot.subsystems.single_motor.SingleMotorIoReplay;
 import frc.robot.subsystems.swerve_module.SwerveModuleIoReplay;
@@ -73,7 +72,7 @@ public class RobotContainer {
 
     private final Aimer aimer;
     // TODO: Add Climber variable.
-    private final ColorSensor colorSensor;
+    private final NoteSensor noteSensor;
     private final Feeder feeder;
     private final Flywheel flywheel;
     private final Intake intake;
@@ -169,7 +168,7 @@ public class RobotContainer {
 
         // #region: Initialize Subsystems without Simulation and/or Log Replay Mode
         aimer = CONSTANTS.hasAimerSubsystem() ? new Aimer() : null;
-        colorSensor = CONSTANTS.hasColorSensorSubsystem() ? new ColorSensor() : null;
+        noteSensor = CONSTANTS.hasNoteSensorSubsystem() ? new NoteSensor() : null;
         flywheel = CONSTANTS.hasFlywheelSubsystem() ? new Flywheel() : null;
         /*
          * We can safely set LEDs even if there are no LEDs.
@@ -182,18 +181,11 @@ public class RobotContainer {
 
         // #region: ==================== Default Commands & Triggers ===========
         // #region: ---------- Configure Default Commands ----------
-        driveBase.setDefaultCommand(DriveCommands.manualDriveDefaultCommand(driveBase,
-                () -> {
-                    return CONSTANTS.getAlliance() == Alliance.Blue ? -pilot.getLeftY()
-                            : pilot.getLeftY();
-                },
-                () -> {
-                    return CONSTANTS.getAlliance() == Alliance.Blue ? -pilot.getLeftX()
-                            : pilot.getLeftX();
-                },
-                () -> -pilot.getRightX()));
-        // TODO - Create helper method in DriveCommands that sets deadband/inverts
-        // controllers as needed
+        driveBase.setDefaultCommand(DriveCommands.manualDriveDefaultCommand(driveBase, () -> {
+            return pilot.getLeftY();
+        }, () -> {
+            return pilot.getLeftX();
+        }, () -> -pilot.getRightX()));
         leds.setDefaultCommand(LedCommands.defaultLedCommand(leds));
         if (CONSTANTS.hasFlywheelSubsystem()) {
             flywheel.setDefaultCommand(ShooterCommands.defaultFlywheelCommand(flywheel));
@@ -202,8 +194,9 @@ public class RobotContainer {
         // #endregion
 
         // #region: ---------- Configure Command Triggers ----------
-        if (CONSTANTS.hasColorSensorSubsystem()) {
-            new Trigger((colorSensor::isObjectDetected)).whileTrue(leds.setColorCommand(Color.kDarkOrange));
+        if (CONSTANTS.hasNoteSensorSubsystem()) {
+            new Trigger((noteSensor::isObjectDetectedSensor)).whileTrue(leds.setColorCommand(Color.kDarkOrange));
+            new Trigger((noteSensor::isObjectDetectedSwitch)).whileTrue(leds.setColorCommand(Color.kBrown));
         }
         // #endregion
         // #region: ---------- Motor Overheat Triggers ----------
@@ -236,8 +229,8 @@ public class RobotContainer {
 
         Command aimAtSpeakerCommand = DriveCommands.turnToTargetCommand(driveBase, CONSTANTS::getSpeakerLocation, 4.5);
         Command autoShootCommand;
-        if (CONSTANTS.hasFeederSubsystem() && CONSTANTS.hasColorSensorSubsystem()) {
-            autoShootCommand = ShooterCommands.shootAutonomousCommand(feeder, leds, colorSensor);
+        if (CONSTANTS.hasFeederSubsystem() && CONSTANTS.hasNoteSensorSubsystem()) {
+            autoShootCommand = ShooterCommands.shootAutonomousCommand(feeder, leds, noteSensor);
         } else {
             autoShootCommand = LedCommands.blinkCommand(leds, Color.kOrange);
         }
@@ -252,22 +245,18 @@ public class RobotContainer {
         // #region: ---------- Configure Controller 0 for Pilot ----------
         pilot.leftTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel, aimer,
                 () -> {
-                    return CONSTANTS.getAlliance() == Alliance.Blue ? -pilot.getLeftY()
-                            : pilot.getLeftY(); // TODO: Figure out why this inversion is needed.
+                    return pilot.getLeftY();
                 },
                 () -> {
-                    return CONSTANTS.getAlliance() == Alliance.Blue ? -pilot.getLeftX()
-                            : pilot.getLeftX(); // TODO: Figure out why this inversion is needed.
+                    return pilot.getLeftX();
                 },
                 CONSTANTS::getSpeakerLocation));
         pilot.rightTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel, aimer,
                 () -> {
-                    return CONSTANTS.getAlliance() == Alliance.Blue ? -pilot.getLeftY()
-                            : pilot.getLeftY();
+                    return pilot.getLeftY();
                 },
                 () -> {
-                    return CONSTANTS.getAlliance() == Alliance.Blue ? -pilot.getLeftX()
-                            : pilot.getLeftX();
+                    return pilot.getLeftX();
                 },
                 CONSTANTS::getAmpLocation));
 
@@ -278,10 +267,10 @@ public class RobotContainer {
         // #region: ---------- Configure Controller 1 for Co-Pilot ----------
         if (CONSTANTS.hasIntakeSubsystem() && CONSTANTS.hasFeederSubsystem()) {
 
-            if (CONSTANTS.hasColorSensorSubsystem()) {
+            if (CONSTANTS.hasNoteSensorSubsystem()) {
                 // TODO - Make one Command in ShooterCommands class.
                 // TODO: Stop Flywheel as well.
-                coPilot.leftTrigger().and(not(colorSensor::isObjectDetected))
+                coPilot.leftTrigger().and(not(noteSensor::isObjectDetectedSwitch))
                         .whileTrue(new Command() {
                             {
                                 addRequirements(intake, feeder);
@@ -309,9 +298,9 @@ public class RobotContainer {
 
         if (CONSTANTS.hasFeederSubsystem() && CONSTANTS.hasFlywheelSubsystem()) {
 
-            if (CONSTANTS.hasColorSensorSubsystem()) {
+            if (CONSTANTS.hasNoteSensorSubsystem()) {
                 coPilot.rightTrigger()
-                        .onTrue(ShooterCommands.shootTeleopCommand(feeder, flywheel, intake, colorSensor, leds));
+                        .onTrue(ShooterCommands.shootTeleopCommand(feeder, flywheel, intake, noteSensor, leds));
             }
 
             // TODO - Make one Command in ShooterCommands class.

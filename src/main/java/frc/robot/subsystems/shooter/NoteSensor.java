@@ -7,6 +7,7 @@ import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.ColorSensorV3;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,39 +16,51 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.constants.AbstractConstants;
 
-public class ColorSensor extends SubsystemBase {
+public class NoteSensor extends SubsystemBase {
 
     @AutoLog
-    static class ColorSensorInputs {
+    static class NoteSensorInputs {
         public double proximity;
-        public boolean isObjectDetected;
+        public boolean isObjectDetectedSensor;
         public int red, blue, green;
+        public boolean isObjectDetectedSwitch;
     }
 
-    private ColorSensorInputsAutoLogged inputs = new ColorSensorInputsAutoLogged();
+    private NoteSensorInputsAutoLogged inputs = new NoteSensorInputsAutoLogged();
     private final ColorSensorV3 colorSensor;
+    private final DigitalInput limitSwitch;
 
-    public ColorSensor(I2C.Port port) {
+    public NoteSensor(I2C.Port port, int channel) {
         colorSensor = new ColorSensorV3(port);
+        limitSwitch = new DigitalInput(channel);
     }
 
-    public ColorSensor() {
-        this(I2C.Port.kOnboard);
+    public NoteSensor(I2C.Port port) {
+        this(port, 0);
+    }
+
+    public NoteSensor(int port) {
+        this(I2C.Port.kOnboard, port);
+    }
+
+    public NoteSensor() {
+        this(I2C.Port.kOnboard, 0);
     }
 
     @Override
     public void periodic() {
         updateInputs();
-        isObjectDetected();
+        isObjectDetectedSensor();
         Logger.processInputs("Shooter/Color Sensor", inputs);
     }
 
     private void updateInputs() {
         inputs.proximity = getProximity();
-        inputs.isObjectDetected = isObjectDetected();
+        inputs.isObjectDetectedSensor = isObjectDetectedSensor();
         inputs.red = colorSensor.getRed();
         inputs.blue = colorSensor.getBlue();
         inputs.green = colorSensor.getGreen();
+        inputs.isObjectDetectedSwitch = limitSwitch.get();
     }
 
     // ========================= Functions =========================
@@ -76,13 +89,22 @@ public class ColorSensor extends SubsystemBase {
      * 
      * @return True if an object is detected
      */
-    public boolean isObjectDetected() {
-        inputs.isObjectDetected = colorSensor.getProximity() >= CONSTANTS.getColorSensorProximityThreshold();
-        return inputs.isObjectDetected;
+    public boolean isObjectDetectedSensor() {
+        return colorSensor.getProximity() >= CONSTANTS.getColorSensorProximityThreshold();
+    }
+
+    /**
+     * Check if limit switch is activated
+     * 
+     * @return limit switch state;
+     */
+    public boolean isObjectDetectedSwitch() {
+        return limitSwitch.get();
     }
 
     /**
      * Compares the currently observed color to the color passed in.
+     * Basically useless
      * 
      * @param color Color for the sensed color to be compared to
      * 
@@ -98,15 +120,23 @@ public class ColorSensor extends SubsystemBase {
     }
 
     // ========================= Commands =========================
-    public Command waitForObjectCommand() {
-        return new WaitUntilCommand(this::isObjectDetected);
+    public Command waitForObjectCommandSensor() {
+        return new WaitUntilCommand(this::isObjectDetectedSensor);
     }
 
-    public Command waitForNoObjectCommand() {
-        return new WaitUntilCommand(() -> !isObjectDetected());
+    public Command waitForNoObjectCommandSensor() {
+        return new WaitUntilCommand(() -> !isObjectDetectedSensor());
     }
 
     public Command getProximityCommand() {
         return new InstantCommand(this::getProximity);
+    }
+
+    public Command waitForObjectCommandSwitch() {
+        return new WaitUntilCommand(this::isObjectDetectedSwitch);
+    }
+
+    public Command waitForNoObjectCommandSwitch() {
+        return new WaitUntilCommand(() -> !isObjectDetectedSwitch());
     }
 }

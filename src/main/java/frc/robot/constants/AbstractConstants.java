@@ -168,7 +168,7 @@ public abstract class AbstractConstants {
 
     public abstract boolean hasClimberSubsystem();
 
-    public abstract boolean hasColorSensorSubsystem();
+    public abstract boolean hasNoteSensorSubsystem();
 
     public abstract boolean hasFeederSubsystem();
 

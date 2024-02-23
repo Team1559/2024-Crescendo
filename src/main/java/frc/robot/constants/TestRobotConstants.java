@@ -35,7 +35,7 @@ public class TestRobotConstants extends AbstractConstants {
     }
 
     @Override
-    public boolean hasColorSensorSubsystem() {
+    public boolean hasNoteSensorSubsystem() {
         return false;
     }
 
@@ -178,7 +178,7 @@ public class TestRobotConstants extends AbstractConstants {
     // #region: ----- LEDs -----
     @Override
     public int getLedLenth() {
-        return 144;
+        return 288;
     }
 
     // #endregion

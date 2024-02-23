@@ -9,10 +9,10 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.led.Leds;
-import frc.robot.subsystems.shooter.ColorSensor;
 import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.Intake;
+import frc.robot.subsystems.shooter.NoteSensor;
 
 public class ShooterCommands {
 
@@ -21,9 +21,9 @@ public class ShooterCommands {
     }
 
     // ========================= Default Commands =========================
-    public static Command defaultIntakeCommand(Intake intake, ColorSensor sensor) {
+    public static Command defaultIntakeCommand(Intake intake, NoteSensor sensor) {
         return Commands.run(() -> {
-            if (sensor.isObjectDetected()) {
+            if (sensor.isObjectDetectedSensor()) {
                 intake.stop();
             } else {
                 intake.start();
@@ -31,9 +31,9 @@ public class ShooterCommands {
         }, intake);
     }
 
-    public static Command defaultFeederCommand(Feeder feeder, ColorSensor sensor) {
+    public static Command defaultFeederCommand(Feeder feeder, NoteSensor sensor) {
         return Commands.run(() -> {
-            if (sensor.isObjectDetected()) {
+            if (sensor.isObjectDetectedSensor()) {
                 feeder.stop();
             } else {
                 feeder.start();
@@ -67,22 +67,22 @@ public class ShooterCommands {
         return reverseShooterCommand;
     }
 
-    public static Command shootAutonomousCommand(Feeder feeder, Leds leds, ColorSensor colorSensor) {
+    public static Command shootAutonomousCommand(Feeder feeder, Leds leds, NoteSensor noteSensor) {
         return new SequentialCommandGroup(
                 feeder.startCommand(),
                 LedCommands.blinkCommand(leds, Color.kOrange),
-                colorSensor.waitForNoObjectCommand(),
+                noteSensor.waitForNoObjectCommandSensor(),
                 new WaitCommand(.25),
                 feeder.stopCommand());
     }
 
-    public static Command shootTeleopCommand(Feeder feeder, Flywheel flywheel, Intake intake, ColorSensor colorSensor,
+    public static Command shootTeleopCommand(Feeder feeder, Flywheel flywheel, Intake intake, NoteSensor noteSensor,
             Leds leds) {
 
         ParallelRaceGroup group = new ParallelRaceGroup(new StartEndCommand(intake::start, intake::stop, intake),
                 new StartEndCommand(feeder::start, feeder::stop, feeder),
                 leds.setColorCommand(Color.kPurple).repeatedly(),
-                colorSensor.waitForNoObjectCommand(), new WaitCommand(5));
+                noteSensor.waitForNoObjectCommandSensor(), new WaitCommand(5));
 
         if (flywheel.getCurrentVoltage() <= 0) {
             return spinUpFlywheelCommand(flywheel).andThen(group);

@@ -34,6 +34,27 @@ public class DriveCommands {
     private DriveCommands() {
     }
 
+    /**
+     * Calculates and squares the linear magnitude for the swerve drive
+     * 
+     * @param xSupplier Joystick x
+     * @param ySupplier Joystick Y
+     * @return linear magnitude
+     */
+    private static double calculateLinearMagnitude(DoubleSupplier xSupplier, DoubleSupplier ySupplier) {
+        // Apply dead-band.
+        double linearMagnitude = MathUtil.applyDeadband(Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
+                CONSTANTS.getJoystickDeadband());
+        // Square values, to accelerate more gradually.
+        return linearMagnitude * linearMagnitude;
+    }
+
+    private static Rotation2d calculateLinearDirection(DoubleSupplier xSupplier, DoubleSupplier ySupplier) {
+        return CONSTANTS.getAlliance() == Alliance.Blue
+                ? new Rotation2d(-xSupplier.getAsDouble(), -ySupplier.getAsDouble())
+                : new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+    }
+
     // TODO: Deduplicate code between this and the manualDriveDefaultCommand method.
     public static Command autoAimAndManuallyDriveCommand(DriveBase driveBase,
             Flywheel flywheel,
@@ -59,17 +80,9 @@ public class DriveCommands {
 
             @Override
             public void execute() {
-
-                // Apply deadband.
-                double linearMagnitude = MathUtil.applyDeadband(
-                        Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
-                        CONSTANTS.getJoystickDeadband());
-
-                // Square values, to accelerate mor gradually.
-                linearMagnitude = linearMagnitude * linearMagnitude;
-
+                double linearMagnitude = calculateLinearMagnitude(xSupplier, ySupplier);
                 // Calcaulate new linear velocity.
-                Rotation2d linearDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+                Rotation2d linearDirection = calculateLinearDirection(xSupplier, ySupplier);
                 Translation2d linearVelocity = new Pose2d(new Translation2d(), linearDirection)
                         .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d())).getTranslation();
 
@@ -140,20 +153,8 @@ public class DriveCommands {
 
         return Commands.run(
                 () -> {
-
-                    // Apply dead-band.
-                    double linearMagnitude = MathUtil.applyDeadband(
-                            Math.hypot(
-                                    CONSTANTS.getAlliance() == Alliance.Blue ? -xSupplier.getAsDouble()
-                                            : xSupplier.getAsDouble(),
-                                    CONSTANTS.getAlliance() == Alliance.Blue ? -ySupplier.getAsDouble()
-                                            : ySupplier.getAsDouble()), // Inverts the controllers if the alliance is
-                                                                        // red
-                            CONSTANTS.getJoystickDeadband());
+                    double linearMagnitude = calculateLinearMagnitude(xSupplier, ySupplier);
                     double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), CONSTANTS.getJoystickDeadband());
-
-                    // Square values, to accelerate more gradually.
-                    linearMagnitude = linearMagnitude * linearMagnitude;
                     omega = Math.copySign(omega * omega, omega);
 
                     // Calcaulate new linear velocity.
