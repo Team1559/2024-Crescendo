@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Celsius;
 import static frc.robot.constants.AbstractConstants.CONSTANTS;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -65,18 +66,12 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 
     private final StatusSignal<Double> cancoderAbsolutePosition;
 
-    private final StatusSignal<Double> driveMotorPosition;
-    private final StatusSignal<Double> driveMotorVelocity;
-    private final StatusSignal<Double> driveMotorAppliedVolts;
-    private final StatusSignal<Double> driveMotorCurrent;
-    private final StatusSignal<Integer> driveMotorFaults;
-    private final StatusSignal<Double> driveMotorTemp;
-    private final StatusSignal<Double> steerMotorPosition;
-    private final StatusSignal<Double> steerMotorVelocity;
-    private final StatusSignal<Double> steerMotorAppliedVolts;
-    private final StatusSignal<Double> steerMotorStatorCurrent;
-    private final StatusSignal<Integer> steerMotorFaults;
-    private final StatusSignal<Double> steerMotorTemp;
+    private final StatusSignal<Double> driveMotorPosition, steerMotorPosition;
+    private final StatusSignal<Double> driveMotorVelocity, steerMotorVelocity;
+    private final StatusSignal<Double> driveMotorAppliedVolts, steerMotorAppliedVolts;
+    private final StatusSignal<Double> driveMotorCurrent, steerMotorCurrent;
+    private final StatusSignal<Integer> driveMotorFaults, steerMotorFaults;
+    private final StatusSignal<Double> driveMotorTemp, steerMotorTemp;
 
     private final Rotation2d absoluteEncoderOffset;
 
@@ -119,7 +114,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         steerMotorPosition = steerMotor.getPosition();
         steerMotorVelocity = steerMotor.getVelocity();
         steerMotorAppliedVolts = steerMotor.getMotorVoltage();
-        steerMotorStatorCurrent = steerMotor.getStatorCurrent();
+        steerMotorCurrent = steerMotor.getStatorCurrent();
         steerMotorFaults = steerMotor.getFaultField();
         steerMotorTemp = steerMotor.getDeviceTemp();
 
@@ -134,7 +129,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
                 cancoderAbsolutePosition,
                 steerMotorVelocity,
                 steerMotorAppliedVolts,
-                steerMotorStatorCurrent);
+                steerMotorCurrent);
 
         driveMotor.optimizeBusUtilization();
         steerMotor.optimizeBusUtilization();
@@ -158,7 +153,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
     @Override
     public void updateInputs(SwerveModuleIoInputs inputs) {
 
-        BaseStatusSignal.refreshAll(
+        StatusCode refreshResult = BaseStatusSignal.refreshAll(
 
                 cancoderAbsolutePosition,
 
@@ -172,9 +167,11 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
                 steerMotorPosition,
                 steerMotorVelocity,
                 steerMotorAppliedVolts,
-                steerMotorStatorCurrent,
+                steerMotorCurrent,
                 steerMotorFaults,
                 steerMotorTemp);
+
+        System.out.println("XXXXX BaseStatusSignal#refreshAll Result: " + refreshResult + " XXXXX");
 
         inputs.cancoderAbsolutePosition = Rotation2d.fromRotations(cancoderAbsolutePosition.getValueAsDouble());
         inputs.cancoderOffsetPosition = inputs.cancoderAbsolutePosition.minus(absoluteEncoderOffset);
@@ -196,7 +193,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         inputs.steerMotorVelocityRadPerSec = Units.rotationsToRadians(steerMotorVelocity.getValueAsDouble())
                 / CONSTANTS.getGearRatioOfTurnWheel();
         inputs.steerMotorAppliedVolts = steerMotorAppliedVolts.getValueAsDouble();
-        inputs.steerMotorCurrentAmps = steerMotorStatorCurrent.getValueAsDouble();
+        inputs.steerMotorCurrentAmps = steerMotorCurrent.getValueAsDouble();
         inputs.steerMotorFaults = steerMotorFaults.getValue();
         inputs.steerMotorTemp = Celsius.of(steerMotorTemp.getValueAsDouble());
     }
