@@ -92,18 +92,9 @@ public class Aimer extends SubsystemBase {
     // ========================= Functions =====================================
     public void aimAtTarget(Translation3d target, Translation2d currentPosition) {
 
-        double distance = currentPosition.getDistance(target.toTranslation2d());
-        Rotation2d angle = new Rotation2d(distance, target.getZ());
-
-        // Add Offset.
-        angle = angle.minus(Rotation2d.fromDegrees(20)); // > 13 && < 30.
-
-        // Flatten Slope.
-        double COEFFICIENT = 1.00; // The Bigger the number (above 1), the flatter the slope.
-        double angleInDegrees = Math.pow(angle.getDegrees(), 1 / COEFFICIENT);
-        angle = Rotation2d.fromDegrees(angleInDegrees);
-
-        Logger.recordOutput("Aimer/DistanceToTarget", distance);
+        double dis = currentPosition.getDistance(target.toTranslation2d());
+        Rotation2d angle = Rotation2d.fromDegrees(.08689 * dis * dis - 3.898 * dis + 49.86);
+        Logger.recordOutput("Aimer/DistanceToTarget", dis);
 
         setTargetAngle(angle);
     }
