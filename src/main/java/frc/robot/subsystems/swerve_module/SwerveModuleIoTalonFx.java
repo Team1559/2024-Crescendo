@@ -60,12 +60,10 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         return talonFXConfiguration;
     }
 
-    private final TalonFX driveMotor;
-    private final TalonFX steerMotor;
     private final CANcoder cancoder;
+    private final TalonFX driveMotor, steerMotor;
 
     private final StatusSignal<Double> cancoderAbsolutePosition;
-
     private final StatusSignal<Double> driveMotorPosition, steerMotorPosition;
     private final StatusSignal<Double> driveMotorVelocity, steerMotorVelocity;
     private final StatusSignal<Double> driveMotorAppliedVolts, steerMotorAppliedVolts;
