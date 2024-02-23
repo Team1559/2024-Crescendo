@@ -1,12 +1,12 @@
 package frc.robot.commands;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.led.Leds;
 import frc.robot.subsystems.shooter.ColorSensor;
@@ -42,7 +42,7 @@ public class ShooterCommands {
     }
 
     public static Command defaultFlywheelCommand(Flywheel flywheel) {
-        return new SequentialCommandGroup(new WaitCommand(2), flywheel.stopCommand());
+        return new SequentialCommandGroup(new WaitCommand(.25), flywheel.stopCommand());
     }
 
     // ========================= Other Commands =========================
@@ -79,25 +79,16 @@ public class ShooterCommands {
     public static Command shootTeleopCommand(Feeder feeder, Flywheel flywheel, Intake intake, ColorSensor colorSensor,
             Leds leds) {
 
-        SequentialCommandGroup sequentialCommandGroup = new SequentialCommandGroup();
+        ParallelRaceGroup group = new ParallelRaceGroup(new StartEndCommand(intake::start, intake::stop, intake),
+                new StartEndCommand(feeder::start, feeder::stop, feeder),
+                leds.setColorCommand(Color.kPurple).repeatedly(),
+                colorSensor.waitForNoObjectCommand(), new WaitCommand(5));
 
         if (flywheel.getCurrentVoltage() <= 0) {
-            sequentialCommandGroup.addCommands(spinUpFlywheelCommand(flywheel));
+            return spinUpFlywheelCommand(flywheel).andThen(group);
         }
 
-        sequentialCommandGroup.addCommands(
-                intake.startCommand(),
-                feeder.startCommand(),
-                leds.setColorCommand(Color.kPurple),
-                colorSensor.waitForNoObjectCommand(),
-                new InstantCommand(() -> Logger.recordOutput("Shooting", true)),
-                new WaitCommand(.25),
-                new InstantCommand(() -> Logger.recordOutput("Shooting", false)),
-                intake.stopCommand(),
-                feeder.stopCommand(),
-                flywheel.stopCommand());
-
-        return sequentialCommandGroup;
+        return group;
     }
 
     public static Command spinUpFlywheelCommand(Flywheel flywheel) {

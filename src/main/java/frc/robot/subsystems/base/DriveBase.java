@@ -23,6 +23,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -115,7 +116,7 @@ public class DriveBase extends SubsystemBase {
                 new HolonomicPathFollowerConfig(CONSTANTS.getMaxLinearSpeed().in(MetersPerSecond),
                         CONSTANTS.getDriveBaseWheelRadius().in(Meters), new ReplanningConfig()),
                 // Flips path if aliance is on red side.
-                () -> CONSTANTS.getAssignedAlliance() != CONSTANTS.getDefaultAllianceForAuto()
+                () -> CONSTANTS.getAlliance() != CONSTANTS.getDefaultAllianceForAuto()
                         && CONSTANTS.shouldFlipPathIfAssignedAllianceIsNotDefault(),
                 this);
         Pathfinding.setPathfinder(new LocalAdStarAk());
@@ -126,7 +127,8 @@ public class DriveBase extends SubsystemBase {
                 targetPose -> Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose));
 
         // TODO: Figure out why the robot is not starting at 0,0.
-        setPose(new Pose2d());
+        setPose(new Pose2d(new Translation2d(),
+                CONSTANTS.getAlliance() == Alliance.Blue ? Rotation2d.fromDegrees(180) : new Rotation2d()));
     }
 
     @Override

@@ -136,7 +136,7 @@ public class Leds extends SubsystemBase {
 
     public void setAllianceColor() {
         disableDynamicPattern();
-        if (CONSTANTS.getAssignedAlliance() == Alliance.Blue) {
+        if (CONSTANTS.getAlliance() == Alliance.Blue) {
             setColor(Color.kBlue);
         } else {
             setColor(Color.kRed);

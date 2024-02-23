@@ -35,8 +35,8 @@ public class Flywheel extends SubsystemBase {
         public double lVelocity;
         public double rVelocity;
 
-        public Measure<Temperature> rMotorTemp;
-        public Measure<Temperature> lMotorTemp;
+        public Measure<Temperature> rMotorTemp = Celsius.zero();
+        public Measure<Temperature> lMotorTemp = Celsius.zero();
 
         public int rFaults;
         public int lFaults;

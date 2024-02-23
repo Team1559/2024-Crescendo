@@ -186,8 +186,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 
     @Override
     public void updateInputs(SwerveModuleIoInputs inputs) {
-
-        BaseStatusSignal.refreshAll(
+        var result = BaseStatusSignal.refreshAll(
 
                 cancoderAbsolutePosition,
 

@@ -51,13 +51,20 @@ import frc.robot.subsystems.vision.VisionIoSimAndReplay;
  */
 public class RobotContainer {
 
-    /** This Controller is used by the Driver. */
-    private final CommandXboxController controller0 = new CommandXboxController(0);
-    /** This Controller is used by the Co-Pilot. */
-    private final CommandXboxController controller1 = new CommandXboxController(1);
+    /**
+     * Pilot's Controller
+     * Port 0
+     */
+    private final CommandXboxController pilot = new CommandXboxController(0);
+    /**
+     * Co-Pilot's Controller
+     * Port 1
+     */
+    private final CommandXboxController coPilot = new CommandXboxController(1);
     /**
      * This Controller is used by the Technician.
      * THIS IS ONLY FOR TESTING AND SHOULD NEVER BE USED IN A REAL MATCH
+     * Port 3
      */
     private final CommandXboxController technicianTestController;
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -165,8 +172,9 @@ public class RobotContainer {
         colorSensor = CONSTANTS.hasColorSensorSubsystem() ? new ColorSensor() : null;
         flywheel = CONSTANTS.hasFlywheelSubsystem() ? new Flywheel() : null;
         /*
-         * We can safely emit LED instructions even if there are no LEDs.
-         * (The LED control hardware is built into the RoboRio so always "exists".)
+         * We can safely set LEDs even if there are no LEDs.
+         * (The LED control hardware is built into the RoboRio and therfore always
+         * "exists".)
          */
         leds = new Leds();
 
@@ -176,15 +184,16 @@ public class RobotContainer {
         // #region: ---------- Configure Default Commands ----------
         driveBase.setDefaultCommand(DriveCommands.manualDriveDefaultCommand(driveBase,
                 () -> {
-                    return CONSTANTS.getAssignedAlliance() == Alliance.Blue ? -controller0.getLeftY()
-                            : controller0.getLeftY(); // TODO: Figure out why this inversion is needed.
+                    return CONSTANTS.getAlliance() == Alliance.Blue ? -pilot.getLeftY()
+                            : pilot.getLeftY();
                 },
                 () -> {
-                    return CONSTANTS.getAssignedAlliance() == Alliance.Blue ? -controller0.getLeftX()
-                            : controller0.getLeftX(); // TODO: Figure out why this inversion is needed.
+                    return CONSTANTS.getAlliance() == Alliance.Blue ? -pilot.getLeftX()
+                            : pilot.getLeftX();
                 },
-                () -> -controller0.getRightX()));
-
+                () -> -pilot.getRightX()));
+        // TODO - Create helper method in DriveCommands that sets deadband/inverts
+        // controllers as needed
         leds.setDefaultCommand(LedCommands.defaultLedCommand(leds));
         if (CONSTANTS.hasFlywheelSubsystem()) {
             flywheel.setDefaultCommand(ShooterCommands.defaultFlywheelCommand(flywheel));
@@ -196,12 +205,10 @@ public class RobotContainer {
         if (CONSTANTS.hasColorSensorSubsystem()) {
             new Trigger((colorSensor::isObjectDetected)).whileTrue(leds.setColorCommand(Color.kDarkOrange));
         }
-
+        // #endregion
+        // #region: ---------- Motor Overheat Triggers ----------
         // TODO: Add LEDs Flashing Yellow to all Motor Temperature cutoff commands.
-        if (CONSTANTS.hasIntakeSubsystem()) {
-            new Trigger(driveBase::isTemperatureTooHigh).whileTrue(driveBase.stopCommand());
-        }
-        // TODO: Add LEDs Flashing Yellow to all Motor Temperature cutoff commands.
+        new Trigger(driveBase::isTemperatureTooHigh).whileTrue(driveBase.stopCommand());
         if (CONSTANTS.hasIntakeSubsystem()) {
             new Trigger(flywheel::isTemperatureTooHigh).whileTrue(flywheel.stopCommand());
         }
@@ -243,28 +250,28 @@ public class RobotContainer {
 
         // #region: ==================== Tele-Op ===============================
         // #region: ---------- Configure Controller 0 for Pilot ----------
-        controller0.leftTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel, aimer,
+        pilot.leftTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel, aimer,
                 () -> {
-                    return CONSTANTS.getAssignedAlliance() == Alliance.Blue ? -controller0.getLeftY()
-                            : controller0.getLeftY(); // TODO: Figure out why this inversion is needed.
+                    return CONSTANTS.getAlliance() == Alliance.Blue ? -pilot.getLeftY()
+                            : pilot.getLeftY(); // TODO: Figure out why this inversion is needed.
                 },
                 () -> {
-                    return CONSTANTS.getAssignedAlliance() == Alliance.Blue ? -controller0.getLeftX()
-                            : controller0.getLeftX(); // TODO: Figure out why this inversion is needed.
+                    return CONSTANTS.getAlliance() == Alliance.Blue ? -pilot.getLeftX()
+                            : pilot.getLeftX(); // TODO: Figure out why this inversion is needed.
                 },
                 CONSTANTS::getSpeakerLocation));
-        controller0.rightTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel, aimer,
+        pilot.rightTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel, aimer,
                 () -> {
-                    return CONSTANTS.getAssignedAlliance() == Alliance.Blue ? -controller0.getLeftY()
-                            : controller0.getLeftY();
+                    return CONSTANTS.getAlliance() == Alliance.Blue ? -pilot.getLeftY()
+                            : pilot.getLeftY();
                 },
                 () -> {
-                    return CONSTANTS.getAssignedAlliance() == Alliance.Blue ? -controller0.getLeftX()
-                            : controller0.getLeftX();
+                    return CONSTANTS.getAlliance() == Alliance.Blue ? -pilot.getLeftX()
+                            : pilot.getLeftX();
                 },
                 CONSTANTS::getAmpLocation));
 
-        controller0.y().onTrue(driveBase.resetFieldOrientationCommand());
+        pilot.y().onTrue(driveBase.resetFieldOrientationCommand());
 
         // #endregion
 
@@ -274,29 +281,43 @@ public class RobotContainer {
             if (CONSTANTS.hasColorSensorSubsystem()) {
                 // TODO - Make one Command in ShooterCommands class.
                 // TODO: Stop Flywheel as well.
-                controller1.leftTrigger().and(not(colorSensor::isObjectDetected))
-                        .whileTrue(new StartEndCommand(intake::start, intake::stop, intake));
-                controller1.leftTrigger().and(not(colorSensor::isObjectDetected))
-                        .whileTrue(new StartEndCommand(feeder::start, feeder::stop, feeder));
+                coPilot.leftTrigger().and(not(colorSensor::isObjectDetected))
+                        .whileTrue(new Command() {
+                            {
+                                addRequirements(intake, feeder);
+                            }
+
+                            @Override
+                            public void initialize() {
+                                intake.start();
+                                feeder.start();
+                            }
+
+                            @Override
+                            public void end(boolean interrupted) {
+                                intake.stop();
+                                feeder.stop();
+                            }
+                        });
             }
 
             // TODO - Make one Command in ShooterCommands class.
-            controller1.x().whileTrue(new StartEndCommand(intake::reverse, intake::stop, intake));
-            controller1.x().whileTrue(new StartEndCommand(feeder::reverse, feeder::stop, feeder));
-            controller1.x().whileTrue(new StartEndCommand(flywheel::reverse, flywheel::stop, flywheel));
+            coPilot.x().whileTrue(new StartEndCommand(intake::reverse, intake::stop, intake));
+            coPilot.x().whileTrue(new StartEndCommand(feeder::reverse, feeder::stop, feeder));
+            coPilot.x().whileTrue(new StartEndCommand(flywheel::reverse, flywheel::stop, flywheel));
         }
 
         if (CONSTANTS.hasFeederSubsystem() && CONSTANTS.hasFlywheelSubsystem()) {
 
             if (CONSTANTS.hasColorSensorSubsystem()) {
-                controller1.rightTrigger()
+                coPilot.rightTrigger()
                         .onTrue(ShooterCommands.shootTeleopCommand(feeder, flywheel, intake, colorSensor, leds));
             }
 
             // TODO - Make one Command in ShooterCommands class.
-            controller1.b().whileTrue(flywheel.stopCommand());
-            controller1.b().whileTrue(feeder.stopCommand());
-            controller1.a().whileTrue(ShooterCommands.reverseShooterCommand(flywheel, feeder, leds));
+            coPilot.b().whileTrue(flywheel.stopCommand());
+            coPilot.b().whileTrue(feeder.stopCommand());
+            coPilot.a().whileTrue(ShooterCommands.reverseShooterCommand(flywheel, feeder, leds));
         }
 
         if (CONSTANTS.hasClimberSubsystem()) {
@@ -309,9 +330,9 @@ public class RobotContainer {
 
         if (CONSTANTS.hasAimerSubsystem()) {
             // TODO: Switch to right joystick.
-            controller1.rightBumper()
+            coPilot.rightBumper()
                     .whileTrue(new RunCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(.5))));
-            controller1.leftBumper()
+            coPilot.leftBumper()
                     .whileTrue(new RunCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(-.5))));
         }
 
@@ -383,7 +404,7 @@ public class RobotContainer {
             }
 
             if (CONSTANTS.hasTraverserSubsystem()) {
-                controller1.x().onTrue(new StartEndCommand(() -> {
+                coPilot.x().onTrue(new StartEndCommand(() -> {
                     traverser.start();
                 }, () -> {
                     traverser.stop();

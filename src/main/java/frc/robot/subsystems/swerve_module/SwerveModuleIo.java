@@ -1,5 +1,7 @@
 package frc.robot.subsystems.swerve_module;
 
+import static edu.wpi.first.units.Units.Celsius;
+
 import org.littletonrobotics.junction.AutoLog;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -19,14 +21,14 @@ public interface SwerveModuleIo {
         public double driveMotorAppliedVolts;
         public double driveMotorCurrentAmps;
         public int driveMotorFaults;
-        public Measure<Temperature> driveMotorTemp;
+        public Measure<Temperature> driveMotorTemp = Celsius.zero();
 
         public Rotation2d steerMotorPosition = new Rotation2d();
         public double steerMotorVelocityRadPerSec;
         public double steerMotorAppliedVolts;
         public double steerMotorCurrentAmps;
         public int steerMotorFaults;
-        public Measure<Temperature> steerMotorTemp;
+        public Measure<Temperature> steerMotorTemp = Celsius.zero();
     }
 
     /**

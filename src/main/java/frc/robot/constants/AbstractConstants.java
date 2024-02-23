@@ -96,6 +96,7 @@ public abstract class AbstractConstants {
     // ========================= Static Methods ================================
     public static boolean isGameRobot() {
         String roboRioSerialNumber = System.getenv("serialnum");
+        System.out.println("Serial Number = " + roboRioSerialNumber);
         roboRioSerialNumber = roboRioSerialNumber == null ? "" : roboRioSerialNumber.trim();
 
         return FORCE_GAME_ROBOT_CONSTANTS
@@ -147,7 +148,7 @@ public abstract class AbstractConstants {
      * @return The assigned Alliance or the {@link #getDefaultAllianceForAuto}, if
      *         no alliance is set.
      */
-    public Alliance getAssignedAlliance() {
+    public Alliance getAlliance() {
         return DriverStation.getAlliance().orElse(getDefaultAllianceForAuto());
     };
 
@@ -193,7 +194,7 @@ public abstract class AbstractConstants {
 
     // #region: --------------- Game Objects -----------------------------------
     public Translation3d getSpeakerLocation() {
-        if (getAssignedAlliance() == Alliance.Blue) {
+        if (getAlliance() == Alliance.Blue) {
             return CONSTANTS.SPEKER_LOCATION_BLUE;
         } else {
             return CONSTANTS.SPEKER_LOCATION_RED;
@@ -201,7 +202,7 @@ public abstract class AbstractConstants {
     }
 
     public Translation3d getAmpLocation() {
-        if (getAssignedAlliance() == Alliance.Blue) {
+        if (getAlliance() == Alliance.Blue) {
             return CONSTANTS.AMP_LOCATION_RED;
         } else {
             return CONSTANTS.AMP_LOCATION_BLUE;

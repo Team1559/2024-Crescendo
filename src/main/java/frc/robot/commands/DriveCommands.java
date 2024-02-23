@@ -21,6 +21,7 @@ import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.base.DriveBase;
@@ -139,13 +140,19 @@ public class DriveCommands {
 
         return Commands.run(
                 () -> {
+
                     // Apply dead-band.
                     double linearMagnitude = MathUtil.applyDeadband(
-                            Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
+                            Math.hypot(
+                                    CONSTANTS.getAlliance() == Alliance.Blue ? -xSupplier.getAsDouble()
+                                            : xSupplier.getAsDouble(),
+                                    CONSTANTS.getAlliance() == Alliance.Blue ? -ySupplier.getAsDouble()
+                                            : ySupplier.getAsDouble()), // Inverts the controllers if the alliance is
+                                                                        // red
                             CONSTANTS.getJoystickDeadband());
                     double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), CONSTANTS.getJoystickDeadband());
 
-                    // Square values, to accelerate mor gradually.
+                    // Square values, to accelerate more gradually.
                     linearMagnitude = linearMagnitude * linearMagnitude;
                     omega = Math.copySign(omega * omega, omega);
 
