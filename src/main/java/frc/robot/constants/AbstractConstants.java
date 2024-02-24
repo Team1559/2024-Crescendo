@@ -215,13 +215,11 @@ public abstract class AbstractConstants {
 
     // #region: ----- Climber --------
     public int getClimberMotorIdLeft() {
-        // TODO: Add ID
-        throw new UnsupportedOperationException("No Motor ID for Left Climber motor");
+        return 25;
     }
 
     public int getClimberMotorIdRight() {
-        // TODO: Add ID
-        throw new UnsupportedOperationException("No Motor ID for Right Climber motor");
+        return 24;
     }
 
     public abstract PID getClimberPid();

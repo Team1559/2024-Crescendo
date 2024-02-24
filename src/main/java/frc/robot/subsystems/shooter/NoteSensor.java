@@ -35,16 +35,8 @@ public class NoteSensor extends SubsystemBase {
         limitSwitch = new DigitalInput(channel);
     }
 
-    public NoteSensor(I2C.Port port) {
-        this(port, 0);
-    }
-
-    public NoteSensor(int port) {
-        this(I2C.Port.kOnboard, port);
-    }
-
     public NoteSensor() {
-        this(I2C.Port.kOnboard, 0);
+        this(I2C.Port.kOnboard, 3);
     }
 
     @Override

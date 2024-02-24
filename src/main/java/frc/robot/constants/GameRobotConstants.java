@@ -30,7 +30,7 @@ public class GameRobotConstants extends AbstractConstants {
 
     @Override
     public boolean hasClimberSubsystem() {
-        return false;
+        return true;
     }
 
     @Override
@@ -83,13 +83,12 @@ public class GameRobotConstants extends AbstractConstants {
     // #region: ----- Climber --------
     @Override
     public PID getClimberPid() {
-        return new PID(1, 0, 0);
+        return new PID(.1, 0, 0);
     }
 
     @Override
     public double getClimberMaxHeight() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getClimberMaxHeight'");
+        return 12;
     }
 
     // #endregion

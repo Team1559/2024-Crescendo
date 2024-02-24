@@ -29,7 +29,7 @@ public class Climber extends SubsystemBase {
         public double targetRotations;
     }
 
-    private static final int ROTATIONS_PER_INCH = 50;
+    private static final double ROTATIONS_PER_INCH = (5 * 5) * (5D / 3);
 
     private final CANSparkMax motorL = new CANSparkMax(CONSTANTS.getClimberMotorIdLeft(), MotorType.kBrushless);
     private final CANSparkMax motorR = new CANSparkMax(CONSTANTS.getClimberMotorIdRight(), MotorType.kBrushless);
@@ -39,7 +39,7 @@ public class Climber extends SubsystemBase {
     private final ClimberInputsAutoLogged inputs = new ClimberInputsAutoLogged();
 
     public Climber() {
-        motorL.setInverted(false);
+        motorL.setInverted(true);
         motorR.setInverted(true);
         motorL.setIdleMode(IdleMode.kBrake);
         motorR.setIdleMode(IdleMode.kBrake);
@@ -69,7 +69,7 @@ public class Climber extends SubsystemBase {
     private void updateInputs() {
 
         inputs.currentLeftPositionRotations = motorL.getAbsoluteEncoder().getPosition();
-        inputs.currentRightPositionRotations = motorL.getAbsoluteEncoder().getPosition();
+        inputs.currentRightPositionRotations = motorR.getAbsoluteEncoder().getPosition();
         inputs.currentAveragePositionRotations = (inputs.currentLeftPositionRotations
                 + inputs.currentRightPositionRotations) / 2;
 

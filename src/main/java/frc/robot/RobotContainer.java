@@ -23,6 +23,7 @@ import frc.robot.commands.LedCommands;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.subsystems.base.DriveBase;
 import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
+import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.Traverser;
 import frc.robot.subsystems.gyro.GyroIoPigeon2;
 import frc.robot.subsystems.gyro.GyroIoSimAndReplay;
@@ -71,7 +72,7 @@ public class RobotContainer {
     private final DriveBase driveBase;
 
     private final Aimer aimer;
-    // TODO: Add Climber variable.
+    private final Climber climber;
     private final NoteSensor noteSensor;
     private final Feeder feeder;
     private final Flywheel flywheel;
@@ -115,6 +116,7 @@ public class RobotContainer {
                         ? new Traverser(new SingleMotorIoNeo550Brushless(CONSTANTS.getTraverserMotorId(),
                                 CONSTANTS.isTraverserInverted()))
                         : null;
+                climber = CONSTANTS.hasClimberSubsystem() ? new Climber() : null;
                 break;
 
             case SIMULATION:
@@ -140,6 +142,7 @@ public class RobotContainer {
                         ? new Traverser(new SingleMotorIoNeo550Brushless(CONSTANTS.getTraverserMotorId(),
                                 CONSTANTS.isTraverserInverted()))
                         : null;
+                climber = CONSTANTS.hasClimberSubsystem() ? new Climber() : null;
                 break;
 
             case LOG_REPLAY:
@@ -158,6 +161,7 @@ public class RobotContainer {
                 traverser = CONSTANTS.hasTraverserSubsystem()
                         ? new Traverser(new SingleMotorIoReplay())
                         : null;
+                climber = CONSTANTS.hasClimberSubsystem() ? new Climber() : null;
                 break;
 
             default:
@@ -310,7 +314,8 @@ public class RobotContainer {
         }
 
         if (CONSTANTS.hasClimberSubsystem()) {
-            // TODO.
+            coPilot.povUp().onTrue(climber.setTargetHeightCommand(1));
+            coPilot.povDown().onTrue(climber.setTargetHeightCommand(-1));
         }
 
         if (CONSTANTS.hasTraverserSubsystem()) {
