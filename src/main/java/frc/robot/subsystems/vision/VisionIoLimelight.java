@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.vision.Vision.VisionInputs;
 
 public class VisionIoLimelight implements VisionIo {
-    private final double[] STD_DEVS = { 1.0, 1.0, 2.0 };
+    private final double[] STD_DEVS = { 0.5, 0.5, 0.5 };
     private String cameraName;
 
     public VisionIoLimelight(String cameraName) {
