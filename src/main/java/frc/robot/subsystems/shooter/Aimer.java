@@ -16,13 +16,13 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Aimer extends SubsystemBase {
-
     @AutoLog
     static class AimerInputs {
 
@@ -39,8 +39,7 @@ public class Aimer extends SubsystemBase {
     private final CANSparkMax motorL = new CANSparkMax(CONSTANTS.getAimerMotorIdLeft(), MotorType.kBrushless);
     private final CANSparkMax motorR = new CANSparkMax(CONSTANTS.getAimerMotorIdRight(), MotorType.kBrushless);
     private final DutyCycleEncoder encoder = new DutyCycleEncoder(CONSTANTS.getAimerEncoderPort());
-    private final PIDController controller = new PIDController(CONSTANTS.getAimerPid().P, CONSTANTS.getAimerPid().I,
-            CONSTANTS.getAimerPid().D);
+    private final PIDController controller = CONSTANTS.getAimerPid().createController();
     private final AimerInputsAutoLogged inputs = new AimerInputsAutoLogged();
 
     /**
@@ -54,18 +53,18 @@ public class Aimer extends SubsystemBase {
         motorL.setSmartCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentLimit());
         motorR.setSmartCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentLimit());
         motorL.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
-        motorL.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
+        motorR.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
     }
 
     @Override
     public void periodic() {
-        // Log inputs
         updateInputs();
         Logger.processInputs("Shooter/Aimer", inputs);
 
         // Set Voltages
         if (controller.getSetpoint() != 0) { // TODO: Determine Acceptable variance.
             double output = controller.calculate(inputs.currentAngleDegrees);
+            output = Math.min(output, 2);
             motorL.setVoltage(output);
             motorR.setVoltage(output);
         }
@@ -91,11 +90,11 @@ public class Aimer extends SubsystemBase {
 
     // ========================= Functions =====================================
     public void aimAtTarget(Translation3d target, Translation2d currentPosition) {
+        double distanceMeters = currentPosition.getDistance(target.toTranslation2d());
+        Logger.recordOutput("Aimer/DistanceToTarget", distanceMeters);
 
-        double dis = currentPosition.getDistance(target.toTranslation2d());
-        Rotation2d angle = Rotation2d.fromDegrees(.08689 * dis * dis - 3.898 * dis + 49.86);
-        Logger.recordOutput("Aimer/DistanceToTarget", dis);
-
+        double distanceFeet = Units.metersToFeet(distanceMeters);
+        Rotation2d angle = Rotation2d.fromDegrees(.08689 * distanceFeet * distanceFeet - 3.898 * distanceFeet + 49.86);
         setTargetAngle(angle);
     }
 

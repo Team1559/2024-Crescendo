@@ -1,88 +1,40 @@
 package frc.robot.subsystems.shooter;
 
-import static frc.robot.constants.AbstractConstants.CONSTANTS;
-
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
-import com.revrobotics.ColorSensorV3;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.constants.AbstractConstants;
 
 public class NoteSensor extends SubsystemBase {
 
     @AutoLog
     static class NoteSensorInputs {
-        public double proximity;
-        public boolean isObjectDetectedSensor;
-        public int red, blue, green;
         public boolean isObjectDetectedSwitch;
     }
 
     private NoteSensorInputsAutoLogged inputs = new NoteSensorInputsAutoLogged();
-    private final ColorSensorV3 colorSensor;
     private final DigitalInput limitSwitch;
 
     public NoteSensor(I2C.Port port, int channel) {
-        colorSensor = new ColorSensorV3(port);
         limitSwitch = new DigitalInput(channel);
     }
 
     public NoteSensor() {
-        this(I2C.Port.kOnboard, 3);
+        this(I2C.Port.kOnboard, 2);
     }
 
     @Override
     public void periodic() {
         updateInputs();
-        isObjectDetectedSensor();
         Logger.processInputs("Shooter/Color Sensor", inputs);
     }
 
     private void updateInputs() {
-        inputs.proximity = getProximity();
-        inputs.isObjectDetectedSensor = isObjectDetectedSensor();
-        inputs.red = colorSensor.getRed();
-        inputs.blue = colorSensor.getBlue();
-        inputs.green = colorSensor.getGreen();
-        inputs.isObjectDetectedSwitch = limitSwitch.get();
-    }
-
-    // ========================= Functions =========================
-    /**
-     * Gets the color the {@link ColorSensorV3} is currently reading.
-     * 
-     * @return {@link Color} read.
-     */
-    public Color getColor() {
-        return colorSensor.getColor();
-    }
-
-    /**
-     * Gets the proximity (2047 closest, 0 farthest) the {@link ColorSensorV3} is
-     * currently reading.
-     * 
-     * @return Proximity read.
-     */
-    public int getProximity() {
-        return colorSensor.getProximity();
-    }
-
-    /**
-     * Detect an object by comparing the current proximity to the proximity of the
-     * {@link AbstractConstants#getColorSensorProximityThreshold} constant.
-     * 
-     * @return True if an object is detected
-     */
-    public boolean isObjectDetectedSensor() {
-        return colorSensor.getProximity() >= CONSTANTS.getColorSensorProximityThreshold();
+        inputs.isObjectDetectedSwitch = !limitSwitch.get();
     }
 
     /**
@@ -91,39 +43,10 @@ public class NoteSensor extends SubsystemBase {
      * @return limit switch state;
      */
     public boolean isObjectDetectedSwitch() {
-        return limitSwitch.get();
-    }
-
-    /**
-     * Compares the currently observed color to the color passed in.
-     * Basically useless
-     * 
-     * @param color Color for the sensed color to be compared to
-     * 
-     * @return The difference in color from a range of 0 - 765.
-     * @author Kyle Holtz
-     */
-    public int compareToSensor(Color color) {
-        int difference = 0;
-        difference += Math.abs(color.red * 255 - colorSensor.getRed());
-        difference += Math.abs(color.green * 255 - colorSensor.getGreen());
-        difference += Math.abs(color.blue * 255 - colorSensor.getBlue());
-        return difference;
+        return inputs.isObjectDetectedSwitch;
     }
 
     // ========================= Commands =========================
-    public Command waitForObjectCommandSensor() {
-        return new WaitUntilCommand(this::isObjectDetectedSensor);
-    }
-
-    public Command waitForNoObjectCommandSensor() {
-        return new WaitUntilCommand(() -> !isObjectDetectedSensor());
-    }
-
-    public Command getProximityCommand() {
-        return new InstantCommand(this::getProximity);
-    }
-
     public Command waitForObjectCommandSwitch() {
         return new WaitUntilCommand(this::isObjectDetectedSwitch);
     }

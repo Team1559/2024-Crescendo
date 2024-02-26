@@ -9,9 +9,9 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.LedCommands;
 import frc.robot.commands.ShooterCommands;
+import frc.robot.commands.ShooterCommands.IntakeCommand;
 import frc.robot.subsystems.base.DriveBase;
 import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
 import frc.robot.subsystems.climber.Climber;
@@ -50,7 +51,6 @@ import frc.robot.subsystems.vision.VisionIoSimAndReplay;
  * commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-
     /**
      * Pilot's Controller
      * Port 0
@@ -61,12 +61,7 @@ public class RobotContainer {
      * Port 1
      */
     private final CommandXboxController coPilot = new CommandXboxController(1);
-    /**
-     * This Controller is used by the Technician.
-     * THIS IS ONLY FOR TESTING AND SHOULD NEVER BE USED IN A REAL MATCH
-     * Port 3
-     */
-    private final CommandXboxController technicianTestController;
+
     private final LoggedDashboardChooser<Command> autoChooser;
 
     private final DriveBase driveBase;
@@ -85,9 +80,6 @@ public class RobotContainer {
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
-
-        technicianTestController = CONSTANTS.TECHNICIAN_CONTROLLER_ENABLED ? new CommandXboxController(2) : null;
-
         // #region: ==================== Initialize Subsystems =================
 
         // #region: Initialize Subsystems with Simulation and/or Log Replay Mode
@@ -110,7 +102,8 @@ public class RobotContainer {
                                 CONSTANTS.isIntakeMortorInverted()))
                         : null;
                 vision = CONSTANTS.hasVisionSubsystem()
-                        ? new Vision(driveBase.poseEstimator, new VisionIoLimelight(CONSTANTS.getCameraName()))
+                        ? new Vision(driveBase.poseEstimator, new VisionIoLimelight(CONSTANTS.getCameraName()),
+                                new VisionIoLimelight("limelight-back"))
                         : null;
                 traverser = CONSTANTS.hasTraverserSubsystem()
                         ? new Traverser(new SingleMotorIoNeo550Brushless(CONSTANTS.getTraverserMotorId(),
@@ -185,11 +178,8 @@ public class RobotContainer {
 
         // #region: ==================== Default Commands & Triggers ===========
         // #region: ---------- Configure Default Commands ----------
-        driveBase.setDefaultCommand(DriveCommands.manualDriveDefaultCommand(driveBase, () -> {
-            return pilot.getLeftY();
-        }, () -> {
-            return pilot.getLeftX();
-        }, () -> -pilot.getRightX()));
+        driveBase.setDefaultCommand(DriveCommands.manualDriveDefaultCommand(driveBase, pilot::getLeftY, pilot::getLeftX,
+                () -> -pilot.getRightX()));
         leds.setDefaultCommand(LedCommands.defaultLedCommand(leds));
         if (CONSTANTS.hasFlywheelSubsystem()) {
             flywheel.setDefaultCommand(ShooterCommands.defaultFlywheelCommand(flywheel));
@@ -199,7 +189,6 @@ public class RobotContainer {
 
         // #region: ---------- Configure Command Triggers ----------
         if (CONSTANTS.hasNoteSensorSubsystem()) {
-            new Trigger((noteSensor::isObjectDetectedSensor)).whileTrue(leds.setColorCommand(Color.kDarkOrange));
             new Trigger((noteSensor::isObjectDetectedSwitch)).whileTrue(leds.setColorCommand(Color.kBrown));
         }
         // #endregion
@@ -226,12 +215,14 @@ public class RobotContainer {
         // #region: ==================== Autonomous ============================
         // ---------- Create Named Commands for use by Path Planner ----------
         NamedCommands.registerCommand("Spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
-        NamedCommands.registerCommand("StartIntake", LedCommands.blinkCommand(leds, Color.kPurple));
+        NamedCommands.registerCommand("StartIntake", new ShooterCommands.IntakeCommand(intake, feeder));
         if (CONSTANTS.hasFlywheelSubsystem()) {
             NamedCommands.registerCommand("Spin Up Flywheel", ShooterCommands.spinUpFlywheelCommand(flywheel));
         }
 
-        Command aimAtSpeakerCommand = DriveCommands.turnToTargetCommand(driveBase, CONSTANTS::getSpeakerLocation, 4.5);
+        Command aimAtSpeakerCommand = Commands.parallel(
+                DriveCommands.turnToTargetCommand(driveBase, CONSTANTS::getSpeakerLocation, 4.5), new InstantCommand(
+                        () -> aimer.aimAtTarget(CONSTANTS.getSpeakerLocation(), driveBase.getPose().getTranslation())));
         Command autoShootCommand;
         if (CONSTANTS.hasFeederSubsystem() && CONSTANTS.hasNoteSensorSubsystem()) {
             autoShootCommand = ShooterCommands.shootAutonomousCommand(feeder, leds, noteSensor);
@@ -248,20 +239,12 @@ public class RobotContainer {
         // #region: ==================== Tele-Op ===============================
         // #region: ---------- Configure Controller 0 for Pilot ----------
         pilot.leftTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel, aimer,
-                () -> {
-                    return pilot.getLeftY();
-                },
-                () -> {
-                    return pilot.getLeftX();
-                },
+                pilot::getLeftY,
+                pilot::getLeftX,
                 CONSTANTS::getSpeakerLocation));
         pilot.rightTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel, aimer,
-                () -> {
-                    return pilot.getLeftY();
-                },
-                () -> {
-                    return pilot.getLeftX();
-                },
+                pilot::getLeftY,
+                pilot::getLeftX,
                 CONSTANTS::getAmpLocation));
 
         pilot.y().onTrue(driveBase.resetFieldOrientationCommand());
@@ -272,26 +255,9 @@ public class RobotContainer {
         if (CONSTANTS.hasIntakeSubsystem() && CONSTANTS.hasFeederSubsystem()) {
 
             if (CONSTANTS.hasNoteSensorSubsystem()) {
-                // TODO - Make one Command in ShooterCommands class.
                 // TODO: Stop Flywheel as well.
                 coPilot.leftTrigger().and(not(noteSensor::isObjectDetectedSwitch))
-                        .whileTrue(new Command() {
-                            {
-                                addRequirements(intake, feeder);
-                            }
-
-                            @Override
-                            public void initialize() {
-                                intake.start();
-                                feeder.start();
-                            }
-
-                            @Override
-                            public void end(boolean interrupted) {
-                                intake.stop();
-                                feeder.stop();
-                            }
-                        });
+                        .whileTrue(new IntakeCommand(intake, feeder));
             }
 
             // TODO - Make one Command in ShooterCommands class.
@@ -306,16 +272,12 @@ public class RobotContainer {
                 coPilot.rightTrigger()
                         .onTrue(ShooterCommands.shootTeleopCommand(feeder, flywheel, intake, noteSensor, leds));
             }
-
-            // TODO - Make one Command in ShooterCommands class.
-            coPilot.b().whileTrue(flywheel.stopCommand());
-            coPilot.b().whileTrue(feeder.stopCommand());
             coPilot.a().whileTrue(ShooterCommands.reverseShooterCommand(flywheel, feeder, leds));
         }
 
         if (CONSTANTS.hasClimberSubsystem()) {
-            coPilot.povUp().onTrue(climber.setTargetHeightCommand(1));
-            coPilot.povDown().onTrue(climber.setTargetHeightCommand(-1));
+            coPilot.povUp().whileTrue(climber.incrementTargetHeightCommand(.1));
+            coPilot.povDown().whileTrue(climber.incrementTargetHeightCommand(-.1));
         }
 
         if (CONSTANTS.hasTraverserSubsystem()) {
@@ -328,82 +290,6 @@ public class RobotContainer {
                     .whileTrue(new RunCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(.5))));
             coPilot.leftBumper()
                     .whileTrue(new RunCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(-.5))));
-        }
-
-        // #endregion
-
-        // #region: ---------- Configure Controller 2 for Technician ----------
-        if (CONSTANTS.TECHNICIAN_CONTROLLER_ENABLED) {
-            technicianTestController.povUp().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(1, 0, 0)));
-            technicianTestController.povDown().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(-1, 0, 0)));
-            technicianTestController.povRight().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(0, -1, 0)));
-            technicianTestController.povLeft().whileTrue(driveBase.runVelocityCommand(new ChassisSpeeds(0, 1, 0)));
-
-            // #endregion
-
-            // #region: ----- Light Commands -----
-            // #endregion
-
-            // #region: ----- Subsystem Commands -----
-            if (CONSTANTS.hasAimerSubsystem()) {
-                technicianTestController.rightBumper().and(not(technicianTestController.start()))
-                        .and(not(technicianTestController.back()))
-                        .onTrue(new InstantCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(1))));
-                technicianTestController.leftBumper().and(not(technicianTestController.start()))
-                        .and(not(technicianTestController.back()))
-                        .onTrue(new InstantCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(-1))));
-
-                technicianTestController.rightBumper().and(technicianTestController.back())
-                        .and(not(technicianTestController.start()))
-                        .onTrue(new InstantCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(.1))));
-                technicianTestController.leftBumper().and(technicianTestController.back())
-                        .and(not(technicianTestController.start()))
-                        .onTrue(new InstantCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(-.1))));
-            }
-
-            if (CONSTANTS.hasClimberSubsystem()) {
-                // TODO
-            }
-
-            if (CONSTANTS.hasFeederSubsystem()) {
-                technicianTestController.b().and(not(technicianTestController.start()))
-                        .and(not(technicianTestController.back()))
-                        .whileTrue(new StartEndCommand(feeder::start, feeder::stop, feeder));
-                technicianTestController.b().and(technicianTestController.start())
-                        .whileTrue(new StartEndCommand(feeder::reverse, feeder::stop, feeder));
-            }
-
-            if (CONSTANTS.hasFlywheelSubsystem()) {
-                technicianTestController.y().and(not(technicianTestController.start()))
-                        .and(not(technicianTestController.back()))
-                        .whileTrue(new StartEndCommand(flywheel::start, flywheel::stop, flywheel));
-                technicianTestController.y().and(technicianTestController.start())
-                        .whileTrue(new StartEndCommand(flywheel::reverse, flywheel::stop, flywheel));
-                technicianTestController.leftBumper().and(technicianTestController.start())
-                        .whileTrue(new StartEndCommand(() -> {
-                            flywheel.startOneMotor(false);
-                        }, flywheel::stop, flywheel));
-                technicianTestController.rightBumper().and(technicianTestController.start())
-                        .whileTrue(new StartEndCommand(() -> {
-                            flywheel.startOneMotor(true);
-                        }, flywheel::stop, flywheel));
-            }
-
-            if (CONSTANTS.hasIntakeSubsystem()) {
-                technicianTestController.a().and(not(technicianTestController.start()))
-                        .and(not(technicianTestController.back()))
-                        .whileTrue(new StartEndCommand(intake::start, intake::stop, intake));
-                technicianTestController.a().and(technicianTestController.start())
-                        .whileTrue(new StartEndCommand(intake::reverse, intake::stop, intake));
-            }
-
-            if (CONSTANTS.hasTraverserSubsystem()) {
-                coPilot.x().onTrue(new StartEndCommand(() -> {
-                    traverser.start();
-                }, () -> {
-                    traverser.stop();
-                }));
-            }
         }
 
         // #endregion

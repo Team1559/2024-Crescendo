@@ -9,7 +9,6 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -68,8 +67,8 @@ public class Climber extends SubsystemBase {
 
     private void updateInputs() {
 
-        inputs.currentLeftPositionRotations = motorL.getAbsoluteEncoder().getPosition();
-        inputs.currentRightPositionRotations = motorR.getAbsoluteEncoder().getPosition();
+        inputs.currentLeftPositionRotations = motorL.getEncoder().getPosition();
+        inputs.currentRightPositionRotations = motorR.getEncoder().getPosition();
         inputs.currentAveragePositionRotations = (inputs.currentLeftPositionRotations
                 + inputs.currentRightPositionRotations) / 2;
 
@@ -80,8 +79,7 @@ public class Climber extends SubsystemBase {
     // ========================= Functions =========================
     // TODO: Take in Measure<Distance> instead.
     public void setTargetHeight(double heightInches) {
-        double targetHeight = MathUtil.clamp(heightInches, 0, CONSTANTS.getClimberMaxHeight());
-        controller.setSetpoint(targetHeight * ROTATIONS_PER_INCH);
+        controller.setSetpoint(heightInches * ROTATIONS_PER_INCH);
     }
 
     // TODO: Take in Measure<Distance> instead.
@@ -98,6 +96,10 @@ public class Climber extends SubsystemBase {
     // TODO: Take in Measure<Distance> instead.
     public Command setTargetHeightCommand(double heightInches) {
         return new InstantCommand(() -> setTargetHeight(heightInches), this);
+    }
+
+    public Command incrementTargetHeightCommand(double incrementInches) {
+        return new InstantCommand(() -> modifyTargetHeight(incrementInches), this);
     }
 
     // TODO: Create all Commanp Functions.

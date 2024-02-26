@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.opencv.core.Mat.Tuple2;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
@@ -45,6 +46,10 @@ public abstract class AbstractConstants {
             I = i;
             D = d;
         }
+
+        public PIDController createController() {
+            return new PIDController(P, I, D);
+        }
     }
 
     public static class SwerveModuleHardwareIds {
@@ -70,7 +75,7 @@ public abstract class AbstractConstants {
     }
 
     // ========================= Static CONSTANTS ==============================
-    private static final boolean FORCE_GAME_ROBOT_CONSTANTS = false;
+    private static final boolean FORCE_GAME_ROBOT_CONSTANTS = true;
     private static final AbstractConstants GAME_ROBOT_CONSTANTS = new GameRobotConstants();
     private static final AbstractConstants TEST_ROBOT_CONSTANTS = new TestRobotConstants();
 
@@ -233,7 +238,7 @@ public abstract class AbstractConstants {
     public abstract Rotation2d getAimerEncoderOffset();
 
     public int getAimerEncoderPort() {
-        return uniqueRoboRioPort(0, RoboRioPortArrays.DIO);
+        return uniqueRoboRioPort(5, RoboRioPortArrays.DIO);
     }
 
     public int getAimerMotorIdLeft() {
