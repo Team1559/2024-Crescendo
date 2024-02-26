@@ -22,6 +22,7 @@ import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.util.Color;
 
 public abstract class AbstractConstants {
 
@@ -82,10 +83,10 @@ public abstract class AbstractConstants {
     public static final boolean TECHNICIAN_CONTROLLER_ENABLED = false;
     public static final AbstractConstants CONSTANTS = isGameRobot() ? GAME_ROBOT_CONSTANTS : TEST_ROBOT_CONSTANTS;
 
-    private static final Translation3d SPEKER_LOCATION_BLUE = new Translation3d(Units.inchesToMeters(-1.5),
+    private static final Translation3d SPEAKER_LOCATION_BLUE = new Translation3d(Units.inchesToMeters(-1.5),
             Units.inchesToMeters(218.42),
             Units.inchesToMeters(80.5));
-    private static final Translation3d SPEKER_LOCATION_RED = new Translation3d(Units.inchesToMeters(652.73),
+    private static final Translation3d SPEAKER_LOCATION_RED = new Translation3d(Units.inchesToMeters(652.73),
             Units.inchesToMeters(218.42),
             Units.inchesToMeters(80.5));
     private static final Translation3d AMP_LOCATION_RED = new Translation3d(Units.inchesToMeters(72.5),
@@ -200,9 +201,9 @@ public abstract class AbstractConstants {
     // #region: --------------- Game Objects -----------------------------------
     public Translation3d getSpeakerLocation() {
         if (getAlliance() == Alliance.Blue) {
-            return CONSTANTS.SPEKER_LOCATION_BLUE;
+            return CONSTANTS.SPEAKER_LOCATION_BLUE;
         } else {
-            return CONSTANTS.SPEKER_LOCATION_RED;
+            return CONSTANTS.SPEAKER_LOCATION_RED;
         }
     }
 
@@ -463,5 +464,10 @@ public abstract class AbstractConstants {
     public abstract Measure<Distance> getWheelDistanceLeftToRight();
 
     public abstract Measure<Distance> getWheelRadius();
+
+    // #endregion
+    // #region: --------------- LED Patterns --------------------------------
+    public final Color[] OVERHEAT_EMERGENCY_PATTERN = new Color[] { Color.kYellow, Color.kYellow, Color.kRed,
+            Color.kRed, Color.kBlack, Color.kBlack };
     // #endregion
 }

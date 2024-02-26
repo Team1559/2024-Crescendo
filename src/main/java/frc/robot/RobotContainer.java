@@ -13,9 +13,9 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
@@ -193,21 +193,24 @@ public class RobotContainer {
         }
         // #endregion
         // #region: ---------- Motor Overheat Triggers ----------
-        // TODO: Add LEDs Flashing Yellow to all Motor Temperature cutoff commands.
-        new Trigger(driveBase::isTemperatureTooHigh).whileTrue(driveBase.stopCommand());
+        new Trigger(driveBase::isTemperatureTooHigh)
+                .whileTrue(driveBase.stopCommand()
+                        .alongWith(leds.setDynamicPatternCommand(CONSTANTS.OVERHEAT_EMERGENCY_PATTERN, false)));
         if (CONSTANTS.hasIntakeSubsystem()) {
-            new Trigger(flywheel::isTemperatureTooHigh).whileTrue(flywheel.stopCommand());
+            new Trigger(flywheel::isTemperatureTooHigh).whileTrue(flywheel.stopCommand()
+                    .alongWith(leds.setDynamicPatternCommand(CONSTANTS.OVERHEAT_EMERGENCY_PATTERN, false)));
         }
-
-        // TODO: Add LEDs Flashing Yellow to all Motor Temperature cutoff commands.
         if (CONSTANTS.hasIntakeSubsystem()) {
-            new Trigger(intake::isTemperatureTooHigh).whileTrue(intake.stopCommand());
+            new Trigger(intake::isTemperatureTooHigh).whileTrue(intake.stopCommand()
+                    .alongWith(leds.setDynamicPatternCommand(CONSTANTS.OVERHEAT_EMERGENCY_PATTERN, false)));
         }
         if (CONSTANTS.hasFeederSubsystem()) {
-            new Trigger(feeder::isTemperatureTooHigh).whileTrue(feeder.stopCommand());
+            new Trigger(feeder::isTemperatureTooHigh).whileTrue(feeder.stopCommand()
+                    .alongWith(leds.setDynamicPatternCommand(CONSTANTS.OVERHEAT_EMERGENCY_PATTERN, false)));
         }
         if (CONSTANTS.hasTraverserSubsystem()) {
-            new Trigger(traverser::isTemperatureTooHigh).whileTrue(traverser.stopCommand());
+            new Trigger(traverser::isTemperatureTooHigh).whileTrue(traverser.stopCommand()
+                    .alongWith(leds.setDynamicPatternCommand(CONSTANTS.OVERHEAT_EMERGENCY_PATTERN, false)));
         }
 
         // #endregion
@@ -255,15 +258,10 @@ public class RobotContainer {
         if (CONSTANTS.hasIntakeSubsystem() && CONSTANTS.hasFeederSubsystem()) {
 
             if (CONSTANTS.hasNoteSensorSubsystem()) {
-                // TODO: Stop Flywheel as well.
                 coPilot.leftTrigger().and(not(noteSensor::isObjectDetectedSwitch))
-                        .whileTrue(new IntakeCommand(intake, feeder));
+                        .whileTrue(new ParallelCommandGroup(new IntakeCommand(intake, feeder), flywheel.stopCommand()));
             }
-
-            // TODO - Make one Command in ShooterCommands class.
-            coPilot.x().whileTrue(new StartEndCommand(intake::reverse, intake::stop, intake));
-            coPilot.x().whileTrue(new StartEndCommand(feeder::reverse, feeder::stop, feeder));
-            coPilot.x().whileTrue(new StartEndCommand(flywheel::reverse, flywheel::stop, flywheel));
+            coPilot.x().whileTrue(ShooterCommands.reverseShooterAndIntakeCommand(intake, feeder, flywheel));
         }
 
         if (CONSTANTS.hasFeederSubsystem() && CONSTANTS.hasFlywheelSubsystem()) {
@@ -281,11 +279,12 @@ public class RobotContainer {
         }
 
         if (CONSTANTS.hasTraverserSubsystem()) {
-            // TODO.
+            coPilot.povRight().whileTrue(traverser.startCommand());
+            coPilot.povLeft().whileTrue(traverser.reverseCommand());
         }
 
         if (CONSTANTS.hasAimerSubsystem()) {
-            // TODO: Switch to right joystick.
+
             coPilot.rightBumper()
                     .whileTrue(new RunCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(.5))));
             coPilot.leftBumper()

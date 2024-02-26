@@ -84,7 +84,7 @@ public class Leds extends SubsystemBase {
      * @param isDimming Decreases brightness when {@code true} and increases when
      *                  {@code false}.
      */
-    public void changeBrightness(boolean isDimming) { // TODO: Get working for scrolling lights.
+    public void changeBrightness(boolean isDimming) {
         double factor = isDimming ? .85 : 1.15;
         for (int i = 0; i < ledBuffer.getLength(); i++) {
             Color currentColor = ledBuffer.getLED(i);

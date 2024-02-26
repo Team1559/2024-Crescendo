@@ -62,7 +62,7 @@ public class Aimer extends SubsystemBase {
         Logger.processInputs("Shooter/Aimer", inputs);
 
         // Set Voltages
-        if (controller.getSetpoint() != 0) { // TODO: Determine Acceptable variance.
+        if (controller.getSetpoint() != 0) {
             double output = controller.calculate(inputs.currentAngleDegrees);
             output = Math.min(output, 2);
             motorL.setVoltage(output);
