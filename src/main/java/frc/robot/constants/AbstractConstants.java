@@ -21,6 +21,7 @@ import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
 
 public abstract class AbstractConstants {
 
@@ -90,8 +91,8 @@ public abstract class AbstractConstants {
             Units.inchesToMeters(323.00),
             Units.inchesToMeters(44));
     // ========================= Static Variables ==============================
-    private static final Map<String, Set<Integer>> uniqueCanBusIds = new HashMap<>();
-    private static final Map<RoboRioPortArrays, Set<Integer>> uniqueRoboRioPorts = new HashMap();
+    private static Map<String, Set<Integer>> uniqueCanBusIds;
+    private static Map<RoboRioPortArrays, Set<Integer>> uniqueRoboRioPorts;
 
     // ========================= Static Methods ================================
     public static boolean isGameRobot() {
@@ -108,17 +109,16 @@ public abstract class AbstractConstants {
     }
 
     private static int uniqueCanBusId(int id, String canivoreId) {
-        System.out.println(id + " - " + canivoreId);
-        canivoreId = canivoreId == null ? "" : canivoreId;
 
+        uniqueCanBusIds = uniqueCanBusIds == null ? new HashMap<>() : uniqueCanBusIds;
+
+        canivoreId = canivoreId == null ? "" : canivoreId;
         Set<Integer> ids = uniqueCanBusIds.get(canivoreId);
         if (ids == null) {
             uniqueCanBusIds.put(canivoreId, new HashSet<>(Arrays.asList(id)));
         } else if (!ids.add(id)) {
-            // TODO: Fix.
-            // throw new RuntimeException(
-            // "Duplicate ID (" + id + ") on " + (canivoreId.isEmpty() ? "default" :
-            // canivoreId) + " CAN Bus!");
+            throw new RuntimeException(
+                    "Duplicate ID (" + id + ") on " + (canivoreId.isEmpty() ? "default" : canivoreId) + " CAN Bus!");
         }
 
         return id;
@@ -126,6 +126,7 @@ public abstract class AbstractConstants {
 
     private static int uniqueRoboRioPort(int port, RoboRioPortArrays portArray) {
 
+        uniqueRoboRioPorts = uniqueRoboRioPorts == null ? new HashMap<>() : uniqueRoboRioPorts;
         Set<Integer> ports = uniqueRoboRioPorts.get(portArray);
         if (ports == null) {
             ports = new HashSet<>() {
@@ -250,7 +251,7 @@ public abstract class AbstractConstants {
     // #endregion
 
     // #region: ----- Canivore -----
-    public String getCanivoreId() {
+    public static String getCanivoreId() {
         return "1559Canivore";
     }
 
@@ -326,28 +327,27 @@ public abstract class AbstractConstants {
     // #endregion
 
     // #region: ----- Swerve --------
-    /**
-     * The index of the Rotation matches the Index of the Module in Advaltage Scope.
-     * <p>
-     * Note: Offsetting by 180 degrees will invert the direction the wheel spins.
-     * </p>
-     */
-    public abstract Rotation2d[] getSwerveModuleEncoderOffsets();
+    public abstract Map<WheelModuleIndex, Rotation2d> getSwerveModuleEncoderOffsets();
 
-    public SwerveModuleHardwareIds getSwerveModuleHardwareIdsFrontLeft() {
-        return new SwerveModuleHardwareIds(0, 1, 2);
-    }
+    private static Map<WheelModuleIndex, SwerveModuleHardwareIds> swerveModuleHardwareIds = new HashMap<>(4) {
+        {
+            put(WheelModuleIndex.FRONT_LEFT,
+                    new SwerveModuleHardwareIds(uniqueCanBusId(0, getCanivoreId()), uniqueCanBusId(1, getCanivoreId()),
+                            uniqueCanBusId(2, getCanivoreId())));
 
-    public SwerveModuleHardwareIds getSwerveModuleHardwareIdsFrontRight() {
-        return new SwerveModuleHardwareIds(3, 4, 5);
-    }
+            put(WheelModuleIndex.FRONT_RIGHT, new SwerveModuleHardwareIds(uniqueCanBusId(3, getCanivoreId()),
+                    uniqueCanBusId(4, getCanivoreId()), uniqueCanBusId(5, getCanivoreId())));
 
-    public SwerveModuleHardwareIds getSwerveModuleHardwareIdsBackLeft() {
-        return new SwerveModuleHardwareIds(9, 10, 11);
-    }
+            put(WheelModuleIndex.BACK_LEFT, new SwerveModuleHardwareIds(uniqueCanBusId(9, getCanivoreId()),
+                    uniqueCanBusId(10, getCanivoreId()), uniqueCanBusId(11, getCanivoreId())));
 
-    public SwerveModuleHardwareIds getSwerveModuleHardwareIdsBackRight() {
-        return new SwerveModuleHardwareIds(6, 7, 8);
+            put(WheelModuleIndex.BACK_RIGHT, new SwerveModuleHardwareIds(uniqueCanBusId(6, getCanivoreId()),
+                    uniqueCanBusId(7, getCanivoreId()), uniqueCanBusId(8, getCanivoreId())));
+        }
+    };
+
+    public Map<WheelModuleIndex, SwerveModuleHardwareIds> getSwerveModuleHardwareIds() {
+        return swerveModuleHardwareIds;
     }
 
     // #endregion
