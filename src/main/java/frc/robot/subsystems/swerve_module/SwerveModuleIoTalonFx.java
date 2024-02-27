@@ -59,67 +59,30 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         return talonFXConfiguration;
     }
 
-    private final TalonFX driveMotor;
-    private final TalonFX steerMotor;
     private final CANcoder cancoder;
+    private final TalonFX driveMotor, steerMotor;
 
     private final StatusSignal<Double> cancoderAbsolutePosition;
-
-    private final StatusSignal<Double> driveMotorPosition;
-    private final StatusSignal<Double> driveMotorVelocity;
-    private final StatusSignal<Double> driveMotorAppliedVolts;
-    private final StatusSignal<Double> driveMotorCurrent;
-    private final StatusSignal<Integer> driveMotorFaults;
-    private final StatusSignal<Double> driveMotorTemp;
-    private final StatusSignal<Double> steerMotorPosition;
-    private final StatusSignal<Double> steerMotorVelocity;
-    private final StatusSignal<Double> steerMotorAppliedVolts;
-    private final StatusSignal<Double> steerMotorStatorCurrent;
-    private final StatusSignal<Integer> steerMotorFaults;
-    private final StatusSignal<Double> steerMotorTemp;
+    private final StatusSignal<Double> driveMotorPosition, steerMotorPosition;
+    private final StatusSignal<Double> driveMotorVelocity, steerMotorVelocity;
+    private final StatusSignal<Double> driveMotorAppliedVolts, steerMotorAppliedVolts;
+    private final StatusSignal<Double> driveMotorCurrent, steerMotorCurrent;
+    private final StatusSignal<Integer> driveMotorFaults, steerMotorFaults;
+    private final StatusSignal<Double> driveMotorTemp, steerMotorTemp;
 
     private final Rotation2d absoluteEncoderOffset;
 
     public SwerveModuleIoTalonFx(WheelModuleIndex index) {
 
+        absoluteEncoderOffset = CONSTANTS.getSwerveModuleEncoderOffsets().get(index);
+
         // ---------- Instantiate Hardware ----------
-        absoluteEncoderOffset = CONSTANTS.getSwerveModuleEncoderOffsets()[index.value];
-        switch (index) {
-            case FRONT_LEFT:
-                driveMotor = new TalonFX(CONSTANTS.getSwerveModuleHardwareIdsFrontLeft().DRIVE_MOTOR_ID,
-                        CONSTANTS.getCanivoreId());
-                steerMotor = new TalonFX(CONSTANTS.getSwerveModuleHardwareIdsFrontLeft().STEER_MOTOR_ID,
-                        CONSTANTS.getCanivoreId());
-                cancoder = new CANcoder(CONSTANTS.getSwerveModuleHardwareIdsFrontLeft().CANCODER_ID,
-                        CONSTANTS.getCanivoreId());
-                break;
-            case FRONT_RIGHT:
-                driveMotor = new TalonFX(CONSTANTS.getSwerveModuleHardwareIdsFrontRight().DRIVE_MOTOR_ID,
-                        CONSTANTS.getCanivoreId());
-                steerMotor = new TalonFX(CONSTANTS.getSwerveModuleHardwareIdsFrontRight().STEER_MOTOR_ID,
-                        CONSTANTS.getCanivoreId());
-                cancoder = new CANcoder(CONSTANTS.getSwerveModuleHardwareIdsFrontRight().CANCODER_ID,
-                        CONSTANTS.getCanivoreId());
-                break;
-            case BACK_LEFT:
-                driveMotor = new TalonFX(CONSTANTS.getSwerveModuleHardwareIdsBackLeft().DRIVE_MOTOR_ID,
-                        CONSTANTS.getCanivoreId());
-                steerMotor = new TalonFX(CONSTANTS.getSwerveModuleHardwareIdsBackLeft().STEER_MOTOR_ID,
-                        CONSTANTS.getCanivoreId());
-                cancoder = new CANcoder(CONSTANTS.getSwerveModuleHardwareIdsBackLeft().CANCODER_ID,
-                        CONSTANTS.getCanivoreId());
-                break;
-            case BACK_RIGHT:
-                driveMotor = new TalonFX(CONSTANTS.getSwerveModuleHardwareIdsBackRight().DRIVE_MOTOR_ID,
-                        CONSTANTS.getCanivoreId());
-                steerMotor = new TalonFX(CONSTANTS.getSwerveModuleHardwareIdsBackRight().STEER_MOTOR_ID,
-                        CONSTANTS.getCanivoreId());
-                cancoder = new CANcoder(CONSTANTS.getSwerveModuleHardwareIdsBackRight().CANCODER_ID,
-                        CONSTANTS.getCanivoreId());
-                break;
-            default:
-                throw new RuntimeException("Invalid module index: " + index);
-        }
+        cancoder = new CANcoder(CONSTANTS.getSwerveModuleHardwareIds().get(index).CANCODER_ID,
+                CONSTANTS.getCanivoreId());
+        driveMotor = new TalonFX(CONSTANTS.getSwerveModuleHardwareIds().get(index).DRIVE_MOTOR_ID,
+                CONSTANTS.getCanivoreId());
+        steerMotor = new TalonFX(CONSTANTS.getSwerveModuleHardwareIds().get(index).STEER_MOTOR_ID,
+                CONSTANTS.getCanivoreId());
 
         // ---------- Configure Hardware ----------
         // ----- Cancoder -----
@@ -148,7 +111,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         steerMotorPosition = steerMotor.getPosition();
         steerMotorVelocity = steerMotor.getVelocity();
         steerMotorAppliedVolts = steerMotor.getMotorVoltage();
-        steerMotorStatorCurrent = steerMotor.getStatorCurrent();
+        steerMotorCurrent = steerMotor.getStatorCurrent();
         steerMotorFaults = steerMotor.getFaultField();
         steerMotorTemp = steerMotor.getDeviceTemp();
 
@@ -163,7 +126,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
                 cancoderAbsolutePosition,
                 steerMotorVelocity,
                 steerMotorAppliedVolts,
-                steerMotorStatorCurrent);
+                steerMotorCurrent);
 
         driveMotor.optimizeBusUtilization();
         steerMotor.optimizeBusUtilization();
@@ -186,7 +149,8 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 
     @Override
     public void updateInputs(SwerveModuleIoInputs inputs) {
-        var result = BaseStatusSignal.refreshAll(
+
+        BaseStatusSignal.refreshAll(
 
                 cancoderAbsolutePosition,
 
@@ -200,7 +164,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
                 steerMotorPosition,
                 steerMotorVelocity,
                 steerMotorAppliedVolts,
-                steerMotorStatorCurrent,
+                steerMotorCurrent,
                 steerMotorFaults,
                 steerMotorTemp);
 
@@ -224,7 +188,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         inputs.steerMotorVelocityRadPerSec = Units.rotationsToRadians(steerMotorVelocity.getValueAsDouble())
                 / CONSTANTS.getGearRatioOfTurnWheel();
         inputs.steerMotorAppliedVolts = steerMotorAppliedVolts.getValueAsDouble();
-        inputs.steerMotorCurrentAmps = steerMotorStatorCurrent.getValueAsDouble();
+        inputs.steerMotorCurrentAmps = steerMotorCurrent.getValueAsDouble();
         inputs.steerMotorFaults = steerMotorFaults.getValue();
         inputs.steerMotorTemp = Celsius.of(steerMotorTemp.getValueAsDouble());
     }
