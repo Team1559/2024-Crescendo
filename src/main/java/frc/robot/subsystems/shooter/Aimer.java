@@ -28,6 +28,7 @@ public class Aimer extends SubsystemBase {
 
         public double currentAngleDegrees;
         public double targetAngleDegrees;
+        public double currentVsTargetAngleDegrees;
 
         public double lAppliedOutput, rAppliedOutput;
         public double lOutputCurrent, rOutputCurrent;
@@ -63,7 +64,9 @@ public class Aimer extends SubsystemBase {
 
         // Set Voltages
         if (controller.getSetpoint() != 0) {
-            double output = controller.calculate(inputs.currentAngleDegrees);
+            double kF = 0.7;
+            double ff = kF * Rotation2d.fromDegrees(inputs.targetAngleDegrees).getCos();
+            double output = ff + controller.calculate(inputs.currentAngleDegrees);
             output = Math.min(output, 2);
             motorL.setVoltage(output);
             motorR.setVoltage(output);
@@ -74,6 +77,7 @@ public class Aimer extends SubsystemBase {
 
         inputs.currentAngleDegrees = getAngle().getDegrees();
         inputs.targetAngleDegrees = getTargetAngle().getDegrees();
+        inputs.currentVsTargetAngleDegrees = inputs.targetAngleDegrees - inputs.currentAngleDegrees;
 
         inputs.lAppliedOutput = motorL.getAppliedOutput();
         inputs.lOutputCurrent = motorL.getOutputCurrent();
@@ -94,7 +98,7 @@ public class Aimer extends SubsystemBase {
         Logger.recordOutput("Aimer/DistanceToTarget", distanceMeters);
 
         double distanceFeet = Units.metersToFeet(distanceMeters);
-        Rotation2d angle = Rotation2d.fromDegrees(.08689 * distanceFeet * distanceFeet - 3.898 * distanceFeet + 49.86);
+        Rotation2d angle = Rotation2d.fromDegrees(.08689 * distanceFeet * distanceFeet - 3.898 * distanceFeet + 50.5);
         setTargetAngle(angle);
     }
 

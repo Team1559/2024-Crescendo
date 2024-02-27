@@ -77,7 +77,7 @@ public abstract class AbstractConstants {
     }
 
     // ========================= Static CONSTANTS ==============================
-    private static final boolean FORCE_GAME_ROBOT_CONSTANTS = true;
+    private static final boolean FORCE_GAME_ROBOT_CONSTANTS = false;
     private static final AbstractConstants GAME_ROBOT_CONSTANTS = new GameRobotConstants();
     private static final AbstractConstants TEST_ROBOT_CONSTANTS = new TestRobotConstants();
 
@@ -103,7 +103,7 @@ public abstract class AbstractConstants {
     // ========================= Static Methods ================================
     public static boolean isGameRobot() {
         String roboRioSerialNumber = System.getenv("serialnum");
-        System.out.println("Serial Number = " + roboRioSerialNumber);
+        System.out.println("Serial Number = " + System.getenv("serialnum"));
         roboRioSerialNumber = roboRioSerialNumber == null ? "" : roboRioSerialNumber.trim();
 
         return FORCE_GAME_ROBOT_CONSTANTS

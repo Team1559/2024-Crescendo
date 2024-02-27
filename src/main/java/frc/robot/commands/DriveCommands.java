@@ -150,7 +150,6 @@ public class DriveCommands {
         }
     }
 
-    // TODO: Deduplicate code between this and the manualDriveDefaultCommand method.
     public static Command autoAimAndManuallyDriveCommand(DriveBase driveBase,
             Flywheel flywheel,
             Aimer aimer,
@@ -253,7 +252,7 @@ public class DriveCommands {
                     omega = Math.copySign(omega * omega, omega);
 
                     // Calcaulate new linear velocity.
-                    Rotation2d linearDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+                    Rotation2d linearDirection = calculateLinearDirection(xSupplier, ySupplier);
                     Translation2d linearVelocity = new Pose2d(new Translation2d(), linearDirection)
                             .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d())).getTranslation();
 

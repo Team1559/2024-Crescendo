@@ -110,7 +110,7 @@ public class GameRobotConstants extends AbstractConstants {
 
     @Override
     public PID getAimerPid() {
-        return new PID(0.5, .0, 0);
+        return new PID(.6, 0, 0);
     }
 
     // #endregion

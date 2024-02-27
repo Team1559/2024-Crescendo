@@ -81,6 +81,7 @@ public class DriveBase extends SubsystemBase {
     private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
     public final SwerveDrivePoseEstimator poseEstimator;
     private final SwerveModulePosition[] modulePositions;
+    private Translation2d lastPosition;
 
     public DriveBase(GyroIo gyroIo,
             SwerveModuleIo flModuleI,
@@ -135,6 +136,7 @@ public class DriveBase extends SubsystemBase {
     public void periodic() {
         gyroIO.updateInputs(gyroInputs);
         getPose(); // Logs Robot Estimated Position; (TODO: Is this needed?)
+        getSpeed(); // same, revisit later
         Logger.processInputs("Drive/Gyro", gyroInputs);
 
         for (IndexedSwerveModule module : modules) {
@@ -166,6 +168,17 @@ public class DriveBase extends SubsystemBase {
     @AutoLogOutput(key = "EstimatedPosition")
     public Pose2d getPose() {
         return poseEstimator.getEstimatedPosition();
+    }
+
+    @AutoLogOutput(key = "EstimatedSpeed")
+    public double getSpeed() {
+        if (lastPosition == null) {
+            lastPosition = getPose().getTranslation();
+        }
+        Translation2d current = getPose().getTranslation();
+        Translation2d delta = current.minus(lastPosition);
+        lastPosition = current;
+        return delta.getNorm() / 0.02;
     }
 
     /** Returns the current odometry rotation. */
