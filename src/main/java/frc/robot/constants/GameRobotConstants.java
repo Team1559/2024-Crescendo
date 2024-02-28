@@ -195,7 +195,7 @@ public class GameRobotConstants extends AbstractConstants {
     // #region: -------- roboRIO --------
     @Override
     public String getRoboRioSerialNumber() {
-        return ""; // TODO.
+        return "03282B9F";
     }
 
     // #endregion
