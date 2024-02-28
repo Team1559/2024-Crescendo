@@ -13,6 +13,8 @@ import edu.wpi.first.units.Units;
 public abstract class SingleMotorIoSparkMax implements SingleMotorIo {
 
     protected final CANSparkMax motor;
+    protected double velocity;
+    protected boolean inverted;
 
     /**
      * Create a new subsystem for a single SparkMax-controlled motor in voltage mode
@@ -20,12 +22,17 @@ public abstract class SingleMotorIoSparkMax implements SingleMotorIo {
      * @param motorId  Motor CAN ID
      * @param inverted True if the motor direction should be inverted
      */
-    public SingleMotorIoSparkMax(int motorId, boolean inverted) {
+    public SingleMotorIoSparkMax(int motorId, boolean inverted, double kp, double ki, double kd, double ff) {
         motor = new CANSparkMax(motorId, MotorType.kBrushless);
-        motor.setInverted(inverted);
+        motor.setInverted(false); // TODO - randomly flips back
+        this.inverted = inverted;
         motor.setIdleMode(IdleMode.kBrake);
         motor.setSmartCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentLimit());
         motor.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
+        motor.getPIDController().setP(kp);
+        motor.getPIDController().setI(ki);
+        motor.getPIDController().setD(kd);
+        motor.getPIDController().setFF(ff);
     }
 
     public void updateInputs(SingleMotorIoInputs inputs) {
@@ -40,7 +47,7 @@ public abstract class SingleMotorIoSparkMax implements SingleMotorIo {
         return Units.Celsius.of(motor.getMotorTemperature());
     }
 
-    public void setVoltage(double voltage) {
-        motor.setVoltage(voltage);
+    public void setVelocity(double velocity) {
+        motor.getPIDController().setReference(inverted ? -velocity : velocity, CANSparkMax.ControlType.kVelocity);
     }
 }

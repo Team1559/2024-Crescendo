@@ -130,12 +130,12 @@ public class TestRobotConstants extends AbstractConstants {
     }
 
     @Override
-    public double getFeederForwardVoltage() {
+    public double getFeederForwardVelocity() {
         throw new UnsupportedOperationException("Unimplemented method 'getFeederForwardVoltage'");
     }
 
     @Override
-    public double getFeederReverseVoltage() {
+    public double getFeederReverseVelocity() {
         throw new UnsupportedOperationException("Unimplemented method 'getFeederReverseVoltage'");
     }
 
@@ -154,7 +154,7 @@ public class TestRobotConstants extends AbstractConstants {
     }
 
     @Override
-    public double getFlywheelMotorPowerDifferentialPercentage() {
+    public double flywheelSpinOffset() {
         throw new UnsupportedOperationException("Unimplemented method 'getFlywheelMotorPowerDifferentialPercentage'");
     }
 
@@ -168,12 +168,12 @@ public class TestRobotConstants extends AbstractConstants {
     }
 
     @Override
-    public double getIntakeForwardVoltage() {
+    public double getIntakeForwardVelocity() {
         throw new UnsupportedOperationException("Unimplemented method 'getIntakeForwardVoltage'");
     }
 
     @Override
-    public double getIntakeReverseVoltage() {
+    public double getIntakeReverseVelocity() {
         throw new UnsupportedOperationException("Unimplemented method 'getIntakeReverseVoltage'");
     }
 
@@ -212,12 +212,12 @@ public class TestRobotConstants extends AbstractConstants {
 
     // #region: ----- Traverser -----
     @Override
-    public double getTraverserFowardVoltage() {
+    public double getTraverserFowardVelocity() {
         throw new UnsupportedOperationException("Unimplemented method 'getTraverserFowardVoltage'");
     }
 
     @Override
-    public double getTraverserReverseVoltage() {
+    public double getTraverserReverseVelocity() {
         throw new UnsupportedOperationException("Unimplemented method 'getTraverserReverseVoltage'");
     }
 

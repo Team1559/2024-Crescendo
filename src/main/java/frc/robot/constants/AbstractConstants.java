@@ -274,9 +274,9 @@ public abstract class AbstractConstants {
 
     public abstract boolean isFeederMortorInverted();
 
-    public abstract double getFeederForwardVoltage();
+    public abstract double getFeederForwardVelocity();
 
-    public abstract double getFeederReverseVoltage();
+    public abstract double getFeederReverseVelocity();
 
     // #endregion
 
@@ -293,7 +293,7 @@ public abstract class AbstractConstants {
 
     public abstract double getFlywheelReverseVoltage();
 
-    public abstract double getFlywheelMotorPowerDifferentialPercentage();
+    public abstract double flywheelSpinOffset();
 
     // #endregion
 
@@ -311,9 +311,9 @@ public abstract class AbstractConstants {
 
     public abstract boolean isIntakeMortorInverted();
 
-    public abstract double getIntakeForwardVoltage();
+    public abstract double getIntakeForwardVelocity();
 
-    public abstract double getIntakeReverseVoltage();
+    public abstract double getIntakeReverseVelocity();
 
     // #endregion
 
@@ -322,7 +322,7 @@ public abstract class AbstractConstants {
         return uniqueRoboRioPort(0, RoboRioPortArrays.PWM);
     }
 
-    public abstract int getLedLenth(); // 144
+    public abstract int getLedLenth();
 
     // #endregion
 
@@ -358,9 +358,9 @@ public abstract class AbstractConstants {
     // #endregion
 
     // #region: ----- Traverser -----
-    public abstract double getTraverserFowardVoltage();
+    public abstract double getTraverserFowardVelocity();
 
-    public abstract double getTraverserReverseVoltage();
+    public abstract double getTraverserReverseVelocity();
 
     public int getTraverserMotorId() {
         // TODO: Add ID

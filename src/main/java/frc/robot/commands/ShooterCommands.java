@@ -103,15 +103,12 @@ public class ShooterCommands {
             Leds leds) {
 
         ParallelRaceGroup group = new ParallelRaceGroup(new StartEndCommand(intake::start, intake::stop, intake),
-                new StartEndCommand(feeder::start, feeder::stop, feeder),
+                new StartEndCommand(() -> feeder.setVelocity(11000), feeder::stop, feeder),
                 leds.setColorCommand(Color.kPurple).repeatedly(),
                 noteSensor.waitForNoObjectCommandSwitch(), new WaitCommand(5));
 
-        if (flywheel.getCurrentVoltage() <= 0) {
-            return spinUpFlywheelCommand(flywheel).andThen(group);
-        }
-
-        return group;
+        // TODO: Spin up flywheelsm if not already spinning.
+        return spinUpFlywheelCommand(flywheel).andThen(group);
     }
 
     public static Command spinUpFlywheelCommand(Flywheel flywheel) {

@@ -130,15 +130,15 @@ public class GameRobotConstants extends AbstractConstants {
     }
 
     @Override
-    public double getFeederForwardVoltage() {
+    public double getFeederForwardVelocity() {
         // TODO: Configure Value.
-        return 4;
+        return 3666;
     }
 
     @Override
-    public double getFeederReverseVoltage() {
+    public double getFeederReverseVelocity() {
         // TODO: Configure Value.
-        return -getFeederForwardVoltage();
+        return -getFeederForwardVelocity();
     }
 
     // #endregion
@@ -157,9 +157,9 @@ public class GameRobotConstants extends AbstractConstants {
     }
 
     @Override
-    public double getFlywheelMotorPowerDifferentialPercentage() {
+    public double flywheelSpinOffset() {
         // TODO: Tune.
-        return 0.75;
+        return 1;
     }
 
     // #endregion
@@ -171,15 +171,15 @@ public class GameRobotConstants extends AbstractConstants {
     }
 
     @Override
-    public double getIntakeForwardVoltage() {
+    public double getIntakeForwardVelocity() {
         // TODO: Configure Value.
-        return 9;
+        return 8250;
     }
 
     @Override
-    public double getIntakeReverseVoltage() {
+    public double getIntakeReverseVelocity() {
         // TODO: Configure Value.
-        return -getFeederForwardVoltage();
+        return -getFeederForwardVelocity();
     }
 
     // #endregion
@@ -217,13 +217,13 @@ public class GameRobotConstants extends AbstractConstants {
 
     // #region: -------- Traverser --------
     @Override
-    public double getTraverserFowardVoltage() {
-        return 6.0;
+    public double getTraverserFowardVelocity() { // TODO
+        return 5000;
     }
 
     @Override
-    public double getTraverserReverseVoltage() {
-        return -getTraverserFowardVoltage();
+    public double getTraverserReverseVelocity() {
+        return -getTraverserFowardVelocity();
     }
 
     @Override

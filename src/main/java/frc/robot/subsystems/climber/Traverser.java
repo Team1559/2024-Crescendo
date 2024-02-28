@@ -7,6 +7,6 @@ import frc.robot.subsystems.single_motor.SingleMotorSubsystem;
 
 public class Traverser extends SingleMotorSubsystem {
     public Traverser(SingleMotorIo io) {
-        super("Traverser", io, CONSTANTS.getTraverserFowardVoltage(), CONSTANTS.getTraverserFowardVoltage());
+        super("Traverser", io, CONSTANTS.getTraverserFowardVelocity(), CONSTANTS.getTraverserFowardVelocity());
     }
 }

@@ -95,11 +95,13 @@ public class RobotContainer {
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
                 feeder = CONSTANTS.hasFeederSubsystem()
                         ? new Feeder(new SingleMotorIoNeo550Brushless(CONSTANTS.getFeederMotorId(),
-                                CONSTANTS.isFeederMortorInverted()))
+                                CONSTANTS.isFeederMortorInverted(), .33 / CONSTANTS.getFeederForwardVelocity(), 0, 0,
+                                1.0 / 11000)) // TODO - Constants
                         : null;
                 intake = CONSTANTS.hasIntakeSubsystem()
                         ? new Intake(new SingleMotorIoNeo550Brushless(CONSTANTS.getIntakeMotorId(),
-                                CONSTANTS.isIntakeMortorInverted()))
+                                CONSTANTS.isIntakeMortorInverted(), .33 / CONSTANTS.getIntakeForwardVelocity(), 0, 0,
+                                1.0 / 11000)) // TODO - Constants
                         : null;
                 vision = CONSTANTS.hasVisionSubsystem()
                         ? new Vision(driveBase.poseEstimator, new VisionIoLimelight(CONSTANTS.getCameraName()),
@@ -107,7 +109,9 @@ public class RobotContainer {
                         : null;
                 traverser = CONSTANTS.hasTraverserSubsystem()
                         ? new Traverser(new SingleMotorIoNeo550Brushless(CONSTANTS.getTraverserMotorId(),
-                                CONSTANTS.isTraverserInverted()))
+                                CONSTANTS.isTraverserInverted(), .33 / CONSTANTS.getTraverserFowardVelocity(), 0, 0,
+                                11.0 / 11000))
+                        // TODO - Constants
                         : null;
                 climber = CONSTANTS.hasClimberSubsystem() ? new Climber() : null;
                 break;
@@ -122,18 +126,18 @@ public class RobotContainer {
                         new SwerveModuleIoSim());
                 feeder = CONSTANTS.hasFeederSubsystem()
                         ? new Feeder(new SingleMotorIoNeo550Brushless(CONSTANTS.getFeederMotorId(),
-                                CONSTANTS.isFeederMortorInverted()))
+                                CONSTANTS.isFeederMortorInverted(), 0, 0, 0, 1)) // TODO constants
                         : null;
                 intake = CONSTANTS.hasIntakeSubsystem()
                         ? new Intake(new SingleMotorIoNeo550Brushless(CONSTANTS.getIntakeMotorId(),
-                                CONSTANTS.isIntakeMortorInverted()))
+                                CONSTANTS.isIntakeMortorInverted(), 0, 0, 0, 1)) // TODO constants
                         : null;
                 vision = CONSTANTS.hasVisionSubsystem()
                         ? new Vision(driveBase.poseEstimator, new VisionIoSimAndReplay())
                         : null;
                 traverser = CONSTANTS.hasTraverserSubsystem()
                         ? new Traverser(new SingleMotorIoNeo550Brushless(CONSTANTS.getTraverserMotorId(),
-                                CONSTANTS.isTraverserInverted()))
+                                CONSTANTS.isTraverserInverted(), 0, 0, 0, 1)) // TODO constants
                         : null;
                 climber = CONSTANTS.hasClimberSubsystem() ? new Climber() : null;
                 break;
@@ -191,6 +195,7 @@ public class RobotContainer {
         if (CONSTANTS.hasNoteSensorSubsystem()) {
             new Trigger((noteSensor::isObjectDetectedSwitch)).whileTrue(leds.setColorCommand(Color.kBrown));
         }
+        // TODO: Add LED Trigger for Ready to Shoot.
         // #endregion
         // #region: ---------- Motor Overheat Triggers ----------
         new Trigger(driveBase::isTemperatureTooHigh)

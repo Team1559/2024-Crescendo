@@ -1,5 +1,6 @@
 package frc.robot.subsystems.single_motor;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Units;
@@ -12,8 +13,13 @@ public class SingleMotorIoNeo550Brushless extends SingleMotorIoSparkMax {
      * @param motorId  Motor CAN ID
      * @param inverted True if the motor direction should be inverted
      */
-    public SingleMotorIoNeo550Brushless(int motorId, boolean inverted) {
-        super(motorId, inverted);
+    public SingleMotorIoNeo550Brushless(int motorId, boolean inverted, double kp, double ki, double kd, double ff) {
+        super(motorId, inverted, kp, ki, kd, ff);
+    }
+
+    @Override
+    public void setVelocity(double velocity) {
+        super.setVelocity(MathUtil.clamp(velocity, -11000, 11000));
     }
 
     public Measure<Temperature> getMaxSafeTemperature() {

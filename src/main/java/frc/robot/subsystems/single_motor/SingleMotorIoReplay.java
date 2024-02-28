@@ -20,7 +20,7 @@ public class SingleMotorIoReplay implements SingleMotorIo {
     }
 
     @Override
-    public void setVoltage(double voltage) {
+    public void setVelocity(double velocity) {
         // No functionality.
     }
 }
