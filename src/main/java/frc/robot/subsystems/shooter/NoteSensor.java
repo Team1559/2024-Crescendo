@@ -4,7 +4,6 @@ import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -19,12 +18,8 @@ public class NoteSensor extends SubsystemBase {
     private NoteSensorInputsAutoLogged inputs = new NoteSensorInputsAutoLogged();
     private final DigitalInput limitSwitch;
 
-    public NoteSensor(I2C.Port port, int channel) {
+    public NoteSensor(int channel) {
         limitSwitch = new DigitalInput(channel);
-    }
-
-    public NoteSensor() {
-        this(I2C.Port.kOnboard, 2);
     }
 
     @Override

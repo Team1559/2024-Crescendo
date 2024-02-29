@@ -91,8 +91,8 @@ public class GameRobotConstants extends AbstractConstants {
     }
 
     @Override
-    public double getClimberMaxHeight() {
-        return 12;
+    public Measure<Distance> getClimberMaxHeight() {
+        return Inches.of(12);
     }
 
     // #endregion
@@ -114,15 +114,6 @@ public class GameRobotConstants extends AbstractConstants {
     }
 
     // #endregion
-
-    // #region: ----- Color Sensor -----
-    @Override
-    public int getColorSensorProximityThreshold() {
-        return 200; // TODO: Configure Value.
-    }
-
-    // #endregion
-
     // #region: ----- Feeder -----
     @Override
     public boolean isFeederMortorInverted() {

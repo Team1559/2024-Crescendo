@@ -103,7 +103,7 @@ public class TestRobotConstants extends AbstractConstants {
 
     // #region: ----- Climber -----
     @Override
-    public double getClimberMaxHeight() {
+    public Measure<Distance> getClimberMaxHeight() {
         throw new UnsupportedOperationException("Unimplemented method 'getClimberMaxHeight'");
     }
 
@@ -113,15 +113,6 @@ public class TestRobotConstants extends AbstractConstants {
     }
 
     // #endregion
-
-    // #region: ----- Color Sensor -----
-    @Override
-    public int getColorSensorProximityThreshold() {
-        throw new UnsupportedOperationException("Unimplemented method 'getColorSensorProximityThreshold'");
-    }
-
-    // #endregion
-
     // #region: ----- Feeder -----
 
     @Override
@@ -182,7 +173,7 @@ public class TestRobotConstants extends AbstractConstants {
     // #region: ----- LEDs -----
     @Override
     public int getLedLenth() {
-        return 288;
+        return 144;
     }
 
     // #endregion

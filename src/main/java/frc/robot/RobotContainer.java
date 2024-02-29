@@ -169,7 +169,7 @@ public class RobotContainer {
 
         // #region: Initialize Subsystems without Simulation and/or Log Replay Mode
         aimer = CONSTANTS.hasAimerSubsystem() ? new Aimer() : null;
-        noteSensor = CONSTANTS.hasNoteSensorSubsystem() ? new NoteSensor() : null;
+        noteSensor = CONSTANTS.hasNoteSensorSubsystem() ? new NoteSensor(CONSTANTS.getLimitSwitchChannel()) : null;
         flywheel = CONSTANTS.hasFlywheelSubsystem() ? new Flywheel() : null;
         /*
          * We can safely set LEDs even if there are no LEDs.

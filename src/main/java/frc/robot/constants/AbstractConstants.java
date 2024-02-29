@@ -231,7 +231,7 @@ public abstract class AbstractConstants {
 
     public abstract PID getClimberPid();
 
-    public abstract double getClimberMaxHeight();
+    public abstract Measure<Distance> getClimberMaxHeight();
     // #endregion
 
     // #region: ----- Aimer -----
@@ -262,9 +262,10 @@ public abstract class AbstractConstants {
 
     // #endregion
 
-    // #region: ----- Color Sensor -----
-    public abstract int getColorSensorProximityThreshold();
-
+    // #region: ----- Limit Switch -----
+    public static int getLimitSwitchChannel() {
+        return 2;
+    }
     // #endregion
 
     // #region: ----- Feeder -----
