@@ -282,9 +282,10 @@ public abstract class AbstractConstants {
 
     // #endregion
 
-    // #region: ----- Color Sensor -----
-    public abstract int getColorSensorProximityThreshold();
-
+    // #region: ----- Limit Switch -----
+    public static int getLimitSwitchChannel() {
+        return 2;
+    }
     // #endregion
 
     // #region: ----- Feeder -----

@@ -159,7 +159,7 @@ public class RobotContainer {
         aimer = CONSTANTS.hasAimerSubsystem() ? new Aimer() : null;
         climber = CONSTANTS.hasClimberSubsystem() ? new Climber() : null;
         flywheel = CONSTANTS.hasFlywheelSubsystem() ? new Flywheel() : null;
-        noteSensor = CONSTANTS.hasNoteSensorSubsystem() ? new NoteSensor() : null;
+        noteSensor = CONSTANTS.hasNoteSensorSubsystem() ? new NoteSensor(CONSTANTS.getLimitSwitchChannel()) : null;
         /*
          * We can safely set LEDs even if there are no LEDs.
          * (The LED control hardware is built into the RoboRio and therfore always

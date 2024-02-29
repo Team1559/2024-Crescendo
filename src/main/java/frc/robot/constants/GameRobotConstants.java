@@ -108,15 +108,6 @@ public class GameRobotConstants extends AbstractConstants {
     }
 
     // #endregion
-
-    // #region: ----- Color Sensor -----
-    @Override
-    public int getColorSensorProximityThreshold() {
-        return 200; // TODO: Configure Value.
-    }
-
-    // #endregion
-
     // #region: ----- Feeder -----
     @Override
     public boolean isFeederMotorInverted() {

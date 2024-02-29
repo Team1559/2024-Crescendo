@@ -67,7 +67,7 @@ public class Aimer extends SubsystemBase {
             double kF = 0.7;
             double ff = kF * Rotation2d.fromDegrees(inputs.targetAngleDegrees).getCos();
             double output = ff + controller.calculate(inputs.currentAngleDegrees);
-            output = Math.min(output, 2);
+            output = MathUtil.clamp(output, -2, 2);
             motorL.setVoltage(output);
             motorR.setVoltage(output);
         }

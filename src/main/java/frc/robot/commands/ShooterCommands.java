@@ -107,7 +107,7 @@ public class ShooterCommands {
                 noteSensor.waitForNoObjectCommandSwitch(), new WaitCommand(5));
 
         // TODO: Spin up flywheelsm if not already spinning.
-        return spinUpFlywheelCommand(flywheel).andThen(group);
+        return group;
     }
 
     public static Command spinUpFlywheelCommand(Flywheel flywheel) {

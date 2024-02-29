@@ -106,15 +106,6 @@ public class TestRobotConstants extends AbstractConstants {
     }
 
     // #endregion
-
-    // #region: ----- Color Sensor -----
-    @Override
-    public int getColorSensorProximityThreshold() {
-        throw new UnsupportedOperationException("Unimplemented method 'getColorSensorProximityThreshold'");
-    }
-
-    // #endregion
-
     // #region: ----- Feeder -----
 
     @Override
@@ -187,7 +178,7 @@ public class TestRobotConstants extends AbstractConstants {
     // #region: ----- LEDs -----
     @Override
     public int getLedLength() {
-        return 288;
+        return 144;
     }
 
     // #endregion
