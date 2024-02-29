@@ -95,7 +95,7 @@ public class Aimer extends SubsystemBase {
     // ========================= Functions =====================================
     public void aimAtTarget(Translation3d target, Translation2d currentPosition) {
         double distanceMeters = currentPosition.getDistance(target.toTranslation2d());
-        Logger.recordOutput("Aimer/DistanceToTarget", distanceMeters);
+        Logger.recordOutput("Shooter/Aimer/DistanceToTarget", distanceMeters);
 
         double distanceFeet = Units.metersToFeet(distanceMeters);
         Rotation2d angle = Rotation2d.fromDegrees(1.42 * distanceFeet * distanceFeet - 15.8 * distanceFeet + 55.8);
@@ -123,6 +123,10 @@ public class Aimer extends SubsystemBase {
     }
 
     // ========================= Commands ======================================
+    public Command aimAtTargetCommand(Translation3d target, Translation2d currentPosition) {
+        return new InstantCommand(() -> aimAtTarget(target, currentPosition), this);
+    }
+
     public Command setTargetAngleCommand(Rotation2d angle) {
         return new InstantCommand(() -> setTargetAngle(angle), this);
     }

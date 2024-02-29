@@ -3,6 +3,7 @@ package frc.robot.constants;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,13 +20,6 @@ import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
 public class GameRobotConstants extends AbstractConstants {
 
     // ==================== Methods (Ctrl + K, Ctrl + 8 to fold regions) =======
-    // #region: --------------- Alliance ---------------------------------------
-    public boolean shouldFlipPathIfAssignedAllianceIsNotDefault() {
-        return true;
-    }
-
-    // #endregion
-
     // #region: --------------- Capability Flags -------------------------------
     @Override
     public boolean hasAimerSubsystem() {
@@ -91,8 +85,8 @@ public class GameRobotConstants extends AbstractConstants {
     }
 
     @Override
-    public double getClimberMaxHeight() {
-        return 12;
+    public Measure<Distance> getClimberMaxHeight() {
+        return Inches.of(12);
     }
 
     // #endregion
@@ -125,20 +119,25 @@ public class GameRobotConstants extends AbstractConstants {
 
     // #region: ----- Feeder -----
     @Override
-    public boolean isFeederMortorInverted() {
+    public boolean isFeederMotorInverted() {
         return true;
     }
 
     @Override
-    public double getFeederForwardVelocity() {
-        // TODO: Configure Value.
-        return 3666;
+    public PID getFeederPidValues() {
+        return new PID(0.33 / CONSTANTS.getFeederVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000);
     }
 
     @Override
-    public double getFeederReverseVelocity() {
+    public Measure<Velocity<Angle>> getFeederVelocityForward() {
         // TODO: Configure Value.
-        return -getFeederForwardVelocity();
+        return RevolutionsPerSecond.of(3666);
+    }
+
+    @Override
+    public Measure<Velocity<Angle>> getFeederVelocityReverse() {
+        // TODO: Configure Value.
+        return getFeederVelocityForward().negate();
     }
 
     // #endregion
@@ -166,27 +165,32 @@ public class GameRobotConstants extends AbstractConstants {
 
     // #region: ----- Intake -----
     @Override
-    public boolean isIntakeMortorInverted() {
+    public boolean isIntakeMotorInverted() {
         return true;
     }
 
     @Override
-    public double getIntakeForwardVelocity() {
-        // TODO: Configure Value.
-        return 8250;
+    public PID getIntakePidValues() {
+        return new PID(0.33 / CONSTANTS.getIntakeVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000);
     }
 
     @Override
-    public double getIntakeReverseVelocity() {
+    public Measure<Velocity<Angle>> getIntakeVelocityForward() {
         // TODO: Configure Value.
-        return -getFeederForwardVelocity();
+        return RevolutionsPerSecond.of(8250);
+    }
+
+    @Override
+    public Measure<Velocity<Angle>> getIntakeVelocityReverse() {
+        // TODO: Configure Value.
+        return getFeederVelocityForward().negate();
     }
 
     // #endregion
 
     // #region: ----- LEDs -----
     @Override
-    public int getLedLenth() {
+    public int getLedLength() {
         return 144 * 3; // This is the number that WILL be on the robot
     }
 
@@ -216,28 +220,32 @@ public class GameRobotConstants extends AbstractConstants {
     // #endregion
 
     // #region: -------- Traverser --------
-    @Override
-    public double getTraverserFowardVelocity() { // TODO
-        return 5000;
-    }
-
-    @Override
-    public double getTraverserReverseVelocity() {
-        return -getTraverserFowardVelocity();
-    }
 
     @Override
     public boolean isTraverserInverted() {
         return true;
     }
 
+    @Override
+    public PID getTraverserPidValues() {
+        return new PID(0.33 / CONSTANTS.getTraverserVelocity().in(RevolutionsPerSecond), 0, 0, 11.0 / 11000);
+    }
+
+    @Override
+    public Measure<Velocity<Angle>> getTraverserVelocity() { // TODO
+        return RevolutionsPerSecond.of(5000);
+    }
+
     // #endregion
 
     // #region: ----- Vision -----
+    @Override
+    public String getCameraNameBack() {
+        return "limelight-back";
+    }
 
     @Override
-    public String getCameraName() {
-        // TODO Auto-generated method stub
+    public String getCameraNameFront() {
         return "limelight";
     }
 

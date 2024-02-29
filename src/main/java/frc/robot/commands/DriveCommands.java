@@ -248,7 +248,8 @@ public class DriveCommands {
         return Commands.run(
                 () -> {
                     double linearMagnitude = calculateLinearMagnitude(xSupplier, ySupplier);
-                    double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), CONSTANTS.getJoystickDeadband());
+                    double omega = MathUtil.applyDeadband(-omegaSupplier.getAsDouble(),
+                            CONSTANTS.getJoystickDeadband());
                     omega = Math.copySign(omega * omega, omega);
 
                     // Calcaulate new linear velocity.

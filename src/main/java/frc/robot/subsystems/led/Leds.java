@@ -62,8 +62,8 @@ public class Leds extends SubsystemBase {
      */
     public Leds() {
         addressableLED = new AddressableLED(CONSTANTS.getLedPort());
-        addressableLED.setLength(CONSTANTS.getLedLenth());
-        ledBuffer = new AddressableLEDBuffer(CONSTANTS.getLedLenth());
+        addressableLED.setLength(CONSTANTS.getLedLength());
+        ledBuffer = new AddressableLEDBuffer(CONSTANTS.getLedLength());
         addressableLED.start();
     }
 

@@ -1,8 +1,10 @@
 package frc.robot.subsystems.single_motor;
 
+import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.units.Velocity;
 
 public class SingleMotorIoReplay implements SingleMotorIo {
 
@@ -20,7 +22,7 @@ public class SingleMotorIoReplay implements SingleMotorIo {
     }
 
     @Override
-    public void setVelocity(double velocity) {
+    public void setVelocity(Measure<Velocity<Angle>> velocity) {
         // No functionality.
     }
 }

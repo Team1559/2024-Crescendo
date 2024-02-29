@@ -1,48 +1,54 @@
 package frc.robot.subsystems.single_motor;
 
+import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 import static frc.robot.constants.AbstractConstants.CONSTANTS;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SingleMotorSubsystem extends SubsystemBase {
 
-    private final double DEFAULT_FORWARDS_VELOCITY;
-    private final double DEFAULT_REVERSE_VELOCITY;
+    private final Measure<Velocity<Angle>> DEFAULT_FORWARDS_VELOCITY;
+    private final Measure<Velocity<Angle>> DEFAULT_REVERSE_VELOCITY;
 
     private final SingleMotorIo io;
     private final SingleMotorIoInputsAutoLogged inputs = new SingleMotorIoInputsAutoLogged();
 
-    private double appliedVelocity;
+    private Measure<Velocity<Angle>> appliedVelocity;
 
     /**
      * Create a new subsystem for a single motor in velocity mode
      * 
-     * @param name Name of subsystem
-     * @param io   SingleMotorIO instance for the specific motor type
+     * @param name     Name of subsystem
+     * @param io       SingleMotorIO instance for the specific motor type
+     * @param velocity Will be used for forwards and backwards.
      */
-    protected SingleMotorSubsystem(String name, SingleMotorIo io, double velocity) {
+    protected SingleMotorSubsystem(String name, SingleMotorIo io, Measure<Velocity<Angle>> velocity) {
         this(name, io, velocity, velocity);
 
     }
 
-    protected SingleMotorSubsystem(String name, SingleMotorIo io, double forwardsVelocity, double reverseVelocity) {
+    protected SingleMotorSubsystem(String name, SingleMotorIo io, Measure<Velocity<Angle>> forwardsVelocity,
+            Measure<Velocity<Angle>> reverseVelocity) {
 
         super(name);
 
         this.io = io;
         this.DEFAULT_FORWARDS_VELOCITY = forwardsVelocity;
         this.DEFAULT_REVERSE_VELOCITY = reverseVelocity;
-        this.appliedVelocity = 0;
+        this.appliedVelocity = RevolutionsPerSecond.zero();
     }
 
     @Override
     public void periodic() {
 
-        // Set Velocitys.
+        // Set Velocity.
         io.setVelocity(appliedVelocity);
 
         // Log Inputs.
@@ -60,7 +66,7 @@ public class SingleMotorSubsystem extends SubsystemBase {
         setVelocity(DEFAULT_REVERSE_VELOCITY);
     }
 
-    public void setVelocity(double velocity) {
+    public void setVelocity(Measure<Velocity<Angle>> velocity) {
         appliedVelocity = velocity;
     }
 
@@ -69,7 +75,7 @@ public class SingleMotorSubsystem extends SubsystemBase {
     }
 
     public void stop() {
-        setVelocity(0.0);
+        setVelocity(RevolutionsPerSecond.zero());
     }
 
     // ========================= Commands =========================

@@ -7,6 +7,6 @@ import frc.robot.subsystems.single_motor.SingleMotorSubsystem;
 
 public class Intake extends SingleMotorSubsystem {
     public Intake(SingleMotorIo io) {
-        super("Shooter/Intake", io, CONSTANTS.getIntakeForwardVelocity(), CONSTANTS.getIntakeReverseVelocity());
+        super("Shooter/Intake", io, CONSTANTS.getIntakeVelocityForward(), CONSTANTS.getIntakeVelocityReverse());
     }
 }

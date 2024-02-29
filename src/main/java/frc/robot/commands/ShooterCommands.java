@@ -14,30 +14,9 @@ import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.Intake;
 import frc.robot.subsystems.shooter.NoteSensor;
+import frc.robot.subsystems.single_motor.SingleMotorIoNeo550Brushless;
 
 public class ShooterCommands {
-    public static class IntakeCommand extends Command {
-        private final Intake intake;
-        private final Feeder feeder;
-
-        public IntakeCommand(Intake intake, Feeder feeder) {
-            this.intake = intake;
-            this.feeder = feeder;
-            addRequirements(intake, feeder);
-        }
-
-        @Override
-        public void initialize() {
-            intake.start();
-            feeder.start();
-        }
-
-        @Override
-        public void end(boolean interrupted) {
-            intake.stop();
-            feeder.stop();
-        }
-    }
 
     /** Makes Class non-instantiable */
     private ShooterCommands() {
@@ -46,7 +25,7 @@ public class ShooterCommands {
     // ========================= Default Commands =========================
     public static Command defaultIntakeCommand(Intake intake, NoteSensor sensor) {
         return Commands.run(() -> {
-            if (sensor.isObjectDetectedSwitch()) {
+            if (sensor.isObjectDetected()) {
                 intake.stop();
             } else {
                 intake.start();
@@ -56,7 +35,7 @@ public class ShooterCommands {
 
     public static Command defaultFeederCommand(Feeder feeder, NoteSensor sensor) {
         return Commands.run(() -> {
-            if (sensor.isObjectDetectedSwitch()) {
+            if (sensor.isObjectDetected()) {
                 feeder.stop();
             } else {
                 feeder.start();
@@ -69,6 +48,25 @@ public class ShooterCommands {
     }
 
     // ========================= Other Commands =========================
+
+    public static Command intakeStartStopCommand(Intake intake, Feeder feeder) {
+        return new StartEndCommand(
+                () -> {
+                    intake.start();
+                    feeder.start();
+                },
+                () -> {
+                    intake.stop();
+                    feeder.stop();
+                },
+                intake, feeder);
+    }
+
+    public static Command reverseShooterAndIntakeCommand(Intake intake, Feeder feeder, Flywheel flywheel) {
+        return new ParallelCommandGroup(new StartEndCommand(flywheel::reverse, flywheel::stop, flywheel),
+                new StartEndCommand(feeder::reverse, feeder::stop, feeder),
+                new StartEndCommand(intake::reverse, intake::stop, intake));
+    }
 
     public static Command reverseShooterCommand(Flywheel flywheel, Feeder feeder, Leds leds) {
         Command reverseShooterCommand = new Command() {
@@ -103,7 +101,8 @@ public class ShooterCommands {
             Leds leds) {
 
         ParallelRaceGroup group = new ParallelRaceGroup(new StartEndCommand(intake::start, intake::stop, intake),
-                new StartEndCommand(() -> feeder.setVelocity(11000), feeder::stop, feeder),
+                new StartEndCommand(() -> feeder.setVelocity(SingleMotorIoNeo550Brushless.MAX_VELOCITY), feeder::stop,
+                        feeder),
                 leds.setColorCommand(Color.kPurple).repeatedly(),
                 noteSensor.waitForNoObjectCommandSwitch(), new WaitCommand(5));
 
@@ -124,11 +123,5 @@ public class ShooterCommands {
             feeder.stop();
             leds.setDynamicPattern(new Color[] { Color.kRed, Color.kRed, Color.kBlack, Color.kBlack }, true);
         }, intake, feeder);
-    }
-
-    public static Command reverseShooterAndIntakeCommand(Intake intake, Feeder feeder, Flywheel flywheel) {
-        return new ParallelCommandGroup(new StartEndCommand(flywheel::reverse, flywheel::stop, flywheel),
-                new StartEndCommand(feeder::reverse, feeder::stop, feeder),
-                new StartEndCommand(intake::reverse, intake::stop, intake));
     }
 }

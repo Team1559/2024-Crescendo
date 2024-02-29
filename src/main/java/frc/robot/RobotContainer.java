@@ -11,8 +11,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -21,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.LedCommands;
 import frc.robot.commands.ShooterCommands;
-import frc.robot.commands.ShooterCommands.IntakeCommand;
 import frc.robot.subsystems.base.DriveBase;
 import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
 import frc.robot.subsystems.climber.Climber;
@@ -68,11 +65,11 @@ public class RobotContainer {
 
     private final Aimer aimer;
     private final Climber climber;
-    private final NoteSensor noteSensor;
     private final Feeder feeder;
     private final Flywheel flywheel;
     private final Intake intake;
     private final Leds leds;
+    private final NoteSensor noteSensor;
     private final Vision vision;
     private final Traverser traverser;
 
@@ -95,25 +92,20 @@ public class RobotContainer {
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
                 feeder = CONSTANTS.hasFeederSubsystem()
                         ? new Feeder(new SingleMotorIoNeo550Brushless(CONSTANTS.getFeederMotorId(),
-                                CONSTANTS.isFeederMortorInverted(), .33 / CONSTANTS.getFeederForwardVelocity(), 0, 0,
-                                1.0 / 11000)) // TODO - Constants
+                                CONSTANTS.isFeederMotorInverted(), CONSTANTS.getFeederPidValues()))
                         : null;
                 intake = CONSTANTS.hasIntakeSubsystem()
                         ? new Intake(new SingleMotorIoNeo550Brushless(CONSTANTS.getIntakeMotorId(),
-                                CONSTANTS.isIntakeMortorInverted(), .33 / CONSTANTS.getIntakeForwardVelocity(), 0, 0,
-                                1.0 / 11000)) // TODO - Constants
-                        : null;
-                vision = CONSTANTS.hasVisionSubsystem()
-                        ? new Vision(driveBase.poseEstimator, new VisionIoLimelight(CONSTANTS.getCameraName()),
-                                new VisionIoLimelight("limelight-back"))
+                                CONSTANTS.isIntakeMotorInverted(), CONSTANTS.getIntakePidValues()))
                         : null;
                 traverser = CONSTANTS.hasTraverserSubsystem()
                         ? new Traverser(new SingleMotorIoNeo550Brushless(CONSTANTS.getTraverserMotorId(),
-                                CONSTANTS.isTraverserInverted(), .33 / CONSTANTS.getTraverserFowardVelocity(), 0, 0,
-                                11.0 / 11000))
-                        // TODO - Constants
+                                CONSTANTS.isTraverserInverted(), CONSTANTS.getTraverserPidValues()))
                         : null;
-                climber = CONSTANTS.hasClimberSubsystem() ? new Climber() : null;
+                vision = CONSTANTS.hasVisionSubsystem()
+                        ? new Vision(driveBase.poseEstimator, new VisionIoLimelight(CONSTANTS.getCameraNameFront()),
+                                new VisionIoLimelight(CONSTANTS.getCameraNameBack()))
+                        : null;
                 break;
 
             case SIMULATION:
@@ -126,20 +118,19 @@ public class RobotContainer {
                         new SwerveModuleIoSim());
                 feeder = CONSTANTS.hasFeederSubsystem()
                         ? new Feeder(new SingleMotorIoNeo550Brushless(CONSTANTS.getFeederMotorId(),
-                                CONSTANTS.isFeederMortorInverted(), 0, 0, 0, 1)) // TODO constants
+                                CONSTANTS.isFeederMotorInverted(), CONSTANTS.getIntakePidValues()))
                         : null;
                 intake = CONSTANTS.hasIntakeSubsystem()
                         ? new Intake(new SingleMotorIoNeo550Brushless(CONSTANTS.getIntakeMotorId(),
-                                CONSTANTS.isIntakeMortorInverted(), 0, 0, 0, 1)) // TODO constants
+                                CONSTANTS.isIntakeMotorInverted(), CONSTANTS.getIntakePidValues()))
+                        : null;
+                traverser = CONSTANTS.hasTraverserSubsystem()
+                        ? new Traverser(new SingleMotorIoNeo550Brushless(CONSTANTS.getTraverserMotorId(),
+                                CONSTANTS.isTraverserInverted(), CONSTANTS.getTraverserPidValues()))
                         : null;
                 vision = CONSTANTS.hasVisionSubsystem()
                         ? new Vision(driveBase.poseEstimator, new VisionIoSimAndReplay())
                         : null;
-                traverser = CONSTANTS.hasTraverserSubsystem()
-                        ? new Traverser(new SingleMotorIoNeo550Brushless(CONSTANTS.getTraverserMotorId(),
-                                CONSTANTS.isTraverserInverted(), 0, 0, 0, 1)) // TODO constants
-                        : null;
-                climber = CONSTANTS.hasClimberSubsystem() ? new Climber() : null;
                 break;
 
             case LOG_REPLAY:
@@ -152,13 +143,10 @@ public class RobotContainer {
                         new SwerveModuleIoReplay());
                 feeder = CONSTANTS.hasFeederSubsystem() ? new Feeder(new SingleMotorIoReplay()) : null;
                 intake = CONSTANTS.hasIntakeSubsystem() ? new Intake(new SingleMotorIoReplay()) : null;
+                traverser = CONSTANTS.hasTraverserSubsystem() ? new Traverser(new SingleMotorIoReplay()) : null;
                 vision = CONSTANTS.hasVisionSubsystem()
                         ? new Vision(driveBase.poseEstimator, new VisionIoSimAndReplay())
                         : null;
-                traverser = CONSTANTS.hasTraverserSubsystem()
-                        ? new Traverser(new SingleMotorIoReplay())
-                        : null;
-                climber = CONSTANTS.hasClimberSubsystem() ? new Climber() : null;
                 break;
 
             default:
@@ -169,8 +157,9 @@ public class RobotContainer {
 
         // #region: Initialize Subsystems without Simulation and/or Log Replay Mode
         aimer = CONSTANTS.hasAimerSubsystem() ? new Aimer() : null;
-        noteSensor = CONSTANTS.hasNoteSensorSubsystem() ? new NoteSensor() : null;
+        climber = CONSTANTS.hasClimberSubsystem() ? new Climber() : null;
         flywheel = CONSTANTS.hasFlywheelSubsystem() ? new Flywheel() : null;
+        noteSensor = CONSTANTS.hasNoteSensorSubsystem() ? new NoteSensor() : null;
         /*
          * We can safely set LEDs even if there are no LEDs.
          * (The LED control hardware is built into the RoboRio and therfore always
@@ -182,29 +171,31 @@ public class RobotContainer {
 
         // #region: ==================== Default Commands & Triggers ===========
         // #region: ---------- Configure Default Commands ----------
-        driveBase.setDefaultCommand(DriveCommands.manualDriveDefaultCommand(driveBase, pilot::getLeftY, pilot::getLeftX,
-                () -> -pilot.getRightX()));
-        leds.setDefaultCommand(LedCommands.defaultLedCommand(leds));
+        driveBase.setDefaultCommand(
+                DriveCommands.manualDriveDefaultCommand(driveBase, pilot::getLeftY, pilot::getLeftX, pilot::getRightX));
         if (CONSTANTS.hasFlywheelSubsystem()) {
             flywheel.setDefaultCommand(ShooterCommands.defaultFlywheelCommand(flywheel));
         }
+        leds.setDefaultCommand(LedCommands.defaultLedCommand(leds));
 
         // #endregion
 
         // #region: ---------- Configure Command Triggers ----------
         if (CONSTANTS.hasNoteSensorSubsystem()) {
-            new Trigger((noteSensor::isObjectDetectedSwitch)).whileTrue(leds.setColorCommand(Color.kBrown));
+            new Trigger((noteSensor::isObjectDetected)).whileTrue(leds.setColorCommand(Color.kBrown));
         }
         // TODO: Add LED Trigger for Ready to Shoot.
         // #endregion
+
         // #region: ---------- Motor Overheat Triggers ----------
         new Trigger(driveBase::isTemperatureTooHigh)
                 .whileTrue(driveBase.stopCommand()
                         .alongWith(leds.setDynamicPatternCommand(CONSTANTS.OVERHEAT_EMERGENCY_PATTERN, false)));
-        if (CONSTANTS.hasIntakeSubsystem()) {
+        if (CONSTANTS.hasFlywheelSubsystem()) {
             new Trigger(flywheel::isTemperatureTooHigh).whileTrue(flywheel.stopCommand()
                     .alongWith(leds.setDynamicPatternCommand(CONSTANTS.OVERHEAT_EMERGENCY_PATTERN, false)));
         }
+        // TODO: Make a generic SingleMotorSubsystem overheat command.
         if (CONSTANTS.hasIntakeSubsystem()) {
             new Trigger(intake::isTemperatureTooHigh).whileTrue(intake.stopCommand()
                     .alongWith(leds.setDynamicPatternCommand(CONSTANTS.OVERHEAT_EMERGENCY_PATTERN, false)));
@@ -223,21 +214,19 @@ public class RobotContainer {
         // #region: ==================== Autonomous ============================
         // ---------- Create Named Commands for use by Path Planner ----------
         NamedCommands.registerCommand("Spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
-        NamedCommands.registerCommand("StartIntake", new ShooterCommands.IntakeCommand(intake, feeder));
+        if (CONSTANTS.hasIntakeSubsystem() && CONSTANTS.hasFeederSubsystem()) {
+            NamedCommands.registerCommand("StartIntake", ShooterCommands.intakeStartStopCommand(intake, feeder));
+        }
         if (CONSTANTS.hasFlywheelSubsystem()) {
             NamedCommands.registerCommand("Spin Up Flywheel", ShooterCommands.spinUpFlywheelCommand(flywheel));
         }
-
-        Command aimAtSpeakerCommand = Commands.parallel(
-                DriveCommands.turnToTargetCommand(driveBase, CONSTANTS::getSpeakerLocation, 4.5), new InstantCommand(
-                        () -> aimer.aimAtTarget(CONSTANTS.getSpeakerLocation(), driveBase.getPose().getTranslation())));
-        Command autoShootCommand;
-        if (CONSTANTS.hasFeederSubsystem() && CONSTANTS.hasNoteSensorSubsystem()) {
-            autoShootCommand = ShooterCommands.shootAutonomousCommand(feeder, leds, noteSensor);
-        } else {
-            autoShootCommand = LedCommands.blinkCommand(leds, Color.kOrange);
+        if (CONSTANTS.hasFeederSubsystem() && CONSTANTS.hasNoteSensorSubsystem() && CONSTANTS.hasAimerSubsystem()) {
+            NamedCommands.registerCommand("Auto Shoot", new SequentialCommandGroup(
+                    new ParallelCommandGroup(
+                            DriveCommands.turnToTargetCommand(driveBase, CONSTANTS::getSpeakerLocation, 4.5),
+                            aimer.aimAtTargetCommand(CONSTANTS.getSpeakerLocation(), driveBase.getTranslation())),
+                    ShooterCommands.shootAutonomousCommand(feeder, leds, noteSensor)));
         }
-        NamedCommands.registerCommand("Auto Shoot", new SequentialCommandGroup(aimAtSpeakerCommand, autoShootCommand));
 
         // ---------- Set-up Autonomous Choices ----------
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -260,11 +249,11 @@ public class RobotContainer {
         // #endregion
 
         // #region: ---------- Configure Controller 1 for Co-Pilot ----------
-        if (CONSTANTS.hasIntakeSubsystem() && CONSTANTS.hasFeederSubsystem()) {
+        if (CONSTANTS.hasIntakeSubsystem() && CONSTANTS.hasFeederSubsystem() && CONSTANTS.hasFlywheelSubsystem()) {
 
             if (CONSTANTS.hasNoteSensorSubsystem()) {
-                coPilot.leftTrigger().and(not(noteSensor::isObjectDetectedSwitch))
-                        .whileTrue(new ParallelCommandGroup(new IntakeCommand(intake, feeder), flywheel.stopCommand()));
+                coPilot.leftTrigger().and(not(noteSensor::isObjectDetected)).whileTrue(new ParallelCommandGroup(
+                        ShooterCommands.intakeStartStopCommand(intake, feeder), flywheel.stopCommand()));
             }
             coPilot.x().whileTrue(ShooterCommands.reverseShooterAndIntakeCommand(intake, feeder, flywheel));
         }

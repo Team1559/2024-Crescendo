@@ -20,13 +20,6 @@ import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
 public class TestRobotConstants extends AbstractConstants {
 
     // ==================== Methods (Ctrl + K, Ctrl + 8 to fold regions) =======
-    // #region: --------------- Alliance ---------------------------------------
-    public boolean shouldFlipPathIfAssignedAllianceIsNotDefault() {
-        return true;
-    }
-
-    // #endregion
-
     // #region: --------------- Capability Flags -------------------------------
     @Override
     public boolean hasAimerSubsystem() {
@@ -103,7 +96,7 @@ public class TestRobotConstants extends AbstractConstants {
 
     // #region: ----- Climber -----
     @Override
-    public double getClimberMaxHeight() {
+    public Measure<Distance> getClimberMaxHeight() {
         throw new UnsupportedOperationException("Unimplemented method 'getClimberMaxHeight'");
     }
 
@@ -125,17 +118,23 @@ public class TestRobotConstants extends AbstractConstants {
     // #region: ----- Feeder -----
 
     @Override
-    public boolean isFeederMortorInverted() {
+    public boolean isFeederMotorInverted() {
         throw new UnsupportedOperationException("Unimplemented method 'isFeederMortorInverted'");
     }
 
     @Override
-    public double getFeederForwardVelocity() {
+    public PID getFeederPidValues() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getFeederPidValues'");
+    }
+
+    @Override
+    public Measure<Velocity<Angle>> getFeederVelocityForward() {
         throw new UnsupportedOperationException("Unimplemented method 'getFeederForwardVoltage'");
     }
 
     @Override
-    public double getFeederReverseVelocity() {
+    public Measure<Velocity<Angle>> getFeederVelocityReverse() {
         throw new UnsupportedOperationException("Unimplemented method 'getFeederReverseVoltage'");
     }
 
@@ -163,17 +162,23 @@ public class TestRobotConstants extends AbstractConstants {
     // #region: ----- Intake -----
 
     @Override
-    public boolean isIntakeMortorInverted() {
+    public boolean isIntakeMotorInverted() {
         throw new UnsupportedOperationException("Unimplemented method 'isIntakeMortorInverted'");
     }
 
     @Override
-    public double getIntakeForwardVelocity() {
+    public PID getIntakePidValues() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getIntakePidValues'");
+    }
+
+    @Override
+    public Measure<Velocity<Angle>> getIntakeVelocityForward() {
         throw new UnsupportedOperationException("Unimplemented method 'getIntakeForwardVoltage'");
     }
 
     @Override
-    public double getIntakeReverseVelocity() {
+    public Measure<Velocity<Angle>> getIntakeVelocityReverse() {
         throw new UnsupportedOperationException("Unimplemented method 'getIntakeReverseVoltage'");
     }
 
@@ -181,7 +186,7 @@ public class TestRobotConstants extends AbstractConstants {
 
     // #region: ----- LEDs -----
     @Override
-    public int getLedLenth() {
+    public int getLedLength() {
         return 288;
     }
 
@@ -211,14 +216,16 @@ public class TestRobotConstants extends AbstractConstants {
     // #endregion
 
     // #region: ----- Traverser -----
+
     @Override
-    public double getTraverserFowardVelocity() {
-        throw new UnsupportedOperationException("Unimplemented method 'getTraverserFowardVoltage'");
+    public PID getTraverserPidValues() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getTraverserPidValues'");
     }
 
     @Override
-    public double getTraverserReverseVelocity() {
-        throw new UnsupportedOperationException("Unimplemented method 'getTraverserReverseVoltage'");
+    public Measure<Velocity<Angle>> getTraverserVelocity() {
+        throw new UnsupportedOperationException("Unimplemented method 'getTraverserFowardVoltage'");
     }
 
     @Override
@@ -230,7 +237,12 @@ public class TestRobotConstants extends AbstractConstants {
 
     // #region: ----- Vision -----
     @Override
-    public String getCameraName() {
+    public String getCameraNameBack() {
+        throw new UnsupportedOperationException("Unimplemented method 'getCameraNameBack'");
+    }
+
+    @Override
+    public String getCameraNameFront() {
         return "limelight";
     }
 

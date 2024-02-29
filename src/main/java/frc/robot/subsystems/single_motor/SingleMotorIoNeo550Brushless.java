@@ -1,11 +1,18 @@
 package frc.robot.subsystems.single_motor;
 
+import static edu.wpi.first.units.Units.RevolutionsPerSecond;
+
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.units.Velocity;
+import frc.robot.constants.AbstractConstants.PID;
 
 public class SingleMotorIoNeo550Brushless extends SingleMotorIoSparkMax {
+
+    public static final Measure<Velocity<Angle>> MAX_VELOCITY = RevolutionsPerSecond.of(11000);
 
     /**
      * Create a new subsystem for a single SparkMax-controlled motor in voltage mode
@@ -13,13 +20,14 @@ public class SingleMotorIoNeo550Brushless extends SingleMotorIoSparkMax {
      * @param motorId  Motor CAN ID
      * @param inverted True if the motor direction should be inverted
      */
-    public SingleMotorIoNeo550Brushless(int motorId, boolean inverted, double kp, double ki, double kd, double ff) {
-        super(motorId, inverted, kp, ki, kd, ff);
+    public SingleMotorIoNeo550Brushless(int motorId, boolean inverted, PID pidValues) {
+        super(motorId, inverted, pidValues);
     }
 
     @Override
-    public void setVelocity(double velocity) {
-        super.setVelocity(MathUtil.clamp(velocity, -11000, 11000));
+    public void setVelocity(Measure<Velocity<Angle>> velocity) {
+        super.setVelocity(RevolutionsPerSecond.of(MathUtil.clamp(velocity.in(RevolutionsPerSecond),
+                MAX_VELOCITY.negate().in(RevolutionsPerSecond), MAX_VELOCITY.in(RevolutionsPerSecond))));
     }
 
     public Measure<Temperature> getMaxSafeTemperature() {

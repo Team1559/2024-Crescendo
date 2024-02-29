@@ -40,15 +40,31 @@ public abstract class AbstractConstants {
     }
 
     // ========================= Static Classes ================================
+    /**
+     * Contains PID values and a Feed Forward (FF) value.
+     */
     public static class PID {
-        public final double P, I, D;
 
-        PID(double p, double i, double d) {
+        public final double P, I, D, FF;
+
+        /**
+         * Constructs this PID object with a FF value of 0.
+         */
+        public PID(double p, double i, double d) {
+            this(p, i, d, 0);
+        }
+
+        public PID(double p, double i, double d, double ff) {
             P = p;
             I = i;
             D = d;
+            FF = ff;
         }
 
+        /**
+         * @returns A {@link PIDController} with the defined {@link #P}, {@link #I}, &
+         *          {@link #D} values.
+         */
         public PIDController createController() {
             return new PIDController(P, I, D);
         }
@@ -77,40 +93,12 @@ public abstract class AbstractConstants {
     }
 
     // ========================= Static CONSTANTS ==============================
-    private static final boolean FORCE_GAME_ROBOT_CONSTANTS = false;
-    private static final AbstractConstants GAME_ROBOT_CONSTANTS = new GameRobotConstants();
-    private static final AbstractConstants TEST_ROBOT_CONSTANTS = new TestRobotConstants();
 
-    public static final boolean TECHNICIAN_CONTROLLER_ENABLED = false;
-    public static final AbstractConstants CONSTANTS = isGameRobot() ? GAME_ROBOT_CONSTANTS : TEST_ROBOT_CONSTANTS;
-
-    private static final Translation3d SPEAKER_LOCATION_BLUE = new Translation3d(Units.inchesToMeters(-1.5),
-            Units.inchesToMeters(218.42),
-            Units.inchesToMeters(80.5));
-    private static final Translation3d SPEAKER_LOCATION_RED = new Translation3d(Units.inchesToMeters(652.73),
-            Units.inchesToMeters(218.42),
-            Units.inchesToMeters(80.5));
-    private static final Translation3d AMP_LOCATION_RED = new Translation3d(Units.inchesToMeters(72.5),
-            Units.inchesToMeters(323.00),
-            Units.inchesToMeters(44));
-    private static final Translation3d AMP_LOCATION_BLUE = new Translation3d(Units.inchesToMeters(578.77),
-            Units.inchesToMeters(323.00),
-            Units.inchesToMeters(44));
     // ========================= Static Variables ==============================
     private static Map<String, Set<Integer>> uniqueCanBusIds;
     private static Map<RoboRioPortArrays, Set<Integer>> uniqueRoboRioPorts;
 
     // ========================= Static Methods ================================
-    public static boolean isGameRobot() {
-        String roboRioSerialNumber = System.getenv("serialnum");
-        System.out.println("Serial Number = " + System.getenv("serialnum"));
-        roboRioSerialNumber = roboRioSerialNumber == null ? "" : roboRioSerialNumber.trim();
-
-        return FORCE_GAME_ROBOT_CONSTANTS
-                || roboRioSerialNumber.equalsIgnoreCase(GAME_ROBOT_CONSTANTS.getRoboRioSerialNumber())
-                || !roboRioSerialNumber.equalsIgnoreCase(TEST_ROBOT_CONSTANTS.getRoboRioSerialNumber());
-    }
-
     private static int uniqueCanBusId(int id) {
         return uniqueCanBusId(id, null);
     }
@@ -136,12 +124,7 @@ public abstract class AbstractConstants {
         uniqueRoboRioPorts = uniqueRoboRioPorts == null ? new HashMap<>() : uniqueRoboRioPorts;
         Set<Integer> ports = uniqueRoboRioPorts.get(portArray);
         if (ports == null) {
-            ports = new HashSet<>() {
-                {
-                    add(port);
-                }
-            };
-            uniqueRoboRioPorts.put(portArray, ports);
+            uniqueRoboRioPorts.put(portArray, new HashSet<>(Arrays.asList(port)));
         } else if (!ports.add(port)) {
             throw new RuntimeException("Duplicate roboRIO Port (" + port + ")!");
         }
@@ -149,7 +132,27 @@ public abstract class AbstractConstants {
         return port;
     }
 
-    // ==================== Methods (Ctrl + K, Ctrl + 8 to fold regions) =======
+    // ==================== "CONSTANTS" (Ctrl + K, Ctrl + 8 to fold regions) ===
+    // #region: --------------- Game Robot / Technician ------------------------
+    private static final boolean FORCE_GAME_ROBOT_CONSTANTS = true;
+    public static final boolean TECHNICIAN_CONTROLLER_ENABLED = false && !FORCE_GAME_ROBOT_CONSTANTS;
+
+    private static final AbstractConstants GAME_ROBOT_CONSTANTS = new GameRobotConstants();
+    private static final AbstractConstants TEST_ROBOT_CONSTANTS = new TestRobotConstants();
+    public static final AbstractConstants CONSTANTS = isGameRobot() ? GAME_ROBOT_CONSTANTS : TEST_ROBOT_CONSTANTS;
+
+    private static boolean isGameRobot() {
+        String roboRioSerialNumber = System.getenv("serialnum");
+        System.out.println("Serial Number = " + System.getenv("serialnum"));
+        roboRioSerialNumber = roboRioSerialNumber == null ? "" : roboRioSerialNumber.trim();
+
+        return FORCE_GAME_ROBOT_CONSTANTS
+                || roboRioSerialNumber.equalsIgnoreCase(GAME_ROBOT_CONSTANTS.getRoboRioSerialNumber())
+                || !roboRioSerialNumber.equalsIgnoreCase(TEST_ROBOT_CONSTANTS.getRoboRioSerialNumber());
+    }
+
+    // #endregion
+
     // #region: --------------- Alliance ---------------------------------------
     /**
      * @return The assigned Alliance or the {@link #getDefaultAllianceForAuto}, if
@@ -166,7 +169,9 @@ public abstract class AbstractConstants {
         return Alliance.Blue;
     }
 
-    public abstract boolean shouldFlipPathIfAssignedAllianceIsNotDefault();
+    public boolean shouldFlipPathIfAssignedAllianceIsNotDefault() {
+        return true;
+    }
 
     // #endregion
 
@@ -200,19 +205,33 @@ public abstract class AbstractConstants {
     // #endregion
 
     // #region: --------------- Game Objects -----------------------------------
+    private static final Translation3d SPEAKER_LOCATION_BLUE = new Translation3d(Units.inchesToMeters(-1.5),
+            Units.inchesToMeters(218.42),
+            Units.inchesToMeters(80.5));
+    private static final Translation3d SPEAKER_LOCATION_RED = new Translation3d(Units.inchesToMeters(652.73),
+            Units.inchesToMeters(218.42),
+            Units.inchesToMeters(80.5));
+
     public Translation3d getSpeakerLocation() {
         if (getAlliance() == Alliance.Blue) {
-            return CONSTANTS.SPEAKER_LOCATION_BLUE;
+            return AbstractConstants.SPEAKER_LOCATION_BLUE;
         } else {
-            return CONSTANTS.SPEAKER_LOCATION_RED;
+            return AbstractConstants.SPEAKER_LOCATION_RED;
         }
     }
 
+    private static final Translation3d AMP_LOCATION_RED = new Translation3d(Units.inchesToMeters(72.5),
+            Units.inchesToMeters(323.00),
+            Units.inchesToMeters(44));
+    private static final Translation3d AMP_LOCATION_BLUE = new Translation3d(Units.inchesToMeters(578.77),
+            Units.inchesToMeters(323.00),
+            Units.inchesToMeters(44));
+
     public Translation3d getAmpLocation() {
         if (getAlliance() == Alliance.Blue) {
-            return CONSTANTS.AMP_LOCATION_RED;
+            return AbstractConstants.AMP_LOCATION_RED;
         } else {
-            return CONSTANTS.AMP_LOCATION_BLUE;
+            return AbstractConstants.AMP_LOCATION_BLUE;
         }
     }
 
@@ -222,16 +241,17 @@ public abstract class AbstractConstants {
 
     // #region: ----- Climber --------
     public int getClimberMotorIdLeft() {
-        return 25;
+        return uniqueCanBusId(25, getCanivoreId());
     }
 
     public int getClimberMotorIdRight() {
-        return 24;
+        return uniqueCanBusId(24, getCanivoreId());
     }
 
     public abstract PID getClimberPid();
 
-    public abstract double getClimberMaxHeight();
+    public abstract Measure<Distance> getClimberMaxHeight();
+
     // #endregion
 
     // #region: ----- Aimer -----
@@ -272,11 +292,13 @@ public abstract class AbstractConstants {
         return uniqueCanBusId(21, getCanivoreId());
     }
 
-    public abstract boolean isFeederMortorInverted();
+    public abstract PID getFeederPidValues();
 
-    public abstract double getFeederForwardVelocity();
+    public abstract Measure<Velocity<Angle>> getFeederVelocityForward();
 
-    public abstract double getFeederReverseVelocity();
+    public abstract Measure<Velocity<Angle>> getFeederVelocityReverse();
+
+    public abstract boolean isFeederMotorInverted();
 
     // #endregion
 
@@ -309,20 +331,25 @@ public abstract class AbstractConstants {
         return uniqueCanBusId(20, getCanivoreId());
     }
 
-    public abstract boolean isIntakeMortorInverted();
+    public abstract PID getIntakePidValues();
 
-    public abstract double getIntakeForwardVelocity();
+    public abstract Measure<Velocity<Angle>> getIntakeVelocityForward();
 
-    public abstract double getIntakeReverseVelocity();
+    public abstract Measure<Velocity<Angle>> getIntakeVelocityReverse();
+
+    public abstract boolean isIntakeMotorInverted();
 
     // #endregion
 
     // #region: ----- LEDs -----
+    public static final Color[] OVERHEAT_EMERGENCY_PATTERN = new Color[] { Color.kYellow, Color.kYellow, Color.kRed,
+            Color.kRed, Color.kBlack, Color.kBlack };
+
     public int getLedPort() {
         return uniqueRoboRioPort(0, RoboRioPortArrays.PWM);
     }
 
-    public abstract int getLedLenth();
+    public abstract int getLedLength();
 
     // #endregion
 
@@ -358,21 +385,23 @@ public abstract class AbstractConstants {
     // #endregion
 
     // #region: ----- Traverser -----
-    public abstract double getTraverserFowardVelocity();
-
-    public abstract double getTraverserReverseVelocity();
-
     public int getTraverserMotorId() {
         // TODO: Add ID
         throw new UnsupportedOperationException("No Motor ID for Traverser");
     }
+
+    public abstract PID getTraverserPidValues();
+
+    public abstract Measure<Velocity<Angle>> getTraverserVelocity();
 
     public abstract boolean isTraverserInverted();
 
     // #endregion
 
     // #region: ----- Vision -----
-    public abstract String getCameraName();
+    public abstract String getCameraNameBack();
+
+    public abstract String getCameraNameFront();
 
     // #endregion
 
@@ -465,9 +494,5 @@ public abstract class AbstractConstants {
 
     public abstract Measure<Distance> getWheelRadius();
 
-    // #endregion
-    // #region: --------------- LED Patterns --------------------------------
-    public final Color[] OVERHEAT_EMERGENCY_PATTERN = new Color[] { Color.kYellow, Color.kYellow, Color.kRed,
-            Color.kRed, Color.kBlack, Color.kBlack };
     // #endregion
 }

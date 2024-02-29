@@ -2,8 +2,10 @@ package frc.robot.subsystems.single_motor;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
+import edu.wpi.first.units.Velocity;
 
 public interface SingleMotorIo {
 
@@ -22,5 +24,5 @@ public interface SingleMotorIo {
 
     public Measure<Temperature> getTemperature();
 
-    public void setVelocity(double velocityRPM);
+    public void setVelocity(Measure<Velocity<Angle>> velocityRPM);
 }

@@ -186,6 +186,11 @@ public class DriveBase extends SubsystemBase {
         return poseEstimator.getEstimatedPosition().getRotation();
     }
 
+    /** Returns the current odometry rotation. */
+    public Translation2d getTranslation() {
+        return poseEstimator.getEstimatedPosition().getTranslation();
+    }
+
     public boolean isTemperatureTooHigh() {
         for (IndexedSwerveModule module : modules) {
             if (module.isTemperatureTooHigh()) {
