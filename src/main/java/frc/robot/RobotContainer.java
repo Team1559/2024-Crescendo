@@ -42,7 +42,6 @@ import frc.robot.subsystems.swerve_module.SwerveModuleIoTalonFx;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIoLimelight;
 import frc.robot.subsystems.vision.VisionIoSimAndReplay;
-import frc.robot.util.KColor;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -68,7 +67,7 @@ public class RobotContainer {
     private final DriveBase driveBase;
 
     private final Aimer aimer;
-    private final Climber climber;
+    public final Climber climber;
     private final NoteSensor noteSensor;
     private final Feeder feeder;
     private final Flywheel flywheel;
@@ -194,7 +193,7 @@ public class RobotContainer {
 
         // #region: ---------- Configure Command Triggers ----------
         if (CONSTANTS.hasNoteSensorSubsystem()) {
-            new Trigger((noteSensor::isObjectDetectedSwitch)).whileTrue(LedCommands.blinkCommand(leds, KColor.kBrown));
+            new Trigger((noteSensor::isObjectDetectedSwitch)).whileTrue(leds.setColorCommand(Color.kGreen));
         }
         // TODO: Add LED Trigger for Ready to Shoot.
         // #endregion
@@ -255,9 +254,7 @@ public class RobotContainer {
                 pilot::getLeftY,
                 pilot::getLeftX,
                 CONSTANTS::getAmpLocation));
-
         pilot.y().onTrue(driveBase.resetFieldOrientationCommand());
-
         // #endregion
 
         // #region: ---------- Configure Controller 1 for Co-Pilot ----------

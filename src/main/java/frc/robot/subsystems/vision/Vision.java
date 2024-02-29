@@ -23,8 +23,9 @@ public class Vision extends SubsystemBase {
 
         public boolean havePose = false;
         public Pose2d pose = new Pose2d();
+        public double distanceToTarget;
         public double timestamp;
-        public double[] estimateStdDevs;
+        public double[] estimateStdDevs = new double[3];
     }
 
     public Vision(SwerveDrivePoseEstimator poseEstimator, VisionIo... ios) {

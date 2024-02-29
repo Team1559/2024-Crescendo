@@ -38,7 +38,7 @@ public class Climber extends SubsystemBase {
     private final ClimberInputsAutoLogged inputs = new ClimberInputsAutoLogged();
 
     public Climber() {
-        motorL.setInverted(true);
+        motorL.setInverted(false);
         motorR.setInverted(true);
         motorL.setIdleMode(IdleMode.kBrake);
         motorR.setIdleMode(IdleMode.kBrake);
