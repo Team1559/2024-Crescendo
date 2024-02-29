@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SingleMotorSubsystem extends SubsystemBase {
 
-    private final Measure<Velocity<Angle>> DEFAULT_FORWARDS_VELOCITY;
-    private final Measure<Velocity<Angle>> DEFAULT_REVERSE_VELOCITY;
+    protected final Measure<Velocity<Angle>> DEFAULT_FORWARDS_VELOCITY;
+    protected final Measure<Velocity<Angle>> DEFAULT_REVERSE_VELOCITY;
 
     private final SingleMotorIo io;
     private final SingleMotorIoInputsAutoLogged inputs = new SingleMotorIoInputsAutoLogged();

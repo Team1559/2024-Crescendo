@@ -216,7 +216,7 @@ public class TestRobotConstants extends AbstractConstants {
 
     @Override
     public Measure<Velocity<Angle>> getTraverserVelocity() {
-        throw new UnsupportedOperationException("Unimplemented method 'getTraverserFowardVoltage'");
+        throw new UnsupportedOperationException("Unimplemented method 'getTraverserVelocity'");
     }
 
     @Override

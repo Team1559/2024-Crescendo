@@ -1,5 +1,6 @@
 package frc.robot.subsystems.climber;
 
+import static edu.wpi.first.units.Units.Inches;
 import static frc.robot.constants.AbstractConstants.CONSTANTS;
 
 import org.littletonrobotics.junction.AutoLog;
@@ -10,6 +11,8 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,22 +22,22 @@ public class Climber extends SubsystemBase {
     @AutoLog
     static class ClimberInputs { // TODO: Log everything that SingleMotorIo is.
 
-        public double currentLeftPositionRotations;
-        public double currentRightPositionRotations;
-        public double currentAveragePositionRotations;
-        // TODO: Add currentAverageHeightInches
+        public double currentRotationsLeft;
+        public double currentRotationsRight;
+        public double currentHeightAverageInInches;
 
         public double targetHeightInches;
         public double targetRotations;
     }
 
+    // TODO: Move to Constants.
     private static final double ROTATIONS_PER_INCH = (5 * 5) * (5D / 3);
 
+    // TODO: Update CANSparkMax variables as SingleMotorIo variables.
     private final CANSparkMax motorL = new CANSparkMax(CONSTANTS.getClimberMotorIdLeft(), MotorType.kBrushless);
     private final CANSparkMax motorR = new CANSparkMax(CONSTANTS.getClimberMotorIdRight(), MotorType.kBrushless);
-    private final PIDController controller = new PIDController(CONSTANTS.getAimerPid().P, CONSTANTS.getAimerPid().I,
-            CONSTANTS.getAimerPid().D);
 
+    private final PIDController controller = CONSTANTS.getAimerPid().createController();
     private final ClimberInputsAutoLogged inputs = new ClimberInputsAutoLogged();
 
     public Climber() {
@@ -57,49 +60,49 @@ public class Climber extends SubsystemBase {
 
         // Set Voltages.
         if (controller.getSetpoint() != 0) {
-            double outputL = controller.calculate(inputs.currentLeftPositionRotations);
-            double outputR = controller.calculate(inputs.currentRightPositionRotations);
-            // TODO: Clamp the Voltage between Min/Max.
-            motorL.setVoltage(outputL);
-            motorR.setVoltage(outputR);
+            motorL.setVoltage(controller.calculate(inputs.currentRotationsLeft));
+            motorR.setVoltage(controller.calculate(inputs.currentRotationsRight));
         }
     }
 
     private void updateInputs() {
 
-        inputs.currentLeftPositionRotations = motorL.getEncoder().getPosition();
-        inputs.currentRightPositionRotations = motorR.getEncoder().getPosition();
-        inputs.currentAveragePositionRotations = (inputs.currentLeftPositionRotations
-                + inputs.currentRightPositionRotations) / 2;
+        inputs.currentRotationsLeft = motorL.getEncoder().getPosition();
+        inputs.currentRotationsRight = motorR.getEncoder().getPosition();
+        inputs.currentHeightAverageInInches = getHeight().in(Inches);
 
         inputs.targetRotations = controller.getSetpoint();
         inputs.targetHeightInches = inputs.targetRotations / ROTATIONS_PER_INCH;
     }
 
     // ========================= Functions =========================
-    // TODO: Take in Measure<Distance> instead.
-    public void setTargetHeight(double heightInches) {
-        controller.setSetpoint(heightInches * ROTATIONS_PER_INCH);
+    public void setHeight(Measure<Distance> height) {
+        // TODO: Clamp the Voltage between Min/Max.
+        controller.setSetpoint(height.in(Inches) * ROTATIONS_PER_INCH);
     }
 
-    // TODO: Take in Measure<Distance> instead.
-    public void modifyTargetHeight(double changeHeightInches) {
-        setTargetHeight(controller.getSetpoint() / ROTATIONS_PER_INCH + changeHeightInches);
+    public void modifyHeight(Measure<Distance> change) {
+        setHeight(getHeight().plus(change));
     }
 
-    // TODO: Return a Measure<Distance> instead.
-    public double getCurrentTargetHeightInches() {
-        return controller.getSetpoint() / ROTATIONS_PER_INCH;
+    public Measure<Distance> getHeight() {
+        return Inches
+                .of(((motorL.getEncoder().getPosition() + motorR.getEncoder().getPosition()) / 2) / ROTATIONS_PER_INCH);
     }
+
+    public Measure<Distance> getTargetHeight() {
+        return Inches.of(controller.getSetpoint());
+    }
+
+    // TODO: Add Stop Method.
 
     // ========================= Commands =========================
-    // TODO: Take in Measure<Distance> instead.
-    public Command setTargetHeightCommand(double heightInches) {
-        return new InstantCommand(() -> setTargetHeight(heightInches), this);
+    public Command setHeightCommand(Measure<Distance> height) {
+        return new InstantCommand(() -> setHeight(height), this);
     }
 
-    public Command incrementTargetHeightCommand(double incrementInches) {
-        return new InstantCommand(() -> modifyTargetHeight(incrementInches), this);
+    public Command modifyHeightCommand(Measure<Distance> change) {
+        return new InstantCommand(() -> modifyHeight(change), this);
     }
 
     // TODO: Create all Commanp Functions.

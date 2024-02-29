@@ -1,5 +1,6 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
 import static frc.robot.constants.AbstractConstants.CONSTANTS;
 import static frc.robot.util.SupplierUtil.not;
 
@@ -12,7 +13,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -260,7 +260,7 @@ public class RobotContainer {
 
         if (CONSTANTS.hasFeederSubsystem() && CONSTANTS.hasFlywheelSubsystem()) {
 
-            if (CONSTANTS.hasNoteSensorSubsystem()) {
+            if (CONSTANTS.hasIntakeSubsystem() && CONSTANTS.hasNoteSensorSubsystem()) {
                 coPilot.rightTrigger()
                         .onTrue(ShooterCommands.shootTeleopCommand(feeder, flywheel, intake, noteSensor, leds));
             }
@@ -268,21 +268,18 @@ public class RobotContainer {
         }
 
         if (CONSTANTS.hasClimberSubsystem()) {
-            coPilot.povUp().whileTrue(climber.incrementTargetHeightCommand(.1));
-            coPilot.povDown().whileTrue(climber.incrementTargetHeightCommand(-.1));
+            coPilot.povUp().whileTrue(climber.modifyHeightCommand(Inches.of(0.1)));
+            coPilot.povDown().whileTrue(climber.modifyHeightCommand(Inches.of(-0.1)));
         }
 
         if (CONSTANTS.hasTraverserSubsystem()) {
-            coPilot.povRight().whileTrue(traverser.startCommand());
-            coPilot.povLeft().whileTrue(traverser.reverseCommand());
+            coPilot.povRight().whileTrue(traverser.traverserRightStartStopCommand());
+            coPilot.povLeft().whileTrue(traverser.traverserLeftStartStopCommand());
         }
 
         if (CONSTANTS.hasAimerSubsystem()) {
-
-            coPilot.rightBumper()
-                    .whileTrue(new RunCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(.5))));
-            coPilot.leftBumper()
-                    .whileTrue(new RunCommand(() -> aimer.modifyTargetAngle(Rotation2d.fromDegrees(-.5))));
+            coPilot.rightBumper().whileTrue(aimer.modifyAngleCommand(Rotation2d.fromDegrees(0.5)));
+            coPilot.leftBumper().whileTrue(aimer.modifyAngleCommand(Rotation2d.fromDegrees(-0.5)));
         }
 
         // #endregion

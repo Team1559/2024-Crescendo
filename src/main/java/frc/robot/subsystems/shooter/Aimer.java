@@ -20,6 +20,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Aimer extends SubsystemBase {
@@ -94,23 +95,13 @@ public class Aimer extends SubsystemBase {
 
     // ========================= Functions =====================================
     public void aimAtTarget(Translation3d target, Translation2d currentPosition) {
+
         double distanceMeters = currentPosition.getDistance(target.toTranslation2d());
         Logger.recordOutput("Shooter/Aimer/DistanceToTarget", distanceMeters);
 
         double distanceFeet = Units.metersToFeet(distanceMeters);
         Rotation2d angle = Rotation2d.fromDegrees(1.42 * distanceFeet * distanceFeet - 15.8 * distanceFeet + 55.8);
-        setTargetAngle(angle);
-    }
-
-    public void setTargetAngle(Rotation2d angle) {
-
-        double targetAngle = MathUtil.clamp(angle.getDegrees(), CONSTANTS.getAimerAngleRange().get_0().getDegrees(),
-                CONSTANTS.getAimerAngleRange().get_1().getDegrees());
-        controller.setSetpoint(targetAngle);
-    }
-
-    public void modifyTargetAngle(Rotation2d change) {
-        setTargetAngle(Rotation2d.fromDegrees(controller.getSetpoint()).plus(change));
+        setAngle(angle);
     }
 
     public Rotation2d getTargetAngle() {
@@ -122,12 +113,32 @@ public class Aimer extends SubsystemBase {
         return Rotation2d.fromRotations(-encoder.getAbsolutePosition()).plus(CONSTANTS.getAimerEncoderOffset());
     }
 
+    public void modifyAngle(Rotation2d change) {
+        setAngle(getAngle().plus(change));
+    }
+
+    public void modifyTargetAngle(Rotation2d change) {
+        setAngle(Rotation2d.fromDegrees(controller.getSetpoint()).plus(change));
+    }
+
+    public void setAngle(Rotation2d angle) {
+        double targetAngle = MathUtil.clamp(angle.getDegrees(), CONSTANTS.getAimerAngleRange().get_0().getDegrees(),
+                CONSTANTS.getAimerAngleRange().get_1().getDegrees());
+        controller.setSetpoint(targetAngle);
+    }
+
     // ========================= Commands ======================================
     public Command aimAtTargetCommand(Translation3d target, Translation2d currentPosition) {
         return new InstantCommand(() -> aimAtTarget(target, currentPosition), this);
     }
 
-    public Command setTargetAngleCommand(Rotation2d angle) {
-        return new InstantCommand(() -> setTargetAngle(angle), this);
+    public Command modifyAngleCommand(Rotation2d change) {
+        return new RunCommand(() -> modifyAngle(change), this);
     }
+
+    public Command setAngleCommand(Rotation2d angle) {
+        return new InstantCommand(() -> setAngle(angle), this);
+    }
+
+    // TODO: Set all other functions as commands.
 }
