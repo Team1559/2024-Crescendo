@@ -23,6 +23,9 @@ import frc.robot.subsystems.swerve_module.SwerveModuleIoTalonFx;
 public class Flywheel extends SubsystemBase {
     @AutoLog
     static class FlywheelInputs {
+
+        public double targetVoltage;
+
         public double lMotorVoltage;
         public double rMotorVoltage;
 
@@ -35,8 +38,8 @@ public class Flywheel extends SubsystemBase {
         public double lVelocity;
         public double rVelocity;
 
-        public Measure<Temperature> rMotorTemp;
-        public Measure<Temperature> lMotorTemp;
+        public Measure<Temperature> rMotorTemp = Celsius.zero();
+        public Measure<Temperature> lMotorTemp = Celsius.zero();
 
         public int rFaults;
         public int lFaults;
@@ -107,7 +110,7 @@ public class Flywheel extends SubsystemBase {
         }
         if (runOneWheelFlag == null || !runOneWheelFlag) {
             flywheelMotorL.setControl(
-                    new VoltageOut(currentVoltage * CONSTANTS.getFlywheelMotorPowerDifferentialPercentage()));
+                    new VoltageOut(currentVoltage * CONSTANTS.flywheelSpinOffset()));
         }
 
         // Log Inputs.
@@ -123,6 +126,8 @@ public class Flywheel extends SubsystemBase {
                 flywheelLVelocity, flywheelRVelocity,
                 flywheelLMotorTemp, flywheelRMotorTemp,
                 flywheelLFaults, flywheelRFaults);
+
+        inputs.targetVoltage = currentVoltage;
 
         inputs.lMotorVoltage = flywheelLMotorVoltage.getValueAsDouble();
         inputs.rMotorVoltage = flywheelRMotorVoltage.getValueAsDouble();

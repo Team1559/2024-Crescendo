@@ -1,0 +1,52 @@
+package frc.robot.subsystems.shooter;
+
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+
+public class NoteSensor extends SubsystemBase {
+
+    @AutoLog
+    static class NoteSensorInputs {
+        public boolean isObjectDetectedSwitch;
+    }
+
+    private NoteSensorInputsAutoLogged inputs = new NoteSensorInputsAutoLogged();
+    private final DigitalInput limitSwitch;
+
+    public NoteSensor(int channel) {
+        limitSwitch = new DigitalInput(channel);
+    }
+
+    @Override
+    public void periodic() {
+        updateInputs();
+        Logger.processInputs("Shooter/Color Sensor", inputs);
+    }
+
+    private void updateInputs() {
+        inputs.isObjectDetectedSwitch = !limitSwitch.get();
+    }
+
+    /**
+     * Check if limit switch is activated
+     * 
+     * @return limit switch state;
+     */
+    public boolean isObjectDetectedSwitch() {
+        return inputs.isObjectDetectedSwitch;
+    }
+
+    // ========================= Commands =========================
+    public Command waitForObjectCommandSwitch() {
+        return new WaitUntilCommand(this::isObjectDetectedSwitch);
+    }
+
+    public Command waitForNoObjectCommandSwitch() {
+        return new WaitUntilCommand(() -> !isObjectDetectedSwitch());
+    }
+}

@@ -21,6 +21,7 @@ import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.base.DriveBase;
@@ -33,7 +34,122 @@ public class DriveCommands {
     private DriveCommands() {
     }
 
-    // TODO: Deduplicate code between this and the manualDriveDefaultCommand method.
+    /**
+     * Calculates and squares the linear magnitude for the swerve drive
+     * 
+     * @param xSupplier Joystick x
+     * @param ySupplier Joystick Y
+     * @return linear magnitude
+     */
+    private static double calculateLinearMagnitude(DoubleSupplier xSupplier, DoubleSupplier ySupplier) {
+        double magnitude = Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+        double clampedMagnitude = MathUtil.applyDeadband(magnitude, CONSTANTS.getJoystickDeadband());
+        // Square values, for more precision at slow speeds
+        return Math.pow(clampedMagnitude, 2);
+    }
+
+    private static Rotation2d calculateLinearDirection(DoubleSupplier xSupplier, DoubleSupplier ySupplier) {
+        Rotation2d stickDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+        return CONSTANTS.getAlliance() == Alliance.Red
+                ? stickDirection
+                : stickDirection.plus(Rotation2d.fromDegrees(180));
+    }
+
+    public static class AutoAimDriveCommand extends Command {
+        private final DriveBase driveBase;
+        private final Flywheel flywheel;
+        private final Aimer aimer;
+
+        private final DoubleSupplier xVelocity;
+        private final DoubleSupplier yVelocity;
+        private final Supplier<Translation3d> target;
+
+        private final PIDController pid;
+
+        public AutoAimDriveCommand(DriveBase driveBase, Flywheel flywheel, Aimer aimer, DoubleSupplier xVelocity,
+                DoubleSupplier yVelocity,
+                Supplier<Translation3d> target) {
+            this.driveBase = driveBase;
+            this.flywheel = flywheel;
+            this.aimer = aimer;
+
+            this.xVelocity = xVelocity;
+            this.yVelocity = yVelocity;
+            this.target = target;
+
+            pid = new PIDController(CONSTANTS.getMaxAngularSpeed().in(RadiansPerSecond) / 90, 0, 0);
+            pid.setTolerance(1);
+            pid.enableContinuousInput(-180, 180);
+        }
+
+        @Override
+        public void initialize() {
+            pid.setSetpoint(0);
+
+            if (flywheel != null) {
+                flywheel.start();
+            }
+        }
+
+        @Override
+        public void execute() {
+            double linearMagnitude = calculateLinearMagnitude(xVelocity, yVelocity);
+            // Calcaulate new linear velocity.
+            Rotation2d linearDirection = calculateLinearDirection(xVelocity, yVelocity);
+            Translation2d linearVelocity = new Pose2d(new Translation2d(), linearDirection)
+                    .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d())).getTranslation();
+
+            // Calculate omega velocity.
+            double degreesToTarget = driveBase.getRotationToTarget(target.get().toTranslation2d())
+                    .plus(Rotation2d.fromDegrees(180))
+                    .getDegrees();
+            /*
+             * Range:
+             * - If kd = 0: minimumInput * kp - ki <-> maximumInput * kp + ki.
+             * - If kd != 0: -Double.MAX_VALUE <-> Double.MAX_VALUE.
+             */
+            // We are inverting the direction because degreesToTarget is our "correction",
+            // but the PIDController wants our "position".
+            double omega = pid.calculate(-degreesToTarget);
+
+            omega = MathUtil.clamp(omega, // TODO: Use same units when calculating KP.
+                    -CONSTANTS.getMaxAngularSpeed().in(RadiansPerSecond),
+                    CONSTANTS.getMaxAngularSpeed().in(RadiansPerSecond));
+
+            // Scale Velocities to between 0 and Max.
+            double scaledXVelocity = linearVelocity.getX() * CONSTANTS.getMaxLinearSpeed().in(MetersPerSecond),
+                    scaledYVelocity = linearVelocity.getY() * CONSTANTS.getMaxLinearSpeed().in(MetersPerSecond);
+
+            // Run Velocities.
+            if (CONSTANTS.isDrivingModeFieldRelative()) {
+                driveBase.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(scaledXVelocity, scaledYVelocity,
+                        omega, driveBase.getRotation()));
+            } else {
+                driveBase.runVelocity(new ChassisSpeeds(scaledXVelocity, scaledYVelocity, omega));
+            }
+
+            aimer.aimAtTarget(target.get(), driveBase.getPose().getTranslation());
+
+            // TODO: Add Turning LEDs to Green, when close enough to shoot.
+
+            // Log Calculated Values.
+            Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/degreesToTarget", degreesToTarget);
+            Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/vxMetersPerSecond", scaledXVelocity);
+            Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/vyMetersPerSecond", scaledYVelocity);
+            Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/omegaRadiansPerSecond", omega);
+        }
+
+        @Override
+        public boolean isFinished() {
+            return false;
+        }
+
+        @Override
+        public void end(boolean interrupted) {
+            pid.close();
+        }
+    }
+
     public static Command autoAimAndManuallyDriveCommand(DriveBase driveBase,
             Flywheel flywheel,
             Aimer aimer,
@@ -58,17 +174,9 @@ public class DriveCommands {
 
             @Override
             public void execute() {
-
-                // Apply deadband.
-                double linearMagnitude = MathUtil.applyDeadband(
-                        Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
-                        CONSTANTS.getJoystickDeadband());
-
-                // Square values, to accelerate mor gradually.
-                linearMagnitude = linearMagnitude * linearMagnitude;
-
+                double linearMagnitude = calculateLinearMagnitude(xSupplier, ySupplier);
                 // Calcaulate new linear velocity.
-                Rotation2d linearDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+                Rotation2d linearDirection = calculateLinearDirection(xSupplier, ySupplier);
                 Translation2d linearVelocity = new Pose2d(new Translation2d(), linearDirection)
                         .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d())).getTranslation();
 
@@ -139,18 +247,12 @@ public class DriveCommands {
 
         return Commands.run(
                 () -> {
-                    // Apply dead-band.
-                    double linearMagnitude = MathUtil.applyDeadband(
-                            Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
-                            CONSTANTS.getJoystickDeadband());
+                    double linearMagnitude = calculateLinearMagnitude(xSupplier, ySupplier);
                     double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), CONSTANTS.getJoystickDeadband());
-
-                    // Square values, to accelerate mor gradually.
-                    linearMagnitude = linearMagnitude * linearMagnitude;
                     omega = Math.copySign(omega * omega, omega);
 
                     // Calcaulate new linear velocity.
-                    Rotation2d linearDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+                    Rotation2d linearDirection = calculateLinearDirection(xSupplier, ySupplier);
                     Translation2d linearVelocity = new Pose2d(new Translation2d(), linearDirection)
                             .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d())).getTranslation();
 

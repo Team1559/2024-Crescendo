@@ -10,40 +10,40 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SingleMotorSubsystem extends SubsystemBase {
 
-    private final double DEFAULT_FORWARDS_VOLTAGE;
-    private final double DEFAULT_REVERSE_VOLTAGE;
+    private final double DEFAULT_FORWARDS_VELOCITY;
+    private final double DEFAULT_REVERSE_VELOCITY;
 
     private final SingleMotorIo io;
     private final SingleMotorIoInputsAutoLogged inputs = new SingleMotorIoInputsAutoLogged();
 
-    private double appliedVoltage;
+    private double appliedVelocity;
 
     /**
-     * Create a new subsystem for a single motor in voltage mode
+     * Create a new subsystem for a single motor in velocity mode
      * 
      * @param name Name of subsystem
      * @param io   SingleMotorIO instance for the specific motor type
      */
-    protected SingleMotorSubsystem(String name, SingleMotorIo io, double voltage) {
-        this(name, io, voltage, voltage);
+    protected SingleMotorSubsystem(String name, SingleMotorIo io, double velocity) {
+        this(name, io, velocity, velocity);
+
     }
 
-    protected SingleMotorSubsystem(String name, SingleMotorIo io, double forwardsVoltage, double reverseVoltage) {
+    protected SingleMotorSubsystem(String name, SingleMotorIo io, double forwardsVelocity, double reverseVelocity) {
 
         super(name);
 
         this.io = io;
-        this.DEFAULT_FORWARDS_VOLTAGE = forwardsVoltage;
-        this.DEFAULT_REVERSE_VOLTAGE = reverseVoltage;
-
-        this.appliedVoltage = 0;
+        this.DEFAULT_FORWARDS_VELOCITY = forwardsVelocity;
+        this.DEFAULT_REVERSE_VELOCITY = reverseVelocity;
+        this.appliedVelocity = 0;
     }
 
     @Override
     public void periodic() {
 
-        // Set Voltages.
-        io.setVoltage(appliedVoltage);
+        // Set Velocitys.
+        io.setVelocity(appliedVelocity);
 
         // Log Inputs.
         io.updateInputs(inputs);
@@ -57,19 +57,19 @@ public class SingleMotorSubsystem extends SubsystemBase {
     }
 
     public void reverse() {
-        setVoltage(DEFAULT_REVERSE_VOLTAGE);
+        setVelocity(DEFAULT_REVERSE_VELOCITY);
     }
 
-    private void setVoltage(double voltage) {
-        appliedVoltage = voltage;
+    public void setVelocity(double velocity) {
+        appliedVelocity = velocity;
     }
 
     public void start() {
-        setVoltage(DEFAULT_FORWARDS_VOLTAGE);
+        setVelocity(DEFAULT_FORWARDS_VELOCITY);
     }
 
     public void stop() {
-        setVoltage(0.0);
+        setVelocity(0.0);
     }
 
     // ========================= Commands =========================

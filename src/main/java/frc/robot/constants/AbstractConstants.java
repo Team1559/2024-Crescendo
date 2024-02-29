@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.opencv.core.Mat.Tuple2;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
@@ -21,6 +22,7 @@ import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
 
 public abstract class AbstractConstants {
@@ -45,6 +47,10 @@ public abstract class AbstractConstants {
             P = p;
             I = i;
             D = d;
+        }
+
+        public PIDController createController() {
+            return new PIDController(P, I, D);
         }
     }
 
@@ -78,10 +84,10 @@ public abstract class AbstractConstants {
     public static final boolean TECHNICIAN_CONTROLLER_ENABLED = false;
     public static final AbstractConstants CONSTANTS = isGameRobot() ? GAME_ROBOT_CONSTANTS : TEST_ROBOT_CONSTANTS;
 
-    private static final Translation3d SPEKER_LOCATION_BLUE = new Translation3d(Units.inchesToMeters(-1.5),
+    private static final Translation3d SPEAKER_LOCATION_BLUE = new Translation3d(Units.inchesToMeters(-1.5),
             Units.inchesToMeters(218.42),
             Units.inchesToMeters(80.5));
-    private static final Translation3d SPEKER_LOCATION_RED = new Translation3d(Units.inchesToMeters(652.73),
+    private static final Translation3d SPEAKER_LOCATION_RED = new Translation3d(Units.inchesToMeters(652.73),
             Units.inchesToMeters(218.42),
             Units.inchesToMeters(80.5));
     private static final Translation3d AMP_LOCATION_RED = new Translation3d(Units.inchesToMeters(72.5),
@@ -97,6 +103,7 @@ public abstract class AbstractConstants {
     // ========================= Static Methods ================================
     public static boolean isGameRobot() {
         String roboRioSerialNumber = System.getenv("serialnum");
+        System.out.println("Serial Number = " + System.getenv("serialnum"));
         roboRioSerialNumber = roboRioSerialNumber == null ? "" : roboRioSerialNumber.trim();
 
         return FORCE_GAME_ROBOT_CONSTANTS
@@ -148,7 +155,7 @@ public abstract class AbstractConstants {
      * @return The assigned Alliance or the {@link #getDefaultAllianceForAuto}, if
      *         no alliance is set.
      */
-    public Alliance getAssignedAlliance() {
+    public Alliance getAlliance() {
         return DriverStation.getAlliance().orElse(getDefaultAllianceForAuto());
     };
 
@@ -168,7 +175,7 @@ public abstract class AbstractConstants {
 
     public abstract boolean hasClimberSubsystem();
 
-    public abstract boolean hasColorSensorSubsystem();
+    public abstract boolean hasNoteSensorSubsystem();
 
     public abstract boolean hasFeederSubsystem();
 
@@ -194,15 +201,15 @@ public abstract class AbstractConstants {
 
     // #region: --------------- Game Objects -----------------------------------
     public Translation3d getSpeakerLocation() {
-        if (getAssignedAlliance() == Alliance.Blue) {
-            return CONSTANTS.SPEKER_LOCATION_BLUE;
+        if (getAlliance() == Alliance.Blue) {
+            return CONSTANTS.SPEAKER_LOCATION_BLUE;
         } else {
-            return CONSTANTS.SPEKER_LOCATION_RED;
+            return CONSTANTS.SPEAKER_LOCATION_RED;
         }
     }
 
     public Translation3d getAmpLocation() {
-        if (getAssignedAlliance() == Alliance.Blue) {
+        if (getAlliance() == Alliance.Blue) {
             return CONSTANTS.AMP_LOCATION_RED;
         } else {
             return CONSTANTS.AMP_LOCATION_BLUE;
@@ -215,18 +222,16 @@ public abstract class AbstractConstants {
 
     // #region: ----- Climber --------
     public int getClimberMotorIdLeft() {
-        // TODO: Add ID
-        throw new UnsupportedOperationException("No Motor ID for Left Climber motor");
+        return 25;
     }
 
     public int getClimberMotorIdRight() {
-        // TODO: Add ID
-        throw new UnsupportedOperationException("No Motor ID for Right Climber motor");
+        return 24;
     }
 
     public abstract PID getClimberPid();
 
-    public abstract double getClimberMaxHeight();
+    public abstract Measure<Distance> getClimberMaxHeight();
     // #endregion
 
     // #region: ----- Aimer -----
@@ -235,7 +240,7 @@ public abstract class AbstractConstants {
     public abstract Rotation2d getAimerEncoderOffset();
 
     public int getAimerEncoderPort() {
-        return uniqueRoboRioPort(0, RoboRioPortArrays.DIO);
+        return uniqueRoboRioPort(5, RoboRioPortArrays.DIO);
     }
 
     public int getAimerMotorIdLeft() {
@@ -257,9 +262,10 @@ public abstract class AbstractConstants {
 
     // #endregion
 
-    // #region: ----- Color Sensor -----
-    public abstract int getColorSensorProximityThreshold();
-
+    // #region: ----- Limit Switch -----
+    public static int getLimitSwitchChannel() {
+        return 2;
+    }
     // #endregion
 
     // #region: ----- Feeder -----
@@ -269,9 +275,9 @@ public abstract class AbstractConstants {
 
     public abstract boolean isFeederMortorInverted();
 
-    public abstract double getFeederForwardVoltage();
+    public abstract double getFeederForwardVelocity();
 
-    public abstract double getFeederReverseVoltage();
+    public abstract double getFeederReverseVelocity();
 
     // #endregion
 
@@ -288,7 +294,7 @@ public abstract class AbstractConstants {
 
     public abstract double getFlywheelReverseVoltage();
 
-    public abstract double getFlywheelMotorPowerDifferentialPercentage();
+    public abstract double flywheelSpinOffset();
 
     // #endregion
 
@@ -306,9 +312,9 @@ public abstract class AbstractConstants {
 
     public abstract boolean isIntakeMortorInverted();
 
-    public abstract double getIntakeForwardVoltage();
+    public abstract double getIntakeForwardVelocity();
 
-    public abstract double getIntakeReverseVoltage();
+    public abstract double getIntakeReverseVelocity();
 
     // #endregion
 
@@ -317,7 +323,7 @@ public abstract class AbstractConstants {
         return uniqueRoboRioPort(0, RoboRioPortArrays.PWM);
     }
 
-    public abstract int getLedLenth(); // 144
+    public abstract int getLedLenth();
 
     // #endregion
 
@@ -353,9 +359,9 @@ public abstract class AbstractConstants {
     // #endregion
 
     // #region: ----- Traverser -----
-    public abstract double getTraverserFowardVoltage();
+    public abstract double getTraverserFowardVelocity();
 
-    public abstract double getTraverserReverseVoltage();
+    public abstract double getTraverserReverseVelocity();
 
     public int getTraverserMotorId() {
         // TODO: Add ID
@@ -459,5 +465,10 @@ public abstract class AbstractConstants {
     public abstract Measure<Distance> getWheelDistanceLeftToRight();
 
     public abstract Measure<Distance> getWheelRadius();
+
+    // #endregion
+    // #region: --------------- LED Patterns --------------------------------
+    public final Color[] OVERHEAT_EMERGENCY_PATTERN = new Color[] { Color.kYellow, Color.kYellow, Color.kRed,
+            Color.kRed, Color.kBlack, Color.kBlack };
     // #endregion
 }

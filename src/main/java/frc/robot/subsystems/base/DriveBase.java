@@ -23,6 +23,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -80,6 +81,7 @@ public class DriveBase extends SubsystemBase {
     private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
     public final SwerveDrivePoseEstimator poseEstimator;
     private final SwerveModulePosition[] modulePositions;
+    private Translation2d lastPosition;
 
     public DriveBase(GyroIo gyroIo,
             SwerveModuleIo flModuleI,
@@ -115,7 +117,7 @@ public class DriveBase extends SubsystemBase {
                 new HolonomicPathFollowerConfig(CONSTANTS.getMaxLinearSpeed().in(MetersPerSecond),
                         CONSTANTS.getDriveBaseWheelRadius().in(Meters), new ReplanningConfig()),
                 // Flips path if aliance is on red side.
-                () -> CONSTANTS.getAssignedAlliance() != CONSTANTS.getDefaultAllianceForAuto()
+                () -> CONSTANTS.getAlliance() != CONSTANTS.getDefaultAllianceForAuto()
                         && CONSTANTS.shouldFlipPathIfAssignedAllianceIsNotDefault(),
                 this);
         Pathfinding.setPathfinder(new LocalAdStarAk());
@@ -126,13 +128,15 @@ public class DriveBase extends SubsystemBase {
                 targetPose -> Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose));
 
         // TODO: Figure out why the robot is not starting at 0,0.
-        setPose(new Pose2d());
+        setPose(new Pose2d(new Translation2d(),
+                CONSTANTS.getAlliance() == Alliance.Blue ? Rotation2d.fromDegrees(180) : new Rotation2d()));
     }
 
     @Override
     public void periodic() {
         gyroIO.updateInputs(gyroInputs);
         getPose(); // Logs Robot Estimated Position; (TODO: Is this needed?)
+        getSpeed(); // same, revisit later
         Logger.processInputs("Drive/Gyro", gyroInputs);
 
         for (IndexedSwerveModule module : modules) {
@@ -164,6 +168,17 @@ public class DriveBase extends SubsystemBase {
     @AutoLogOutput(key = "EstimatedPosition")
     public Pose2d getPose() {
         return poseEstimator.getEstimatedPosition();
+    }
+
+    @AutoLogOutput(key = "EstimatedSpeed")
+    public double getSpeed() {
+        if (lastPosition == null) {
+            lastPosition = getPose().getTranslation();
+        }
+        Translation2d current = getPose().getTranslation();
+        Translation2d delta = current.minus(lastPosition);
+        lastPosition = current;
+        return delta.getNorm() / 0.02;
     }
 
     /** Returns the current odometry rotation. */

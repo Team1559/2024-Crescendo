@@ -22,5 +22,5 @@ public interface SingleMotorIo {
 
     public Measure<Temperature> getTemperature();
 
-    public void setVoltage(double voltage);
+    public void setVelocity(double velocityRPM);
 }

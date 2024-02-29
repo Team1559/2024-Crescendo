@@ -34,11 +34,11 @@ public class GameRobotConstants extends AbstractConstants {
 
     @Override
     public boolean hasClimberSubsystem() {
-        return false;
+        return true;
     }
 
     @Override
-    public boolean hasColorSensorSubsystem() {
+    public boolean hasNoteSensorSubsystem() {
         return true;
     }
 
@@ -87,13 +87,12 @@ public class GameRobotConstants extends AbstractConstants {
     // #region: ----- Climber --------
     @Override
     public PID getClimberPid() {
-        return new PID(1, 0, 0);
+        return new PID(.1, 0, 0);
     }
 
     @Override
-    public double getClimberMaxHeight() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getClimberMaxHeight'");
+    public Measure<Distance> getClimberMaxHeight() {
+        return Inches.of(12);
     }
 
     // #endregion
@@ -111,19 +110,10 @@ public class GameRobotConstants extends AbstractConstants {
 
     @Override
     public PID getAimerPid() {
-        return new PID(0.4, 0, 0);
+        return new PID(.6, 0, 0);
     }
 
     // #endregion
-
-    // #region: ----- Color Sensor -----
-    @Override
-    public int getColorSensorProximityThreshold() {
-        return 200; // TODO: Configure Value.
-    }
-
-    // #endregion
-
     // #region: ----- Feeder -----
     @Override
     public boolean isFeederMortorInverted() {
@@ -131,15 +121,15 @@ public class GameRobotConstants extends AbstractConstants {
     }
 
     @Override
-    public double getFeederForwardVoltage() {
+    public double getFeederForwardVelocity() {
         // TODO: Configure Value.
-        return 4;
+        return 3666;
     }
 
     @Override
-    public double getFeederReverseVoltage() {
+    public double getFeederReverseVelocity() {
         // TODO: Configure Value.
-        return -getFeederForwardVoltage();
+        return -getFeederForwardVelocity();
     }
 
     // #endregion
@@ -158,9 +148,9 @@ public class GameRobotConstants extends AbstractConstants {
     }
 
     @Override
-    public double getFlywheelMotorPowerDifferentialPercentage() {
+    public double flywheelSpinOffset() {
         // TODO: Tune.
-        return 0.75;
+        return 1;
     }
 
     // #endregion
@@ -172,15 +162,15 @@ public class GameRobotConstants extends AbstractConstants {
     }
 
     @Override
-    public double getIntakeForwardVoltage() {
+    public double getIntakeForwardVelocity() {
         // TODO: Configure Value.
-        return 9;
+        return 8250;
     }
 
     @Override
-    public double getIntakeReverseVoltage() {
+    public double getIntakeReverseVelocity() {
         // TODO: Configure Value.
-        return -getFeederForwardVoltage();
+        return -getFeederForwardVelocity();
     }
 
     // #endregion
@@ -218,13 +208,13 @@ public class GameRobotConstants extends AbstractConstants {
 
     // #region: -------- Traverser --------
     @Override
-    public double getTraverserFowardVoltage() {
-        return 6.0;
+    public double getTraverserFowardVelocity() { // TODO
+        return 5000;
     }
 
     @Override
-    public double getTraverserReverseVoltage() {
-        return -getTraverserFowardVoltage();
+    public double getTraverserReverseVelocity() {
+        return -getTraverserFowardVelocity();
     }
 
     @Override

@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.Celsius;
 import static frc.robot.constants.AbstractConstants.CONSTANTS;
 
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -151,7 +150,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
     @Override
     public void updateInputs(SwerveModuleIoInputs inputs) {
 
-        StatusCode refreshResult = BaseStatusSignal.refreshAll(
+        BaseStatusSignal.refreshAll(
 
                 cancoderAbsolutePosition,
 
@@ -168,8 +167,6 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
                 steerMotorCurrent,
                 steerMotorFaults,
                 steerMotorTemp);
-
-        System.out.println("XXXXX BaseStatusSignal#refreshAll Result: " + refreshResult + " XXXXX");
 
         inputs.cancoderAbsolutePosition = Rotation2d.fromRotations(cancoderAbsolutePosition.getValueAsDouble());
         inputs.cancoderOffsetPosition = inputs.cancoderAbsolutePosition.minus(absoluteEncoderOffset);
