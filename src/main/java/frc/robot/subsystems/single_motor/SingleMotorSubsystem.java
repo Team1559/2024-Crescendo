@@ -59,7 +59,7 @@ public class SingleMotorSubsystem extends SubsystemBase {
     // ========================= Functions =========================
     public boolean isTemperatureTooHigh() {
         // 90% Buffer.
-        return io.getTemperature().gt(io.getMaxSafeTemperature().times(CONSTANTS.SAFE_MOTOR_TEMPERATURE_BUFFER));
+        return io.getTemperature().gt(io.getMaxSafeTemperature().times(CONSTANTS.getMotorSafeTemperatureBuffer()));
     }
 
     public void reverse() {

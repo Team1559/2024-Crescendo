@@ -1,7 +1,9 @@
 package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Celsius;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -239,25 +241,14 @@ public abstract class AbstractConstants {
 
     // #region: --------------- Hardware ---------------------------------------
 
-    // #region: ----- Climber --------
-    public int getClimberMotorIdLeft() {
-        return uniqueCanBusId(25, getCanivoreId());
-    }
-
-    public int getClimberMotorIdRight() {
-        return uniqueCanBusId(24, getCanivoreId());
-    }
-
-    public abstract PID getClimberPid();
-
-    public abstract Measure<Distance> getClimberMaxHeight();
-
-    // #endregion
-
     // #region: ----- Aimer -----
-    public abstract Tuple2<Rotation2d> getAimerAngleRange();
+    public Tuple2<Rotation2d> getAimerAngleRange() {
+        return new Tuple2<Rotation2d>(Rotation2d.fromDegrees(1), Rotation2d.fromDegrees(40));
+    }
 
-    public abstract Rotation2d getAimerEncoderOffset();
+    public Rotation2d getAimerEncoderOffset() {
+        return Rotation2d.fromRadians(2.599);
+    }
 
     public int getAimerEncoderPort() {
         return uniqueRoboRioPort(5, RoboRioPortArrays.DIO);
@@ -271,21 +262,37 @@ public abstract class AbstractConstants {
         return uniqueCanBusId(22, getCanivoreId());
     }
 
-    public abstract PID getAimerPid();
+    public PID getAimerPid() {
+        return new PID(.6, 0, 0);
+    }
 
     // #endregion
 
     // #region: ----- Canivore -----
+
     public static String getCanivoreId() {
         return "1559Canivore";
     }
 
     // #endregion
 
-    // #region: ----- Limit Switch -----
-    public static int getLimitSwitchChannel() {
-        return 2;
+    // #region: ----- Climber --------
+    public Measure<Distance> getClimberMaxHeight() {
+        return Inches.of(12);
     }
+
+    public int getClimberMotorIdLeft() {
+        return uniqueCanBusId(25, getCanivoreId());
+    }
+
+    public int getClimberMotorIdRight() {
+        return uniqueCanBusId(24, getCanivoreId());
+    }
+
+    public PID getClimberPid() {
+        return new PID(.1, 0, 0);
+    }
+
     // #endregion
 
     // #region: ----- Feeder -----
@@ -293,13 +300,23 @@ public abstract class AbstractConstants {
         return uniqueCanBusId(21, getCanivoreId());
     }
 
-    public abstract PID getFeederPidValues();
+    public boolean isFeederMotorInverted() {
+        return true;
+    }
 
-    public abstract Measure<Velocity<Angle>> getFeederVelocityForward();
+    public PID getFeederPidValues() {
+        return new PID(0.33 / CONSTANTS.getFeederVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000);
+    }
 
-    public abstract Measure<Velocity<Angle>> getFeederVelocityReverse();
+    public Measure<Velocity<Angle>> getFeederVelocityForward() {
+        // TODO: Configure Value.
+        return RevolutionsPerSecond.of(3666);
+    }
 
-    public abstract boolean isFeederMotorInverted();
+    public Measure<Velocity<Angle>> getFeederVelocityReverse() {
+        // TODO: Configure Value.
+        return getFeederVelocityForward().negate();
+    }
 
     // #endregion
 
@@ -312,15 +329,25 @@ public abstract class AbstractConstants {
         return uniqueCanBusId(25, getCanivoreId());
     }
 
-    public abstract double getFlywheelForwardVoltage();
+    public double getFlywheelForwardVoltage() {
+        // TODO: Configure Value.
+        return 10;
+    }
 
-    public abstract double getFlywheelReverseVoltage();
+    public double getFlywheelReverseVoltage() {
+        // TODO: Configure Value.
+        return -6;
+    }
 
-    public abstract double flywheelSpinOffset();
+    public double flywheelSpinOffset() {
+        // TODO: Tune.
+        return 1;
+    }
 
     // #endregion
 
     // #region: ----- Gyro -----
+
     public int getGyroId() {
         return uniqueCanBusId(12, getCanivoreId());
     }
@@ -328,29 +355,50 @@ public abstract class AbstractConstants {
     // #endregion
 
     // #region: ----- Intake -----
+
     public int getIntakeMotorId() {
         return uniqueCanBusId(20, getCanivoreId());
     }
 
-    public abstract PID getIntakePidValues();
+    public boolean isIntakeMotorInverted() {
+        return true;
+    }
 
-    public abstract Measure<Velocity<Angle>> getIntakeVelocityForward();
+    public PID getIntakePidValues() {
+        return new PID(0.33 / CONSTANTS.getIntakeVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000);
+    }
 
-    public abstract Measure<Velocity<Angle>> getIntakeVelocityReverse();
+    public Measure<Velocity<Angle>> getIntakeVelocityForward() {
+        // TODO: Configure Value.
+        return RevolutionsPerSecond.of(8250);
+    }
 
-    public abstract boolean isIntakeMotorInverted();
+    public Measure<Velocity<Angle>> getIntakeVelocityReverse() {
+        // TODO: Configure Value.
+        return getFeederVelocityForward().negate();
+    }
 
     // #endregion
 
     // #region: ----- LEDs -----
-    public static final Color[] OVERHEAT_EMERGENCY_PATTERN = new Color[] { Color.kYellow, Color.kYellow, Color.kRed,
-            Color.kRed, Color.kBlack, Color.kBlack };
 
     public int getLedPort() {
         return uniqueRoboRioPort(0, RoboRioPortArrays.PWM);
     }
 
     public abstract int getLedLength();
+
+    public Color[] getMotorOverheatEmergencyPattern() {
+        return new Color[] { Color.kYellow, Color.kYellow, Color.kRed, Color.kRed, Color.kBlack, Color.kBlack };
+    }
+
+    // #endregion
+
+    // #region: ----- Note Sensor -----
+
+    public static int getNoteSensorChannel() {
+        return uniqueRoboRioPort(2, RoboRioPortArrays.DIO);
+    }
 
     // #endregion
 
@@ -386,29 +434,44 @@ public abstract class AbstractConstants {
     // #endregion
 
     // #region: ----- Traverser -----
+
     public int getTraverserMotorId() {
         // TODO: Add ID
         throw new UnsupportedOperationException("No Motor ID for Traverser");
     }
 
-    public abstract PID getTraverserPidValues();
+    public boolean isTraverserInverted() {
+        return true;
+    }
 
-    public abstract Measure<Velocity<Angle>> getTraverserVelocity();
+    public PID getTraverserPidValues() {
+        return new PID(0.33 / CONSTANTS.getTraverserVelocity().in(RevolutionsPerSecond), 0, 0, 11.0 / 11000);
+    }
 
-    public abstract boolean isTraverserInverted();
+    public Measure<Velocity<Angle>> getTraverserVelocity() {
+        // TODO: Tune.
+        return RevolutionsPerSecond.of(5000);
+    }
 
     // #endregion
 
     // #region: ----- Vision -----
-    public abstract String getCameraNameBack();
 
-    public abstract String getCameraNameFront();
+    public String getCameraNameBack() {
+        return "limelight-back";
+    }
+
+    public String getCameraNameFront() {
+        return "limelight";
+    }
 
     // #endregion
 
     // #region: --------------- Motor / Motor Controller Settings --------------
 
-    public final double SAFE_MOTOR_TEMPERATURE_BUFFER = 0.9;
+    public double getMotorSafeTemperatureBuffer() {
+        return 0.9;
+    }
 
     // #region: ----- Falcon 500 Motor -----
 

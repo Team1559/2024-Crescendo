@@ -159,7 +159,7 @@ public class Flywheel extends SubsystemBase {
     public boolean isTemperatureTooHigh() {
         // 90% Buffer.
         return getMaxTemperature()
-                .gt(CONSTANTS.getFalcon500MaxTemperature().times(CONSTANTS.SAFE_MOTOR_TEMPERATURE_BUFFER));
+                .gt(CONSTANTS.getFalcon500MaxTemperature().times(CONSTANTS.getMotorSafeTemperatureBuffer()));
     }
 
     /**

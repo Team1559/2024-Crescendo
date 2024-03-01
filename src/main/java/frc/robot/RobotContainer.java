@@ -159,7 +159,7 @@ public class RobotContainer {
         aimer = CONSTANTS.hasAimerSubsystem() ? new Aimer() : null;
         climber = CONSTANTS.hasClimberSubsystem() ? new Climber() : null;
         flywheel = CONSTANTS.hasFlywheelSubsystem() ? new Flywheel() : null;
-        noteSensor = CONSTANTS.hasNoteSensorSubsystem() ? new NoteSensor(CONSTANTS.getLimitSwitchChannel()) : null;
+        noteSensor = CONSTANTS.hasNoteSensorSubsystem() ? new NoteSensor(CONSTANTS.getNoteSensorChannel()) : null;
         /*
          * We can safely set LEDs even if there are no LEDs.
          * (The LED control hardware is built into the RoboRio and therfore always
@@ -190,23 +190,23 @@ public class RobotContainer {
         // #region: ---------- Motor Overheat Triggers ----------
         new Trigger(driveBase::isTemperatureTooHigh)
                 .whileTrue(driveBase.stopCommand()
-                        .alongWith(leds.setDynamicPatternCommand(CONSTANTS.OVERHEAT_EMERGENCY_PATTERN, false)));
+                        .alongWith(leds.setDynamicPatternCommand(CONSTANTS.getMotorOverheatEmergencyPattern(), false)));
         if (CONSTANTS.hasFlywheelSubsystem()) {
             new Trigger(flywheel::isTemperatureTooHigh).whileTrue(flywheel.stopCommand()
-                    .alongWith(leds.setDynamicPatternCommand(CONSTANTS.OVERHEAT_EMERGENCY_PATTERN, false)));
+                    .alongWith(leds.setDynamicPatternCommand(CONSTANTS.getMotorOverheatEmergencyPattern(), false)));
         }
         // TODO: Make a generic SingleMotorSubsystem overheat command.
         if (CONSTANTS.hasIntakeSubsystem()) {
             new Trigger(intake::isTemperatureTooHigh).whileTrue(intake.stopCommand()
-                    .alongWith(leds.setDynamicPatternCommand(CONSTANTS.OVERHEAT_EMERGENCY_PATTERN, false)));
+                    .alongWith(leds.setDynamicPatternCommand(CONSTANTS.getMotorOverheatEmergencyPattern(), false)));
         }
         if (CONSTANTS.hasFeederSubsystem()) {
             new Trigger(feeder::isTemperatureTooHigh).whileTrue(feeder.stopCommand()
-                    .alongWith(leds.setDynamicPatternCommand(CONSTANTS.OVERHEAT_EMERGENCY_PATTERN, false)));
+                    .alongWith(leds.setDynamicPatternCommand(CONSTANTS.getMotorOverheatEmergencyPattern(), false)));
         }
         if (CONSTANTS.hasTraverserSubsystem()) {
             new Trigger(traverser::isTemperatureTooHigh).whileTrue(traverser.stopCommand()
-                    .alongWith(leds.setDynamicPatternCommand(CONSTANTS.OVERHEAT_EMERGENCY_PATTERN, false)));
+                    .alongWith(leds.setDynamicPatternCommand(CONSTANTS.getMotorOverheatEmergencyPattern(), false)));
         }
 
         // #endregion

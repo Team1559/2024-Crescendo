@@ -8,8 +8,6 @@ import static edu.wpi.first.units.Units.Second;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.opencv.core.Mat.Tuple2;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
@@ -76,106 +74,9 @@ public class TestRobotConstants extends AbstractConstants {
     // #endregion
 
     // #region: --------------- Hardware ---------------------------------------
-    // #region: ----- Aimer -----
-    @Override
-    public Tuple2<Rotation2d> getAimerAngleRange() {
-        throw new UnsupportedOperationException("Unimplemented method 'getAimerAngleRange'");
-    }
-
-    @Override
-    public Rotation2d getAimerEncoderOffset() {
-        throw new UnsupportedOperationException("Unimplemented method 'getAimerEncoderOffset'");
-    }
-
-    @Override
-    public PID getAimerPid() {
-        throw new UnsupportedOperationException("Unimplemented method 'getAimerPid'");
-    }
-
-    // #endregion
-
-    // #region: ----- Climber -----
-    @Override
-    public Measure<Distance> getClimberMaxHeight() {
-        throw new UnsupportedOperationException("Unimplemented method 'getClimberMaxHeight'");
-    }
-
-    @Override
-    public PID getClimberPid() {
-        throw new UnsupportedOperationException("Unimplemented method 'getClimberPid'");
-    }
-
-    // #endregion
-    // #region: ----- Feeder -----
-
-    @Override
-    public boolean isFeederMotorInverted() {
-        throw new UnsupportedOperationException("Unimplemented method 'isFeederMortorInverted'");
-    }
-
-    @Override
-    public PID getFeederPidValues() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getFeederPidValues'");
-    }
-
-    @Override
-    public Measure<Velocity<Angle>> getFeederVelocityForward() {
-        throw new UnsupportedOperationException("Unimplemented method 'getFeederForwardVoltage'");
-    }
-
-    @Override
-    public Measure<Velocity<Angle>> getFeederVelocityReverse() {
-        throw new UnsupportedOperationException("Unimplemented method 'getFeederReverseVoltage'");
-    }
-
-    // #endregion
-
-    // #region: ----- Flywheel -----
-
-    @Override
-    public double getFlywheelForwardVoltage() {
-        throw new UnsupportedOperationException("Unimplemented method 'getFlywheelForwardVoltage'");
-    }
-
-    @Override
-    public double getFlywheelReverseVoltage() {
-        throw new UnsupportedOperationException("Unimplemented method 'getFlywheelReverseVoltage'");
-    }
-
-    @Override
-    public double flywheelSpinOffset() {
-        throw new UnsupportedOperationException("Unimplemented method 'getFlywheelMotorPowerDifferentialPercentage'");
-    }
-
-    // #endregion
-
-    // #region: ----- Intake -----
-
-    @Override
-    public boolean isIntakeMotorInverted() {
-        throw new UnsupportedOperationException("Unimplemented method 'isIntakeMortorInverted'");
-    }
-
-    @Override
-    public PID getIntakePidValues() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getIntakePidValues'");
-    }
-
-    @Override
-    public Measure<Velocity<Angle>> getIntakeVelocityForward() {
-        throw new UnsupportedOperationException("Unimplemented method 'getIntakeForwardVoltage'");
-    }
-
-    @Override
-    public Measure<Velocity<Angle>> getIntakeVelocityReverse() {
-        throw new UnsupportedOperationException("Unimplemented method 'getIntakeReverseVoltage'");
-    }
-
-    // #endregion
 
     // #region: ----- LEDs -----
+
     @Override
     public int getLedLength() {
         return 144;
@@ -184,6 +85,7 @@ public class TestRobotConstants extends AbstractConstants {
     // #endregion
 
     // #region: ----- roboRIO -----
+
     @Override
     public String getRoboRioSerialNumber() {
         return "03282BB6";
@@ -192,6 +94,7 @@ public class TestRobotConstants extends AbstractConstants {
     // #endregion
 
     // #region: ----- Swerve -----
+
     @Override
     public Map<WheelModuleIndex, Rotation2d> getSwerveModuleEncoderOffsets() {
         return new HashMap<>() {
@@ -206,35 +109,10 @@ public class TestRobotConstants extends AbstractConstants {
 
     // #endregion
 
-    // #region: ----- Traverser -----
-
-    @Override
-    public PID getTraverserPidValues() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getTraverserPidValues'");
-    }
-
-    @Override
-    public Measure<Velocity<Angle>> getTraverserVelocity() {
-        throw new UnsupportedOperationException("Unimplemented method 'getTraverserVelocity'");
-    }
-
-    @Override
-    public boolean isTraverserInverted() {
-        throw new UnsupportedOperationException("Unimplemented method 'isTraverserInverted'");
-    }
-
-    // #endregion
-
     // #region: ----- Vision -----
     @Override
     public String getCameraNameBack() {
         throw new UnsupportedOperationException("Unimplemented method 'getCameraNameBack'");
-    }
-
-    @Override
-    public String getCameraNameFront() {
-        return "limelight";
     }
 
     // #endregion

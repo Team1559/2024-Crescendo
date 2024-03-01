@@ -3,12 +3,9 @@ package frc.robot.constants;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.opencv.core.Mat.Tuple2;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
@@ -78,116 +75,17 @@ public class GameRobotConstants extends AbstractConstants {
 
     // #region: --------------- Hardware ---------------------------------------
 
-    // #region: ----- Climber --------
-    @Override
-    public PID getClimberPid() {
-        return new PID(.1, 0, 0);
-    }
-
-    @Override
-    public Measure<Distance> getClimberMaxHeight() {
-        return Inches.of(12);
-    }
-
-    // #endregion
-
-    // #region: ----- Aimer -----
-    @Override
-    public Tuple2<Rotation2d> getAimerAngleRange() {
-        return new Tuple2<Rotation2d>(Rotation2d.fromDegrees(1), Rotation2d.fromDegrees(40));
-    }
-
-    @Override
-    public Rotation2d getAimerEncoderOffset() {
-        return Rotation2d.fromRadians(2.599);
-    }
-
-    @Override
-    public PID getAimerPid() {
-        return new PID(.6, 0, 0);
-    }
-
-    // #endregion
-    // #region: ----- Feeder -----
-    @Override
-    public boolean isFeederMotorInverted() {
-        return true;
-    }
-
-    @Override
-    public PID getFeederPidValues() {
-        return new PID(0.33 / CONSTANTS.getFeederVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000);
-    }
-
-    @Override
-    public Measure<Velocity<Angle>> getFeederVelocityForward() {
-        // TODO: Configure Value.
-        return RevolutionsPerSecond.of(3666);
-    }
-
-    @Override
-    public Measure<Velocity<Angle>> getFeederVelocityReverse() {
-        // TODO: Configure Value.
-        return getFeederVelocityForward().negate();
-    }
-
-    // #endregion
-
-    // #region: ----- Flywheel -----
-    @Override
-    public double getFlywheelForwardVoltage() {
-        // TODO: Configure Value.
-        return 10;
-    }
-
-    @Override
-    public double getFlywheelReverseVoltage() {
-        // TODO: Configure Value.
-        return -6;
-    }
-
-    @Override
-    public double flywheelSpinOffset() {
-        // TODO: Tune.
-        return 1;
-    }
-
-    // #endregion
-
-    // #region: ----- Intake -----
-    @Override
-    public boolean isIntakeMotorInverted() {
-        return true;
-    }
-
-    @Override
-    public PID getIntakePidValues() {
-        return new PID(0.33 / CONSTANTS.getIntakeVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000);
-    }
-
-    @Override
-    public Measure<Velocity<Angle>> getIntakeVelocityForward() {
-        // TODO: Configure Value.
-        return RevolutionsPerSecond.of(8250);
-    }
-
-    @Override
-    public Measure<Velocity<Angle>> getIntakeVelocityReverse() {
-        // TODO: Configure Value.
-        return getFeederVelocityForward().negate();
-    }
-
-    // #endregion
-
     // #region: ----- LEDs -----
+
     @Override
     public int getLedLength() {
-        return 144 * 3; // This is the number that WILL be on the robot
+        return 144 /* 1 strip */ * 3;
     }
 
     // #endregion
 
     // #region: -------- roboRIO --------
+
     @Override
     public String getRoboRioSerialNumber() {
         return "03282B9F";
@@ -206,38 +104,6 @@ public class GameRobotConstants extends AbstractConstants {
                 put(WheelModuleIndex.BACK_RIGHT, Rotation2d.fromRadians(0.853));
             }
         };
-    }
-
-    // #endregion
-
-    // #region: -------- Traverser --------
-
-    @Override
-    public boolean isTraverserInverted() {
-        return true;
-    }
-
-    @Override
-    public PID getTraverserPidValues() {
-        return new PID(0.33 / CONSTANTS.getTraverserVelocity().in(RevolutionsPerSecond), 0, 0, 11.0 / 11000);
-    }
-
-    @Override
-    public Measure<Velocity<Angle>> getTraverserVelocity() { // TODO
-        return RevolutionsPerSecond.of(5000);
-    }
-
-    // #endregion
-
-    // #region: ----- Vision -----
-    @Override
-    public String getCameraNameBack() {
-        return "limelight-back";
-    }
-
-    @Override
-    public String getCameraNameFront() {
-        return "limelight";
     }
 
     // #endregion

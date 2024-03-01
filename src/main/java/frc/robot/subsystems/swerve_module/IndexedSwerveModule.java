@@ -177,6 +177,6 @@ public class IndexedSwerveModule {
 
     public boolean isTemperatureTooHigh() {
         // 90% Buffer.
-        return getMaxTemperature().gt(io.getMaxSafeMotorTemperature().times(CONSTANTS.SAFE_MOTOR_TEMPERATURE_BUFFER));
+        return getMaxTemperature().gt(io.getMaxSafeMotorTemperature().times(CONSTANTS.getMotorSafeTemperatureBuffer()));
     }
 }
