@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.swerve_module.SwerveModuleIoTalonFx;
 
 public class Flywheel extends SubsystemBase {
+
     @AutoLog
     static class FlywheelInputs {
 

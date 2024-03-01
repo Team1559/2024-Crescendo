@@ -2,9 +2,10 @@ package frc.robot.subsystems.base;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.constants.AbstractConstants.CONSTANTS;
 
-import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -22,12 +23,14 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.gyro.GyroIo;
 import frc.robot.subsystems.gyro.GyroIoInputsAutoLogged;
@@ -38,34 +41,33 @@ import frc.robot.util.LocalAdStarAk;
 
 public class DriveBase extends SubsystemBase {
 
-    // ========================= Class Level ===================================
-
-    private static final double ENCODER_STD_DEV = 0.01;
-
-    /** Returns an array of module translations. */
-    public static Translation2d[] getModuleTranslations() {
-        return new Translation2d[] {
-                new Translation2d(CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
-                        CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0),
-                new Translation2d(CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
-                        -CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0),
-                new Translation2d(-CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
-                        CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0),
-                new Translation2d(-CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
-                        -CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0)
-        };
+    @AutoLog
+    static class DriveBaseInputs {
+        public Pose2d estimatedPosition;
+        public Measure<Velocity<Distance>> estimatedSpeed;
     }
 
-    // ========================= Object Level ==================================
+    private final String LOG_PATH = "Drive/Base";
 
     private final GyroIo gyroIO;
     private final GyroIoInputsAutoLogged gyroInputs = new GyroIoInputsAutoLogged();
     private final IndexedSwerveModule[] modules = new IndexedSwerveModule[4];
 
-    private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
+    private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(new Translation2d[] {
+            new Translation2d(CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
+                    CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0),
+            new Translation2d(CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
+                    -CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0),
+            new Translation2d(-CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
+                    CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0),
+            new Translation2d(-CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
+                    -CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0)
+    });
     public final SwerveDrivePoseEstimator poseEstimator;
-    private final SwerveModulePosition[] modulePositions;
-    private Translation2d lastPosition;
+    private final SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
+    private Pose2d lastPosition;
+
+    private DriveBaseInputsAutoLogged inputs = new DriveBaseInputsAutoLogged();
 
     public DriveBase(GyroIo gyroIo,
             SwerveModuleIo flModuleI,
@@ -73,39 +75,39 @@ public class DriveBase extends SubsystemBase {
             SwerveModuleIo blModuleIo,
             SwerveModuleIo brModuleIo) {
 
+        // -------------------- Instantiate Hardware --------------------
         this.gyroIO = gyroIo;
         modules[WheelModuleIndex.FRONT_LEFT.value] = new IndexedSwerveModule(flModuleI, WheelModuleIndex.FRONT_LEFT);
         modules[WheelModuleIndex.FRONT_RIGHT.value] = new IndexedSwerveModule(frModuleIo, WheelModuleIndex.FRONT_RIGHT);
         modules[WheelModuleIndex.BACK_LEFT.value] = new IndexedSwerveModule(blModuleIo, WheelModuleIndex.BACK_LEFT);
         modules[WheelModuleIndex.BACK_RIGHT.value] = new IndexedSwerveModule(brModuleIo, WheelModuleIndex.BACK_RIGHT);
 
-        modulePositions = new SwerveModulePosition[4];
+        // -------------------- Create Position Estimator --------------------
         updateModulePositions();
 
         poseEstimator = new SwerveDrivePoseEstimator(
                 kinematics, gyroInputs.yawPosition, modulePositions,
                 new Pose2d(0, 0, gyroInputs.yawPosition),
-                VecBuilder.fill(ENCODER_STD_DEV, ENCODER_STD_DEV, ENCODER_STD_DEV),
+                VecBuilder.fill(0.01, 0.01, 0.01), // TODO: Why not use default number?
                 VecBuilder.fill(1, 1, 1)); // placeholder, will be filled in by vision
 
-        // Configure AutoBuilder for PathPlanner
+        lastPosition = getEstimatedPosition();
+
+        // -------------------- Configure PathPlanner --------------------
         AutoBuilder.configureHolonomic(
-                this::getPose,
+                this::getEstimatedPosition,
                 this::setPose,
                 () -> kinematics.toChassisSpeeds(getModuleStates()),
                 this::runVelocity,
                 new HolonomicPathFollowerConfig(CONSTANTS.getMaxLinearSpeed().in(MetersPerSecond),
                         CONSTANTS.getDriveBaseWheelRadius().in(Meters), new ReplanningConfig()),
-                // Flips path if alliance is on red side.
-                () -> CONSTANTS.getAlliance() != CONSTANTS.getDefaultAllianceForAuto()
-                        && CONSTANTS.shouldFlipPathIfAssignedAllianceIsNotDefault(),
+                CONSTANTS::shouldFlipPath,
                 this);
         Pathfinding.setPathfinder(new LocalAdStarAk());
-        PathPlannerLogging.setLogActivePathCallback(
-                activePath -> Logger.recordOutput("Odometry/Trajectory",
-                        activePath.toArray(new Pose2d[activePath.size()])));
-        PathPlannerLogging.setLogTargetPoseCallback(
-                targetPose -> Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose));
+        PathPlannerLogging.setLogActivePathCallback(activePath -> Logger.recordOutput("Odometry/Trajectory",
+                activePath.toArray(new Pose2d[activePath.size()])));
+        PathPlannerLogging
+                .setLogTargetPoseCallback(targetPose -> Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose));
 
         // TODO: Figure out why the robot is not starting at 0,0.
         setPose(new Pose2d(new Translation2d(),
@@ -114,9 +116,16 @@ public class DriveBase extends SubsystemBase {
 
     @Override
     public void periodic() {
+
+        // ---------- Log Inputs ----------
+        inputs.estimatedPosition = getEstimatedPosition();
+        inputs.estimatedSpeed = Meters
+                .of(lastPosition.getTranslation().getDistance(getEstimatedPosition().getTranslation()))
+                .per(Seconds.of(1 / 50));
+        lastPosition = getEstimatedPosition();
+        Logger.processInputs(LOG_PATH, inputs);
+
         gyroIO.updateInputs(gyroInputs);
-        getPose(); // Logs Robot Estimated Position; (TODO: Is this needed?)
-        getSpeed(); // same, revisit later
         Logger.processInputs("Drive/Gyro", gyroInputs);
 
         for (IndexedSwerveModule module : modules) {
@@ -139,36 +148,38 @@ public class DriveBase extends SubsystemBase {
         // Update odometry
         updateModulePositions();
         poseEstimator.update(gyroInputs.yawPosition, modulePositions);
-        getPose(); // Logs Robot Estimated Positio;
+        getEstimatedPosition(); // Logs Robot Estimated Position;
     }
 
     // ========================= Functions =====================================
-
-    /** Returns the current odometry pose. */
-    @AutoLogOutput(key = "EstimatedPosition")
-    public Pose2d getPose() {
+    public Pose2d getEstimatedPosition() {
         return poseEstimator.getEstimatedPosition();
     }
 
-    @AutoLogOutput(key = "EstimatedSpeed")
-    public double getSpeed() {
-        if (lastPosition == null) {
-            lastPosition = getPose().getTranslation();
-        }
-        Translation2d current = getPose().getTranslation();
-        Translation2d delta = current.minus(lastPosition);
-        lastPosition = current;
-        return delta.getNorm() / 0.02;
+    public Measure<Velocity<Distance>> getEstimatedSpeed() {
+        return inputs.estimatedSpeed;
     }
 
-    /** Returns the current odometry rotation. */
     public Rotation2d getRotation() {
-        return poseEstimator.getEstimatedPosition().getRotation();
+        return getEstimatedPosition().getRotation();
     }
 
-    /** Returns the current odometry rotation. */
+    /**
+     * This gets the rotation from the current position to the target position, and
+     * it's trying to point the front of the robot to the target.
+     *
+     * @param target
+     * @return
+     */
+    public Rotation2d getRotationToTarget(Translation2d target) {
+        Pose2d currentPose = getEstimatedPosition();
+        Translation2d deltaTranslation = target.minus(currentPose.getTranslation());
+        Rotation2d deltaAngle = deltaTranslation.getAngle();
+        return deltaAngle.minus(currentPose.getRotation());
+    }
+
     public Translation2d getTranslation() {
-        return poseEstimator.getEstimatedPosition().getTranslation();
+        return getEstimatedPosition().getTranslation();
     }
 
     public boolean isTemperatureTooHigh() {
@@ -180,17 +191,9 @@ public class DriveBase extends SubsystemBase {
         return false;
     }
 
-    /** Runs forwards at the commanded voltage. */
-    public void runCharacterizationVolts(double volts) {
-        for (int i = 0; i < 4; i++) {
-            modules[i].runCharacterization(volts);
-        }
-    }
-
     public void resetFieldOrientation() {
-        poseEstimator.addVisionMeasurement(
-                new Pose2d(poseEstimator.getEstimatedPosition().getTranslation(), new Rotation2d()),
-                Timer.getFPGATimestamp(), VecBuilder.fill(0, 0, 0));
+        poseEstimator.addVisionMeasurement(new Pose2d(getTranslation(), new Rotation2d()), Timer.getFPGATimestamp(),
+                VecBuilder.fill(0, 0, 0));
     }
 
     /**
@@ -200,21 +203,20 @@ public class DriveBase extends SubsystemBase {
      */
     public void runVelocity(ChassisSpeeds speeds) {
 
-        // Calculate module setpoints
+        // Calculate module setpoints.
         ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
         SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, CONSTANTS.getMaxLinearSpeed());
 
         // Send setpoints to modules
         SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
-        for (int i = 0; i < 4; i++) {
-            // The module returns the optimized state, useful for logging
+        for (int i = 0; i < modules.length; i++) {
             optimizedSetpointStates[i] = modules[i].runSetpoint(setpointStates[i]);
         }
 
         // Log setpoint states
-        Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
-        Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
+        Logger.recordOutput(LOG_PATH + "/Setpoints", setpointStates);
+        Logger.recordOutput(LOG_PATH + "/SetpointsOptimized", optimizedSetpointStates);
     }
 
     /** Resets the current odometry pose. */
@@ -222,45 +224,14 @@ public class DriveBase extends SubsystemBase {
         poseEstimator.resetPosition(gyroInputs.yawPosition, modulePositions, pose);
     }
 
-    /** Stops the drive. */
     public void stop() {
         runVelocity(new ChassisSpeeds());
     }
 
-    // ========================= Calculations ==================================
-
-    /**
-     * This gets the rotation from the current position to the target position, and
-     * it's trying to point the front of the robot to the target.
-     *
-     * @param target
-     * @return
-     */
-    public Rotation2d getRotationToTarget(Translation2d target) {
-        Pose2d currentPose = getPose();
-        Translation2d deltaTranslation = target.minus(currentPose.getTranslation());
-        Rotation2d deltaAngle = deltaTranslation.getAngle();
-        return deltaAngle.minus(currentPose.getRotation());
-    }
-
-    // ========================= Commands ======================================
-
-    // TODO: Add other Functions as Commands.
-
-    /** Uses a RunCommand. */
-    public Command runVelocityCommand(ChassisSpeeds speeds) {
-        return new RunCommand(() -> this.runVelocity(speeds), this);
-    }
-
     // ========================= Helper Methods ================================
-    /**
-     * Returns the module states (turn angles and drive velocities) for all of the
-     * modules.
-     */
-    @AutoLogOutput(key = "SwerveStates/Measured")
     private SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < modules.length; i++) {
             states[i] = modules[i].getState();
         }
         return states;
@@ -281,6 +252,4 @@ public class DriveBase extends SubsystemBase {
     public Command stopCommand() {
         return new InstantCommand(this::stop);
     }
-
-    // TODO: Add remaining Instant Commands.
 }

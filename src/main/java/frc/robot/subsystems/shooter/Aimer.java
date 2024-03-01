@@ -108,6 +108,14 @@ public class Aimer extends SubsystemBase {
         setAngle(angle);
     }
 
+    /**
+     * @return {@code true} if within error margin of target.
+     */
+    public boolean atTarget() {
+        return Math.abs(getTargetAngle().minus(getAngle()).getDegrees()) <= Math
+                .abs(CONSTANTS.getAimerErrorThreshold().getDegrees());
+    }
+
     public Rotation2d getTargetAngle() {
         return Rotation2d.fromDegrees(controller.getSetpoint());
     }
@@ -132,8 +140,27 @@ public class Aimer extends SubsystemBase {
     }
 
     // ========================= Commands ======================================
+    /**
+     * Will Aim and the given target and wait until within error threshold.
+     * 
+     * @param target
+     * @param currentPosition
+     * @return
+     */
     public Command aimAtTargetCommand(Supplier<Translation3d> target, Supplier<Translation2d> currentPosition) {
-        return new InstantCommand(() -> aimAtTarget(target.get(), currentPosition.get()), this);
+        Command command = new Command() {
+            @Override
+            public void initialize() {
+                aimAtTarget(target.get(), currentPosition.get());
+            }
+
+            @Override
+            public boolean isFinished() {
+                return atTarget();
+            }
+        };
+        command.addRequirements(this);
+        return command;
     }
 
     public Command modifyAngleCommand(Rotation2d change) {

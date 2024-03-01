@@ -171,6 +171,10 @@ public abstract class AbstractConstants {
         return Alliance.Blue;
     }
 
+    public boolean shouldFlipPath() {
+        return getAlliance() != getDefaultAllianceForAuto() && CONSTANTS.shouldFlipPathIfAssignedAllianceIsNotDefault();
+    }
+
     public boolean shouldFlipPathIfAssignedAllianceIsNotDefault() {
         return true;
     }
@@ -252,6 +256,10 @@ public abstract class AbstractConstants {
 
     public int getAimerEncoderPort() {
         return uniqueRoboRioPort(5, RoboRioPortArrays.DIO);
+    }
+
+    public Rotation2d getAimerErrorThreshold() {
+        return Rotation2d.fromDegrees(2);
     }
 
     public int getAimerMotorIdLeft() {

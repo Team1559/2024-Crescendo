@@ -128,7 +128,7 @@ public class DriveCommands {
                 driveBase.runVelocity(new ChassisSpeeds(scaledXVelocity, scaledYVelocity, omega));
             }
 
-            aimer.aimAtTarget(target.get(), driveBase.getPose().getTranslation());
+            aimer.aimAtTarget(target.get(), driveBase.getEstimatedPosition().getTranslation());
 
             // TODO: Add Turning LEDs to Green, when close enough to shoot.
 
@@ -209,7 +209,7 @@ public class DriveCommands {
                     driveBase.runVelocity(new ChassisSpeeds(scaledXVelocity, scaledYVelocity, omega));
                 }
 
-                aimer.aimAtTarget(target.get(), driveBase.getPose().getTranslation());
+                aimer.aimAtTarget(target.get(), driveBase.getEstimatedPosition().getTranslation());
 
                 // TODO: Add Turning LEDs to Green, when close enough to shoot.
 
