@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.gyro.GyroIo;
 import frc.robot.subsystems.gyro.GyroIoInputsAutoLogged;
 import frc.robot.subsystems.swerve_module.IndexedSwerveModule;
+import frc.robot.subsystems.swerve_module.IndexedSwerveModule.WheelModuleIndex;
 import frc.robot.subsystems.swerve_module.SwerveModuleIo;
 import frc.robot.util.LocalAdStarAk;
 
@@ -39,24 +40,7 @@ public class DriveBase extends SubsystemBase {
 
     // ========================= Class Level ===================================
 
-    public enum WheelModuleIndex {
-        /** 0 */
-        FRONT_LEFT(0),
-        /** 1 */
-        FRONT_RIGHT(1),
-        /** 2 */
-        BACK_LEFT(2),
-        /** 3 */
-        BACK_RIGHT(3);
-
-        public final int value;
-
-        private WheelModuleIndex(int value) {
-            this.value = value;
-        }
-    }
-
-    private static final double ENCODER_STDDEV = 0.01;
+    private static final double ENCODER_STD_DEV = 0.01;
 
     /** Returns an array of module translations. */
     public static Translation2d[] getModuleTranslations() {
@@ -90,14 +74,10 @@ public class DriveBase extends SubsystemBase {
             SwerveModuleIo brModuleIo) {
 
         this.gyroIO = gyroIo;
-        modules[WheelModuleIndex.FRONT_LEFT.value] = new IndexedSwerveModule(flModuleI,
-                WheelModuleIndex.FRONT_LEFT.value);
-        modules[WheelModuleIndex.FRONT_RIGHT.value] = new IndexedSwerveModule(frModuleIo,
-                WheelModuleIndex.FRONT_RIGHT.value);
-        modules[WheelModuleIndex.BACK_LEFT.value] = new IndexedSwerveModule(blModuleIo,
-                WheelModuleIndex.BACK_LEFT.value);
-        modules[WheelModuleIndex.BACK_RIGHT.value] = new IndexedSwerveModule(brModuleIo,
-                WheelModuleIndex.BACK_RIGHT.value);
+        modules[WheelModuleIndex.FRONT_LEFT.value] = new IndexedSwerveModule(flModuleI, WheelModuleIndex.FRONT_LEFT);
+        modules[WheelModuleIndex.FRONT_RIGHT.value] = new IndexedSwerveModule(frModuleIo, WheelModuleIndex.FRONT_RIGHT);
+        modules[WheelModuleIndex.BACK_LEFT.value] = new IndexedSwerveModule(blModuleIo, WheelModuleIndex.BACK_LEFT);
+        modules[WheelModuleIndex.BACK_RIGHT.value] = new IndexedSwerveModule(brModuleIo, WheelModuleIndex.BACK_RIGHT);
 
         modulePositions = new SwerveModulePosition[4];
         updateModulePositions();
@@ -105,7 +85,7 @@ public class DriveBase extends SubsystemBase {
         poseEstimator = new SwerveDrivePoseEstimator(
                 kinematics, gyroInputs.yawPosition, modulePositions,
                 new Pose2d(0, 0, gyroInputs.yawPosition),
-                VecBuilder.fill(ENCODER_STDDEV, ENCODER_STDDEV, ENCODER_STDDEV),
+                VecBuilder.fill(ENCODER_STD_DEV, ENCODER_STD_DEV, ENCODER_STD_DEV),
                 VecBuilder.fill(1, 1, 1)); // placeholder, will be filled in by vision
 
         // Configure AutoBuilder for PathPlanner
@@ -116,7 +96,7 @@ public class DriveBase extends SubsystemBase {
                 this::runVelocity,
                 new HolonomicPathFollowerConfig(CONSTANTS.getMaxLinearSpeed().in(MetersPerSecond),
                         CONSTANTS.getDriveBaseWheelRadius().in(Meters), new ReplanningConfig()),
-                // Flips path if aliance is on red side.
+                // Flips path if alliance is on red side.
                 () -> CONSTANTS.getAlliance() != CONSTANTS.getDefaultAllianceForAuto()
                         && CONSTANTS.shouldFlipPathIfAssignedAllianceIsNotDefault(),
                 this);

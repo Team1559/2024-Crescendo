@@ -15,11 +15,28 @@ import edu.wpi.first.units.Temperature;
 
 public class IndexedSwerveModule {
 
+    public enum WheelModuleIndex {
+        /** 0 */
+        FRONT_LEFT(0),
+        /** 1 */
+        FRONT_RIGHT(1),
+        /** 2 */
+        BACK_LEFT(2),
+        /** 3 */
+        BACK_RIGHT(3);
+
+        public final int value;
+
+        private WheelModuleIndex(int value) {
+            this.value = value;
+        }
+    }
+
     private final SwerveModuleIo io;
     private final SwerveModuleIoInputsAutoLogged inputs = new SwerveModuleIoInputsAutoLogged();
-    private final int index;
+    private final WheelModuleIndex index;
 
-    private final SimpleMotorFeedforward driveFeedforward;
+    private final SimpleMotorFeedforward driveFeedForward;
     private final PIDController driveFeedback;
     private final PIDController turnFeedback;
     private Rotation2d angleSetpoint; // Setpoint for closed loop control, null for open loop.
@@ -27,7 +44,7 @@ public class IndexedSwerveModule {
     private Rotation2d turnRelativeOffset; // Relative + Offset = Absolute.
     private double lastPositionMeters; // Used for delta calculation.
 
-    public IndexedSwerveModule(SwerveModuleIo io, int index) {
+    public IndexedSwerveModule(SwerveModuleIo io, WheelModuleIndex index) {
 
         this.io = io;
         this.index = index;
@@ -37,12 +54,12 @@ public class IndexedSwerveModule {
         switch (CONSTANTS.getCurrentOperatingMode()) {
             case REAL_WORLD:
             case LOG_REPLAY:
-                driveFeedforward = new SimpleMotorFeedforward(0.1, 0.13);
+                driveFeedForward = new SimpleMotorFeedforward(0.1, 0.13);
                 driveFeedback = new PIDController(0.05, 0.0, 0.0);
                 turnFeedback = new PIDController(7.0, 0.0, 0.0);
                 break;
             case SIMULATION:
-                driveFeedforward = new SimpleMotorFeedforward(0.0, 0.13);
+                driveFeedForward = new SimpleMotorFeedforward(0.0, 0.13);
                 driveFeedback = new PIDController(0.1, 0.0, 0.0);
                 turnFeedback = new PIDController(10.0, 0.0, 0.0);
                 break;
@@ -57,7 +74,7 @@ public class IndexedSwerveModule {
     public void periodic() {
 
         io.updateInputs(inputs);
-        Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
+        Logger.processInputs("Drive/Module_m" + index, inputs);
 
         // On first cycle, reset relative turn encoder.
         // Wait until absolute angle is nonzero in case it wasn't initialized yet.
@@ -82,7 +99,7 @@ public class IndexedSwerveModule {
 
                 // Run drive controller/
                 double velocityRadPerSec = adjustSpeedSetpoint / CONSTANTS.getWheelRadius().in(Meters);
-                io.setDriveVoltage(driveFeedforward.calculate(velocityRadPerSec)
+                io.setDriveVoltage(driveFeedForward.calculate(velocityRadPerSec)
                         + driveFeedback.calculate(inputs.driveMotorVelocityRadPerSec, velocityRadPerSec));
             }
         }

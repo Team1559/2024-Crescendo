@@ -20,7 +20,6 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.LedCommands;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.subsystems.base.DriveBase;
-import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.Traverser;
 import frc.robot.subsystems.gyro.GyroIoPigeon2;
@@ -33,6 +32,7 @@ import frc.robot.subsystems.shooter.Intake;
 import frc.robot.subsystems.shooter.NoteSensor;
 import frc.robot.subsystems.single_motor.SingleMotorIoNeo550Brushless;
 import frc.robot.subsystems.single_motor.SingleMotorIoReplay;
+import frc.robot.subsystems.swerve_module.IndexedSwerveModule.WheelModuleIndex;
 import frc.robot.subsystems.swerve_module.SwerveModuleIoReplay;
 import frc.robot.subsystems.swerve_module.SwerveModuleIoSim;
 import frc.robot.subsystems.swerve_module.SwerveModuleIoTalonFx;
@@ -224,7 +224,7 @@ public class RobotContainer {
             NamedCommands.registerCommand("Auto Shoot", new SequentialCommandGroup(
                     new ParallelCommandGroup(
                             DriveCommands.turnToTargetCommand(driveBase, CONSTANTS::getSpeakerLocation, 4.5),
-                            aimer.aimAtTargetCommand(CONSTANTS.getSpeakerLocation(), driveBase.getTranslation())),
+                            aimer.aimAtTargetCommand(CONSTANTS::getSpeakerLocation, driveBase::getTranslation)),
                     ShooterCommands.shootAutonomousCommand(feeder, leds, noteSensor)));
         }
 

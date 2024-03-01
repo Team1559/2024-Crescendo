@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.vision.Vision.VisionInputs;
 
 public class VisionIoLimelight implements VisionIo {
+
     private static final double LINEAR_STD_DEV_RATIO = 0.5;
     private static final double ROTATION_STD_DEV = 1;
 

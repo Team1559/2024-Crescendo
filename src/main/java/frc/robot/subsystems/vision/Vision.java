@@ -11,16 +11,13 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Vision extends SubsystemBase {
+
     private final VisionIo[] ios;
     private final SwerveDrivePoseEstimator poseEstimator;
     private final VisionInputsAutoLogged inputs = new VisionInputsAutoLogged();
 
     @AutoLog
     public static class VisionInputs {
-        public VisionInputs() {
-            estimateStdDevs = new double[3];
-        }
-
         public boolean havePose = false;
         public Pose2d pose = new Pose2d();
         public double distanceToTarget;

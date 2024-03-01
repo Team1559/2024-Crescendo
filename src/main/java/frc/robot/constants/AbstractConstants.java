@@ -25,7 +25,7 @@ import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
-import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
+import frc.robot.subsystems.swerve_module.IndexedSwerveModule.WheelModuleIndex;
 
 public abstract class AbstractConstants {
 

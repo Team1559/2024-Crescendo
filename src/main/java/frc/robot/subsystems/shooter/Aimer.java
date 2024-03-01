@@ -4,6 +4,8 @@ package frc.robot.subsystems.shooter;
 
 import static frc.robot.constants.AbstractConstants.CONSTANTS;
 
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -130,8 +132,8 @@ public class Aimer extends SubsystemBase {
     }
 
     // ========================= Commands ======================================
-    public Command aimAtTargetCommand(Translation3d target, Translation2d currentPosition) {
-        return new InstantCommand(() -> aimAtTarget(target, currentPosition), this);
+    public Command aimAtTargetCommand(Supplier<Translation3d> target, Supplier<Translation2d> currentPosition) {
+        return new InstantCommand(() -> aimAtTarget(target.get(), currentPosition.get()), this);
     }
 
     public Command modifyAngleCommand(Rotation2d change) {

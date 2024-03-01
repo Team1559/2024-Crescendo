@@ -19,7 +19,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
-import frc.robot.subsystems.base.DriveBase.WheelModuleIndex;
+import frc.robot.subsystems.swerve_module.IndexedSwerveModule.WheelModuleIndex;
 
 /**
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn
