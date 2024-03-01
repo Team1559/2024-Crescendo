@@ -16,7 +16,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -24,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Aimer extends SubsystemBase {
+
     @AutoLog
     static class AimerInputs {
 
@@ -99,8 +99,10 @@ public class Aimer extends SubsystemBase {
         double distanceMeters = currentPosition.getDistance(target.toTranslation2d());
         Logger.recordOutput("Shooter/Aimer/DistanceToTarget", distanceMeters);
 
-        double distanceFeet = Units.metersToFeet(distanceMeters);
-        Rotation2d angle = Rotation2d.fromDegrees(1.42 * distanceFeet * distanceFeet - 15.8 * distanceFeet + 55.8);
+        Rotation2d angle = Rotation2d
+                .fromDegrees(1.42 * distanceMeters * distanceMeters - 15.8 * distanceMeters + 55.8);
+        Logger.recordOutput("Shooter/Aimer/CalculatedTargetAngleInDegrees", angle.getDegrees());
+
         setAngle(angle);
     }
 

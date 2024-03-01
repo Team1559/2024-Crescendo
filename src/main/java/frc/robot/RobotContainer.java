@@ -64,7 +64,7 @@ public class RobotContainer {
     private final DriveBase driveBase;
 
     private final Aimer aimer;
-    private final Climber climber;
+    final Climber climber;
     private final Feeder feeder;
     private final Flywheel flywheel;
     private final Intake intake;
@@ -182,7 +182,7 @@ public class RobotContainer {
 
         // #region: ---------- Configure Command Triggers ----------
         if (CONSTANTS.hasNoteSensorSubsystem()) {
-            new Trigger((noteSensor::isObjectDetected)).whileTrue(leds.setColorCommand(Color.kBrown));
+            new Trigger((noteSensor::isObjectDetected)).whileTrue(leds.setColorCommand(Color.kGreen));
         }
         // TODO: Add LED Trigger for Ready to Shoot.
         // #endregion
@@ -243,9 +243,7 @@ public class RobotContainer {
                 pilot::getLeftY,
                 pilot::getLeftX,
                 CONSTANTS::getAmpLocation));
-
         pilot.y().onTrue(driveBase.resetFieldOrientationCommand());
-
         // #endregion
 
         // #region: ---------- Configure Controller 1 for Co-Pilot ----------
