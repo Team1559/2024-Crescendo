@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
@@ -66,7 +67,7 @@ public class RobotContainer {
 
     private final DriveBase driveBase;
 
-    private final Aimer aimer;
+    public final Aimer aimer;
     public final Climber climber;
     private final NoteSensor noteSensor;
     private final Feeder feeder;
@@ -230,7 +231,8 @@ public class RobotContainer {
 
         Command aimAtSpeakerCommand = Commands.parallel(
                 DriveCommands.turnToTargetCommand(driveBase, CONSTANTS::getSpeakerLocation, 4.5), new InstantCommand(
-                        () -> aimer.aimAtTarget(CONSTANTS.getSpeakerLocation(), driveBase.getPose().getTranslation())));
+                        () -> aimer.aimAtTarget(CONSTANTS.getSpeakerLocation(), driveBase.getPose().getTranslation())))
+                .andThen(new WaitUntilCommand(aimer::atTarget));
         Command autoShootCommand;
         if (CONSTANTS.hasFeederSubsystem() && CONSTANTS.hasNoteSensorSubsystem()) {
             autoShootCommand = ShooterCommands.shootAutonomousCommand(feeder, leds, noteSensor);
@@ -277,8 +279,8 @@ public class RobotContainer {
         }
 
         if (CONSTANTS.hasClimberSubsystem()) {
-            coPilot.povUp().whileTrue(climber.incrementTargetHeightCommand(.1));
-            coPilot.povDown().whileTrue(climber.incrementTargetHeightCommand(-.1));
+            coPilot.povUp().whileTrue(climber.incrementTargetHeightCommand(.05).repeatedly());
+            coPilot.povDown().whileTrue(climber.incrementTargetHeightCommand(-.1).repeatedly());
         }
 
         if (CONSTANTS.hasTraverserSubsystem()) {

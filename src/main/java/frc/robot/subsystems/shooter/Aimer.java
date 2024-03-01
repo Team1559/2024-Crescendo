@@ -97,7 +97,7 @@ public class Aimer extends SubsystemBase {
         double distanceMeters = currentPosition.getDistance(target.toTranslation2d());
         Logger.recordOutput("Shooter/Aimer/DistanceToTarget", distanceMeters);
         Rotation2d angle = Rotation2d
-                .fromDegrees(1.42 * distanceMeters * distanceMeters - 15.8 * distanceMeters + 55.8);
+                .fromDegrees(1.42 * distanceMeters * distanceMeters - 15.8 * distanceMeters + 55.3);
         Logger.recordOutput("Shooter/Aimer/CalculatedTargetAngleInDegrees", angle.getDegrees());
         setTargetAngle(angle);
     }
@@ -120,6 +120,10 @@ public class Aimer extends SubsystemBase {
     public Rotation2d getAngle() {
         // Invert angle as encoder is mounted "backwards".
         return Rotation2d.fromRotations(-encoder.getAbsolutePosition()).plus(CONSTANTS.getAimerEncoderOffset());
+    }
+
+    public boolean atTarget() {
+        return Math.abs(inputs.currentAngleDegrees - inputs.targetAngleDegrees) < 2;
     }
 
     // ========================= Commands ======================================
