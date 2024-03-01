@@ -1,5 +1,6 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Centimeters;
 import static frc.robot.constants.AbstractConstants.CONSTANTS;
 
 import org.littletonrobotics.junction.LogFileUtil;
@@ -101,7 +102,10 @@ public class Robot extends LoggedRobot {
     @Override
     public void autonomousInit() {
         autonomousCommand = robotContainer.getAutonomousCommand();
-        CommandScheduler.getInstance().schedule(robotContainer.climber.setTargetHeightCommand(.5));
+
+        if (CONSTANTS.hasClimberSubsystem()) {
+            CommandScheduler.getInstance().schedule(robotContainer.climber.setHeightCommand(Centimeters.of(1)));
+        }
 
         // schedule the autonomous command (example)
         if (autonomousCommand != null) {
