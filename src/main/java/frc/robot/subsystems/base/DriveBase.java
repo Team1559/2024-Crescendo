@@ -53,16 +53,7 @@ public class DriveBase extends SubsystemBase {
     private final GyroIoInputsAutoLogged gyroInputs = new GyroIoInputsAutoLogged();
     private final IndexedSwerveModule[] modules = new IndexedSwerveModule[4];
 
-    private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(new Translation2d[] {
-            new Translation2d(CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
-                    CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0),
-            new Translation2d(CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
-                    -CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0),
-            new Translation2d(-CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
-                    CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0),
-            new Translation2d(-CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
-                    -CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0)
-    });
+    private final SwerveDriveKinematics kinematics;
     public final SwerveDrivePoseEstimator poseEstimator;
     private final SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
     private Pose2d lastPosition;
@@ -83,6 +74,17 @@ public class DriveBase extends SubsystemBase {
         modules[WheelModuleIndex.BACK_RIGHT.value] = new IndexedSwerveModule(brModuleIo, WheelModuleIndex.BACK_RIGHT);
 
         // -------------------- Create Position Estimator --------------------
+        kinematics = new SwerveDriveKinematics(new Translation2d[] {
+                new Translation2d(CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
+                        CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0),
+                new Translation2d(CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
+                        -CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0),
+                new Translation2d(-CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
+                        CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0),
+                new Translation2d(-CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
+                        -CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0)
+        });
+
         updateModulePositions();
 
         poseEstimator = new SwerveDrivePoseEstimator(
@@ -104,10 +106,10 @@ public class DriveBase extends SubsystemBase {
                 CONSTANTS::shouldFlipPath,
                 this);
         Pathfinding.setPathfinder(new LocalAdStarAk());
-        PathPlannerLogging.setLogActivePathCallback(activePath -> Logger.recordOutput("Odometry/Trajectory",
+        PathPlannerLogging.setLogActivePathCallback(activePath -> Logger.recordOutput("PathPlanner/ActivePath",
                 activePath.toArray(new Pose2d[activePath.size()])));
         PathPlannerLogging
-                .setLogTargetPoseCallback(targetPose -> Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose));
+                .setLogTargetPoseCallback(targetPose -> Logger.recordOutput("PathPlanner/TargetPos", targetPose));
 
         // TODO: Figure out why the robot is not starting at 0,0.
         setPose(new Pose2d(new Translation2d(),
@@ -117,38 +119,31 @@ public class DriveBase extends SubsystemBase {
     @Override
     public void periodic() {
 
-        // ---------- Log Inputs ----------
+        // Stop moving when disabled.
+        if (DriverStation.isDisabled()) {
+            stop();
+        }
+
+        // Run Module periodic methods.
+        for (IndexedSwerveModule module : modules) {
+            module.periodic();
+        }
+
+        // ---------- Log Gyro Inputs ----------
+        gyroIO.updateInputs(gyroInputs);
+        Logger.processInputs("Drive/Gyro", gyroInputs);
+
+        // ---------- Update Position Estimator ----------
+        updateModulePositions();
+        poseEstimator.update(gyroInputs.yawPosition, modulePositions);
+
+        // ---------- Log Drive Base Inputs ----------
         inputs.estimatedPosition = getEstimatedPosition();
         inputs.estimatedSpeed = Meters
                 .of(lastPosition.getTranslation().getDistance(getEstimatedPosition().getTranslation()))
                 .per(Seconds.of(1 / 50));
         lastPosition = getEstimatedPosition();
         Logger.processInputs(LOG_PATH, inputs);
-
-        gyroIO.updateInputs(gyroInputs);
-        Logger.processInputs("Drive/Gyro", gyroInputs);
-
-        for (IndexedSwerveModule module : modules) {
-            module.periodic();
-        }
-
-        // Stop moving when disabled
-        if (DriverStation.isDisabled()) {
-            for (IndexedSwerveModule module : modules) {
-                module.stop();
-            }
-        }
-
-        // Log empty setpoint states when disabled
-        if (DriverStation.isDisabled()) {
-            Logger.recordOutput("SwerveStates/Setpoints []");
-            Logger.recordOutput("SwerveStates/SetpointsOptimized []");
-        }
-
-        // Update odometry
-        updateModulePositions();
-        poseEstimator.update(gyroInputs.yawPosition, modulePositions);
-        getEstimatedPosition(); // Logs Robot Estimated Position;
     }
 
     // ========================= Functions =====================================
@@ -203,18 +198,30 @@ public class DriveBase extends SubsystemBase {
      */
     public void runVelocity(ChassisSpeeds speeds) {
 
-        // Calculate module setpoints.
-        ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
-        SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
-        SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, CONSTANTS.getMaxLinearSpeed());
+        SwerveModuleState[] setpointStates, optimizedSetpointStates;
+        if (speeds.vxMetersPerSecond == 0 && speeds.vyMetersPerSecond == 0 && speeds.omegaRadiansPerSecond == 0) {
 
-        // Send setpoints to modules
-        SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
-        for (int i = 0; i < modules.length; i++) {
-            optimizedSetpointStates[i] = modules[i].runSetpoint(setpointStates[i]);
+            optimizedSetpointStates = setpointStates = new SwerveModuleState[4];
+            int i = -1;
+            for (IndexedSwerveModule module : modules) {
+                module.stop();
+                setpointStates[++i] = module.getState();
+            }
+        } else {
+
+            // Calculate module setpoints.
+            ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
+            setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
+            SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, CONSTANTS.getMaxLinearSpeed());
+
+            // Send setpoints to modules.
+            optimizedSetpointStates = new SwerveModuleState[4];
+            for (int i = 0; i < modules.length; i++) {
+                optimizedSetpointStates[i] = modules[i].runSetpoint(setpointStates[i]);
+            }
         }
 
-        // Log setpoint states
+        // Log setpoint states.
         Logger.recordOutput(LOG_PATH + "/Setpoints", setpointStates);
         Logger.recordOutput(LOG_PATH + "/SetpointsOptimized", optimizedSetpointStates);
     }
