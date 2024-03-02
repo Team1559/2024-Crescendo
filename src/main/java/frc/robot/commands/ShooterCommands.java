@@ -9,12 +9,12 @@ import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.io.motor.MotorIoNeo550Brushless;
 import frc.robot.subsystems.led.Leds;
 import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.Intake;
 import frc.robot.subsystems.shooter.NoteSensor;
-import frc.robot.subsystems.single_motor.SingleMotorIoNeo550Brushless;
 
 public class ShooterCommands {
 
@@ -101,7 +101,7 @@ public class ShooterCommands {
             Leds leds) {
 
         ParallelRaceGroup group = new ParallelRaceGroup(new StartEndCommand(intake::start, intake::stop, intake),
-                new StartEndCommand(() -> feeder.setVelocity(SingleMotorIoNeo550Brushless.MAX_VELOCITY), feeder::stop,
+                new StartEndCommand(() -> feeder.setVelocity(MotorIoNeo550Brushless.MAX_VELOCITY), feeder::stop,
                         feeder),
                 leds.setColorCommand(Color.kPurple).repeatedly(),
                 noteSensor.waitForNoObjectCommandSwitch(), new WaitCommand(5));

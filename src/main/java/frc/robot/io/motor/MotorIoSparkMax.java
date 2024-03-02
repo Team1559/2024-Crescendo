@@ -1,4 +1,4 @@
-package frc.robot.subsystems.single_motor;
+package frc.robot.io.motor;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
@@ -19,7 +19,7 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.units.Velocity;
 import frc.robot.constants.AbstractConstants.PID;
 
-public abstract class SingleMotorIoSparkMax implements SingleMotorIo {
+public abstract class MotorIoSparkMax implements MotorIo {
 
     protected final CANSparkMax motor;
     protected Measure<Velocity<Angle>> targetVelocity;
@@ -31,7 +31,7 @@ public abstract class SingleMotorIoSparkMax implements SingleMotorIo {
      * @param motorId  Motor CAN ID
      * @param inverted True if the motor direction should be inverted
      */
-    public SingleMotorIoSparkMax(int motorId, boolean inverted, PID pidValues) {
+    public MotorIoSparkMax(int motorId, boolean inverted, PID pidValues) {
 
         // Create & Configure Motor.
         motor = new CANSparkMax(motorId, MotorType.kBrushless);
@@ -48,7 +48,7 @@ public abstract class SingleMotorIoSparkMax implements SingleMotorIo {
     }
 
     @Override
-    public void updateInputs(SingleMotorIoInputs inputs) {
+    public void updateInputs(MotorIoInputs inputs) {
 
         List<String> faults = new LinkedList<>(), stickyFaults = new LinkedList<>();
         for (FaultID faultID : FaultID.values()) {

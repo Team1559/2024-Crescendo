@@ -1,4 +1,4 @@
-package frc.robot.subsystems.single_motor;
+package frc.robot.io.motor;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
@@ -12,7 +12,7 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.units.Velocity;
 import frc.robot.constants.AbstractConstants.PID;
 
-public class SingleMotorIoNeo550Brushless extends SingleMotorIoSparkMax {
+public class MotorIoNeo550Brushless extends MotorIoSparkMax {
 
     public static final Measure<Velocity<Angle>> MAX_VELOCITY = RevolutionsPerSecond.of(11000);
 
@@ -22,7 +22,7 @@ public class SingleMotorIoNeo550Brushless extends SingleMotorIoSparkMax {
      * @param motorId  Motor CAN ID
      * @param inverted True if the motor direction should be inverted
      */
-    public SingleMotorIoNeo550Brushless(int motorId, boolean inverted, PID pidValues) {
+    public MotorIoNeo550Brushless(int motorId, boolean inverted, PID pidValues) {
         super(motorId, inverted, pidValues);
 
         motor.setSmartCurrentLimit((int) CONSTANTS.getNeo550BrushlessCurrentLimit().in(Amps));

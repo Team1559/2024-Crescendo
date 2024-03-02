@@ -4,12 +4,12 @@ import static frc.robot.constants.AbstractConstants.CONSTANTS;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import frc.robot.subsystems.single_motor.SingleMotorIo;
+import frc.robot.io.motor.MotorIo;
 import frc.robot.subsystems.single_motor.SingleMotorSubsystem;
 
 public class Traverser extends SingleMotorSubsystem {
 
-    public Traverser(SingleMotorIo io) {
+    public Traverser(MotorIo io) {
         super("Traverser", io, CONSTANTS.getTraverserVelocity(), CONSTANTS.getTraverserVelocity());
     }
 

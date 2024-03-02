@@ -21,6 +21,8 @@ import frc.robot.commands.LedCommands;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.io.gyro.GyroIoPigeon2;
 import frc.robot.io.gyro.GyroIoSimAndReplay;
+import frc.robot.io.motor.MotorIoNeo550Brushless;
+import frc.robot.io.motor.MotorIoReplay;
 import frc.robot.subsystems.base.DriveBase;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.Traverser;
@@ -30,8 +32,6 @@ import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.Intake;
 import frc.robot.subsystems.shooter.NoteSensor;
-import frc.robot.subsystems.single_motor.SingleMotorIoNeo550Brushless;
-import frc.robot.subsystems.single_motor.SingleMotorIoReplay;
 import frc.robot.subsystems.swerve_module.IndexedSwerveModule.WheelModuleIndex;
 import frc.robot.subsystems.swerve_module.SwerveModuleIoReplay;
 import frc.robot.subsystems.swerve_module.SwerveModuleIoSim;
@@ -91,15 +91,15 @@ public class RobotContainer {
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_LEFT),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
                 feeder = CONSTANTS.hasFeederSubsystem()
-                        ? new Feeder(new SingleMotorIoNeo550Brushless(CONSTANTS.getFeederMotorId(),
+                        ? new Feeder(new MotorIoNeo550Brushless(CONSTANTS.getFeederMotorId(),
                                 CONSTANTS.isFeederMotorInverted(), CONSTANTS.getFeederPidValues()))
                         : null;
                 intake = CONSTANTS.hasIntakeSubsystem()
-                        ? new Intake(new SingleMotorIoNeo550Brushless(CONSTANTS.getIntakeMotorId(),
+                        ? new Intake(new MotorIoNeo550Brushless(CONSTANTS.getIntakeMotorId(),
                                 CONSTANTS.isIntakeMotorInverted(), CONSTANTS.getIntakePidValues()))
                         : null;
                 traverser = CONSTANTS.hasTraverserSubsystem()
-                        ? new Traverser(new SingleMotorIoNeo550Brushless(CONSTANTS.getTraverserMotorId(),
+                        ? new Traverser(new MotorIoNeo550Brushless(CONSTANTS.getTraverserMotorId(),
                                 CONSTANTS.isTraverserInverted(), CONSTANTS.getTraverserPidValues()))
                         : null;
                 vision = CONSTANTS.hasVisionSubsystem()
@@ -117,15 +117,15 @@ public class RobotContainer {
                         new SwerveModuleIoSim(),
                         new SwerveModuleIoSim());
                 feeder = CONSTANTS.hasFeederSubsystem()
-                        ? new Feeder(new SingleMotorIoNeo550Brushless(CONSTANTS.getFeederMotorId(),
+                        ? new Feeder(new MotorIoNeo550Brushless(CONSTANTS.getFeederMotorId(),
                                 CONSTANTS.isFeederMotorInverted(), CONSTANTS.getIntakePidValues()))
                         : null;
                 intake = CONSTANTS.hasIntakeSubsystem()
-                        ? new Intake(new SingleMotorIoNeo550Brushless(CONSTANTS.getIntakeMotorId(),
+                        ? new Intake(new MotorIoNeo550Brushless(CONSTANTS.getIntakeMotorId(),
                                 CONSTANTS.isIntakeMotorInverted(), CONSTANTS.getIntakePidValues()))
                         : null;
                 traverser = CONSTANTS.hasTraverserSubsystem()
-                        ? new Traverser(new SingleMotorIoNeo550Brushless(CONSTANTS.getTraverserMotorId(),
+                        ? new Traverser(new MotorIoNeo550Brushless(CONSTANTS.getTraverserMotorId(),
                                 CONSTANTS.isTraverserInverted(), CONSTANTS.getTraverserPidValues()))
                         : null;
                 vision = CONSTANTS.hasVisionSubsystem()
@@ -141,9 +141,9 @@ public class RobotContainer {
                         new SwerveModuleIoReplay(),
                         new SwerveModuleIoReplay(),
                         new SwerveModuleIoReplay());
-                feeder = CONSTANTS.hasFeederSubsystem() ? new Feeder(new SingleMotorIoReplay()) : null;
-                intake = CONSTANTS.hasIntakeSubsystem() ? new Intake(new SingleMotorIoReplay()) : null;
-                traverser = CONSTANTS.hasTraverserSubsystem() ? new Traverser(new SingleMotorIoReplay()) : null;
+                feeder = CONSTANTS.hasFeederSubsystem() ? new Feeder(new MotorIoReplay()) : null;
+                intake = CONSTANTS.hasIntakeSubsystem() ? new Intake(new MotorIoReplay()) : null;
+                traverser = CONSTANTS.hasTraverserSubsystem() ? new Traverser(new MotorIoReplay()) : null;
                 vision = CONSTANTS.hasVisionSubsystem()
                         ? new Vision(driveBase.poseEstimator, new VisionIoSimAndReplay())
                         : null;

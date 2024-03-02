@@ -11,14 +11,16 @@ import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.io.motor.MotorIo;
+import frc.robot.io.motor.MotorIoInputsAutoLogged;
 
-public class SingleMotorSubsystem extends SubsystemBase {
+public abstract class SingleMotorSubsystem extends SubsystemBase {
 
     protected final Measure<Velocity<Angle>> DEFAULT_FORWARDS_VELOCITY;
     protected final Measure<Velocity<Angle>> DEFAULT_REVERSE_VELOCITY;
 
-    private final SingleMotorIo io;
-    private final SingleMotorIoInputsAutoLogged inputs = new SingleMotorIoInputsAutoLogged();
+    private final MotorIo io;
+    private final MotorIoInputsAutoLogged inputs = new MotorIoInputsAutoLogged();
 
     private Measure<Velocity<Angle>> appliedVelocity;
 
@@ -29,12 +31,12 @@ public class SingleMotorSubsystem extends SubsystemBase {
      * @param io       SingleMotorIO instance for the specific motor type
      * @param velocity Will be used for forwards and backwards.
      */
-    protected SingleMotorSubsystem(String name, SingleMotorIo io, Measure<Velocity<Angle>> velocity) {
+    protected SingleMotorSubsystem(String name, MotorIo io, Measure<Velocity<Angle>> velocity) {
         this(name, io, velocity, velocity);
 
     }
 
-    protected SingleMotorSubsystem(String name, SingleMotorIo io, Measure<Velocity<Angle>> forwardsVelocity,
+    protected SingleMotorSubsystem(String name, MotorIo io, Measure<Velocity<Angle>> forwardsVelocity,
             Measure<Velocity<Angle>> reverseVelocity) {
 
         super(name);

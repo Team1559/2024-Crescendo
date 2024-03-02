@@ -1,4 +1,4 @@
-package frc.robot.subsystems.single_motor;
+package frc.robot.io.motor;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
@@ -8,12 +8,12 @@ import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.Velocity;
 
-public class SingleMotorIoReplay implements SingleMotorIo {
+public class MotorIoReplay implements MotorIo {
 
     Measure<Velocity<Angle>> velocity = RotationsPerSecond.of(0);
 
     @Override
-    public void updateInputs(SingleMotorIoInputs inputs) {
+    public void updateInputs(MotorIoInputs inputs) {
         inputs.velocityActual = inputs.velocityTarget = velocity;
     }
 
