@@ -1,8 +1,13 @@
 package frc.robot.subsystems.single_motor;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Celsius;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import org.littletonrobotics.junction.AutoLog;
 
 import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Current;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Velocity;
@@ -11,11 +16,20 @@ public interface SingleMotorIo {
 
     @AutoLog
     static class SingleMotorIoInputs {
+
+        public String[] faults = new String[0], stickyFaults = new String[0];
+
+        /**
+         * Percentage of power from -1 to 1.
+         */
         public double appliedOutput;
-        public double outputCurrent;
-        public double motorTemp;
-        public int faults;
-        public double velocity;
+
+        public Measure<Current> outputCurrent = Amps.of(0);
+
+        public Measure<Temperature> motorTemperature = Celsius.of(0);
+
+        public Measure<Velocity<Angle>> velocityActual = RotationsPerSecond.of(0);
+        public Measure<Velocity<Angle>> velocityTarget = RotationsPerSecond.of(0);
     }
 
     public void updateInputs(SingleMotorIoInputs inputs);
@@ -24,5 +38,7 @@ public interface SingleMotorIo {
 
     public Measure<Temperature> getTemperature();
 
-    public void setVelocity(Measure<Velocity<Angle>> velocityRPM);
+    public Measure<Velocity<Angle>> getVelocity();
+
+    public void setVelocity(Measure<Velocity<Angle>> velocity);
 }

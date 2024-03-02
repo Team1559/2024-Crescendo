@@ -1,5 +1,7 @@
 package frc.robot.subsystems.single_motor;
 
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
@@ -8,9 +10,11 @@ import edu.wpi.first.units.Velocity;
 
 public class SingleMotorIoReplay implements SingleMotorIo {
 
+    Measure<Velocity<Angle>> velocity = RotationsPerSecond.of(0);
+
     @Override
     public void updateInputs(SingleMotorIoInputs inputs) {
-        // No functionality.
+        inputs.velocityActual = inputs.velocityTarget = velocity;
     }
 
     public Measure<Temperature> getMaxSafeTemperature() {
@@ -22,7 +26,12 @@ public class SingleMotorIoReplay implements SingleMotorIo {
     }
 
     @Override
+    public Measure<Velocity<Angle>> getVelocity() {
+        return velocity;
+    }
+
+    @Override
     public void setVelocity(Measure<Velocity<Angle>> velocity) {
-        // No functionality.
+        this.velocity = velocity;
     }
 }

@@ -1,5 +1,6 @@
 package frc.robot.constants;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
@@ -18,6 +19,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Current;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
@@ -128,7 +130,7 @@ public abstract class AbstractConstants {
         if (ports == null) {
             uniqueRoboRioPorts.put(portArray, new HashSet<>(Arrays.asList(port)));
         } else if (!ports.add(port)) {
-            throw new RuntimeException("Duplicate roboRIO Port (" + port + ")!");
+            throw new RuntimeException("Duplicate roboRIO Port (" + port + ") on the " + portArray + " array!");
         }
 
         return port;
@@ -498,18 +500,12 @@ public abstract class AbstractConstants {
 
     // #region: ----- NEO 550 Brushless Motor -----
 
-    /**
-     * @return Value as Amps.
-     */
-    public int getNeo550BrushlessCurrentLimit() {
-        return 24;
+    public Measure<Current> getNeo550BrushlessCurrentLimit() {
+        return Amps.of(24);
     }
 
-    /**
-     * @return Value as Amps.
-     */
-    public int getNeo550BrushlessCurrentSecondaryLimit() {
-        return 80;
+    public Measure<Current> getNeo550BrushlessCurrentSecondaryLimit() {
+        return Amps.of(24);
     }
 
     // #endregion

@@ -1,8 +1,13 @@
 package frc.robot.subsystems.single_motor;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
-import static frc.robot.constants.AbstractConstants.CONSTANTS;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import com.revrobotics.CANSparkBase.FaultID;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
@@ -17,7 +22,7 @@ import frc.robot.constants.AbstractConstants.PID;
 public abstract class SingleMotorIoSparkMax implements SingleMotorIo {
 
     protected final CANSparkMax motor;
-    protected double velocity;
+    protected Measure<Velocity<Angle>> targetVelocity;
     protected boolean inverted;
 
     /**
@@ -27,33 +32,60 @@ public abstract class SingleMotorIoSparkMax implements SingleMotorIo {
      * @param inverted True if the motor direction should be inverted
      */
     public SingleMotorIoSparkMax(int motorId, boolean inverted, PID pidValues) {
+
+        // Create & Configure Motor.
         motor = new CANSparkMax(motorId, MotorType.kBrushless);
-        motor.setInverted(false); // TODO - randomly flips back
+        // Randomly flips back. TODO: Figure out why?
+        // motor.setInverted(false);
         this.inverted = inverted;
         motor.setIdleMode(IdleMode.kBrake);
-        motor.setSmartCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentLimit());
-        motor.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
+
+        // Configure piD Controller.
         motor.getPIDController().setP(pidValues.P);
         motor.getPIDController().setI(pidValues.I);
         motor.getPIDController().setD(pidValues.D);
         motor.getPIDController().setFF(pidValues.FF);
     }
 
+    @Override
     public void updateInputs(SingleMotorIoInputs inputs) {
+
+        List<String> faults = new LinkedList<>(), stickyFaults = new LinkedList<>();
+        for (FaultID faultID : FaultID.values()) {
+            if (motor.getFault(faultID)) {
+                faults.add(faultID.name());
+            }
+            if (motor.getStickyFault(faultID)) {
+                stickyFaults.add(faultID.name());
+            }
+        }
+        inputs.faults = faults.toArray(new String[0]);
+        inputs.stickyFaults = stickyFaults.toArray(new String[0]);
+
         inputs.appliedOutput = motor.getAppliedOutput();
-        inputs.outputCurrent = motor.getOutputCurrent();
-        inputs.motorTemp = motor.getMotorTemperature();
-        inputs.faults = motor.getFaults();
-        inputs.velocity = motor.getEncoder().getVelocity();
+
+        inputs.outputCurrent = Amps.of(motor.getOutputCurrent());
+        inputs.motorTemperature = Celsius.of(motor.getMotorTemperature());
+        inputs.velocityActual = getVelocity();
+        inputs.velocityTarget = targetVelocity;
     }
 
+    @Override
     public Measure<Temperature> getTemperature() {
         return Units.Celsius.of(motor.getMotorTemperature());
     }
 
+    @Override
+    public Measure<Velocity<Angle>> getVelocity() {
+        return RevolutionsPerSecond.of(motor.getEncoder().getVelocity());
+    }
+
+    @Override
     public void setVelocity(Measure<Velocity<Angle>> velocity) {
         motor.getPIDController().setReference(
                 inverted ? velocity.negate().in(RevolutionsPerSecond) : velocity.in(RevolutionsPerSecond),
                 CANSparkMax.ControlType.kVelocity);
+
+        targetVelocity = velocity;
     }
 }

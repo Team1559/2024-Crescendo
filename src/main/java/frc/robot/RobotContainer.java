@@ -19,11 +19,11 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.LedCommands;
 import frc.robot.commands.ShooterCommands;
+import frc.robot.io.gyro.GyroIoPigeon2;
+import frc.robot.io.gyro.GyroIoSimAndReplay;
 import frc.robot.subsystems.base.DriveBase;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.Traverser;
-import frc.robot.subsystems.gyro.GyroIoPigeon2;
-import frc.robot.subsystems.gyro.GyroIoSimAndReplay;
 import frc.robot.subsystems.led.Leds;
 import frc.robot.subsystems.shooter.Aimer;
 import frc.robot.subsystems.shooter.Feeder;
@@ -237,12 +237,10 @@ public class RobotContainer {
         // #region: ==================== Tele-Op ===============================
         // #region: ---------- Configure Controller 0 for Pilot ----------
         pilot.leftTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel, aimer,
-                pilot::getLeftY,
-                pilot::getLeftX,
+                pilot::getLeftY, pilot::getLeftX,
                 CONSTANTS::getSpeakerLocation));
         pilot.rightTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel, aimer,
-                pilot::getLeftY,
-                pilot::getLeftX,
+                pilot::getLeftY, pilot::getLeftX,
                 CONSTANTS::getAmpLocation));
         pilot.y().onTrue(driveBase.resetFieldOrientationCommand());
         // #endregion

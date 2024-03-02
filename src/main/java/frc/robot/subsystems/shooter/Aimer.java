@@ -2,6 +2,7 @@
 //Actual anlge 55 deg. correspods to reading 103 deg.
 package frc.robot.subsystems.shooter;
 
+import static edu.wpi.first.units.Units.Amps;
 import static frc.robot.constants.AbstractConstants.CONSTANTS;
 
 import java.util.function.Supplier;
@@ -55,10 +56,10 @@ public class Aimer extends SubsystemBase {
         motorR.setInverted(true);
         motorL.setIdleMode(IdleMode.kBrake);
         motorR.setIdleMode(IdleMode.kBrake);
-        motorL.setSmartCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentLimit());
-        motorR.setSmartCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentLimit());
-        motorL.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
-        motorR.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
+        motorL.setSmartCurrentLimit((int) CONSTANTS.getNeo550BrushlessCurrentLimit().in(Amps));
+        motorR.setSmartCurrentLimit((int) CONSTANTS.getNeo550BrushlessCurrentLimit().in(Amps));
+        motorL.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit().in(Amps));
+        motorR.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit().in(Amps));
     }
 
     @Override

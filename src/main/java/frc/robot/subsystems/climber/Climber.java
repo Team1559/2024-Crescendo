@@ -1,5 +1,6 @@
 package frc.robot.subsystems.climber;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
 import static frc.robot.constants.AbstractConstants.CONSTANTS;
 
@@ -45,10 +46,10 @@ public class Climber extends SubsystemBase {
         motorR.setInverted(false);
         motorL.setIdleMode(IdleMode.kBrake);
         motorR.setIdleMode(IdleMode.kBrake);
-        motorL.setSmartCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentLimit());
-        motorR.setSmartCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentLimit());
-        motorL.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
-        motorL.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
+        motorL.setSmartCurrentLimit((int) CONSTANTS.getNeo550BrushlessCurrentLimit().in(Amps));
+        motorR.setSmartCurrentLimit((int) CONSTANTS.getNeo550BrushlessCurrentLimit().in(Amps));
+        motorL.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit().in(Amps));
+        motorL.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit().in(Amps));
     }
 
     @Override

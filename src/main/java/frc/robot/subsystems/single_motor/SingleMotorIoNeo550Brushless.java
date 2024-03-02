@@ -1,6 +1,8 @@
 package frc.robot.subsystems.single_motor;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
+import static frc.robot.constants.AbstractConstants.CONSTANTS;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.Angle;
@@ -22,6 +24,9 @@ public class SingleMotorIoNeo550Brushless extends SingleMotorIoSparkMax {
      */
     public SingleMotorIoNeo550Brushless(int motorId, boolean inverted, PID pidValues) {
         super(motorId, inverted, pidValues);
+
+        motor.setSmartCurrentLimit((int) CONSTANTS.getNeo550BrushlessCurrentLimit().in(Amps));
+        motor.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit().in(Amps));
     }
 
     @Override
