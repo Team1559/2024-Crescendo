@@ -318,7 +318,7 @@ public abstract class AbstractConstants {
 
     public Measure<Velocity<Angle>> getFeederVelocityForward() {
         // TODO: Configure Value.
-        return RevolutionsPerSecond.of(3666);
+        return getIntakeVelocityForward().divide(4);
     }
 
     public Measure<Velocity<Angle>> getFeederVelocityReverse() {
@@ -378,7 +378,7 @@ public abstract class AbstractConstants {
 
     public Measure<Velocity<Angle>> getIntakeVelocityForward() {
         // TODO: Configure Value.
-        return RevolutionsPerSecond.of(8250);
+        return RevolutionsPerSecond.of(11000);
     }
 
     public Measure<Velocity<Angle>> getIntakeVelocityReverse() {
