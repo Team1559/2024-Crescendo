@@ -63,7 +63,7 @@ public class RobotContainer {
 
     private final DriveBase driveBase;
 
-    private final Aimer aimer;
+    final Aimer aimer;
     final Climber climber;
     private final Feeder feeder;
     private final Flywheel flywheel;
@@ -224,7 +224,8 @@ public class RobotContainer {
             NamedCommands.registerCommand("Auto Shoot", new SequentialCommandGroup(
                     new ParallelCommandGroup(
                             DriveCommands.turnToTargetCommand(driveBase, CONSTANTS::getSpeakerLocation, 4.5),
-                            aimer.aimAtTargetCommand(CONSTANTS::getSpeakerLocation, driveBase::getTranslation)),
+                            aimer.aimAtTargetCommand(CONSTANTS::getSpeakerLocation, driveBase::getTranslation)
+                                    .andThen(aimer.waitUntilAtTargetCommand())),
                     ShooterCommands.shootAutonomousCommand(feeder, leds, noteSensor)));
         }
 
@@ -266,7 +267,7 @@ public class RobotContainer {
         }
 
         if (CONSTANTS.hasClimberSubsystem()) {
-            coPilot.povUp().whileTrue(climber.modifyHeightCommand(Inches.of(0.1)));
+            coPilot.povUp().whileTrue(climber.modifyHeightCommand(Inches.of(0.05)));
             coPilot.povDown().whileTrue(climber.modifyHeightCommand(Inches.of(-0.1)));
         }
 

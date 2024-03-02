@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
 public class Aimer extends SubsystemBase {
 
@@ -102,7 +103,7 @@ public class Aimer extends SubsystemBase {
         Logger.recordOutput("Shooter/Aimer/DistanceToTarget", distanceMeters);
 
         Rotation2d angle = Rotation2d
-                .fromDegrees(1.42 * distanceMeters * distanceMeters - 15.8 * distanceMeters + 55.8);
+                .fromDegrees(1.42 * distanceMeters * distanceMeters - 15.8 * distanceMeters + 55.3);
         Logger.recordOutput("Shooter/Aimer/CalculatedTargetAngleInDegrees", angle.getDegrees());
 
         setAngle(angle);
@@ -140,27 +141,8 @@ public class Aimer extends SubsystemBase {
     }
 
     // ========================= Commands ======================================
-    /**
-     * Will Aim and the given target and wait until within error threshold.
-     * 
-     * @param target
-     * @param currentPosition
-     * @return
-     */
     public Command aimAtTargetCommand(Supplier<Translation3d> target, Supplier<Translation2d> currentPosition) {
-        Command command = new Command() {
-            @Override
-            public void initialize() {
-                aimAtTarget(target.get(), currentPosition.get());
-            }
-
-            @Override
-            public boolean isFinished() {
-                return atTarget();
-            }
-        };
-        command.addRequirements(this);
-        return command;
+        return new InstantCommand(() -> this.aimAtTarget(target.get(), currentPosition.get()), this);
     }
 
     public Command modifyAngleCommand(Rotation2d change) {
@@ -171,5 +153,7 @@ public class Aimer extends SubsystemBase {
         return new InstantCommand(() -> setAngle(angle), this);
     }
 
-    // TODO: Set all other functions as commands.
+    public Command waitUntilAtTargetCommand() {
+        return new WaitUntilCommand(this::atTarget);
+    }
 }

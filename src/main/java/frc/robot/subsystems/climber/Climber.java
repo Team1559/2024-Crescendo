@@ -41,8 +41,8 @@ public class Climber extends SubsystemBase {
     private final ClimberInputsAutoLogged inputs = new ClimberInputsAutoLogged();
 
     public Climber() {
-        motorL.setInverted(false);
-        motorR.setInverted(true);
+        motorL.setInverted(true);
+        motorR.setInverted(false);
         motorL.setIdleMode(IdleMode.kBrake);
         motorR.setIdleMode(IdleMode.kBrake);
         motorL.setSmartCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentLimit());
