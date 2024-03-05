@@ -19,7 +19,7 @@ import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
-import frc.robot.constants.AbstractConstants.PID;
+import frc.robot.Constants.PID;
 
 public abstract class MotorIoSparkMax implements MotorIo {
 

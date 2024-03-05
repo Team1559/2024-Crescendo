@@ -4,7 +4,7 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.constants.AbstractConstants.CONSTANTS;
+import static frc.robot.Constants.CONSTANTS;
 
 import java.util.LinkedList;
 import java.util.List;

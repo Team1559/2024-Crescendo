@@ -2,7 +2,7 @@ package frc.robot.subsystems.vision;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
-import static frc.robot.constants.AbstractConstants.CONSTANTS;
+import static frc.robot.Constants.CONSTANTS;
 
 import org.littletonrobotics.junction.Logger;
 

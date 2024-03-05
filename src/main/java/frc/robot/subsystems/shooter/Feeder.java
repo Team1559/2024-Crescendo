@@ -1,6 +1,6 @@
 package frc.robot.subsystems.shooter;
 
-import static frc.robot.constants.AbstractConstants.CONSTANTS;
+import static frc.robot.Constants.CONSTANTS;
 
 import frc.robot.io.motor.MotorIo;
 import frc.robot.subsystems.AbstractSingleMotorSubsystem;

@@ -2,7 +2,7 @@ package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static frc.robot.constants.AbstractConstants.CONSTANTS;
+import static frc.robot.Constants.CONSTANTS;
 
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;

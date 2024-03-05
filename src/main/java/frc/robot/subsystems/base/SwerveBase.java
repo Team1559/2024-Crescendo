@@ -3,7 +3,7 @@ package frc.robot.subsystems.base;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
-import static frc.robot.constants.AbstractConstants.CONSTANTS;
+import static frc.robot.Constants.CONSTANTS;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;

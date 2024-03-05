@@ -1,10 +1,13 @@
-package frc.robot.constants;
+package frc.robot;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -45,7 +48,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.subsystems.base.SwerveModule.WheelModuleIndex;
 
-public abstract class AbstractConstants {
+public class Constants {
 
     // ========================= Enums =========================================
     public enum OperatingMode {
@@ -59,7 +62,7 @@ public abstract class AbstractConstants {
         PWM
     }
 
-    // ========================= Static Classes ================================
+    // #region: ========================= Static Classes =======================
     /**
      * Contains PID values and a Feed Forward (FF) value.
      */
@@ -112,13 +115,15 @@ public abstract class AbstractConstants {
         }
     }
 
+    // #endregion
+
     // ========================= Static CONSTANTS ==============================
 
     // ========================= Static Variables ==============================
     private static Map<String, Set<Integer>> uniqueCanBusIds;
     private static Map<RoboRioPortArrays, Set<Integer>> uniqueRoboRioPorts;
 
-    // ========================= Static Methods ================================
+    // #region: ========================= Static Methods =======================
     private static int uniqueCanBusId(int id) {
         return uniqueCanBusId(id, null);
     }
@@ -152,14 +157,14 @@ public abstract class AbstractConstants {
         return port;
     }
 
+    // #endregion
+
     // ==================== "CONSTANTS" (Ctrl + K, Ctrl + 8 to fold regions) ===
     // #region: --------------- Game Robot / Technician ------------------------
     private static final boolean FORCE_GAME_ROBOT_CONSTANTS = true;
     public static final boolean TECHNICIAN_CONTROLLER_ENABLED = false && !FORCE_GAME_ROBOT_CONSTANTS;
 
-    private static final AbstractConstants GAME_ROBOT_CONSTANTS = new GameRobotConstants();
-    private static final AbstractConstants TEST_ROBOT_CONSTANTS = new TestRobotConstants();
-    public static final AbstractConstants CONSTANTS = isGameRobot() ? GAME_ROBOT_CONSTANTS : TEST_ROBOT_CONSTANTS;
+    public static final Constants CONSTANTS = new Constants();
 
     private static boolean isGameRobot() {
         String roboRioSerialNumber = System.getenv("serialnum");
@@ -167,8 +172,8 @@ public abstract class AbstractConstants {
         roboRioSerialNumber = roboRioSerialNumber == null ? "" : roboRioSerialNumber.trim();
 
         return FORCE_GAME_ROBOT_CONSTANTS
-                || roboRioSerialNumber.equalsIgnoreCase(GAME_ROBOT_CONSTANTS.getRoboRioSerialNumber())
-                || !roboRioSerialNumber.equalsIgnoreCase(TEST_ROBOT_CONSTANTS.getRoboRioSerialNumber());
+                || roboRioSerialNumber.equalsIgnoreCase("03282B9F" /* Game Robot */)
+                || !roboRioSerialNumber.equalsIgnoreCase("03282BB6" /* Test Robot */);
     }
 
     // #endregion
@@ -200,21 +205,69 @@ public abstract class AbstractConstants {
     // #endregion
 
     // #region: --------------- Capability Flags -------------------------------
-    public abstract boolean hasAimerSubsystem();
+    public boolean hasAimerSubsystem() {
+        if (isGameRobot()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-    public abstract boolean hasClimberSubsystem();
+    public boolean hasClimberSubsystem() {
+        if (isGameRobot()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-    public abstract boolean hasNoteSensorSubsystem();
+    public boolean hasNoteSensorSubsystem() {
+        if (isGameRobot()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-    public abstract boolean hasFeederSubsystem();
+    public boolean hasFeederSubsystem() {
+        if (isGameRobot()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-    public abstract boolean hasFlywheelSubsystem();
+    public boolean hasFlywheelSubsystem() {
+        if (isGameRobot()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-    public abstract boolean hasIntakeSubsystem();
+    public boolean hasIntakeSubsystem() {
+        if (isGameRobot()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-    public abstract boolean hasTraverserSubsystem();
+    public boolean hasVisionSubsystem() {
+        if (isGameRobot()) {
+            return true;
+        } else {
+            return true;
+        }
+    }
 
-    public abstract boolean hasVisionSubsystem();
+    public boolean hasTraverserSubsystem() {
+        if (isGameRobot()) {
+            return false;
+        } else {
+            return false;
+        }
+    }
 
     // #endregion
 
@@ -223,9 +276,25 @@ public abstract class AbstractConstants {
         return 0.05;
     }
 
-    public abstract Measure<Velocity<Angle>> getMaxAngularSpeed();
+    public Measure<Velocity<Angle>> getMaxAngularSpeed() {
+        if (isGameRobot()) {
+            // TODO: Tune.
+            return DegreesPerSecond.of(360);
+        } else {
+            return RadiansPerSecond.of(360);
+        }
+    }
 
-    public abstract Measure<Velocity<Distance>> getMaxLinearSpeed();
+    public Measure<Velocity<Distance>> getMaxLinearSpeed() {
+        if (isGameRobot()) {
+            // TODO: Tune.
+            return MetersPerSecond.of(5);
+        } else {
+            // TODO: Tune.
+            return MetersPerSecond.of(10);
+        }
+    }
+
     // #endregion
 
     // #region: --------------- Game Objects -----------------------------------
@@ -238,9 +307,9 @@ public abstract class AbstractConstants {
 
     public Translation3d getSpeakerLocation() {
         if (getAlliance() == Alliance.Blue) {
-            return AbstractConstants.SPEAKER_LOCATION_BLUE;
+            return Constants.SPEAKER_LOCATION_BLUE;
         } else {
-            return AbstractConstants.SPEAKER_LOCATION_RED;
+            return Constants.SPEAKER_LOCATION_RED;
         }
     }
 
@@ -253,9 +322,9 @@ public abstract class AbstractConstants {
 
     public Translation3d getAmpLocation() {
         if (getAlliance() == Alliance.Blue) {
-            return AbstractConstants.AMP_LOCATION_RED;
+            return Constants.AMP_LOCATION_RED;
         } else {
-            return AbstractConstants.AMP_LOCATION_BLUE;
+            return Constants.AMP_LOCATION_BLUE;
         }
     }
 
@@ -432,7 +501,13 @@ public abstract class AbstractConstants {
         return uniqueRoboRioPort(0, RoboRioPortArrays.PWM);
     }
 
-    public abstract int getLedLength();
+    public int getLedLength() {
+        if (isGameRobot()) {
+            return 144 /* 1 strip */ * 3;
+        } else {
+            return 144 /* 1 strip */ * 1;
+        }
+    }
 
     public Color[] getMotorOverheatEmergencyPattern() {
         return new Color[] { Color.kYellow, Color.kYellow, Color.kRed, Color.kRed, Color.kBlack, Color.kBlack };
@@ -448,13 +523,28 @@ public abstract class AbstractConstants {
 
     // #endregion
 
-    // #region: ----- roboRIO -----
-    public abstract String getRoboRioSerialNumber();
-
-    // #endregion
-
     // #region: ----- Swerve --------
-    public abstract Map<WheelModuleIndex, Rotation2d> getSwerveModuleEncoderOffsets();
+    public Map<WheelModuleIndex, Rotation2d> getSwerveModuleEncoderOffsets() {
+        if (isGameRobot()) {
+            return new HashMap<>() {
+                {
+                    put(WheelModuleIndex.FRONT_LEFT, Rotation2d.fromRadians(0.120));
+                    put(WheelModuleIndex.FRONT_RIGHT, Rotation2d.fromRadians(-0.023));
+                    put(WheelModuleIndex.BACK_LEFT, Rotation2d.fromRadians(2.789));
+                    put(WheelModuleIndex.BACK_RIGHT, Rotation2d.fromRadians(0.853));
+                }
+            };
+        } else {
+            return new HashMap<>() {
+                {
+                    put(WheelModuleIndex.FRONT_LEFT, Rotation2d.fromRotations(-0.300293));
+                    put(WheelModuleIndex.FRONT_RIGHT, Rotation2d.fromRotations(-0.228760));
+                    put(WheelModuleIndex.BACK_LEFT, Rotation2d.fromRotations(-0.238525));
+                    put(WheelModuleIndex.BACK_RIGHT, Rotation2d.fromRotations(-0.000732));
+                }
+            };
+        }
+    }
 
     private static Map<WheelModuleIndex, SwerveModuleHardwareIds> swerveModuleHardwareIds = new HashMap<>(4) {
         {
@@ -595,7 +685,13 @@ public abstract class AbstractConstants {
         return OperatingMode.REAL_WORLD;
     }
 
-    public abstract boolean isDrivingModeFieldRelative();
+    public boolean isDrivingModeFieldRelative() {
+        if (isGameRobot()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     // #endregion
 
@@ -624,23 +720,47 @@ public abstract class AbstractConstants {
                 getWheelDistanceLeftToRight().divide(2).in(Meters)));
     }
 
-    public abstract double getGearRatioOfDriveWheel();
+    public double getGearRatioOfDriveWheel() {
+        if (isGameRobot()) {
+            // L3 Gear ratio.
+            return (50.0 / 14.0) * (16.0 / 28.0) * (45.0 / 15.0);
+        } else {
+            // L2 Gear ratio.
+            return (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
+        }
+    }
 
-    public abstract double getGearRatioOfTurnWheel();
+    public double getGearRatioOfTurnWheel() {
+        return 12.8;
+    }
 
     /**
      * @return The distance between the middle of the front wheel to middle of the
      *         back wheel (X coordinates).
      */
-    public abstract Measure<Distance> getWheelDistanceFrontToBack();
+    public Measure<Distance> getWheelDistanceFrontToBack() {
+        if (isGameRobot()) {
+            return Inches.of(23);
+        } else {
+            return Inches.of(24);
+        }
+    }
 
     /**
      * @return The distance between the middle of the left wheel to middle of the
      *         right wheel (y coordinates).
      */
-    public abstract Measure<Distance> getWheelDistanceLeftToRight();
+    public Measure<Distance> getWheelDistanceLeftToRight() {
+        if (isGameRobot()) {
+            return Inches.of(23);
+        } else {
+            return Inches.of(24);
+        }
+    }
 
-    public abstract Measure<Distance> getWheelRadius();
+    public Measure<Distance> getWheelRadius() {
+        return Inches.of(2);
+    }
 
     // #endregion
 }

@@ -1,7 +1,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Inches;
-import static frc.robot.constants.AbstractConstants.CONSTANTS;
+import static frc.robot.Constants.CONSTANTS;
 import static frc.robot.util.SupplierUtil.not;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -72,8 +72,11 @@ public class RobotContainer { // TODO: Merge into the Robot class.
     private final Intake intake;
     private final Leds leds;
     private final NoteSensor noteSensor;
-    private final Vision vision;
     private final Traverser traverser;
+
+    /** Is used indirectly when its periodic method gets called. */
+    @SuppressWarnings("unused")
+    private final Vision vision;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.

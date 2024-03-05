@@ -1,7 +1,7 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
-import static frc.robot.constants.AbstractConstants.CONSTANTS;
+import static frc.robot.Constants.CONSTANTS;
 
 import org.littletonrobotics.junction.Logger;
 

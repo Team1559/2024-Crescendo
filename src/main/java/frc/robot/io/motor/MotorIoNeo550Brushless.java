@@ -2,7 +2,7 @@ package frc.robot.io.motor;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
-import static frc.robot.constants.AbstractConstants.CONSTANTS;
+import static frc.robot.Constants.CONSTANTS;
 
 import com.revrobotics.CANSparkBase.IdleMode;
 
@@ -13,7 +13,7 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.Velocity;
-import frc.robot.constants.AbstractConstants.PID;
+import frc.robot.Constants.PID;
 
 public class MotorIoNeo550Brushless extends MotorIoSparkMax {
 
