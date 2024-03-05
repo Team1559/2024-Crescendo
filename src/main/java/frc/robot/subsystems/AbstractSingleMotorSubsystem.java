@@ -33,20 +33,22 @@ public abstract class AbstractSingleMotorSubsystem extends SubsystemBase {
      * @param io       SingleMotorIO instance for the specific motor type
      * @param velocity Will be used for forwards and backwards.
      */
-    protected AbstractSingleMotorSubsystem(String name, MotorIo io, Measure<Velocity<Angle>> velocity) {
-        this(name, io, velocity, velocity);
-
+    protected AbstractSingleMotorSubsystem(MotorIo io, Measure<Velocity<Angle>> velocity) {
+        this(io, velocity, velocity);
     }
 
-    protected AbstractSingleMotorSubsystem(String name, MotorIo io, Measure<Velocity<Angle>> forwardsVelocity,
+    protected AbstractSingleMotorSubsystem(MotorIo io, Measure<Velocity<Angle>> forwardsVelocity,
             Measure<Velocity<Angle>> reverseVelocity) {
-
-        super(name);
 
         this.io = io;
         this.DEFAULT_FORWARDS_VELOCITY = forwardsVelocity;
         this.DEFAULT_REVERSE_VELOCITY = reverseVelocity;
         this.appliedVelocity = RevolutionsPerSecond.zero();
+
+        String[] packagePath = getClass().getPackageName().split(".");
+        String packageName = packagePath[packagePath.length - 1];
+        String name = packageName + "/" + getClass().getName();
+        super.setName(name);
     }
 
     @Override

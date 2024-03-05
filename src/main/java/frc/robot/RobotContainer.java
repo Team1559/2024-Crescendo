@@ -277,8 +277,8 @@ public class RobotContainer { // TODO: Merge into the Robot class.
         }
 
         if (Constants.hasTraverserSubsystem()) {
-            coPilot.povRight().whileTrue(traverser.traverserRightStartStopCommand());
-            coPilot.povLeft().whileTrue(traverser.traverserLeftStartStopCommand());
+            coPilot.povRight().whileTrue(traverser.traverserRightStopCommand());
+            coPilot.povLeft().whileTrue(traverser.traverserLeftStopCommand());
         }
 
         if (Constants.hasAimerSubsystem()) {

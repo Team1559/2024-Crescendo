@@ -38,8 +38,6 @@ import frc.robot.io.swerve_module.SwerveModuleIo;
 import frc.robot.subsystems.base.SwerveModule.WheelModuleIndex;
 import frc.robot.util.LocalAdStarAk;
 
-import frc.robot.Constants;
-
 public class SwerveBase extends SubsystemBase {
 
     @AutoLog

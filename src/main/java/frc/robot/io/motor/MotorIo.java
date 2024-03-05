@@ -25,6 +25,7 @@ public interface MotorIo {
         public String[] faults = new String[0];
 
         public Rotation2d positionAbsolute = new Rotation2d();
+        public Rotation2d positionTarget = null;
 
         /** From -1 to 1. */
         public float powerPercentage = 0;
@@ -32,11 +33,11 @@ public interface MotorIo {
         public Measure<Temperature> temperature = Celsius.zero();
 
         public Measure<Velocity<Angle>> velocityActual = RotationsPerSecond.zero();
-        public Measure<Velocity<Angle>> velocityTarget = RotationsPerSecond.zero();
+        public Measure<Velocity<Angle>> velocityTarget = null;
 
         public Measure<Voltage> voltsActual = Volts.zero();
         public Measure<Voltage> voltsAvailable = Volts.zero();
-        public Measure<Voltage> voltsTarget = Volts.zero();
+        public Measure<Voltage> voltsTarget = null;
     }
 
     public void updateInputs(MotorIoInputs inputs);
@@ -53,6 +54,8 @@ public interface MotorIo {
     public Measure<Velocity<Angle>> getVelocity();
 
     public Measure<Voltage> getVoltage();
+
+    public void setPosition(Rotation2d position);
 
     public void setVelocity(Measure<Velocity<Angle>> velocity);
 

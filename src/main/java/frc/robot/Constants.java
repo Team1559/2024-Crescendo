@@ -50,7 +50,7 @@ import frc.robot.subsystems.base.SwerveModule.WheelModuleIndex;
 
 public class Constants {
 
-    // ========================= Enums =========================================
+    // #region: ================ Enums =========================================
     public enum OperatingMode {
         REAL_WORLD,
         SIMULATION,
@@ -62,7 +62,9 @@ public class Constants {
         PWM
     }
 
-    // #region: ========================= Static Classes =======================
+    // #endregion
+
+    // #region: ================ Static Classes ================================
     /**
      * Contains PID values and a Feed Forward (FF) value.
      */
@@ -123,7 +125,8 @@ public class Constants {
     private static Map<String, Set<Integer>> uniqueCanBusIds;
     private static Map<RoboRioPortArrays, Set<Integer>> uniqueRoboRioPorts;
 
-    // #region: ========================= Static Methods =======================
+    // #region: ================ Static Methods ================================
+    @SuppressWarnings("unused")
     private static int uniqueCanBusId(int id) {
         return uniqueCanBusId(id, null);
     }
@@ -163,9 +166,9 @@ public class Constants {
     // #region: --------------- Game Robot / Technician ------------------------
     private static final boolean FORCE_GAME_ROBOT_CONSTANTS = true;
 
+    @SuppressWarnings("unused")
     private static boolean isGameRobot() {
         String roboRioSerialNumber = System.getenv("serialnum");
-        System.out.println("Serial Number = " + System.getenv("serialnum"));
         roboRioSerialNumber = roboRioSerialNumber == null ? "" : roboRioSerialNumber.trim();
 
         return FORCE_GAME_ROBOT_CONSTANTS

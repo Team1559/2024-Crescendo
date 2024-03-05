@@ -13,13 +13,13 @@ import edu.wpi.first.units.Voltage;
 
 public class MotorIoReplay implements MotorIo {
 
+    Rotation2d position = Rotation2d.fromRotations(0);
     Measure<Velocity<Angle>> velocity = RotationsPerSecond.zero();
     Measure<Voltage> voltage = Volts.zero();
 
     @Override
     public void updateInputs(MotorIoInputs inputs) {
-        inputs.velocityActual = inputs.velocityTarget = velocity;
-        inputs.voltsTarget = inputs.voltsTarget = voltage;
+        // No functionality.
     }
 
     @Override
@@ -29,7 +29,7 @@ public class MotorIoReplay implements MotorIo {
 
     @Override
     public Rotation2d getAbsolutePosition() {
-        return Rotation2d.fromRotations(0);
+        return position;
     }
 
     @Override
@@ -45,6 +45,11 @@ public class MotorIoReplay implements MotorIo {
     @Override
     public Measure<Voltage> getVoltage() {
         return voltage;
+    }
+
+    @Override
+    public void setPosition(Rotation2d position) {
+        this.position = position;
     }
 
     @Override

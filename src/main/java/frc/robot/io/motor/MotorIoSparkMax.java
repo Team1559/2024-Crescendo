@@ -23,10 +23,11 @@ import frc.robot.Constants.PID;
 
 public abstract class MotorIoSparkMax implements MotorIo {
 
-    protected final boolean inverted;
+    protected final boolean isInverted;
     protected final CANSparkMax motor;
     protected final Rotation2d absoluteEncoderOffset;
 
+    protected Rotation2d targetPosition;
     protected Measure<Velocity<Angle>> targetVelocity;
     protected Measure<Voltage> targetVoltage;
 
@@ -43,7 +44,7 @@ public abstract class MotorIoSparkMax implements MotorIo {
         motor = new CANSparkMax(motorId, MotorType.kBrushless);
         // Randomly flips back. TODO: Figure out why?
         // motor.setInverted(false);
-        this.inverted = inverted;
+        this.isInverted = inverted;
         motor.setIdleMode(idleMode);
 
         // Configure Encoder.
@@ -74,6 +75,7 @@ public abstract class MotorIoSparkMax implements MotorIo {
         inputs.temperature = getTemperature();
 
         inputs.positionAbsolute = getAbsolutePosition();
+        inputs.positionTarget = targetPosition;
 
         inputs.voltsActual = getVoltage();
         inputs.voltsAvailable = Volts.of(motor.getBusVoltage());
@@ -106,17 +108,30 @@ public abstract class MotorIoSparkMax implements MotorIo {
     }
 
     @Override
+    public void setPosition(Rotation2d position) {
+        motor.getPIDController().setReference(isInverted ? -position.getRotations() : position.getRotations(),
+                CANSparkMax.ControlType.kPosition);
+        targetPosition = position;
+        targetVelocity = null;
+        targetVoltage = null;
+    }
+
+    @Override
     public void setVelocity(Measure<Velocity<Angle>> velocity) {
         motor.getPIDController().setReference(
-                inverted ? velocity.negate().in(RevolutionsPerSecond) : velocity.in(RevolutionsPerSecond),
+                isInverted ? velocity.negate().in(RevolutionsPerSecond) : velocity.in(RevolutionsPerSecond),
                 CANSparkMax.ControlType.kVelocity);
-
         targetVelocity = velocity;
+        targetPosition = null;
+        targetVoltage = null;
     }
 
     @Override
     public void setVoltage(Measure<Voltage> voltage) {
-        motor.setVoltage(voltage.in(Volts));
-        this.targetVoltage = voltage;
+        motor.getPIDController().setReference(isInverted ? voltage.negate().in(Volts) : voltage.in(Volts),
+                CANSparkMax.ControlType.kVoltage);
+        targetVoltage = voltage;
+        targetPosition = null;
+        targetVelocity = null;
     }
 }

@@ -9,7 +9,7 @@ import frc.robot.subsystems.AbstractSingleMotorSubsystem;
 public class Traverser extends AbstractSingleMotorSubsystem {
 
     public Traverser(MotorIo io) {
-        super("Traverser", io, Constants.getTraverserVelocity(), Constants.getTraverserVelocity());
+        super(io, Constants.getTraverserVelocity(), Constants.getTraverserVelocity());
     }
 
     // ========================= Functions =========================
@@ -22,11 +22,11 @@ public class Traverser extends AbstractSingleMotorSubsystem {
     }
 
     // ========================= Commands =========================
-    public Command traverserLeftStartStopCommand() {
+    public Command traverserLeftStopCommand() {
         return new StartEndCommand(this::traverserLeft, this::stop, this);
     }
 
-    public Command traverserRightStartStopCommand() {
+    public Command traverserRightStopCommand() {
         return new StartEndCommand(this::traverserRight, this::stop, this);
     }
 }

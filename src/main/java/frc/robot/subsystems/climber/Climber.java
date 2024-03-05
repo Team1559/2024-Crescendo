@@ -16,13 +16,12 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import frc.robot.Constants;
 
 public class Climber extends SubsystemBase {
 
     @AutoLog
-    static class ClimberInputs { // TODO: Log everything that SingleMotorIo is.
+    static class ClimberInputs { // TODO: Log everything that MotorIo is.
 
         public double currentRotationsLeft;
         public double currentRotationsRight;
@@ -35,7 +34,7 @@ public class Climber extends SubsystemBase {
     // TODO: Move to Constants.
     private static final double ROTATIONS_PER_INCH = (5 * 5) * (5D / 3);
 
-    // TODO: Update CANSparkMax variables as MotorIo variables.
+    // TODO: Use MotorIo variables instead.
     private final CANSparkMax motorL = new CANSparkMax(Constants.getClimberMotorIdLeft(), MotorType.kBrushless);
     private final CANSparkMax motorR = new CANSparkMax(Constants.getClimberMotorIdRight(), MotorType.kBrushless);
 
@@ -106,6 +105,4 @@ public class Climber extends SubsystemBase {
     public Command modifyHeightCommand(Measure<Distance> change) {
         return new InstantCommand(() -> modifyHeight(change), this);
     }
-
-    // TODO: Create all Commanp Functions.
 }
