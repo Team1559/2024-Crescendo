@@ -7,13 +7,26 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.opencv.core.Mat.Tuple2;
+
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,7 +42,7 @@ import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
-import frc.robot.subsystems.swerve_module.IndexedSwerveModule.WheelModuleIndex;
+import frc.robot.subsystems.base.SwerveModule.WheelModuleIndex;
 
 public abstract class AbstractConstants {
 
@@ -485,7 +498,39 @@ public abstract class AbstractConstants {
         return 0.9;
     }
 
+    // #region: ----- NEO 550 Brushless Motor -----
+
+    public Measure<Current> getNeo550BrushlessCurrentLimit() {
+        return Amps.of(24);
+    }
+
+    public Measure<Current> getNeo550BrushlessCurrentSecondaryLimit() {
+        return Amps.of(24);
+    }
+
+    // #endregion
+
     // #region: ----- Falcon 500 Motor -----
+
+    @SuppressWarnings("unchecked")
+    public Map<String, StatusSignal<Boolean>> getAllGetFaultStatusSignalMethods(TalonFX motor) {
+        Map<String, StatusSignal<Boolean>> faults = new HashMap<>();
+        Class<?> c = motor.getClass();
+        Method[] publicMethods = c.getMethods();
+        for (int i = 0; i < publicMethods.length; i++) {
+            Method method = publicMethods[i];
+            String[] parts = method.toString().split("_");
+            if (parts.length == 2 && parts[0].equals("public StatusSignal<Boolean> getFault")) {
+                try {
+                    faults.put(parts[1].split("(")[0], (StatusSignal<Boolean>) method.invoke(motor));
+                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                    // Ignore.
+                    e.printStackTrace();
+                }
+            }
+        }
+        return faults;
+    }
 
     /**
      * See: <a href=
@@ -498,16 +543,40 @@ public abstract class AbstractConstants {
         return Celsius.of(109);
     }
 
-    // #endregion
+    public String[] getFaults(Map<String, StatusSignal<Boolean>> faultStatusSignals) {
 
-    // #region: ----- NEO 550 Brushless Motor -----
-
-    public Measure<Current> getNeo550BrushlessCurrentLimit() {
-        return Amps.of(24);
+        List<String> faults = new LinkedList<>();
+        for (Entry<String, StatusSignal<Boolean>> entry : faultStatusSignals.entrySet()) {
+            if (entry.getValue().getValue()) {
+                faults.add(entry.getKey());
+            }
+        }
+        return faults.toArray(new String[0]);
     }
 
-    public Measure<Current> getNeo550BrushlessCurrentSecondaryLimit() {
-        return Amps.of(24);
+    // #endregion
+
+    // #region: ----- TalonFX Motor -----
+
+    public TalonFXConfiguration getDefaultTalonFXConfiguration(InvertedValue invertedValue,
+            NeutralModeValue breakingMode) {
+
+        TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration();
+
+        // https://api.ctr-electronics.com/phoenix6/release/java/com/ctre/phoenix6/configs/CurrentLimitsConfigs.html
+        CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs();
+        currentLimitsConfigs.SupplyCurrentLimitEnable = true;
+        currentLimitsConfigs.SupplyCurrentLimit = 40.0;
+        currentLimitsConfigs.SupplyCurrentThreshold = 80.0;
+        currentLimitsConfigs.SupplyTimeThreshold = 0.5;
+        talonFXConfiguration.CurrentLimits = currentLimitsConfigs;
+
+        MotorOutputConfigs driveMotorOutputConfigs = new MotorOutputConfigs();
+        driveMotorOutputConfigs.Inverted = invertedValue;
+        driveMotorOutputConfigs.NeutralMode = breakingMode;
+        talonFXConfiguration.withMotorOutput(driveMotorOutputConfigs);
+
+        return talonFXConfiguration;
     }
 
     // #endregion

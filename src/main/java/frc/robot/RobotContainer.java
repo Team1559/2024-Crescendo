@@ -11,6 +11,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -24,7 +25,11 @@ import frc.robot.io.gyro.GyroIoPigeon2;
 import frc.robot.io.gyro.GyroIoSimAndReplay;
 import frc.robot.io.motor.MotorIoNeo550Brushless;
 import frc.robot.io.motor.MotorIoReplay;
-import frc.robot.subsystems.base.DriveBase;
+import frc.robot.io.swerve_module.SwerveModuleIoReplay;
+import frc.robot.io.swerve_module.SwerveModuleIoSim;
+import frc.robot.io.swerve_module.SwerveModuleIoTalonFx;
+import frc.robot.subsystems.base.SwerveBase;
+import frc.robot.subsystems.base.SwerveModule.WheelModuleIndex;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.Traverser;
 import frc.robot.subsystems.led.Leds;
@@ -33,10 +38,6 @@ import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.Intake;
 import frc.robot.subsystems.shooter.NoteSensor;
-import frc.robot.subsystems.swerve_module.IndexedSwerveModule.WheelModuleIndex;
-import frc.robot.subsystems.swerve_module.SwerveModuleIoReplay;
-import frc.robot.subsystems.swerve_module.SwerveModuleIoSim;
-import frc.robot.subsystems.swerve_module.SwerveModuleIoTalonFx;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIoLimelight;
 import frc.robot.subsystems.vision.VisionIoSimAndReplay;
@@ -48,7 +49,7 @@ import frc.robot.subsystems.vision.VisionIoSimAndReplay;
  * scheduler calls). Instead, the structure of the robot (including subsystems,
  * commands, and button mappings) should be declared here.
  */
-public class RobotContainer {
+public class RobotContainer { // TODO: Merge into the Robot class.
     /**
      * Pilot's Controller
      * Port 0
@@ -62,7 +63,7 @@ public class RobotContainer {
 
     private final LoggedDashboardChooser<Command> autoChooser;
 
-    private final DriveBase driveBase;
+    private final SwerveBase driveBase;
 
     final Aimer aimer;
     final Climber climber;
@@ -83,7 +84,7 @@ public class RobotContainer {
         // #region: Initialize DriveBase Subsystem.
         switch (CONSTANTS.getCurrentOperatingMode()) {
             case REAL_WORLD:
-                driveBase = new DriveBase(
+                driveBase = new SwerveBase(
                         new GyroIoPigeon2(CONSTANTS.getGyroId(), CONSTANTS.getCanivoreId()),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_LEFT),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_RIGHT),
@@ -91,15 +92,15 @@ public class RobotContainer {
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
                 break;
             case SIMULATION:
-                driveBase = new DriveBase(
+                driveBase = new SwerveBase(
                         new GyroIoSimAndReplay(),
-                        new SwerveModuleIoSim(),
-                        new SwerveModuleIoSim(),
-                        new SwerveModuleIoSim(),
-                        new SwerveModuleIoSim());
+                        new SwerveModuleIoSim(DCMotor.getKrakenX60(1), DCMotor.getFalcon500(1)),
+                        new SwerveModuleIoSim(DCMotor.getKrakenX60(1), DCMotor.getFalcon500(1)),
+                        new SwerveModuleIoSim(DCMotor.getKrakenX60(1), DCMotor.getFalcon500(1)),
+                        new SwerveModuleIoSim(DCMotor.getKrakenX60(1), DCMotor.getFalcon500(1)));
                 break;
             case LOG_REPLAY:
-                driveBase = new DriveBase(
+                driveBase = new SwerveBase(
                         new GyroIoSimAndReplay(),
                         new SwerveModuleIoReplay(),
                         new SwerveModuleIoReplay(),

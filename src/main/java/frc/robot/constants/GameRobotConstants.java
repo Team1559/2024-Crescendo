@@ -12,7 +12,7 @@ import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
-import frc.robot.subsystems.swerve_module.IndexedSwerveModule.WheelModuleIndex;
+import frc.robot.subsystems.base.SwerveModule.WheelModuleIndex;
 
 public class GameRobotConstants extends AbstractConstants {
 

@@ -1,12 +1,13 @@
-package frc.robot.subsystems.swerve_module;
+package frc.robot.io.swerve_module;
 
 import static edu.wpi.first.units.Units.Celsius;
 
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
+import edu.wpi.first.units.Voltage;
 
 /**
- * No funclionality provided because none needed for replay.
+ * No functionality provided because none needed for replay.
  */
 public class SwerveModuleIoReplay implements SwerveModuleIo {
 
@@ -16,12 +17,12 @@ public class SwerveModuleIoReplay implements SwerveModuleIo {
     }
 
     @Override
-    public void setDriveVoltage(double volts) {
+    public void setDriveVoltage(Measure<Voltage> volts) {
         // No functionality.
     }
 
     @Override
-    public void setTurnVoltage(double volts) {
+    public void setTurnVoltage(Measure<Voltage> volts) {
         // No functionality.
     }
 

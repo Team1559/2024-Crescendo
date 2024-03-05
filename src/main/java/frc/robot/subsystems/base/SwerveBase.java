@@ -34,12 +34,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.io.gyro.GyroIo;
 import frc.robot.io.gyro.GyroIoInputsAutoLogged;
-import frc.robot.subsystems.swerve_module.IndexedSwerveModule;
-import frc.robot.subsystems.swerve_module.IndexedSwerveModule.WheelModuleIndex;
-import frc.robot.subsystems.swerve_module.SwerveModuleIo;
+import frc.robot.io.swerve_module.SwerveModuleIo;
+import frc.robot.subsystems.base.SwerveModule.WheelModuleIndex;
 import frc.robot.util.LocalAdStarAk;
 
-public class DriveBase extends SubsystemBase {
+public class SwerveBase extends SubsystemBase {
 
     @AutoLog
     static class DriveBaseInputs {
@@ -51,7 +50,7 @@ public class DriveBase extends SubsystemBase {
 
     private final GyroIo gyroIO;
     private final GyroIoInputsAutoLogged gyroInputs = new GyroIoInputsAutoLogged();
-    private final IndexedSwerveModule[] modules = new IndexedSwerveModule[4];
+    private final SwerveModule[] modules = new SwerveModule[4];
 
     private final SwerveDriveKinematics kinematics;
     public final SwerveDrivePoseEstimator poseEstimator;
@@ -60,7 +59,7 @@ public class DriveBase extends SubsystemBase {
 
     private DriveBaseInputsAutoLogged inputs = new DriveBaseInputsAutoLogged();
 
-    public DriveBase(GyroIo gyroIo,
+    public SwerveBase(GyroIo gyroIo,
             SwerveModuleIo flModuleI,
             SwerveModuleIo frModuleIo,
             SwerveModuleIo blModuleIo,
@@ -68,10 +67,10 @@ public class DriveBase extends SubsystemBase {
 
         // -------------------- Instantiate Hardware --------------------
         this.gyroIO = gyroIo;
-        modules[WheelModuleIndex.FRONT_LEFT.value] = new IndexedSwerveModule(flModuleI, WheelModuleIndex.FRONT_LEFT);
-        modules[WheelModuleIndex.FRONT_RIGHT.value] = new IndexedSwerveModule(frModuleIo, WheelModuleIndex.FRONT_RIGHT);
-        modules[WheelModuleIndex.BACK_LEFT.value] = new IndexedSwerveModule(blModuleIo, WheelModuleIndex.BACK_LEFT);
-        modules[WheelModuleIndex.BACK_RIGHT.value] = new IndexedSwerveModule(brModuleIo, WheelModuleIndex.BACK_RIGHT);
+        modules[WheelModuleIndex.FRONT_LEFT.value] = new SwerveModule(flModuleI, WheelModuleIndex.FRONT_LEFT);
+        modules[WheelModuleIndex.FRONT_RIGHT.value] = new SwerveModule(frModuleIo, WheelModuleIndex.FRONT_RIGHT);
+        modules[WheelModuleIndex.BACK_LEFT.value] = new SwerveModule(blModuleIo, WheelModuleIndex.BACK_LEFT);
+        modules[WheelModuleIndex.BACK_RIGHT.value] = new SwerveModule(brModuleIo, WheelModuleIndex.BACK_RIGHT);
 
         // -------------------- Create Position Estimator --------------------
         kinematics = new SwerveDriveKinematics(new Translation2d[] {
@@ -125,7 +124,7 @@ public class DriveBase extends SubsystemBase {
         }
 
         // Run Module periodic methods.
-        for (IndexedSwerveModule module : modules) {
+        for (SwerveModule module : modules) {
             module.periodic();
         }
 
@@ -178,7 +177,7 @@ public class DriveBase extends SubsystemBase {
     }
 
     public boolean isTemperatureTooHigh() {
-        for (IndexedSwerveModule module : modules) {
+        for (SwerveModule module : modules) {
             if (module.isTemperatureTooHigh()) {
                 return true;
             }
@@ -203,9 +202,9 @@ public class DriveBase extends SubsystemBase {
 
             optimizedSetpointStates = setpointStates = new SwerveModuleState[4];
             int i = -1;
-            for (IndexedSwerveModule module : modules) {
+            for (SwerveModule module : modules) {
                 module.stop();
-                setpointStates[++i] = module.getState();
+                setpointStates[++i] = module.getSwerveModuleState();
             }
         } else {
 
@@ -239,14 +238,14 @@ public class DriveBase extends SubsystemBase {
     private SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
         for (int i = 0; i < modules.length; i++) {
-            states[i] = modules[i].getState();
+            states[i] = modules[i].getSwerveModuleState();
         }
         return states;
     }
 
     private void updateModulePositions() {
         for (int i = 0; i < modules.length; i++) {
-            modulePositions[i] = modules[i].getPosition();
+            modulePositions[i] = modules[i].getSwerveModulePosition();
         }
     }
 

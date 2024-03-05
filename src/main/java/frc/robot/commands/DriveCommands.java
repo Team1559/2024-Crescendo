@@ -24,7 +24,7 @@ import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.base.DriveBase;
+import frc.robot.subsystems.base.SwerveBase;
 import frc.robot.subsystems.shooter.Aimer;
 import frc.robot.subsystems.shooter.Flywheel;
 
@@ -56,7 +56,7 @@ public class DriveCommands {
     }
 
     public static class AutoAimDriveCommand extends Command {
-        private final DriveBase driveBase;
+        private final SwerveBase driveBase;
         private final Flywheel flywheel;
         private final Aimer aimer;
 
@@ -66,7 +66,7 @@ public class DriveCommands {
 
         private final PIDController pid;
 
-        public AutoAimDriveCommand(DriveBase driveBase, Flywheel flywheel, Aimer aimer, DoubleSupplier xVelocity,
+        public AutoAimDriveCommand(SwerveBase driveBase, Flywheel flywheel, Aimer aimer, DoubleSupplier xVelocity,
                 DoubleSupplier yVelocity,
                 Supplier<Translation3d> target) {
             this.driveBase = driveBase;
@@ -150,7 +150,7 @@ public class DriveCommands {
         }
     }
 
-    public static Command autoAimAndManuallyDriveCommand(DriveBase driveBase,
+    public static Command autoAimAndManuallyDriveCommand(SwerveBase driveBase,
             Flywheel flywheel,
             Aimer aimer,
             DoubleSupplier xSupplier,
@@ -240,7 +240,7 @@ public class DriveCommands {
         return aimingDrive;
     }
 
-    public static Command manualDriveDefaultCommand(DriveBase driveBase,
+    public static Command manualDriveDefaultCommand(SwerveBase driveBase,
             DoubleSupplier xSupplier,
             DoubleSupplier ySupplier,
             DoubleSupplier omegaSupplier) {
@@ -286,7 +286,7 @@ public class DriveCommands {
      *                      than 0).
      * @return The created command.
      */
-    public static Command spinCommand(DriveBase driveBase, Rotation2d rotationAmount, double speed) {
+    public static Command spinCommand(SwerveBase driveBase, Rotation2d rotationAmount, double speed) {
 
         if (speed <= 0) {
             throw new RuntimeException("Robot cannot spin because velocity is negative or zero:  " + speed);
@@ -347,7 +347,7 @@ public class DriveCommands {
     // public static PIDCommand turnToTargetPidCommand(DriveBase driveBase,
     // Translation2d target, double speed)
 
-    public static Command turnToTargetCommand(DriveBase driveBase, Supplier<Translation3d> target, double speed) {
+    public static Command turnToTargetCommand(SwerveBase driveBase, Supplier<Translation3d> target, double speed) {
 
         Command spinCommand = new Command() {
 

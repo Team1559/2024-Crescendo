@@ -1,6 +1,10 @@
-package frc.robot.subsystems.swerve_module;
+package frc.robot.subsystems.base;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.constants.AbstractConstants.CONSTANTS;
 
 import org.littletonrobotics.junction.Logger;
@@ -10,10 +14,14 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
+import edu.wpi.first.units.Velocity;
+import frc.robot.io.swerve_module.SwerveModuleIo;
+import frc.robot.io.swerve_module.SwerveModuleIoInputsAutoLogged;
 
-public class IndexedSwerveModule {
+public class SwerveModule {
 
     public enum WheelModuleIndex {
         /** 0 */
@@ -42,9 +50,8 @@ public class IndexedSwerveModule {
     private Rotation2d angleSetpoint; // Setpoint for closed loop control, null for open loop.
     private Double speedSetpoint; // Setpoint for closed loop control, null for open loop.
     private Rotation2d turnRelativeOffset; // Relative + Offset = Absolute.
-    private double lastPositionMeters; // Used for delta calculation.
 
-    public IndexedSwerveModule(SwerveModuleIo io, WheelModuleIndex index) {
+    public SwerveModule(SwerveModuleIo io, WheelModuleIndex index) {
 
         this.io = io;
         this.index = index;
@@ -64,8 +71,7 @@ public class IndexedSwerveModule {
                 turnFeedback = new PIDController(10.0, 0.0, 0.0);
                 break;
             default:
-                throw new RuntimeException(
-                        "Unknown Run Mode: " + CONSTANTS.getCurrentOperatingMode());
+                throw new RuntimeException("Unknown Run Mode: " + CONSTANTS.getCurrentOperatingMode());
         }
 
         turnFeedback.enableContinuousInput(-Math.PI, Math.PI);
@@ -79,13 +85,13 @@ public class IndexedSwerveModule {
         // On first cycle, reset relative turn encoder.
         // Wait until absolute angle is nonzero in case it wasn't initialized yet.
         if (turnRelativeOffset == null && inputs.cancoderOffsetPosition.getRadians() != 0.0) {
-            turnRelativeOffset = inputs.cancoderOffsetPosition.minus(inputs.steerMotorPosition);
+            turnRelativeOffset = inputs.cancoderOffsetPosition.minus(inputs.steerMotorPositionAbsolute);
         }
 
         // Run closed loop turn control.
         if (angleSetpoint != null) {
 
-            io.setTurnVoltage(turnFeedback.calculate(getAngle().getRadians(), angleSetpoint.getRadians()));
+            io.setTurnVoltage(Volts.of(turnFeedback.calculate(getAngle().getRadians(), angleSetpoint.getRadians())));
 
             // Run closed loop drive control.
             // Only allowed if closed loop turn control is running.
@@ -99,101 +105,74 @@ public class IndexedSwerveModule {
 
                 // Run drive controller/
                 double velocityRadPerSec = adjustSpeedSetpoint / CONSTANTS.getWheelRadius().in(Meters);
-                io.setDriveVoltage(driveFeedForward.calculate(velocityRadPerSec)
-                        + driveFeedback.calculate(inputs.driveMotorVelocityRadPerSec, velocityRadPerSec));
+                io.setDriveVoltage(Volts.of(driveFeedForward.calculate(velocityRadPerSec) + driveFeedback
+                        .calculate(inputs.driveMotorVelocityActual.in(RadiansPerSecond), velocityRadPerSec)));
             }
         }
     }
 
+    // ========================= Functions =========================
+
     /**
-     * Runs the module with the specified setpoint state. Returns the optimized
-     * state.
+     * Runs the module with the specified setpoint state, after optimizing it.
+     * 
+     * @return The optimized state.
      */
     public SwerveModuleState runSetpoint(SwerveModuleState state) {
-        // Optimize state based on current angle
-        // Controllers run in "periodic" when the setpoint is not null
 
+        // Optimize state based on current angle.
         SwerveModuleState optimizedState = SwerveModuleState.optimize(state, getAngle());
 
-        // Update setpoints, controllers run in "periodic"
+        // Set Setpoints.
         angleSetpoint = optimizedState.angle;
-        speedSetpoint = -optimizedState.speedMetersPerSecond;
+        speedSetpoint = -optimizedState.speedMetersPerSecond; // TODO: Why is this negated?
 
         return optimizedState;
     }
 
-    /**
-     * Runs the module with the specified voltage while controlling to zero degrees.
-     */
-    public void runCharacterization(double volts) {
-        // Closed loop turn control
-        angleSetpoint = new Rotation2d();
-
-        // Open loop drive control
-        io.setDriveVoltage(volts);
-        speedSetpoint = null;
-    }
-
     /** Disables all outputs to motors. */
     public void stop() {
-        io.setTurnVoltage(0.0);
-        io.setDriveVoltage(0.0);
+        io.setTurnVoltage(Volts.zero());
+        io.setDriveVoltage(Volts.zero());
 
         // Disable closed loop control for turn and drive
         angleSetpoint = null;
         speedSetpoint = null;
     }
 
-    /** Returns the current turn angle of the module. */
+    /** @return The current turn angle of the module. */
     public Rotation2d getAngle() {
-        if (turnRelativeOffset == null) {
-            return new Rotation2d();
-        } else {
-            return inputs.steerMotorPosition.plus(turnRelativeOffset);
-        }
+        return inputs.steerMotorPositionAbsolute
+                .plus(turnRelativeOffset == null ? Rotation2d.fromRotations(0) : turnRelativeOffset);
     }
 
-    /**
-     * @return The Temperature of the hottest motor.
-     */
+    /** @return The Temperature of the hottest motor. */
     public Measure<Temperature> getMaxTemperature() {
         return inputs.driveMotorTemp.gt(inputs.steerMotorTemp) ? inputs.driveMotorTemp : inputs.steerMotorTemp;
     }
 
-    /** Returns the current drive position of the module in meters. */
-    public double getPositionMeters() {
-        return inputs.driveMotorPositionRad * CONSTANTS.getWheelRadius().in(Meters);
+    /** @return The current drive position of the module. */
+    public Measure<Distance> getPosition() {
+        return Meters.of(inputs.driveMotorPositionAbsolute.getRotations() * CONSTANTS.getWheelRadius().in(Meters));
     }
 
-    /** Returns the current drive velocity of the module in meters per second. */
-    public double getVelocityMetersPerSec() {
-        return inputs.driveMotorVelocityRadPerSec * CONSTANTS.getWheelRadius().in(Meters);
+    /** @return The current drive velocity of the module. */
+    public Measure<Velocity<Distance>> getVelocity() {
+        return MetersPerSecond
+                .of(inputs.driveMotorVelocityActual.in(RotationsPerSecond) * CONSTANTS.getWheelRadius().in(Meters));
     }
 
-    /** Returns the module position. */
-    public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(getPositionMeters(), getAngle());
+    /** @return The module position. */
+    public SwerveModulePosition getSwerveModulePosition() {
+        return new SwerveModulePosition(getPosition(), getAngle());
     }
 
-    /** Returns the module position delta since the last call to this method. */
-    public SwerveModulePosition getPositionDelta() {
-        SwerveModulePosition delta = new SwerveModulePosition(getPositionMeters() - lastPositionMeters, getAngle());
-        lastPositionMeters = getPositionMeters();
-        return delta;
-    }
-
-    /** Returns the module state (turn angle and drive velocity). */
-    public SwerveModuleState getState() {
-        return new SwerveModuleState(getVelocityMetersPerSec(), getAngle());
-    }
-
-    /** Returns the drive velocity in radians/sec. */
-    public double getCharacterizationVelocity() {
-        return inputs.driveMotorVelocityRadPerSec;
+    /** @return The module state (turn angle and drive velocity). */
+    public SwerveModuleState getSwerveModuleState() {
+        return new SwerveModuleState(getVelocity(), getAngle());
     }
 
     public boolean isTemperatureTooHigh() {
-        // 90% Buffer.
         return getMaxTemperature().gt(io.getMaxSafeMotorTemperature().times(CONSTANTS.getMotorSafeTemperatureBuffer()));
     }
 }

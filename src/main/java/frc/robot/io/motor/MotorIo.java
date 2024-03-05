@@ -20,17 +20,16 @@ public interface MotorIo {
     @AutoLog
     static class MotorIoInputs {
 
-        /** Percentage of power from -1 to 1. */
-        public float appliedOutput;
+        public Measure<Current> currentActual = Amps.zero();
 
         public String[] faults = new String[0];
 
-        public Measure<Temperature> motorTemp = Celsius.zero();
-
-        /** Amount of current being used. */
-        public Measure<Current> outputCurrent = Amps.zero();
-
         public Rotation2d positionAbsolute = new Rotation2d();
+
+        /** From -1 to 1. */
+        public float powerPercentage = 0;
+
+        public Measure<Temperature> temperature = Celsius.zero();
 
         public Measure<Velocity<Angle>> velocityActual = RotationsPerSecond.zero();
         public Measure<Velocity<Angle>> velocityTarget = RotationsPerSecond.zero();
