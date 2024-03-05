@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
@@ -339,14 +341,14 @@ public abstract class AbstractConstants {
         return uniqueCanBusId(25, getCanivoreId());
     }
 
-    public double getFlywheelForwardVoltage() {
+    public Measure<Voltage> getFlywheelForwardVoltage() {
         // TODO: Configure Value.
-        return 10;
+        return Volts.of(10);
     }
 
-    public double getFlywheelReverseVoltage() {
+    public Measure<Voltage> getFlywheelReverseVoltage() {
         // TODO: Configure Value.
-        return -6;
+        return Volts.of(-6);
     }
 
     public double flywheelSpinOffset() {

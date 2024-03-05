@@ -17,17 +17,16 @@ public interface MotorIo {
     @AutoLog
     static class MotorIoInputs {
 
-        public String[] faults = new String[0],
-                stickyFaults = new String[0];
+        public String[] faults = new String[0];
 
         /**
          * Percentage of power from -1 to 1.
          */
-        public double appliedOutput;
+        public float appliedOutput;
 
         public Measure<Current> outputCurrent = Amps.of(0);
 
-        public Measure<Temperature> motorTemperature = Celsius.of(0);
+        public Measure<Temperature> motorTemp = Celsius.of(0);
 
         public Measure<Velocity<Angle>> velocityActual = RotationsPerSecond.of(0);
         public Measure<Velocity<Angle>> velocityTarget = RotationsPerSecond.of(0);

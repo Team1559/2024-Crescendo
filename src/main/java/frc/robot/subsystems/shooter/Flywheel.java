@@ -1,7 +1,18 @@
 package frc.robot.subsystems.shooter;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.constants.AbstractConstants.CONSTANTS;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
@@ -13,8 +24,13 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Current;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
+import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,40 +41,44 @@ public class Flywheel extends SubsystemBase {
     @AutoLog
     static class FlywheelInputs {
 
-        public double targetVoltage;
+        public Measure<Current> supplyCurrent = Amps.of(0);
 
-        public double lMotorVoltage;
-        public double rMotorVoltage;
+        public Measure<Temperature> motorTemp = Celsius.zero();
 
-        public double lSupplyCurrent;
-        public double rSupplyCurrent;
+        /** How much Voltage the motor is using. */
+        public Measure<Voltage> motorVoltage = Volts.of(0);
 
-        public double lSupplyVoltage;
-        public double rSupplyVoltage;
+        /** How much Voltage is available to the motor. */
+        public Measure<Voltage> supplyVoltage = Volts.of(0);
 
-        public double lVelocity;
-        public double rVelocity;
+        public Measure<Voltage> targetVoltage = Volts.of(0);
 
-        public Measure<Temperature> rMotorTemp = Celsius.zero();
-        public Measure<Temperature> lMotorTemp = Celsius.zero();
+        public Measure<Velocity<Angle>> velocityActual = RotationsPerSecond.of(0);
+        public Measure<Velocity<Angle>> velocityTarget = RotationsPerSecond.of(0);
 
-        public int rFaults;
-        public int lFaults;
+        public Rotation2d position = new Rotation2d();
+
+        public String[] faults = new String[0];
     }
 
+    private final StatusSignal<Double> flywheelLMotorTemp, flywheelRMotorTemp;
     private final StatusSignal<Double> flywheelLMotorVoltage, flywheelRMotorVoltage;
+    private final StatusSignal<Double> flywheelLPosition, flywheelRPosition;
     private final StatusSignal<Double> flywheelLSupplyCurrent, flywheelRSupplyCurrent;
     private final StatusSignal<Double> flywheelLSupplyVoltage, flywheelRSupplyVoltage;
     private final StatusSignal<Double> flywheelLVelocity, flywheelRVelocity;
-    private final StatusSignal<Double> flywheelLMotorTemp, flywheelRMotorTemp;
-    private final StatusSignal<Integer> flywheelLFaults, flywheelRFaults;
+    private final Map<String, StatusSignal<Boolean>> flywheelLFaults, flywheelRFaults;
+    private final List<StatusSignal<?>> statusSignals = new LinkedList<>();
+    private final StatusSignal<?>[] statusSignalArray;
 
-    private final TalonFX flywheelMotorL = new TalonFX(CONSTANTS.getFlywheelMotorIdLeft());
-    private final TalonFX flywheelMotorR = new TalonFX(CONSTANTS.getFlywheelMotorIdRight());
+    // TODO: Create TalonFXIo class that extends the MotorIo class, and use that.
+    private final TalonFX flywheelMotorL, flywheelMotorR;
 
-    private final FlywheelInputsAutoLogged inputs = new FlywheelInputsAutoLogged();
+    private final FlywheelInputsAutoLogged lInputs = new FlywheelInputsAutoLogged();
+    private final FlywheelInputsAutoLogged rInputs = new FlywheelInputsAutoLogged();
 
-    private double currentVoltage;
+    private Measure<Voltage> targetVoltage;
+
     /**
      * Null when both wheels run, true when right wheel runs, false when left wheel
      * runs.
@@ -67,7 +87,10 @@ public class Flywheel extends SubsystemBase {
 
     public Flywheel() {
 
-        // ---------- Configure Motors ----------
+        // ---------- Create & Configure Motors ----------
+        flywheelMotorL = new TalonFX(CONSTANTS.getFlywheelMotorIdLeft());
+        flywheelMotorR = new TalonFX(CONSTANTS.getFlywheelMotorIdRight());
+
         // Only set the Motor Configuration once, to avoid accidentally overriding
         // configs with defaults.
         flywheelMotorL.getConfigurator().apply(SwerveModuleIoTalonFx.getDefaultTalonFXConfiguration(
@@ -76,77 +99,114 @@ public class Flywheel extends SubsystemBase {
                 InvertedValue.Clockwise_Positive /* inverted */, NeutralModeValue.Coast));
 
         // ---------- Define Loggable Fields ----------
-        flywheelLMotorVoltage = flywheelMotorL.getMotorVoltage();
-        flywheelRMotorVoltage = flywheelMotorR.getMotorVoltage();
-        flywheelLSupplyCurrent = flywheelMotorL.getSupplyCurrent();
-        flywheelRSupplyCurrent = flywheelMotorR.getSupplyCurrent();
-        flywheelLSupplyVoltage = flywheelMotorL.getSupplyVoltage();
-        flywheelRSupplyVoltage = flywheelMotorR.getSupplyVoltage();
-        flywheelLVelocity = flywheelMotorL.getVelocity();
-        flywheelRVelocity = flywheelMotorR.getVelocity();
-        flywheelLMotorTemp = flywheelMotorL.getDeviceTemp();
-        flywheelRMotorTemp = flywheelMotorR.getDeviceTemp();
-        flywheelLFaults = flywheelMotorL.getFaultField();
-        flywheelRFaults = flywheelMotorR.getFaultField();
+        statusSignals.add(flywheelLMotorVoltage = flywheelMotorL.getMotorVoltage());
+        statusSignals.add(flywheelRMotorVoltage = flywheelMotorR.getMotorVoltage());
+
+        statusSignals.add(flywheelLSupplyCurrent = flywheelMotorL.getSupplyCurrent());
+        statusSignals.add(flywheelRSupplyCurrent = flywheelMotorR.getSupplyCurrent());
+
+        statusSignals.add(flywheelLSupplyVoltage = flywheelMotorL.getSupplyVoltage());
+        statusSignals.add(flywheelRSupplyVoltage = flywheelMotorR.getSupplyVoltage());
+
+        statusSignals.add(flywheelLVelocity = flywheelMotorL.getVelocity());
+        statusSignals.add(flywheelRVelocity = flywheelMotorR.getVelocity());
+
+        statusSignals.add(flywheelLMotorTemp = flywheelMotorL.getDeviceTemp());
+        statusSignals.add(flywheelRMotorTemp = flywheelMotorR.getDeviceTemp());
+
+        statusSignals.add(flywheelLPosition = flywheelMotorL.getPosition());
+        statusSignals.add(flywheelRPosition = flywheelMotorR.getPosition());
+
+        flywheelLFaults = new HashMap<>();
+        flywheelRFaults = new HashMap<>();
+
+        addAllGetFaultStatusSignalMethods(flywheelLFaults, flywheelMotorL);
+        addAllGetFaultStatusSignalMethods(flywheelRFaults, flywheelMotorR);
+
+        statusSignals.addAll(flywheelLFaults.values());
+        statusSignals.addAll(flywheelRFaults.values());
 
         // ---------- Optimize Bus Utilization ----------
-        BaseStatusSignal.setUpdateFrequencyForAll(
-                CONSTANTS.getPathPlannerLogUpdateFrequencyDefault(),
-                flywheelLMotorVoltage, flywheelRMotorVoltage,
-                flywheelLSupplyCurrent, flywheelRSupplyCurrent,
-                flywheelLSupplyVoltage, flywheelRSupplyVoltage,
-                flywheelLVelocity, flywheelRVelocity,
-                flywheelLMotorTemp, flywheelRMotorTemp,
-                flywheelLFaults, flywheelRFaults);
+        statusSignalArray = statusSignals.toArray(new StatusSignal[0]);
+        BaseStatusSignal.setUpdateFrequencyForAll(CONSTANTS.getPathPlannerLogUpdateFrequencyDefault(),
+                statusSignalArray);
         flywheelMotorL.optimizeBusUtilization();
         flywheelMotorR.optimizeBusUtilization();
+    }
+
+    @SuppressWarnings("unchecked")
+    private void addAllGetFaultStatusSignalMethods(Map<String, StatusSignal<Boolean>> faults, TalonFX motor) {
+        Class<?> c = motor.getClass();
+        Method[] publicMethods = c.getMethods();
+        for (int i = 0; i < publicMethods.length; i++) {
+            Method method = publicMethods[i];
+            String[] parts = method.toString().split("_");
+            if (parts.length == 2 && parts[0].equals("public StatusSignal<Boolean> getFault")) {
+                try {
+                    faults.put(parts[1].split("(")[0], (StatusSignal<Boolean>) method.invoke(motor));
+                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                    // Ignore.
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     @Override
     public void periodic() {
 
-        // Set Voltages.
+        // Set/Log Voltages.
         if (runOneWheelFlag == null || runOneWheelFlag) {
-            flywheelMotorR.setControl(new VoltageOut(currentVoltage));
+            lInputs.targetVoltage = getTargetVoltage();
+            flywheelMotorR.setControl(new VoltageOut(lInputs.targetVoltage.in(Volts)));
         }
         if (runOneWheelFlag == null || !runOneWheelFlag) {
-            flywheelMotorL.setControl(
-                    new VoltageOut(currentVoltage * CONSTANTS.flywheelSpinOffset()));
+            rInputs.targetVoltage = getTargetVoltage().times(CONSTANTS.flywheelSpinOffset());
+            flywheelMotorL.setControl(new VoltageOut(rInputs.targetVoltage.in(Volts)));
         }
 
         // Log Inputs.
-        updateInputs();
-        Logger.processInputs("Shooter/Flywheel", inputs);
+        BaseStatusSignal.refreshAll(statusSignalArray);
+
+        updateFaultInputs(lInputs, flywheelMotorL, flywheelLFaults);
+        updateFaultInputs(rInputs, flywheelMotorR, flywheelRFaults);
+
+        lInputs.motorTemp = Celsius.of(flywheelLMotorTemp.getValue());
+        rInputs.motorTemp = Celsius.of(flywheelRMotorTemp.getValue());
+
+        lInputs.motorVoltage = Volts.of(flywheelLMotorVoltage.getValue());
+        rInputs.motorVoltage = Volts.of(flywheelRMotorVoltage.getValue());
+
+        lInputs.position = Rotation2d.fromRotations(flywheelLPosition.getValue());
+        rInputs.position = Rotation2d.fromRotations(flywheelRPosition.getValue());
+
+        lInputs.supplyCurrent = Amps.of(flywheelLSupplyCurrent.getValue());
+        rInputs.supplyCurrent = Amps.of(flywheelRSupplyCurrent.getValue());
+
+        lInputs.supplyVoltage = Volts.of(flywheelLSupplyVoltage.getValue());
+        rInputs.supplyVoltage = Volts.of(flywheelRSupplyVoltage.getValue());
+
+        lInputs.velocityActual = RotationsPerSecond.of(flywheelLVelocity.getValue());
+        rInputs.velocityActual = RotationsPerSecond.of(flywheelRVelocity.getValue());
+
+        // Not Currently Supported. (TODO)
+        // lInputs.velocityTarget =
+        // rInputs.velocityTarget =
+
+        Logger.processInputs("Shooter/Flywheel/LeftMotor", lInputs);
+        Logger.processInputs("Shooter/Flywheel/RightMotor", rInputs);
     }
 
-    private void updateInputs() {
-        BaseStatusSignal.refreshAll(
-                flywheelLMotorVoltage, flywheelRMotorVoltage,
-                flywheelLSupplyCurrent, flywheelRSupplyCurrent,
-                flywheelLSupplyVoltage, flywheelRSupplyVoltage,
-                flywheelLVelocity, flywheelRVelocity,
-                flywheelLMotorTemp, flywheelRMotorTemp,
-                flywheelLFaults, flywheelRFaults);
+    private void updateFaultInputs(FlywheelInputsAutoLogged inputs, TalonFX motor,
+            Map<String, StatusSignal<Boolean>> faultsMap) {
 
-        inputs.targetVoltage = currentVoltage;
-
-        inputs.lMotorVoltage = flywheelLMotorVoltage.getValueAsDouble();
-        inputs.rMotorVoltage = flywheelRMotorVoltage.getValueAsDouble();
-
-        inputs.lSupplyCurrent = flywheelLSupplyCurrent.getValueAsDouble();
-        inputs.rSupplyCurrent = flywheelRSupplyCurrent.getValueAsDouble();
-
-        inputs.lSupplyVoltage = flywheelLSupplyVoltage.getValueAsDouble();
-        inputs.rSupplyVoltage = flywheelRSupplyVoltage.getValueAsDouble();
-
-        inputs.lVelocity = flywheelLVelocity.getValueAsDouble();
-        inputs.rVelocity = flywheelRVelocity.getValueAsDouble();
-
-        inputs.lMotorTemp = Celsius.of(flywheelLMotorTemp.getValueAsDouble());
-        inputs.rMotorTemp = Celsius.of(flywheelRMotorTemp.getValueAsDouble());
-
-        inputs.lFaults = flywheelLFaults.getValue();
-        inputs.rFaults = flywheelRFaults.getValue();
+        List<String> faults = new LinkedList<>();
+        for (Entry<String, StatusSignal<Boolean>> entry : faultsMap.entrySet()) {
+            if (entry.getValue().getValue()) {
+                faults.add(entry.getKey());
+            }
+        }
+        inputs.faults = faults.toArray(new String[0]);
     }
 
     // ========================= Functions =========================
@@ -154,7 +214,7 @@ public class Flywheel extends SubsystemBase {
      * @return The Temperature of the hottest motor.
      */
     public Measure<Temperature> getMaxTemperature() {
-        return inputs.rMotorTemp.gt(inputs.lMotorTemp) ? inputs.rMotorTemp : inputs.lMotorTemp;
+        return rInputs.motorTemp.gt(lInputs.motorTemp) ? rInputs.motorTemp : lInputs.motorTemp;
     }
 
     public boolean isTemperatureTooHigh() {
@@ -168,8 +228,8 @@ public class Flywheel extends SubsystemBase {
      * 
      * @param voltage Set Flywheels to this voltage
      */
-    public void start(double voltage) {
-        currentVoltage = voltage;
+    public void start(Measure<Voltage> voltage) {
+        targetVoltage = voltage;
         runOneWheelFlag = null;
     }
 
@@ -185,15 +245,15 @@ public class Flywheel extends SubsystemBase {
         runOneWheelFlag = runRightWheel;
     }
 
-    public double getCurrentVoltage() {
-        return currentVoltage;
+    public Measure<Voltage> getTargetVoltage() {
+        return targetVoltage;
     }
 
     /**
      * Stop the Flywheels
      */
     public void stop() {
-        currentVoltage = 0;
+        targetVoltage = Volts.zero();
         flywheelMotorL.stopMotor();
         flywheelMotorR.stopMotor();
     }
@@ -210,7 +270,7 @@ public class Flywheel extends SubsystemBase {
         return new InstantCommand(this::start, this);
     }
 
-    public Command startCommand(double voltage) {
+    public Command startCommand(Measure<Voltage> voltage) {
         return new InstantCommand(() -> start(voltage), this);
     }
 

@@ -50,22 +50,18 @@ public abstract class MotorIoSparkMax implements MotorIo {
     @Override
     public void updateInputs(MotorIoInputs inputs) {
 
-        List<String> faults = new LinkedList<>(), stickyFaults = new LinkedList<>();
+        List<String> faults = new LinkedList<>();
         for (FaultID faultID : FaultID.values()) {
             if (motor.getFault(faultID)) {
                 faults.add(faultID.name());
             }
-            if (motor.getStickyFault(faultID)) {
-                stickyFaults.add(faultID.name());
-            }
         }
         inputs.faults = faults.toArray(new String[0]);
-        inputs.stickyFaults = stickyFaults.toArray(new String[0]);
 
-        inputs.appliedOutput = motor.getAppliedOutput();
+        inputs.appliedOutput = (float) motor.getAppliedOutput();
 
         inputs.outputCurrent = Amps.of(motor.getOutputCurrent());
-        inputs.motorTemperature = Celsius.of(motor.getMotorTemperature());
+        inputs.motorTemp = Celsius.of(motor.getMotorTemperature());
         inputs.velocityActual = getVelocity();
         inputs.velocityTarget = targetVelocity;
     }

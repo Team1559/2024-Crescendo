@@ -42,8 +42,10 @@ public class Aimer extends SubsystemBase {
         public double lVelocity, rVelocity;
     }
 
+    // TODO: Update CANSparkMax variables as MotorIo variables.
     private final CANSparkMax motorL = new CANSparkMax(CONSTANTS.getAimerMotorIdLeft(), MotorType.kBrushless);
     private final CANSparkMax motorR = new CANSparkMax(CONSTANTS.getAimerMotorIdRight(), MotorType.kBrushless);
+
     private final DutyCycleEncoder encoder = new DutyCycleEncoder(CONSTANTS.getAimerEncoderPort());
     private final PIDController controller = CONSTANTS.getAimerPid().createController();
     private final AimerInputsAutoLogged inputs = new AimerInputsAutoLogged();

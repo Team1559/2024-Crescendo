@@ -34,7 +34,7 @@ public class Climber extends SubsystemBase {
     // TODO: Move to Constants.
     private static final double ROTATIONS_PER_INCH = (5 * 5) * (5D / 3);
 
-    // TODO: Update CANSparkMax variables as SingleMotorIo variables.
+    // TODO: Update CANSparkMax variables as MotorIo variables.
     private final CANSparkMax motorL = new CANSparkMax(CONSTANTS.getClimberMotorIdLeft(), MotorType.kBrushless);
     private final CANSparkMax motorR = new CANSparkMax(CONSTANTS.getClimberMotorIdRight(), MotorType.kBrushless);
 
