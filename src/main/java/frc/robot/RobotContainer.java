@@ -28,6 +28,8 @@ import frc.robot.io.motor.MotorIoReplay;
 import frc.robot.io.swerve_module.SwerveModuleIoReplay;
 import frc.robot.io.swerve_module.SwerveModuleIoSim;
 import frc.robot.io.swerve_module.SwerveModuleIoTalonFx;
+import frc.robot.io.vision.VisionIoLimelight;
+import frc.robot.io.vision.VisionIoSimAndReplay;
 import frc.robot.subsystems.base.SwerveBase;
 import frc.robot.subsystems.base.SwerveModule.WheelModuleIndex;
 import frc.robot.subsystems.climber.Climber;
@@ -39,8 +41,6 @@ import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.Intake;
 import frc.robot.subsystems.shooter.NoteSensor;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionIoLimelight;
-import frc.robot.subsystems.vision.VisionIoSimAndReplay;
 
 /**
  * This class is where the bulk of the robot should be declared. Since

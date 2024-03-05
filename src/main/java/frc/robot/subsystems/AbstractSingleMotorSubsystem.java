@@ -1,4 +1,4 @@
-package frc.robot.subsystems.single_motor;
+package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 import static frc.robot.constants.AbstractConstants.CONSTANTS;
@@ -10,7 +10,9 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.io.motor.MotorIo;
 import frc.robot.io.motor.MotorIoInputsAutoLogged;
 
@@ -60,7 +62,6 @@ public abstract class AbstractSingleMotorSubsystem extends SubsystemBase {
 
     // ========================= Functions =========================
     public boolean isTemperatureTooHigh() {
-        // 90% Buffer.
         return io.getTemperature().gt(io.getMaxSafeTemperature().times(CONSTANTS.getMotorSafeTemperatureBuffer()));
     }
 
@@ -82,15 +83,33 @@ public abstract class AbstractSingleMotorSubsystem extends SubsystemBase {
 
     // ========================= Commands =========================
 
+    public Command reverseCommand() {
+        return new InstantCommand(this::reverse, this);
+    }
+
+    public Command reverseStopCommand() {
+        return new StartEndCommand(this::reverse, this::stop, this);
+    }
+
+    public Command setVelocityCommand(Measure<Velocity<Angle>> velocity) {
+        return new InstantCommand(() -> setVelocity(velocity), this);
+    }
+
     public Command startCommand() {
         return new InstantCommand(this::start, this);
+    }
+
+    public Command startStopCommand() {
+        return new StartEndCommand(this::start, this::stop, this);
     }
 
     public Command stopCommand() {
         return new InstantCommand(this::stop, this);
     }
 
-    public Command reverseCommand() {
-        return new InstantCommand(this::reverse, this);
+    public Command waitUntilTemperatureIsNotTooHighCommand() {
+        Command command = new WaitUntilCommand(this::isTemperatureTooHigh);
+        command.addRequirements(this);
+        return command;
     }
 }

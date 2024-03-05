@@ -5,7 +5,7 @@ import static frc.robot.constants.AbstractConstants.CONSTANTS;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.io.motor.MotorIo;
-import frc.robot.subsystems.single_motor.AbstractSingleMotorSubsystem;
+import frc.robot.subsystems.AbstractSingleMotorSubsystem;
 
 public class Traverser extends AbstractSingleMotorSubsystem {
 

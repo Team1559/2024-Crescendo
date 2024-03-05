@@ -2,6 +2,7 @@ package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
@@ -293,6 +294,26 @@ public abstract class AbstractConstants {
 
     // #endregion
 
+    // #region: ----- Camera -----
+
+    public String getCameraNameBack() {
+        return "limelight-back";
+    }
+
+    public String getCameraNameFront() {
+        return "limelight";
+    }
+
+    public Measure<Distance> getCameraLinearStandardDeviation() {
+        return Meters.of(0.5);
+    }
+
+    public Measure<Angle> getCameraRotationalStandardDeviation() {
+        return Degrees.of(1);
+    }
+
+    // #endregion
+
     // #region: ----- Canivore -----
 
     public static String getCanivoreId() {
@@ -476,18 +497,6 @@ public abstract class AbstractConstants {
     public Measure<Velocity<Angle>> getTraverserVelocity() {
         // TODO: Tune.
         return RevolutionsPerSecond.of(5000);
-    }
-
-    // #endregion
-
-    // #region: ----- Vision -----
-
-    public String getCameraNameBack() {
-        return "limelight-back";
-    }
-
-    public String getCameraNameFront() {
-        return "limelight";
     }
 
     // #endregion
