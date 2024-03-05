@@ -70,6 +70,7 @@ public class VisionIoLimelight implements VisionIo {
                 inputs.havePose = false;
                 inputs.pose = new Pose2d();
                 inputs.timestamp = 0;
+                return;
             }
             inputs.havePose = true;
             inputs.pose = pose;
