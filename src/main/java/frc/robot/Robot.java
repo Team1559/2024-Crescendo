@@ -102,9 +102,9 @@ public class Robot extends LoggedRobot {
     @Override
     public void autonomousInit() {
         autonomousCommand = robotContainer.getAutonomousCommand();
-        if (CONSTANTS.hasClimberSubsystem()) {
-            CommandScheduler.getInstance().schedule(robotContainer.climber.setTargetHeightCommand(.5));
-        }
+        // if (CONSTANTS.hasClimberSubsystem()) {
+        // CommandScheduler.getInstance().schedule(robotContainer.climber.setTargetHeightCommand(.5));
+        // }
         if (CONSTANTS.hasAimerSubsystem()) {
             CommandScheduler.getInstance()
                     .schedule(robotContainer.aimer.setTargetAngleCommand(Rotation2d.fromDegrees(2)));

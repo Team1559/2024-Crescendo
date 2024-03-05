@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.subsystems.vision.LimelightHelpers.LimelightResults;
 import frc.robot.subsystems.vision.Vision.VisionInputs;
 
 public class VisionIoLimelight implements VisionIo {
@@ -22,6 +23,7 @@ public class VisionIoLimelight implements VisionIo {
 
     public void updateInputs(VisionInputs inputs) {
         double[] data = LimelightHelpers.getBotPose_wpiBlue(cameraName);
+        LimelightResults results = LimelightHelpers.getLatestResults(cameraName);
         if (data.length < 6 || (data[0] == 0 && data[1] == 0)) {
             inputs.havePose = false;
             inputs.pose = new Pose2d();
@@ -33,8 +35,10 @@ public class VisionIoLimelight implements VisionIo {
 
             double[] targetdata = LimelightHelpers.getTargetPose_CameraSpace(cameraName);
             inputs.distanceToTarget = Math.hypot(targetdata[0], targetdata[1]);
-            inputs.estimateStdDevs[0] = inputs.distanceToTarget * LINEAR_STD_DEV_RATIO;
-            inputs.estimateStdDevs[1] = inputs.distanceToTarget * LINEAR_STD_DEV_RATIO;
+            double translationStdDev = inputs.distanceToTarget * LINEAR_STD_DEV_RATIO
+                    / results.targetingResults.targets_Fiducials.length;
+            inputs.estimateStdDevs[0] = translationStdDev;
+            inputs.estimateStdDevs[1] = translationStdDev;
             inputs.estimateStdDevs[2] = ROTATION_STD_DEV;
 
             inputs.havePose = true;
