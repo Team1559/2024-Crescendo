@@ -183,29 +183,29 @@ public class Constants {
      * @return The assigned Alliance or the {@link #getDefaultAllianceForAuto}, if
      *         no alliance is set.
      */
-    public Alliance getAlliance() {
+    public static Alliance getAlliance() {
         return DriverStation.getAlliance().orElse(getDefaultAllianceForAuto());
     };
 
     /**
      * @return The side of the field that the automation paths are made for.
      */
-    public Alliance getDefaultAllianceForAuto() {
+    public static Alliance getDefaultAllianceForAuto() {
         return Alliance.Blue;
     }
 
-    public boolean shouldFlipPath() {
+    public static boolean shouldFlipPath() {
         return getAlliance() != getDefaultAllianceForAuto() && CONSTANTS.shouldFlipPathIfAssignedAllianceIsNotDefault();
     }
 
-    public boolean shouldFlipPathIfAssignedAllianceIsNotDefault() {
+    public static boolean shouldFlipPathIfAssignedAllianceIsNotDefault() {
         return true;
     }
 
     // #endregion
 
     // #region: --------------- Capability Flags -------------------------------
-    public boolean hasAimerSubsystem() {
+    public static boolean hasAimerSubsystem() {
         if (isGameRobot()) {
             return true;
         } else {
@@ -213,7 +213,7 @@ public class Constants {
         }
     }
 
-    public boolean hasClimberSubsystem() {
+    public static boolean hasClimberSubsystem() {
         if (isGameRobot()) {
             return true;
         } else {
@@ -221,7 +221,7 @@ public class Constants {
         }
     }
 
-    public boolean hasNoteSensorSubsystem() {
+    public static boolean hasNoteSensorSubsystem() {
         if (isGameRobot()) {
             return true;
         } else {
@@ -229,7 +229,7 @@ public class Constants {
         }
     }
 
-    public boolean hasFeederSubsystem() {
+    public static boolean hasFeederSubsystem() {
         if (isGameRobot()) {
             return true;
         } else {
@@ -237,7 +237,7 @@ public class Constants {
         }
     }
 
-    public boolean hasFlywheelSubsystem() {
+    public static boolean hasFlywheelSubsystem() {
         if (isGameRobot()) {
             return true;
         } else {
@@ -245,7 +245,7 @@ public class Constants {
         }
     }
 
-    public boolean hasIntakeSubsystem() {
+    public static boolean hasIntakeSubsystem() {
         if (isGameRobot()) {
             return true;
         } else {
@@ -253,7 +253,7 @@ public class Constants {
         }
     }
 
-    public boolean hasVisionSubsystem() {
+    public static boolean hasVisionSubsystem() {
         if (isGameRobot()) {
             return true;
         } else {
@@ -261,7 +261,7 @@ public class Constants {
         }
     }
 
-    public boolean hasTraverserSubsystem() {
+    public static boolean hasTraverserSubsystem() {
         if (isGameRobot()) {
             return false;
         } else {
@@ -272,11 +272,11 @@ public class Constants {
     // #endregion
 
     // #region: --------------- Driving Configurations -------------------------
-    public double getJoystickDeadband() {
+    public static double getJoystickDeadband() {
         return 0.05;
     }
 
-    public Measure<Velocity<Angle>> getMaxAngularSpeed() {
+    public static Measure<Velocity<Angle>> getMaxAngularSpeed() {
         if (isGameRobot()) {
             // TODO: Tune.
             return DegreesPerSecond.of(360);
@@ -285,7 +285,7 @@ public class Constants {
         }
     }
 
-    public Measure<Velocity<Distance>> getMaxLinearSpeed() {
+    public static Measure<Velocity<Distance>> getMaxLinearSpeed() {
         if (isGameRobot()) {
             // TODO: Tune.
             return MetersPerSecond.of(5);
@@ -305,7 +305,7 @@ public class Constants {
             Units.inchesToMeters(218.42),
             Units.inchesToMeters(80.5));
 
-    public Translation3d getSpeakerLocation() {
+    public static Translation3d getSpeakerLocation() {
         if (getAlliance() == Alliance.Blue) {
             return Constants.SPEAKER_LOCATION_BLUE;
         } else {
@@ -320,7 +320,7 @@ public class Constants {
             Units.inchesToMeters(323.00),
             Units.inchesToMeters(44));
 
-    public Translation3d getAmpLocation() {
+    public static Translation3d getAmpLocation() {
         if (getAlliance() == Alliance.Blue) {
             return Constants.AMP_LOCATION_RED;
         } else {
@@ -333,31 +333,31 @@ public class Constants {
     // #region: --------------- Hardware ---------------------------------------
 
     // #region: ----- Aimer -----
-    public Tuple2<Rotation2d> getAimerAngleRange() {
+    public static Tuple2<Rotation2d> getAimerAngleRange() {
         return new Tuple2<Rotation2d>(Rotation2d.fromDegrees(1), Rotation2d.fromDegrees(40));
     }
 
-    public Rotation2d getAimerEncoderOffset() {
+    public static Rotation2d getAimerEncoderOffset() {
         return Rotation2d.fromRadians(2.599);
     }
 
-    public int getAimerEncoderPort() {
+    public static int getAimerEncoderPort() {
         return uniqueRoboRioPort(5, RoboRioPortArrays.DIO);
     }
 
-    public Rotation2d getAimerErrorThreshold() {
+    public static Rotation2d getAimerErrorThreshold() {
         return Rotation2d.fromDegrees(2);
     }
 
-    public int getAimerMotorIdLeft() {
+    public static int getAimerMotorIdLeft() {
         return uniqueCanBusId(23, getCanivoreId());
     }
 
-    public int getAimerMotorIdRight() {
+    public static int getAimerMotorIdRight() {
         return uniqueCanBusId(22, getCanivoreId());
     }
 
-    public PID getAimerPid() {
+    public static PID getAimerPid() {
         return new PID(.6, 0, 0);
     }
 
@@ -365,19 +365,19 @@ public class Constants {
 
     // #region: ----- Camera -----
 
-    public String getCameraNameBack() {
+    public static String getCameraNameBack() {
         return "limelight-back";
     }
 
-    public String getCameraNameFront() {
+    public static String getCameraNameFront() {
         return "limelight";
     }
 
-    public Measure<Distance> getCameraLinearStandardDeviation() {
+    public static Measure<Distance> getCameraLinearStandardDeviation() {
         return Meters.of(0.5);
     }
 
-    public Measure<Angle> getCameraRotationalStandardDeviation() {
+    public static Measure<Angle> getCameraRotationalStandardDeviation() {
         return Degrees.of(1);
     }
 
@@ -392,43 +392,43 @@ public class Constants {
     // #endregion
 
     // #region: ----- Climber --------
-    public Measure<Distance> getClimberMaxHeight() {
+    public static Measure<Distance> getClimberMaxHeight() {
         return Inches.of(12);
     }
 
-    public int getClimberMotorIdLeft() {
+    public static int getClimberMotorIdLeft() {
         return uniqueCanBusId(25, getCanivoreId());
     }
 
-    public int getClimberMotorIdRight() {
+    public static int getClimberMotorIdRight() {
         return uniqueCanBusId(24, getCanivoreId());
     }
 
-    public PID getClimberPid() {
+    public static PID getClimberPid() {
         return new PID(.1, 0, 0);
     }
 
     // #endregion
 
     // #region: ----- Feeder -----
-    public int getFeederMotorId() {
+    public static int getFeederMotorId() {
         return uniqueCanBusId(21, getCanivoreId());
     }
 
-    public boolean isFeederMotorInverted() {
+    public static boolean isFeederMotorInverted() {
         return true;
     }
 
-    public PID getFeederPidValues() {
+    public static PID getFeederPidValues() {
         return new PID(0.33 / CONSTANTS.getFeederVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000);
     }
 
-    public Measure<Velocity<Angle>> getFeederVelocityForward() {
+    public static Measure<Velocity<Angle>> getFeederVelocityForward() {
         // TODO: Configure Value.
         return getIntakeVelocityForward().divide(4);
     }
 
-    public Measure<Velocity<Angle>> getFeederVelocityReverse() {
+    public static Measure<Velocity<Angle>> getFeederVelocityReverse() {
         // TODO: Configure Value.
         return getFeederVelocityForward().negate();
     }
@@ -436,25 +436,25 @@ public class Constants {
     // #endregion
 
     // #region: ----- Flywheel -----
-    public int getFlywheelMotorIdLeft() {
+    public static int getFlywheelMotorIdLeft() {
         return uniqueCanBusId(24, getCanivoreId());
     }
 
-    public int getFlywheelMotorIdRight() {
+    public static int getFlywheelMotorIdRight() {
         return uniqueCanBusId(25, getCanivoreId());
     }
 
-    public Measure<Voltage> getFlywheelForwardVoltage() {
+    public static Measure<Voltage> getFlywheelForwardVoltage() {
         // TODO: Configure Value.
         return Volts.of(10);
     }
 
-    public Measure<Voltage> getFlywheelReverseVoltage() {
+    public static Measure<Voltage> getFlywheelReverseVoltage() {
         // TODO: Configure Value.
         return Volts.of(-6);
     }
 
-    public double flywheelSpinOffset() {
+    public static double flywheelSpinOffset() {
         // TODO: Tune.
         return 1;
     }
@@ -463,7 +463,7 @@ public class Constants {
 
     // #region: ----- Gyro -----
 
-    public int getGyroId() {
+    public static int getGyroId() {
         return uniqueCanBusId(12, getCanivoreId());
     }
 
@@ -471,24 +471,24 @@ public class Constants {
 
     // #region: ----- Intake -----
 
-    public int getIntakeMotorId() {
+    public static int getIntakeMotorId() {
         return uniqueCanBusId(20, getCanivoreId());
     }
 
-    public boolean isIntakeMotorInverted() {
+    public static boolean isIntakeMotorInverted() {
         return true;
     }
 
-    public PID getIntakePidValues() {
+    public static PID getIntakePidValues() {
         return new PID(0.33 / CONSTANTS.getIntakeVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000);
     }
 
-    public Measure<Velocity<Angle>> getIntakeVelocityForward() {
+    public static Measure<Velocity<Angle>> getIntakeVelocityForward() {
         // TODO: Configure Value.
         return RevolutionsPerSecond.of(11000);
     }
 
-    public Measure<Velocity<Angle>> getIntakeVelocityReverse() {
+    public static Measure<Velocity<Angle>> getIntakeVelocityReverse() {
         // TODO: Configure Value.
         return getFeederVelocityForward().negate();
     }
@@ -497,11 +497,11 @@ public class Constants {
 
     // #region: ----- LEDs -----
 
-    public int getLedPort() {
+    public static int getLedPort() {
         return uniqueRoboRioPort(0, RoboRioPortArrays.PWM);
     }
 
-    public int getLedLength() {
+    public static int getLedLength() {
         if (isGameRobot()) {
             return 144 /* 1 strip */ * 3;
         } else {
@@ -509,7 +509,7 @@ public class Constants {
         }
     }
 
-    public Color[] getMotorOverheatEmergencyPattern() {
+    public static Color[] getMotorOverheatEmergencyPattern() {
         return new Color[] { Color.kYellow, Color.kYellow, Color.kRed, Color.kRed, Color.kBlack, Color.kBlack };
     }
 
@@ -517,14 +517,14 @@ public class Constants {
 
     // #region: ----- Note Sensor -----
 
-    public int getNoteSensorChannel() {
+    public static int getNoteSensorChannel() {
         return uniqueRoboRioPort(2, RoboRioPortArrays.DIO);
     }
 
     // #endregion
 
     // #region: ----- Swerve --------
-    public Map<WheelModuleIndex, Rotation2d> getSwerveModuleEncoderOffsets() {
+    public static Map<WheelModuleIndex, Rotation2d> getSwerveModuleEncoderOffsets() {
         if (isGameRobot()) {
             return new HashMap<>() {
                 {
@@ -563,7 +563,7 @@ public class Constants {
         }
     };
 
-    public Map<WheelModuleIndex, SwerveModuleHardwareIds> getSwerveModuleHardwareIds() {
+    public static Map<WheelModuleIndex, SwerveModuleHardwareIds> getSwerveModuleHardwareIds() {
         return swerveModuleHardwareIds;
     }
 
@@ -571,20 +571,20 @@ public class Constants {
 
     // #region: ----- Traverser -----
 
-    public int getTraverserMotorId() {
+    public static int getTraverserMotorId() {
         // TODO: Add ID
         throw new UnsupportedOperationException("No Motor ID for Traverser");
     }
 
-    public boolean isTraverserInverted() {
+    public static boolean isTraverserInverted() {
         return true;
     }
 
-    public PID getTraverserPidValues() {
+    public static PID getTraverserPidValues() {
         return new PID(0.33 / CONSTANTS.getTraverserVelocity().in(RevolutionsPerSecond), 0, 0, 11.0 / 11000);
     }
 
-    public Measure<Velocity<Angle>> getTraverserVelocity() {
+    public static Measure<Velocity<Angle>> getTraverserVelocity() {
         // TODO: Tune.
         return RevolutionsPerSecond.of(5000);
     }
@@ -593,17 +593,17 @@ public class Constants {
 
     // #region: --------------- Motor / Motor Controller Settings --------------
 
-    public double getMotorSafeTemperatureBuffer() {
+    public static double getMotorSafeTemperatureBuffer() {
         return 0.9;
     }
 
     // #region: ----- NEO 550 Brushless Motor -----
 
-    public Measure<Current> getNeo550BrushlessCurrentLimit() {
+    public static Measure<Current> getNeo550BrushlessCurrentLimit() {
         return Amps.of(24);
     }
 
-    public Measure<Current> getNeo550BrushlessCurrentSecondaryLimit() {
+    public static Measure<Current> getNeo550BrushlessCurrentSecondaryLimit() {
         return Amps.of(24);
     }
 
@@ -612,14 +612,14 @@ public class Constants {
     // #region: ----- Falcon 500 Motor -----
 
     @SuppressWarnings("unchecked")
-    public Map<String, StatusSignal<Boolean>> getAllGetFaultStatusSignalMethods(TalonFX motor) {
+    public static Map<String, StatusSignal<Boolean>> getAllGetFaultStatusSignalMethods(TalonFX motor) {
         Map<String, StatusSignal<Boolean>> faults = new HashMap<>();
         Class<?> c = motor.getClass();
         Method[] publicMethods = c.getMethods();
         for (int i = 0; i < publicMethods.length; i++) {
             Method method = publicMethods[i];
             String[] parts = method.toString().split("_");
-            if (parts.length == 2 && parts[0].equals("public StatusSignal<Boolean> getFault")) {
+            if (parts.length == 2 && parts[0].equals("public static StatusSignal<Boolean> getFault")) {
                 try {
                     faults.put(parts[1].split("(")[0], (StatusSignal<Boolean>) method.invoke(motor));
                 } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
@@ -638,11 +638,11 @@ public class Constants {
      * 
      * @return 109 degrees C
      */
-    public Measure<Temperature> getFalcon500MaxTemperature() {
+    public static Measure<Temperature> getFalcon500MaxTemperature() {
         return Celsius.of(109);
     }
 
-    public String[] getFaults(Map<String, StatusSignal<Boolean>> faultStatusSignals) {
+    public static String[] getFaults(Map<String, StatusSignal<Boolean>> faultStatusSignals) {
 
         List<String> faults = new LinkedList<>();
         for (Entry<String, StatusSignal<Boolean>> entry : faultStatusSignals.entrySet()) {
@@ -657,7 +657,7 @@ public class Constants {
 
     // #region: ----- TalonFX Motor -----
 
-    public TalonFXConfiguration getDefaultTalonFXConfiguration(InvertedValue invertedValue,
+    public static TalonFXConfiguration getDefaultTalonFXConfiguration(InvertedValue invertedValue,
             NeutralModeValue breakingMode) {
 
         TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration();
@@ -681,11 +681,11 @@ public class Constants {
     // #endregion
 
     // #region: --------------- Operation Modes --------------------------------
-    public OperatingMode getCurrentOperatingMode() {
+    public static OperatingMode getCurrentOperatingMode() {
         return OperatingMode.REAL_WORLD;
     }
 
-    public boolean isDrivingModeFieldRelative() {
+    public static boolean isDrivingModeFieldRelative() {
         if (isGameRobot()) {
             return true;
         } else {
@@ -699,7 +699,7 @@ public class Constants {
     /**
      * @return Value in Times per Second.
      */
-    public double getPathPlannerLogUpdateFrequencyDefault() {
+    public static double getPathPlannerLogUpdateFrequencyDefault() {
         return 50;
     }
 
@@ -708,19 +708,19 @@ public class Constants {
      * 
      * @return Value in Times per Second.
      */
-    public double getPathPlannerLogFrequencyForOdometry() {
+    public static double getPathPlannerLogFrequencyForOdometry() {
         return 100;
     }
 
     // #endregion
 
     // #region: --------------- Physical Measurements --------------------------
-    public Measure<Distance> getDriveBaseWheelRadius() {
+    public static Measure<Distance> getDriveBaseWheelRadius() {
         return Meters.of(Math.hypot(getWheelDistanceFrontToBack().divide(2).in(Meters),
                 getWheelDistanceLeftToRight().divide(2).in(Meters)));
     }
 
-    public double getGearRatioOfDriveWheel() {
+    public static double getGearRatioOfDriveWheel() {
         if (isGameRobot()) {
             // L3 Gear ratio.
             return (50.0 / 14.0) * (16.0 / 28.0) * (45.0 / 15.0);
@@ -730,7 +730,7 @@ public class Constants {
         }
     }
 
-    public double getGearRatioOfTurnWheel() {
+    public static double getGearRatioOfTurnWheel() {
         return 12.8;
     }
 
@@ -738,7 +738,7 @@ public class Constants {
      * @return The distance between the middle of the front wheel to middle of the
      *         back wheel (X coordinates).
      */
-    public Measure<Distance> getWheelDistanceFrontToBack() {
+    public static Measure<Distance> getWheelDistanceFrontToBack() {
         if (isGameRobot()) {
             return Inches.of(23);
         } else {
@@ -750,7 +750,7 @@ public class Constants {
      * @return The distance between the middle of the left wheel to middle of the
      *         right wheel (y coordinates).
      */
-    public Measure<Distance> getWheelDistanceLeftToRight() {
+    public static Measure<Distance> getWheelDistanceLeftToRight() {
         if (isGameRobot()) {
             return Inches.of(23);
         } else {
@@ -758,7 +758,7 @@ public class Constants {
         }
     }
 
-    public Measure<Distance> getWheelRadius() {
+    public static Measure<Distance> getWheelRadius() {
         return Inches.of(2);
     }
 

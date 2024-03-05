@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.io.gyro.GyroIo;
 import frc.robot.io.gyro.GyroIoInputsAutoLogged;
 import frc.robot.io.swerve_module.SwerveModuleIo;
@@ -102,7 +103,7 @@ public class SwerveBase extends SubsystemBase {
                 this::runVelocity,
                 new HolonomicPathFollowerConfig(CONSTANTS.getMaxLinearSpeed().in(MetersPerSecond),
                         CONSTANTS.getDriveBaseWheelRadius().in(Meters), new ReplanningConfig()),
-                CONSTANTS::shouldFlipPath,
+                Constants::shouldFlipPath,
                 this);
         Pathfinding.setPathfinder(new LocalAdStarAk());
         PathPlannerLogging.setLogActivePathCallback(activePath -> Logger.recordOutput("PathPlanner/ActivePath",

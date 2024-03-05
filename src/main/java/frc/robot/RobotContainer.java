@@ -238,8 +238,8 @@ public class RobotContainer { // TODO: Merge into the Robot class.
         if (CONSTANTS.hasFeederSubsystem() && CONSTANTS.hasNoteSensorSubsystem() && CONSTANTS.hasAimerSubsystem()) {
             NamedCommands.registerCommand("Auto Shoot", new SequentialCommandGroup(
                     new ParallelCommandGroup(
-                            DriveCommands.turnToTargetCommand(driveBase, CONSTANTS::getSpeakerLocation, 4.5),
-                            aimer.aimAtTargetCommand(CONSTANTS::getSpeakerLocation, driveBase::getTranslation)
+                            DriveCommands.turnToTargetCommand(driveBase, Constants::getSpeakerLocation, 4.5),
+                            aimer.aimAtTargetCommand(Constants::getSpeakerLocation, driveBase::getTranslation)
                                     .andThen(aimer.waitUntilAtTargetCommand())),
                     ShooterCommands.shootAutonomousCommand(feeder, leds, noteSensor)));
         }
@@ -253,10 +253,10 @@ public class RobotContainer { // TODO: Merge into the Robot class.
         // #region: ---------- Configure Controller 0 for Pilot ----------
         pilot.leftTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel, aimer,
                 pilot::getLeftY, pilot::getLeftX,
-                CONSTANTS::getSpeakerLocation));
+                Constants::getSpeakerLocation));
         pilot.rightTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel, aimer,
                 pilot::getLeftY, pilot::getLeftX,
-                CONSTANTS::getAmpLocation));
+                Constants::getAmpLocation));
         pilot.y().onTrue(driveBase.resetFieldOrientationCommand());
         // #endregion
 
