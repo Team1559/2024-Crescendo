@@ -8,6 +8,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.util.Color;
@@ -79,93 +80,103 @@ public class RobotContainer {
     public RobotContainer() {
         // #region: ==================== Initialize Subsystems =================
 
-        // #region: Initialize Subsystems with Simulation and/or Log Replay Mode
+        // #region: Initialize DriveBase Subsystem.
         switch (CONSTANTS.getCurrentOperatingMode()) {
-
             case REAL_WORLD:
-                // Real robot, instantiate hardware IO implementations
                 driveBase = new DriveBase(
                         new GyroIoPigeon2(CONSTANTS.getGyroId(), CONSTANTS.getCanivoreId()),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_LEFT),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_RIGHT),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_LEFT),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
-                feeder = CONSTANTS.hasFeederSubsystem()
-                        ? new Feeder(new MotorIoNeo550Brushless(CONSTANTS.getFeederMotorId(),
-                                CONSTANTS.isFeederMotorInverted(), CONSTANTS.getFeederPidValues()))
-                        : null;
-                intake = CONSTANTS.hasIntakeSubsystem()
-                        ? new Intake(new MotorIoNeo550Brushless(CONSTANTS.getIntakeMotorId(),
-                                CONSTANTS.isIntakeMotorInverted(), CONSTANTS.getIntakePidValues()))
-                        : null;
-                traverser = CONSTANTS.hasTraverserSubsystem()
-                        ? new Traverser(new MotorIoNeo550Brushless(CONSTANTS.getTraverserMotorId(),
-                                CONSTANTS.isTraverserInverted(), CONSTANTS.getTraverserPidValues()))
-                        : null;
-                vision = CONSTANTS.hasVisionSubsystem()
-                        ? new Vision(driveBase.poseEstimator, new VisionIoLimelight(CONSTANTS.getCameraNameFront()),
-                                new VisionIoLimelight(CONSTANTS.getCameraNameBack()))
-                        : null;
                 break;
-
             case SIMULATION:
-                // Sim robot, instantiate physics sim IO implementations
                 driveBase = new DriveBase(
                         new GyroIoSimAndReplay(),
                         new SwerveModuleIoSim(),
                         new SwerveModuleIoSim(),
                         new SwerveModuleIoSim(),
                         new SwerveModuleIoSim());
-                feeder = CONSTANTS.hasFeederSubsystem()
-                        ? new Feeder(new MotorIoNeo550Brushless(CONSTANTS.getFeederMotorId(),
-                                CONSTANTS.isFeederMotorInverted(), CONSTANTS.getIntakePidValues()))
-                        : null;
-                intake = CONSTANTS.hasIntakeSubsystem()
-                        ? new Intake(new MotorIoNeo550Brushless(CONSTANTS.getIntakeMotorId(),
-                                CONSTANTS.isIntakeMotorInverted(), CONSTANTS.getIntakePidValues()))
-                        : null;
-                traverser = CONSTANTS.hasTraverserSubsystem()
-                        ? new Traverser(new MotorIoNeo550Brushless(CONSTANTS.getTraverserMotorId(),
-                                CONSTANTS.isTraverserInverted(), CONSTANTS.getTraverserPidValues()))
-                        : null;
-                vision = CONSTANTS.hasVisionSubsystem()
-                        ? new Vision(driveBase.poseEstimator, new VisionIoSimAndReplay())
-                        : null;
                 break;
-
             case LOG_REPLAY:
-                // Replayed robot, disable IO implementations
                 driveBase = new DriveBase(
                         new GyroIoSimAndReplay(),
                         new SwerveModuleIoReplay(),
                         new SwerveModuleIoReplay(),
                         new SwerveModuleIoReplay(),
                         new SwerveModuleIoReplay());
-                feeder = CONSTANTS.hasFeederSubsystem() ? new Feeder(new MotorIoReplay()) : null;
-                intake = CONSTANTS.hasIntakeSubsystem() ? new Intake(new MotorIoReplay()) : null;
-                traverser = CONSTANTS.hasTraverserSubsystem() ? new Traverser(new MotorIoReplay()) : null;
-                vision = CONSTANTS.hasVisionSubsystem()
-                        ? new Vision(driveBase.poseEstimator, new VisionIoSimAndReplay())
-                        : null;
                 break;
-
             default:
                 throw new RuntimeException("Unknown Run Mode: " + CONSTANTS.getCurrentOperatingMode());
         }
 
         // #endregion
 
-        // #region: Initialize Subsystems without Simulation and/or Log Replay Mode
+        // #region: Initialize SingleMotorSubsystems.
+        switch (CONSTANTS.getCurrentOperatingMode()) {
+            case REAL_WORLD:
+            case SIMULATION:
+                feeder = CONSTANTS.hasFeederSubsystem()
+                        ? new Feeder(new MotorIoNeo550Brushless(CONSTANTS.getFeederMotorId(),
+                                CONSTANTS.isFeederMotorInverted(), IdleMode.kBrake, Rotation2d.fromRotations(0), // TODO
+                                CONSTANTS.getFeederPidValues()))
+                        : null;
+                intake = CONSTANTS.hasIntakeSubsystem()
+                        ? new Intake(new MotorIoNeo550Brushless(CONSTANTS.getIntakeMotorId(),
+                                CONSTANTS.isIntakeMotorInverted(), IdleMode.kBrake, Rotation2d.fromRotations(0), // TODO
+                                CONSTANTS.getIntakePidValues()))
+                        : null;
+                traverser = CONSTANTS.hasTraverserSubsystem()
+                        ? new Traverser(new MotorIoNeo550Brushless(CONSTANTS.getTraverserMotorId(),
+                                CONSTANTS.isTraverserInverted(), IdleMode.kBrake, Rotation2d.fromRotations(0), // TODO
+                                CONSTANTS.getTraverserPidValues()))
+                        : null;
+                break;
+            case LOG_REPLAY:
+                feeder = CONSTANTS.hasFeederSubsystem() ? new Feeder(new MotorIoReplay()) : null;
+                intake = CONSTANTS.hasIntakeSubsystem() ? new Intake(new MotorIoReplay()) : null;
+                traverser = CONSTANTS.hasTraverserSubsystem() ? new Traverser(new MotorIoReplay()) : null;
+                break;
+            default:
+                throw new RuntimeException("Unknown Run Mode: " + CONSTANTS.getCurrentOperatingMode());
+        }
+
+        // #endregion
+
+        // #region: Initialize Vision Subsystem.
+        switch (CONSTANTS.getCurrentOperatingMode()) {
+            case REAL_WORLD:
+                vision = CONSTANTS.hasVisionSubsystem()
+                        ? new Vision(driveBase.poseEstimator, new VisionIoLimelight(CONSTANTS.getCameraNameFront()),
+                                new VisionIoLimelight(CONSTANTS.getCameraNameBack()))
+                        : null;
+                break;
+            case SIMULATION:
+            case LOG_REPLAY:
+                vision = CONSTANTS.hasVisionSubsystem()
+                        ? new Vision(driveBase.poseEstimator, new VisionIoSimAndReplay())
+                        : null;
+                break;
+            default:
+                throw new RuntimeException("Unknown Run Mode: " + CONSTANTS.getCurrentOperatingMode());
+        }
+
+        // #endregion
+
+        // #region: Initialize Dual Motor Subsystems.
         aimer = CONSTANTS.hasAimerSubsystem() ? new Aimer() : null;
         climber = CONSTANTS.hasClimberSubsystem() ? new Climber() : null;
         flywheel = CONSTANTS.hasFlywheelSubsystem() ? new Flywheel() : null;
-        noteSensor = CONSTANTS.hasNoteSensorSubsystem() ? new NoteSensor(CONSTANTS.getNoteSensorChannel()) : null;
+
+        // #endregion
+
+        // #region: Initialize Lights & Sensors.
         /*
          * We can safely set LEDs even if there are no LEDs.
-         * (The LED control hardware is built into the RoboRio and therfore always
-         * "exists".)
+         * (LED hardware is built into the RoboRio and therefore always "exists".)
          */
         leds = new Leds();
+        noteSensor = CONSTANTS.hasNoteSensorSubsystem() ? new NoteSensor(CONSTANTS.getNoteSensorChannel()) : null;
 
         // #endregion
 

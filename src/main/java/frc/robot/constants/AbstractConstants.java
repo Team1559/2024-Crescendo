@@ -408,7 +408,7 @@ public abstract class AbstractConstants {
 
     // #region: ----- Note Sensor -----
 
-    public static int getNoteSensorChannel() {
+    public int getNoteSensorChannel() {
         return uniqueRoboRioPort(2, RoboRioPortArrays.DIO);
     }
 

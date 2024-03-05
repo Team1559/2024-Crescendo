@@ -41,22 +41,18 @@ public class Flywheel extends SubsystemBase {
     @AutoLog
     static class FlywheelInputs {
 
-        public Measure<Current> supplyCurrent = Amps.of(0);
+        public Measure<Current> supplyCurrent = Amps.zero();
 
         public Measure<Temperature> motorTemp = Celsius.zero();
 
-        /** How much Voltage the motor is using. */
-        public Measure<Voltage> motorVoltage = Volts.of(0);
+        public Measure<Voltage> voltsActual = Volts.zero();
+        public Measure<Voltage> voltsAvailable = Volts.zero();
+        public Measure<Voltage> voltsTarget = Volts.zero();
 
-        /** How much Voltage is available to the motor. */
-        public Measure<Voltage> supplyVoltage = Volts.of(0);
+        public Measure<Velocity<Angle>> velocityActual = RotationsPerSecond.zero();
+        public Measure<Velocity<Angle>> velocityTarget = RotationsPerSecond.zero();
 
-        public Measure<Voltage> targetVoltage = Volts.of(0);
-
-        public Measure<Velocity<Angle>> velocityActual = RotationsPerSecond.of(0);
-        public Measure<Velocity<Angle>> velocityTarget = RotationsPerSecond.of(0);
-
-        public Rotation2d position = new Rotation2d();
+        public Rotation2d positionAbsolute = new Rotation2d();
 
         public String[] faults = new String[0];
     }
@@ -157,12 +153,12 @@ public class Flywheel extends SubsystemBase {
 
         // Set/Log Voltages.
         if (runOneWheelFlag == null || runOneWheelFlag) {
-            lInputs.targetVoltage = getTargetVoltage();
-            flywheelMotorR.setControl(new VoltageOut(lInputs.targetVoltage.in(Volts)));
+            lInputs.voltsTarget = getTargetVoltage();
+            flywheelMotorR.setControl(new VoltageOut(lInputs.voltsTarget.in(Volts)));
         }
         if (runOneWheelFlag == null || !runOneWheelFlag) {
-            rInputs.targetVoltage = getTargetVoltage().times(CONSTANTS.flywheelSpinOffset());
-            flywheelMotorL.setControl(new VoltageOut(rInputs.targetVoltage.in(Volts)));
+            rInputs.voltsTarget = getTargetVoltage().times(CONSTANTS.flywheelSpinOffset());
+            flywheelMotorL.setControl(new VoltageOut(rInputs.voltsTarget.in(Volts)));
         }
 
         // Log Inputs.
@@ -174,17 +170,17 @@ public class Flywheel extends SubsystemBase {
         lInputs.motorTemp = Celsius.of(flywheelLMotorTemp.getValue());
         rInputs.motorTemp = Celsius.of(flywheelRMotorTemp.getValue());
 
-        lInputs.motorVoltage = Volts.of(flywheelLMotorVoltage.getValue());
-        rInputs.motorVoltage = Volts.of(flywheelRMotorVoltage.getValue());
+        lInputs.voltsActual = Volts.of(flywheelLMotorVoltage.getValue());
+        rInputs.voltsActual = Volts.of(flywheelRMotorVoltage.getValue());
 
-        lInputs.position = Rotation2d.fromRotations(flywheelLPosition.getValue());
-        rInputs.position = Rotation2d.fromRotations(flywheelRPosition.getValue());
+        lInputs.positionAbsolute = Rotation2d.fromRotations(flywheelLPosition.getValue());
+        rInputs.positionAbsolute = Rotation2d.fromRotations(flywheelRPosition.getValue());
 
         lInputs.supplyCurrent = Amps.of(flywheelLSupplyCurrent.getValue());
         rInputs.supplyCurrent = Amps.of(flywheelRSupplyCurrent.getValue());
 
-        lInputs.supplyVoltage = Volts.of(flywheelLSupplyVoltage.getValue());
-        rInputs.supplyVoltage = Volts.of(flywheelRSupplyVoltage.getValue());
+        lInputs.voltsAvailable = Volts.of(flywheelLSupplyVoltage.getValue());
+        rInputs.voltsAvailable = Volts.of(flywheelRSupplyVoltage.getValue());
 
         lInputs.velocityActual = RotationsPerSecond.of(flywheelLVelocity.getValue());
         rInputs.velocityActual = RotationsPerSecond.of(flywheelRVelocity.getValue());

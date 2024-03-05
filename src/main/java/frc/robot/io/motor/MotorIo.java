@@ -3,42 +3,59 @@ package frc.robot.io.motor;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Current;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
 
 public interface MotorIo {
 
     @AutoLog
     static class MotorIoInputs {
 
-        public String[] faults = new String[0];
-
-        /**
-         * Percentage of power from -1 to 1.
-         */
+        /** Percentage of power from -1 to 1. */
         public float appliedOutput;
 
-        public Measure<Current> outputCurrent = Amps.of(0);
+        public String[] faults = new String[0];
 
-        public Measure<Temperature> motorTemp = Celsius.of(0);
+        public Measure<Temperature> motorTemp = Celsius.zero();
 
-        public Measure<Velocity<Angle>> velocityActual = RotationsPerSecond.of(0);
-        public Measure<Velocity<Angle>> velocityTarget = RotationsPerSecond.of(0);
+        /** Amount of current being used. */
+        public Measure<Current> outputCurrent = Amps.zero();
+
+        public Rotation2d positionAbsolute = new Rotation2d();
+
+        public Measure<Velocity<Angle>> velocityActual = RotationsPerSecond.zero();
+        public Measure<Velocity<Angle>> velocityTarget = RotationsPerSecond.zero();
+
+        public Measure<Voltage> voltsActual = Volts.zero();
+        public Measure<Voltage> voltsAvailable = Volts.zero();
+        public Measure<Voltage> voltsTarget = Volts.zero();
     }
 
     public void updateInputs(MotorIoInputs inputs);
 
     public Measure<Temperature> getMaxSafeTemperature();
 
+    /**
+     * @return The position from the absolute encoder.
+     */
+    public Rotation2d getAbsolutePosition();
+
     public Measure<Temperature> getTemperature();
 
     public Measure<Velocity<Angle>> getVelocity();
 
+    public Measure<Voltage> getVoltage();
+
     public void setVelocity(Measure<Velocity<Angle>> velocity);
+
+    public void setVoltage(Measure<Voltage> voltage);
 }

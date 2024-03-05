@@ -1,8 +1,8 @@
 package frc.robot.io.motor;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -12,18 +12,23 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
 import frc.robot.constants.AbstractConstants.PID;
 
 public abstract class MotorIoSparkMax implements MotorIo {
 
+    protected final boolean inverted;
     protected final CANSparkMax motor;
+    protected final Rotation2d absoluteEncoderOffset;
+
     protected Measure<Velocity<Angle>> targetVelocity;
-    protected boolean inverted;
+    protected Measure<Voltage> targetVoltage;
 
     /**
      * Create a new subsystem for a single SparkMax-controlled motor in voltage mode
@@ -31,14 +36,18 @@ public abstract class MotorIoSparkMax implements MotorIo {
      * @param motorId  Motor CAN ID
      * @param inverted True if the motor direction should be inverted
      */
-    public MotorIoSparkMax(int motorId, boolean inverted, PID pidValues) {
+    public MotorIoSparkMax(int motorId, boolean inverted, IdleMode idleMode, Rotation2d absoluteEncoderOffset,
+            PID pidValues) {
 
         // Create & Configure Motor.
         motor = new CANSparkMax(motorId, MotorType.kBrushless);
         // Randomly flips back. TODO: Figure out why?
         // motor.setInverted(false);
         this.inverted = inverted;
-        motor.setIdleMode(IdleMode.kBrake);
+        motor.setIdleMode(idleMode);
+
+        // Configure Encoder.
+        this.absoluteEncoderOffset = absoluteEncoderOffset;
 
         // Configure piD Controller.
         motor.getPIDController().setP(pidValues.P);
@@ -50,6 +59,8 @@ public abstract class MotorIoSparkMax implements MotorIo {
     @Override
     public void updateInputs(MotorIoInputs inputs) {
 
+        inputs.appliedOutput = (float) motor.getAppliedOutput();
+
         List<String> faults = new LinkedList<>();
         for (FaultID faultID : FaultID.values()) {
             if (motor.getFault(faultID)) {
@@ -58,12 +69,25 @@ public abstract class MotorIoSparkMax implements MotorIo {
         }
         inputs.faults = faults.toArray(new String[0]);
 
-        inputs.appliedOutput = (float) motor.getAppliedOutput();
+        inputs.motorTemp = getTemperature();
 
         inputs.outputCurrent = Amps.of(motor.getOutputCurrent());
-        inputs.motorTemp = Celsius.of(motor.getMotorTemperature());
+
+        inputs.positionAbsolute = getAbsolutePosition();
+
+        inputs.voltsActual = getVoltage();
+        inputs.voltsAvailable = Volts.of(motor.getBusVoltage());
+        inputs.voltsTarget = targetVoltage;
+
         inputs.velocityActual = getVelocity();
         inputs.velocityTarget = targetVelocity;
+    }
+
+    // ========================= Functions =========================
+
+    @Override
+    public Rotation2d getAbsolutePosition() {
+        return Rotation2d.fromRotations(motor.getAbsoluteEncoder().getPosition()).plus(absoluteEncoderOffset);
     }
 
     @Override
@@ -77,11 +101,22 @@ public abstract class MotorIoSparkMax implements MotorIo {
     }
 
     @Override
+    public Measure<Voltage> getVoltage() {
+        return Volts.of(motor.getBusVoltage() * motor.getAppliedOutput());
+    }
+
+    @Override
     public void setVelocity(Measure<Velocity<Angle>> velocity) {
         motor.getPIDController().setReference(
                 inverted ? velocity.negate().in(RevolutionsPerSecond) : velocity.in(RevolutionsPerSecond),
                 CANSparkMax.ControlType.kVelocity);
 
         targetVelocity = velocity;
+    }
+
+    @Override
+    public void setVoltage(Measure<Voltage> voltage) {
+        motor.setVoltage(voltage.in(Volts));
+        this.targetVoltage = voltage;
     }
 }

@@ -4,7 +4,10 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 import static frc.robot.constants.AbstractConstants.CONSTANTS;
 
+import com.revrobotics.CANSparkBase.IdleMode;
+
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
@@ -22,8 +25,9 @@ public class MotorIoNeo550Brushless extends MotorIoSparkMax {
      * @param motorId  Motor CAN ID
      * @param inverted True if the motor direction should be inverted
      */
-    public MotorIoNeo550Brushless(int motorId, boolean inverted, PID pidValues) {
-        super(motorId, inverted, pidValues);
+    public MotorIoNeo550Brushless(int motorId, boolean inverted, IdleMode idleMode, Rotation2d absoluteEncoderOffset,
+            PID pidValues) {
+        super(motorId, inverted, idleMode, absoluteEncoderOffset, pidValues);
 
         motor.setSmartCurrentLimit((int) CONSTANTS.getNeo550BrushlessCurrentLimit().in(Amps));
         motor.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit().in(Amps));
