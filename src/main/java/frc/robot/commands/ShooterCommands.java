@@ -16,8 +16,6 @@ import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.Intake;
 import frc.robot.subsystems.shooter.NoteSensor;
 
-import frc.robot.Constants;
-
 public class ShooterCommands {
 
     /** Makes Class non-instantiable */
@@ -94,7 +92,7 @@ public class ShooterCommands {
         return new SequentialCommandGroup(
                 feeder.startCommand(),
                 LedCommands.blinkCommand(leds, Color.kOrange),
-                noteSensor.waitForNoObjectCommandSwitch(),
+                noteSensor.waitForNoObjectCommand(),
                 new WaitCommand(.25),
                 feeder.stopCommand());
     }
@@ -106,7 +104,7 @@ public class ShooterCommands {
                 new StartEndCommand(() -> feeder.setVelocity(MotorIoNeo550Brushless.MAX_VELOCITY), feeder::stop,
                         feeder),
                 leds.setColorCommand(Color.kPurple).repeatedly(),
-                noteSensor.waitForNoObjectCommandSwitch(), new WaitCommand(5));
+                noteSensor.waitForNoObjectCommand(), new WaitCommand(5));
 
         // TODO: Spin up flywheelsm if not already spinning.
         return group;

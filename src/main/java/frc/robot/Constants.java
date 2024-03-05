@@ -358,7 +358,7 @@ public class Constants {
     }
 
     public static PID getAimerPid() {
-        return new PID(.6, 0, 0);
+        return new PID(.6, 0, 0, 0.7);
     }
 
     // #endregion

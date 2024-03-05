@@ -60,8 +60,6 @@ public abstract class MotorIoSparkMax implements MotorIo {
     @Override
     public void updateInputs(MotorIoInputs inputs) {
 
-        inputs.powerPercentage = (float) motor.getAppliedOutput();
-
         inputs.currentActual = Amps.of(motor.getOutputCurrent());
 
         List<String> faults = new LinkedList<>();
@@ -75,14 +73,16 @@ public abstract class MotorIoSparkMax implements MotorIo {
         inputs.positionAbsolute = getAbsolutePosition();
         inputs.positionTarget = targetPosition;
 
+        inputs.powerPercentage = (float) motor.getAppliedOutput();
+
         inputs.temperature = getTemperature();
+
+        inputs.velocityActual = getVelocity();
+        inputs.velocityTarget = targetVelocity;
 
         inputs.voltsActual = getVoltage();
         inputs.voltsAvailable = Volts.of(motor.getBusVoltage());
         inputs.voltsTarget = targetVoltage;
-
-        inputs.velocityActual = getVelocity();
-        inputs.velocityTarget = targetVelocity;
     }
 
     // ========================= Functions =========================

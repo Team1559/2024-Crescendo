@@ -28,6 +28,7 @@ import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -50,10 +51,10 @@ public class Flywheel extends SubsystemBase {
 
         public Measure<Voltage> voltsActual = Volts.zero();
         public Measure<Voltage> voltsAvailable = Volts.zero();
-        public Measure<Voltage> voltsTarget = Volts.zero();
+        public Measure<Voltage> voltsTarget;
 
         public Measure<Velocity<Angle>> velocityActual = RotationsPerSecond.zero();
-        public Measure<Velocity<Angle>> velocityTarget = RotationsPerSecond.zero();
+        public Measure<Velocity<Angle>> velocityTarget;
     }
 
     private final StatusSignal<Double> flywheelLDeviceTemp, flywheelRDeviceTemp;
@@ -177,7 +178,7 @@ public class Flywheel extends SubsystemBase {
         lInputs.velocityActual = RotationsPerSecond.of(flywheelLVelocity.getValue());
         rInputs.velocityActual = RotationsPerSecond.of(flywheelRVelocity.getValue());
 
-        // Not Currently Supported. (TODO)
+        // Not Currently Supported.
         // lInputs.velocityTarget =
         // rInputs.velocityTarget =
 
@@ -186,72 +187,71 @@ public class Flywheel extends SubsystemBase {
     }
 
     // ========================= Functions =========================
-    /**
-     * @return The Temperature of the hottest motor.
-     */
+    /** @return The Temperature of the hottest motor. */
     public Measure<Temperature> getMaxTemperature() {
         return rInputs.temperature.gt(lInputs.temperature) ? rInputs.temperature : lInputs.temperature;
     }
 
     public boolean isTemperatureTooHigh() {
-        // 90% Buffer.
         return getMaxTemperature()
                 .gt(Constants.getFalcon500MaxTemperature().times(Constants.getMotorSafeTemperatureBuffer()));
     }
 
-    /**
-     * Start the Flywheels with a specific voltage
-     * 
-     * @param voltage Set Flywheels to this voltage
-     */
-    public void start(Measure<Voltage> voltage) {
-        targetVoltage = voltage;
-        runOneWheelFlag = null;
-    }
-
-    /**
-     * Start the Flywheels with default volage
-     */
     public void start() {
         start(Constants.getFlywheelForwardVoltage());
     }
 
+    public void start(Measure<Voltage> voltage) {
+        start(voltage, null);
+    }
+
+    private void start(Measure<Voltage> voltage, Boolean runOneWheelFlag) {
+        targetVoltage = voltage;
+        this.runOneWheelFlag = runOneWheelFlag;
+    }
+
     public void startOneMotor(boolean runRightWheel) {
-        start();
-        runOneWheelFlag = runRightWheel;
+        start(Constants.getFlywheelForwardVoltage(), runRightWheel);
     }
 
     public Measure<Voltage> getTargetVoltage() {
         return targetVoltage;
     }
 
-    /**
-     * Stop the Flywheels
-     */
     public void stop() {
         targetVoltage = Volts.zero();
         flywheelMotorL.stopMotor();
         flywheelMotorR.stopMotor();
     }
 
-    /**
-     * Reverse the Flywheels
-     */
     public void reverse() {
         start(Constants.getFlywheelReverseVoltage());
     }
 
     // ========================= Commands =========================
+
     public Command startCommand() {
         return new InstantCommand(this::start, this);
+    }
+
+    public Command startStopCommand() {
+        return new StartEndCommand(this::start, this::stop, this);
     }
 
     public Command startCommand(Measure<Voltage> voltage) {
         return new InstantCommand(() -> start(voltage), this);
     }
 
+    public Command startStopCommand(Measure<Voltage> voltage) {
+        return new StartEndCommand(() -> start(voltage), this::stop, this);
+    }
+
     public Command startOneMotorCommand(boolean runRightWheel) {
         return new InstantCommand(() -> startOneMotor(runRightWheel), this);
+    }
+
+    public Command startOneMotorStopCommand(boolean runRightWheel) {
+        return new StartEndCommand(() -> startOneMotor(runRightWheel), this::stop, this);
     }
 
     public Command stopCommand() {
@@ -260,5 +260,9 @@ public class Flywheel extends SubsystemBase {
 
     public Command reverseCommand() {
         return new InstantCommand(this::reverse, this);
+    }
+
+    public Command reverseStopCommand() {
+        return new StartEndCommand(this::reverse, this::stop, this);
     }
 }
