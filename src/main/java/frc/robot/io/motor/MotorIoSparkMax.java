@@ -43,7 +43,7 @@ public abstract class MotorIoSparkMax implements MotorIo {
         // Create & Configure Motor.
         motor = new CANSparkMax(motorId, MotorType.kBrushless);
         // Randomly flips back. TODO: Figure out why?
-        // motor.setInverted(false);
+        motor.setInverted(false);
         this.isInverted = inverted;
         motor.setIdleMode(idleMode);
 

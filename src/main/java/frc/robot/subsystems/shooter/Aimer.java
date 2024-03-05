@@ -88,8 +88,10 @@ public class Aimer extends SubsystemBase {
 
     private final PIDController controller = Constants.getAimerPid().createController();
 
-    protected Rotation2d targetAngle, targetAngleClamped;
-    protected Measure<Voltage> targetVoltage;
+    private final boolean isLMotorInverted;
+
+    private Rotation2d targetAngle, targetAngleClamped;
+    private Measure<Voltage> targetVoltage;
 
     private final AimerInputsAutoLogged inputs = new AimerInputsAutoLogged();
 
@@ -97,14 +99,21 @@ public class Aimer extends SubsystemBase {
      * Create a new subsystem for two motors controlled by CANspark Controller
      **/
     public Aimer() {
+
         motorL = new CANSparkMax(Constants.getAimerMotorIdLeft(), MotorType.kBrushless);
         motorR = new CANSparkMax(Constants.getAimerMotorIdRight(), MotorType.kBrushless);
+
+        // Randomly flips back. TODO: Figure out why?
         motorL.setInverted(false);
-        motorR.setInverted(true); // TODO.
+        motorR.setInverted(false);
+        isLMotorInverted = false;
+
         motorL.setIdleMode(IdleMode.kBrake);
         motorR.setIdleMode(IdleMode.kBrake);
+
         motorL.setSmartCurrentLimit((int) Constants.getNeo550BrushlessCurrentLimit().in(Amps));
         motorR.setSmartCurrentLimit((int) Constants.getNeo550BrushlessCurrentLimit().in(Amps));
+
         motorL.setSecondaryCurrentLimit(Constants.getNeo550BrushlessCurrentSecondaryLimit().in(Amps));
         motorR.setSecondaryCurrentLimit(Constants.getNeo550BrushlessCurrentSecondaryLimit().in(Amps));
     }
@@ -124,8 +133,8 @@ public class Aimer extends SubsystemBase {
             targetVoltage = Volts.of(output);
 
             // TODO: What if motors are not moving evenly?
-            motorL.setVoltage(output);
-            motorR.setVoltage(output);
+            motorL.setVoltage(isLMotorInverted ? -output : output);
+            motorR.setVoltage(isLMotorInverted ? output : -output);
         }
     }
 

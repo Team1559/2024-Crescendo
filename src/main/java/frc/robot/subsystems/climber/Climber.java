@@ -62,6 +62,8 @@ public class Climber extends SubsystemBase {
     private final CANSparkMax motorL;
     private final CANSparkMax motorR;
 
+    private final boolean isLMotorInverted;
+
     Measure<Distance> targetHeight;
 
     private final ClimberInputsAutoLogged motorLInputs = new ClimberInputsAutoLogged();
@@ -72,12 +74,18 @@ public class Climber extends SubsystemBase {
         // Create & Configure Motor.
         motorL = new CANSparkMax(Constants.getClimberMotorIdLeft(), MotorType.kBrushless);
         motorR = new CANSparkMax(Constants.getClimberMotorIdRight(), MotorType.kBrushless);
-        motorL.setInverted(true); // TODO.
+
+        // Randomly flips back. TODO: Figure out why?
+        motorL.setInverted(false);
         motorR.setInverted(false);
+        isLMotorInverted = true;
+
         motorL.setIdleMode(IdleMode.kBrake);
         motorR.setIdleMode(IdleMode.kBrake);
+
         motorL.setSmartCurrentLimit((int) Constants.getNeo550BrushlessCurrentLimit().in(Amps));
         motorR.setSmartCurrentLimit((int) Constants.getNeo550BrushlessCurrentLimit().in(Amps));
+
         motorL.setSecondaryCurrentLimit(Constants.getNeo550BrushlessCurrentSecondaryLimit().in(Amps));
         motorL.setSecondaryCurrentLimit(Constants.getNeo550BrushlessCurrentSecondaryLimit().in(Amps));
 
@@ -146,8 +154,10 @@ public class Climber extends SubsystemBase {
     }
 
     private void setPosition(Rotation2d position) {
-        motorL.getPIDController().setReference(position.getRotations(), CANSparkMax.ControlType.kPosition);
-        motorR.getPIDController().setReference(position.getRotations(), CANSparkMax.ControlType.kPosition);
+        motorL.getPIDController().setReference(isLMotorInverted ? -position.getRotations() : position.getRotations(),
+                CANSparkMax.ControlType.kPosition);
+        motorR.getPIDController().setReference(isLMotorInverted ? position.getRotations() : -position.getRotations(),
+                CANSparkMax.ControlType.kPosition);
     }
 
     public Measure<Distance> getHeight() {
