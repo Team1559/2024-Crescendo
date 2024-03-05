@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
-import static frc.robot.Constants.CONSTANTS;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -13,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.Constants;
 import frc.robot.io.motor.MotorIo;
 import frc.robot.io.motor.MotorIoInputsAutoLogged;
 
@@ -62,7 +62,7 @@ public abstract class AbstractSingleMotorSubsystem extends SubsystemBase {
 
     // ========================= Functions =========================
     public boolean isTemperatureTooHigh() {
-        return io.getTemperature().gt(io.getMaxSafeTemperature().times(CONSTANTS.getMotorSafeTemperatureBuffer()));
+        return io.getTemperature().gt(io.getMaxSafeTemperature().times(Constants.getMotorSafeTemperatureBuffer()));
     }
 
     public void reverse() {

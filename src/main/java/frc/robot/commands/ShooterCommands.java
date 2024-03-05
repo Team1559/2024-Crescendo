@@ -16,6 +16,8 @@ import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.Intake;
 import frc.robot.subsystems.shooter.NoteSensor;
 
+import frc.robot.Constants;
+
 public class ShooterCommands {
 
     /** Makes Class non-instantiable */

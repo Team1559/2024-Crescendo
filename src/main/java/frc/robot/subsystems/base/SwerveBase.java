@@ -3,7 +3,6 @@ package frc.robot.subsystems.base;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
-import static frc.robot.Constants.CONSTANTS;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
@@ -38,6 +37,8 @@ import frc.robot.io.gyro.GyroIoInputsAutoLogged;
 import frc.robot.io.swerve_module.SwerveModuleIo;
 import frc.robot.subsystems.base.SwerveModule.WheelModuleIndex;
 import frc.robot.util.LocalAdStarAk;
+
+import frc.robot.Constants;
 
 public class SwerveBase extends SubsystemBase {
 
@@ -75,14 +76,14 @@ public class SwerveBase extends SubsystemBase {
 
         // -------------------- Create Position Estimator --------------------
         kinematics = new SwerveDriveKinematics(new Translation2d[] {
-                new Translation2d(CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
-                        CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0),
-                new Translation2d(CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
-                        -CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0),
-                new Translation2d(-CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
-                        CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0),
-                new Translation2d(-CONSTANTS.getWheelDistanceFrontToBack().in(Meters) / 2.0,
-                        -CONSTANTS.getWheelDistanceLeftToRight().in(Meters) / 2.0)
+                new Translation2d(Constants.getWheelDistanceFrontToBack().in(Meters) / 2.0,
+                        Constants.getWheelDistanceLeftToRight().in(Meters) / 2.0),
+                new Translation2d(Constants.getWheelDistanceFrontToBack().in(Meters) / 2.0,
+                        -Constants.getWheelDistanceLeftToRight().in(Meters) / 2.0),
+                new Translation2d(-Constants.getWheelDistanceFrontToBack().in(Meters) / 2.0,
+                        Constants.getWheelDistanceLeftToRight().in(Meters) / 2.0),
+                new Translation2d(-Constants.getWheelDistanceFrontToBack().in(Meters) / 2.0,
+                        -Constants.getWheelDistanceLeftToRight().in(Meters) / 2.0)
         });
 
         updateModulePositions();
@@ -101,8 +102,8 @@ public class SwerveBase extends SubsystemBase {
                 this::setPose,
                 () -> kinematics.toChassisSpeeds(getModuleStates()),
                 this::runVelocity,
-                new HolonomicPathFollowerConfig(CONSTANTS.getMaxLinearSpeed().in(MetersPerSecond),
-                        CONSTANTS.getDriveBaseWheelRadius().in(Meters), new ReplanningConfig()),
+                new HolonomicPathFollowerConfig(Constants.getMaxLinearSpeed().in(MetersPerSecond),
+                        Constants.getDriveBaseWheelRadius().in(Meters), new ReplanningConfig()),
                 Constants::shouldFlipPath,
                 this);
         Pathfinding.setPathfinder(new LocalAdStarAk());
@@ -113,7 +114,7 @@ public class SwerveBase extends SubsystemBase {
 
         // TODO: Figure out why the robot is not starting at 0,0.
         setPose(new Pose2d(new Translation2d(),
-                CONSTANTS.getAlliance() == Alliance.Blue ? Rotation2d.fromDegrees(180) : new Rotation2d()));
+                Constants.getAlliance() == Alliance.Blue ? Rotation2d.fromDegrees(180) : new Rotation2d()));
     }
 
     @Override
@@ -212,7 +213,7 @@ public class SwerveBase extends SubsystemBase {
             // Calculate module setpoints.
             ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
             setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
-            SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, CONSTANTS.getMaxLinearSpeed());
+            SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, Constants.getMaxLinearSpeed());
 
             // Send setpoints to modules.
             optimizedSetpointStates = new SwerveModuleState[4];

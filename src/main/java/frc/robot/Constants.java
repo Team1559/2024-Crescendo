@@ -162,9 +162,6 @@ public class Constants {
     // ==================== "CONSTANTS" (Ctrl + K, Ctrl + 8 to fold regions) ===
     // #region: --------------- Game Robot / Technician ------------------------
     private static final boolean FORCE_GAME_ROBOT_CONSTANTS = true;
-    public static final boolean TECHNICIAN_CONTROLLER_ENABLED = false && !FORCE_GAME_ROBOT_CONSTANTS;
-
-    public static final Constants CONSTANTS = new Constants();
 
     private static boolean isGameRobot() {
         String roboRioSerialNumber = System.getenv("serialnum");
@@ -195,7 +192,7 @@ public class Constants {
     }
 
     public static boolean shouldFlipPath() {
-        return getAlliance() != getDefaultAllianceForAuto() && CONSTANTS.shouldFlipPathIfAssignedAllianceIsNotDefault();
+        return getAlliance() != getDefaultAllianceForAuto() && Constants.shouldFlipPathIfAssignedAllianceIsNotDefault();
     }
 
     public static boolean shouldFlipPathIfAssignedAllianceIsNotDefault() {
@@ -420,7 +417,7 @@ public class Constants {
     }
 
     public static PID getFeederPidValues() {
-        return new PID(0.33 / CONSTANTS.getFeederVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000);
+        return new PID(0.33 / Constants.getFeederVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000);
     }
 
     public static Measure<Velocity<Angle>> getFeederVelocityForward() {
@@ -480,7 +477,7 @@ public class Constants {
     }
 
     public static PID getIntakePidValues() {
-        return new PID(0.33 / CONSTANTS.getIntakeVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000);
+        return new PID(0.33 / Constants.getIntakeVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000);
     }
 
     public static Measure<Velocity<Angle>> getIntakeVelocityForward() {
@@ -581,7 +578,7 @@ public class Constants {
     }
 
     public static PID getTraverserPidValues() {
-        return new PID(0.33 / CONSTANTS.getTraverserVelocity().in(RevolutionsPerSecond), 0, 0, 11.0 / 11000);
+        return new PID(0.33 / Constants.getTraverserVelocity().in(RevolutionsPerSecond), 0, 0, 11.0 / 11000);
     }
 
     public static Measure<Velocity<Angle>> getTraverserVelocity() {

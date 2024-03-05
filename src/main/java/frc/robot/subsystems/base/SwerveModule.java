@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.Constants.CONSTANTS;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -18,6 +17,7 @@ import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Velocity;
+import frc.robot.Constants;
 import frc.robot.io.swerve_module.SwerveModuleIo;
 import frc.robot.io.swerve_module.SwerveModuleIoInputsAutoLogged;
 
@@ -58,7 +58,7 @@ public class SwerveModule {
 
         // Switch constants based on mode (the physics simulator is treated as a
         // separate robot with different tuning)
-        switch (CONSTANTS.getCurrentOperatingMode()) {
+        switch (Constants.getCurrentOperatingMode()) {
             case REAL_WORLD:
             case LOG_REPLAY:
                 driveFeedForward = new SimpleMotorFeedforward(0.1, 0.13);
@@ -71,7 +71,7 @@ public class SwerveModule {
                 turnFeedback = new PIDController(10.0, 0.0, 0.0);
                 break;
             default:
-                throw new RuntimeException("Unknown Run Mode: " + CONSTANTS.getCurrentOperatingMode());
+                throw new RuntimeException("Unknown Run Mode: " + Constants.getCurrentOperatingMode());
         }
 
         turnFeedback.enableContinuousInput(-Math.PI, Math.PI);
@@ -104,7 +104,7 @@ public class SwerveModule {
                 double adjustSpeedSetpoint = speedSetpoint * Math.cos(turnFeedback.getPositionError());
 
                 // Run drive controller/
-                double velocityRadPerSec = adjustSpeedSetpoint / CONSTANTS.getWheelRadius().in(Meters);
+                double velocityRadPerSec = adjustSpeedSetpoint / Constants.getWheelRadius().in(Meters);
                 io.setDriveVoltage(Volts.of(driveFeedForward.calculate(velocityRadPerSec) + driveFeedback
                         .calculate(inputs.driveMotorVelocityActual.in(RadiansPerSecond), velocityRadPerSec)));
             }
@@ -153,13 +153,13 @@ public class SwerveModule {
 
     /** @return The current drive position of the module. */
     public Measure<Distance> getPosition() {
-        return Meters.of(inputs.driveMotorPositionAbsolute.getRotations() * CONSTANTS.getWheelRadius().in(Meters));
+        return Meters.of(inputs.driveMotorPositionAbsolute.getRotations() * Constants.getWheelRadius().in(Meters));
     }
 
     /** @return The current drive velocity of the module. */
     public Measure<Velocity<Distance>> getVelocity() {
         return MetersPerSecond
-                .of(inputs.driveMotorVelocityActual.in(RotationsPerSecond) * CONSTANTS.getWheelRadius().in(Meters));
+                .of(inputs.driveMotorVelocityActual.in(RotationsPerSecond) * Constants.getWheelRadius().in(Meters));
     }
 
     /** @return The module position. */
@@ -173,6 +173,6 @@ public class SwerveModule {
     }
 
     public boolean isTemperatureTooHigh() {
-        return getMaxTemperature().gt(io.getMaxSafeMotorTemperature().times(CONSTANTS.getMotorSafeTemperatureBuffer()));
+        return getMaxTemperature().gt(io.getMaxSafeMotorTemperature().times(Constants.getMotorSafeTemperatureBuffer()));
     }
 }

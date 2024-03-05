@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.Constants.CONSTANTS;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -24,8 +23,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Voltage;
-import frc.robot.subsystems.base.SwerveModule.WheelModuleIndex;
-
 /**
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn
  * motor controller, and CANcoder.
@@ -41,6 +38,9 @@ import frc.robot.subsystems.base.SwerveModule.WheelModuleIndex;
  * These values are logged under "/Drive/ModuleX/TurnAbsolutePositionRad".
  * </p>
  */
+import frc.robot.Constants;
+import frc.robot.subsystems.base.SwerveModule.WheelModuleIndex;
+
 public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 
     private final CANcoder cancoder;
@@ -69,15 +69,15 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 
     public SwerveModuleIoTalonFx(WheelModuleIndex index) {
 
-        absoluteEncoderOffset = CONSTANTS.getSwerveModuleEncoderOffsets().get(index);
+        absoluteEncoderOffset = Constants.getSwerveModuleEncoderOffsets().get(index);
 
         // ---------- Instantiate Hardware ----------
-        cancoder = new CANcoder(CONSTANTS.getSwerveModuleHardwareIds().get(index).CANCODER_ID,
-                CONSTANTS.getCanivoreId());
-        driveMotor = new TalonFX(CONSTANTS.getSwerveModuleHardwareIds().get(index).DRIVE_MOTOR_ID,
-                CONSTANTS.getCanivoreId());
-        steerMotor = new TalonFX(CONSTANTS.getSwerveModuleHardwareIds().get(index).STEER_MOTOR_ID,
-                CONSTANTS.getCanivoreId());
+        cancoder = new CANcoder(Constants.getSwerveModuleHardwareIds().get(index).CANCODER_ID,
+                Constants.getCanivoreId());
+        driveMotor = new TalonFX(Constants.getSwerveModuleHardwareIds().get(index).DRIVE_MOTOR_ID,
+                Constants.getCanivoreId());
+        steerMotor = new TalonFX(Constants.getSwerveModuleHardwareIds().get(index).STEER_MOTOR_ID,
+                Constants.getCanivoreId());
 
         // ---------- Configure Hardware ----------
         // ----- Cancoder -----
@@ -89,10 +89,10 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         // configs with defaults.
         driveMotor.getConfigurator()
                 // Inverted to match our Swerve Drive Module Gear Box & Motors.
-                .apply(CONSTANTS.getDefaultTalonFXConfiguration(InvertedValue.Clockwise_Positive,
+                .apply(Constants.getDefaultTalonFXConfiguration(InvertedValue.Clockwise_Positive,
                         NeutralModeValue.Brake));
         steerMotor.getConfigurator()
-                .apply(CONSTANTS.getDefaultTalonFXConfiguration(InvertedValue.CounterClockwise_Positive,
+                .apply(Constants.getDefaultTalonFXConfiguration(InvertedValue.CounterClockwise_Positive,
                         NeutralModeValue.Brake));
 
         // ---------- Get StatusSignals ----------
@@ -104,8 +104,8 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         statusSignals.add(driveMotorDutyCycle = driveMotor.getDutyCycle());
         statusSignals.add(steerMotorDutyCycle = steerMotor.getDutyCycle());
 
-        driveMotorFaults = CONSTANTS.getAllGetFaultStatusSignalMethods(driveMotor);
-        steerMotorFaults = CONSTANTS.getAllGetFaultStatusSignalMethods(steerMotor);
+        driveMotorFaults = Constants.getAllGetFaultStatusSignalMethods(driveMotor);
+        steerMotorFaults = Constants.getAllGetFaultStatusSignalMethods(steerMotor);
 
         statusSignals.addAll(driveMotorFaults.values());
         statusSignals.addAll(steerMotorFaults.values());
@@ -129,11 +129,11 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         statusSignals.add(steerMotorVelocity = steerMotor.getVelocity());
 
         // ---------- Set Update Frequency ----------
-        BaseStatusSignal.setUpdateFrequencyForAll(CONSTANTS.getPathPlannerLogUpdateFrequencyDefault(),
+        BaseStatusSignal.setUpdateFrequencyForAll(Constants.getPathPlannerLogUpdateFrequencyDefault(),
                 statusSignals.toArray(new StatusSignal[0]));
 
         // Required for odometry, use faster rate
-        BaseStatusSignal.setUpdateFrequencyForAll(CONSTANTS.getPathPlannerLogFrequencyForOdometry(),
+        BaseStatusSignal.setUpdateFrequencyForAll(Constants.getPathPlannerLogFrequencyForOdometry(),
                 driveMotorPosition, steerMotorPosition);
         statusSignals.add(driveMotorPosition);
         statusSignals.add(steerMotorPosition);
@@ -155,18 +155,18 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         // ---------- Drive Motor ----------
         inputs.driveMotorCurrentActual = Amps.of(driveMotorTorqueCurrent.getValue());
         inputs.driveMotorCurrentAvailable = Amps.of(driveMotorSupplyCurrent.getValue());
-        inputs.driveMotorFaults = CONSTANTS.getFaults(driveMotorFaults);
+        inputs.driveMotorFaults = Constants.getFaults(driveMotorFaults);
         // Inverted so autonomous sees the robot moving in the correct direction.
         inputs.driveMotorPositionAbsolute = Rotation2d
                 .fromRadians(Units.rotationsToRadians(-driveMotorPosition.getValueAsDouble())
-                        / CONSTANTS.getGearRatioOfDriveWheel());
+                        / Constants.getGearRatioOfDriveWheel());
         /** From -1 to 1. */
         inputs.driveMotorPowerPercentage = (float) (driveMotorDutyCycle.getValue() / 2);
         inputs.driveMotorTemp = Celsius.of(driveMotorTemp.getValue());
         inputs.driveMotorVoltsActual = Volts.of(driveMotorAppliedVolts.getValue());
         inputs.driveMotorVoltsTarget = driveVoltsTarget;
         inputs.driveMotorVelocityActual = RadiansPerSecond.of(
-                Units.rotationsToRadians(driveMotorVelocity.getValueAsDouble()) / CONSTANTS.getGearRatioOfDriveWheel());
+                Units.rotationsToRadians(driveMotorVelocity.getValueAsDouble()) / Constants.getGearRatioOfDriveWheel());
         inputs.driveMotorVoltsAvailable = Volts.of(driveMotorSupplyVoltage.getValue());
         // Not Currently Supported. (TODO)
         // inputs.driveMotorVelocityTarget = RotationsPerSecond.zero();
@@ -174,9 +174,9 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         // ---------- Steer Motor ----------
         inputs.steerMotorCurrentActual = Amps.of(steerMotorTorqueCurrent.getValue());
         inputs.driveMotorCurrentAvailable = Amps.of(steerMotorSupplyCurrent.getValue());
-        inputs.steerMotorFaults = CONSTANTS.getFaults(steerMotorFaults);
+        inputs.steerMotorFaults = Constants.getFaults(steerMotorFaults);
         inputs.steerMotorPositionAbsolute = Rotation2d
-                .fromRotations(steerMotorPosition.getValueAsDouble() / CONSTANTS.getGearRatioOfTurnWheel())
+                .fromRotations(steerMotorPosition.getValueAsDouble() / Constants.getGearRatioOfTurnWheel())
                 .plus(Rotation2d.fromRadians(0));
         /** From -1 to 1. */
         inputs.steerMotorPowerPercentage = (float) (steerMotorDutyCycle.getValue() / 2);
@@ -184,7 +184,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         inputs.steerMotorVoltsActual = Volts.of(steerMotorAppliedVolts.getValue());
         inputs.steerMotorVoltsTarget = steerVoltsTarget;
         inputs.steerMotorVelocityActual = RadiansPerSecond.of(
-                Units.rotationsToRadians(steerMotorVelocity.getValueAsDouble()) / CONSTANTS.getGearRatioOfTurnWheel());
+                Units.rotationsToRadians(steerMotorVelocity.getValueAsDouble()) / Constants.getGearRatioOfTurnWheel());
         inputs.driveMotorVoltsAvailable = Volts.of(steerMotorSupplyVoltage.getValue());
         // Not Currently Supported. (TODO)
         // inputs.steerMotorVelocityTarget = RotationsPerSecond.zero();
@@ -194,7 +194,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 
     @Override
     public Measure<Temperature> getMaxSafeMotorTemperature() {
-        return CONSTANTS.getFalcon500MaxTemperature();
+        return Constants.getFalcon500MaxTemperature();
     }
 
     @Override

@@ -13,15 +13,6 @@ import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
-/**
- * Physics SIM implementation of module IO.
- *
- * <p>
- * Uses two flywheel sims for the drive and turn motors, with the absolute
- * position initialized to a random value. The flywheel sims are not physically
- * accurate, but provide a decent approximation for the behavior of the module.
- * </p>
- */
 public class SwerveModuleIoSim implements SwerveModuleIo {
 
     private static final double LOOP_PERIOD_SECS = 0.02;

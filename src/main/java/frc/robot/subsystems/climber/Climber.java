@@ -2,7 +2,6 @@ package frc.robot.subsystems.climber;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
-import static frc.robot.Constants.CONSTANTS;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
@@ -17,6 +16,8 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import frc.robot.Constants;
 
 public class Climber extends SubsystemBase {
 
@@ -35,10 +36,10 @@ public class Climber extends SubsystemBase {
     private static final double ROTATIONS_PER_INCH = (5 * 5) * (5D / 3);
 
     // TODO: Update CANSparkMax variables as MotorIo variables.
-    private final CANSparkMax motorL = new CANSparkMax(CONSTANTS.getClimberMotorIdLeft(), MotorType.kBrushless);
-    private final CANSparkMax motorR = new CANSparkMax(CONSTANTS.getClimberMotorIdRight(), MotorType.kBrushless);
+    private final CANSparkMax motorL = new CANSparkMax(Constants.getClimberMotorIdLeft(), MotorType.kBrushless);
+    private final CANSparkMax motorR = new CANSparkMax(Constants.getClimberMotorIdRight(), MotorType.kBrushless);
 
-    private final PIDController controller = CONSTANTS.getAimerPid().createController();
+    private final PIDController controller = Constants.getAimerPid().createController();
     private final ClimberInputsAutoLogged inputs = new ClimberInputsAutoLogged();
 
     public Climber() {
@@ -46,10 +47,10 @@ public class Climber extends SubsystemBase {
         motorR.setInverted(false);
         motorL.setIdleMode(IdleMode.kBrake);
         motorR.setIdleMode(IdleMode.kBrake);
-        motorL.setSmartCurrentLimit((int) CONSTANTS.getNeo550BrushlessCurrentLimit().in(Amps));
-        motorR.setSmartCurrentLimit((int) CONSTANTS.getNeo550BrushlessCurrentLimit().in(Amps));
-        motorL.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit().in(Amps));
-        motorL.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit().in(Amps));
+        motorL.setSmartCurrentLimit((int) Constants.getNeo550BrushlessCurrentLimit().in(Amps));
+        motorR.setSmartCurrentLimit((int) Constants.getNeo550BrushlessCurrentLimit().in(Amps));
+        motorL.setSecondaryCurrentLimit(Constants.getNeo550BrushlessCurrentSecondaryLimit().in(Amps));
+        motorL.setSecondaryCurrentLimit(Constants.getNeo550BrushlessCurrentSecondaryLimit().in(Amps));
     }
 
     @Override

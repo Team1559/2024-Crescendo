@@ -10,6 +10,8 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
+import frc.robot.Constants;
+
 public class GyroIoPigeon2 implements GyroIo {
 
     private final Pigeon2 pigeon;

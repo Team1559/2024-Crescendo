@@ -1,12 +1,11 @@
 package frc.robot.subsystems.shooter;
 
-import static frc.robot.Constants.CONSTANTS;
-
+import frc.robot.Constants;
 import frc.robot.io.motor.MotorIo;
 import frc.robot.subsystems.AbstractSingleMotorSubsystem;
 
 public class Feeder extends AbstractSingleMotorSubsystem {
     public Feeder(MotorIo io) {
-        super("Shooter/Feeder", io, CONSTANTS.getFeederVelocityForward(), CONSTANTS.getFeederVelocityReverse());
+        super("Shooter/Feeder", io, Constants.getFeederVelocityForward(), Constants.getFeederVelocityReverse());
     }
 }

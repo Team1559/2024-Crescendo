@@ -8,6 +8,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.util.LimelightHelpers;
 
+import frc.robot.Constants;
+
 public class VisionIoLimelight implements VisionIo {
 
     private String cameraName;

@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.Constants.CONSTANTS;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +29,7 @@ import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Flywheel extends SubsystemBase {
 
@@ -85,19 +85,19 @@ public class Flywheel extends SubsystemBase {
     public Flywheel() {
 
         // ---------- Create & Configure Motors ----------
-        flywheelMotorL = new TalonFX(CONSTANTS.getFlywheelMotorIdLeft());
-        flywheelMotorR = new TalonFX(CONSTANTS.getFlywheelMotorIdRight());
+        flywheelMotorL = new TalonFX(Constants.getFlywheelMotorIdLeft());
+        flywheelMotorR = new TalonFX(Constants.getFlywheelMotorIdRight());
 
         // Only set the Motor Configuration once, to avoid accidentally overriding
         // configs with defaults.
-        flywheelMotorL.getConfigurator().apply(CONSTANTS.getDefaultTalonFXConfiguration(
+        flywheelMotorL.getConfigurator().apply(Constants.getDefaultTalonFXConfiguration(
                 InvertedValue.CounterClockwise_Positive /* default */, NeutralModeValue.Coast));
-        flywheelMotorR.getConfigurator().apply(CONSTANTS.getDefaultTalonFXConfiguration(
+        flywheelMotorR.getConfigurator().apply(Constants.getDefaultTalonFXConfiguration(
                 InvertedValue.Clockwise_Positive /* inverted */, NeutralModeValue.Coast));
 
         // ---------- Define Loggable Fields ----------
-        flywheelLFaults = CONSTANTS.getAllGetFaultStatusSignalMethods(flywheelMotorL);
-        flywheelRFaults = CONSTANTS.getAllGetFaultStatusSignalMethods(flywheelMotorR);
+        flywheelLFaults = Constants.getAllGetFaultStatusSignalMethods(flywheelMotorL);
+        flywheelRFaults = Constants.getAllGetFaultStatusSignalMethods(flywheelMotorR);
 
         statusSignals.addAll(flywheelLFaults.values());
         statusSignals.addAll(flywheelRFaults.values());
@@ -128,7 +128,7 @@ public class Flywheel extends SubsystemBase {
 
         // ---------- Optimize Bus Utilization ----------
         statusSignalArray = statusSignals.toArray(new StatusSignal[0]);
-        BaseStatusSignal.setUpdateFrequencyForAll(CONSTANTS.getPathPlannerLogUpdateFrequencyDefault(),
+        BaseStatusSignal.setUpdateFrequencyForAll(Constants.getPathPlannerLogUpdateFrequencyDefault(),
                 statusSignalArray);
         flywheelMotorL.optimizeBusUtilization();
         flywheelMotorR.optimizeBusUtilization();
@@ -143,7 +143,7 @@ public class Flywheel extends SubsystemBase {
             flywheelMotorR.setControl(new VoltageOut(lInputs.voltsTarget.in(Volts)));
         }
         if (runOneWheelFlag == null || !runOneWheelFlag) {
-            rInputs.voltsTarget = getTargetVoltage().times(CONSTANTS.flywheelSpinOffset());
+            rInputs.voltsTarget = getTargetVoltage().times(Constants.flywheelSpinOffset());
             flywheelMotorL.setControl(new VoltageOut(rInputs.voltsTarget.in(Volts)));
         }
 
@@ -156,8 +156,8 @@ public class Flywheel extends SubsystemBase {
         lInputs.currentAvailable = Amps.of(flywheelLSupplyCurrent.getValue());
         rInputs.currentAvailable = Amps.of(flywheelRSupplyCurrent.getValue());
 
-        lInputs.faults = CONSTANTS.getFaults(flywheelLFaults);
-        rInputs.faults = CONSTANTS.getFaults(flywheelRFaults);
+        lInputs.faults = Constants.getFaults(flywheelLFaults);
+        rInputs.faults = Constants.getFaults(flywheelRFaults);
 
         lInputs.temperature = Celsius.of(flywheelLDeviceTemp.getValue());
         rInputs.temperature = Celsius.of(flywheelRDeviceTemp.getValue());
@@ -196,7 +196,7 @@ public class Flywheel extends SubsystemBase {
     public boolean isTemperatureTooHigh() {
         // 90% Buffer.
         return getMaxTemperature()
-                .gt(CONSTANTS.getFalcon500MaxTemperature().times(CONSTANTS.getMotorSafeTemperatureBuffer()));
+                .gt(Constants.getFalcon500MaxTemperature().times(Constants.getMotorSafeTemperatureBuffer()));
     }
 
     /**
@@ -213,7 +213,7 @@ public class Flywheel extends SubsystemBase {
      * Start the Flywheels with default volage
      */
     public void start() {
-        start(CONSTANTS.getFlywheelForwardVoltage());
+        start(Constants.getFlywheelForwardVoltage());
     }
 
     public void startOneMotor(boolean runRightWheel) {
@@ -238,7 +238,7 @@ public class Flywheel extends SubsystemBase {
      * Reverse the Flywheels
      */
     public void reverse() {
-        start(CONSTANTS.getFlywheelReverseVoltage());
+        start(Constants.getFlywheelReverseVoltage());
     }
 
     // ========================= Commands =========================

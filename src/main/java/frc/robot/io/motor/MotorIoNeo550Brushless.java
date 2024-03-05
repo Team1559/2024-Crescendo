@@ -2,7 +2,6 @@ package frc.robot.io.motor;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
-import static frc.robot.Constants.CONSTANTS;
 
 import com.revrobotics.CANSparkBase.IdleMode;
 
@@ -13,6 +12,7 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.Velocity;
+import frc.robot.Constants;
 import frc.robot.Constants.PID;
 
 public class MotorIoNeo550Brushless extends MotorIoSparkMax {
@@ -29,8 +29,8 @@ public class MotorIoNeo550Brushless extends MotorIoSparkMax {
             PID pidValues) {
         super(motorId, inverted, idleMode, absoluteEncoderOffset, pidValues);
 
-        motor.setSmartCurrentLimit((int) CONSTANTS.getNeo550BrushlessCurrentLimit().in(Amps));
-        motor.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit().in(Amps));
+        motor.setSmartCurrentLimit((int) Constants.getNeo550BrushlessCurrentLimit().in(Amps));
+        motor.setSecondaryCurrentLimit(Constants.getNeo550BrushlessCurrentSecondaryLimit().in(Amps));
     }
 
     @Override

@@ -1,7 +1,5 @@
 package frc.robot.subsystems.led;
 
-import static frc.robot.Constants.CONSTANTS;
-
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -10,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Leds extends SubsystemBase {
 
@@ -62,9 +61,9 @@ public class Leds extends SubsystemBase {
      * starts LEDs.
      */
     public Leds() {
-        addressableLED = new AddressableLED(CONSTANTS.getLedPort());
-        addressableLED.setLength(CONSTANTS.getLedLength());
-        ledBuffer = new AddressableLEDBuffer(CONSTANTS.getLedLength());
+        addressableLED = new AddressableLED(Constants.getLedPort());
+        addressableLED.setLength(Constants.getLedLength());
+        ledBuffer = new AddressableLEDBuffer(Constants.getLedLength());
         addressableLED.start();
     }
 
@@ -137,7 +136,7 @@ public class Leds extends SubsystemBase {
 
     public void setAllianceColor() {
         disableDynamicPattern();
-        if (CONSTANTS.getAlliance() == Alliance.Blue) {
+        if (Constants.getAlliance() == Alliance.Blue) {
             setColor(Color.kBlue);
         } else {
             setColor(Color.kRed);

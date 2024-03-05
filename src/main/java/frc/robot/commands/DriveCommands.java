@@ -2,7 +2,6 @@ package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static frc.robot.Constants.CONSTANTS;
 
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -24,6 +23,7 @@ import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Constants;
 import frc.robot.subsystems.base.SwerveBase;
 import frc.robot.subsystems.shooter.Aimer;
 import frc.robot.subsystems.shooter.Flywheel;
@@ -43,14 +43,14 @@ public class DriveCommands {
      */
     private static double calculateLinearMagnitude(DoubleSupplier xSupplier, DoubleSupplier ySupplier) {
         double magnitude = Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble());
-        double clampedMagnitude = MathUtil.applyDeadband(magnitude, CONSTANTS.getJoystickDeadband());
+        double clampedMagnitude = MathUtil.applyDeadband(magnitude, Constants.getJoystickDeadband());
         // Square values, for more precision at slow speeds
         return Math.pow(clampedMagnitude, 2);
     }
 
     private static Rotation2d calculateLinearDirection(DoubleSupplier xSupplier, DoubleSupplier ySupplier) {
         Rotation2d stickDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
-        return CONSTANTS.getAlliance() == Alliance.Red
+        return Constants.getAlliance() == Alliance.Red
                 ? stickDirection
                 : stickDirection.plus(Rotation2d.fromDegrees(180));
     }
@@ -77,7 +77,7 @@ public class DriveCommands {
             this.yVelocity = yVelocity;
             this.target = target;
 
-            pid = new PIDController(CONSTANTS.getMaxAngularSpeed().in(RadiansPerSecond) / 90, 0, 0);
+            pid = new PIDController(Constants.getMaxAngularSpeed().in(RadiansPerSecond) / 90, 0, 0);
             pid.setTolerance(1);
             pid.enableContinuousInput(-180, 180);
         }
@@ -113,15 +113,15 @@ public class DriveCommands {
             double omega = pid.calculate(-degreesToTarget);
 
             omega = MathUtil.clamp(omega, // TODO: Use same units when calculating KP.
-                    -CONSTANTS.getMaxAngularSpeed().in(RadiansPerSecond),
-                    CONSTANTS.getMaxAngularSpeed().in(RadiansPerSecond));
+                    -Constants.getMaxAngularSpeed().in(RadiansPerSecond),
+                    Constants.getMaxAngularSpeed().in(RadiansPerSecond));
 
             // Scale Velocities to between 0 and Max.
-            double scaledXVelocity = linearVelocity.getX() * CONSTANTS.getMaxLinearSpeed().in(MetersPerSecond),
-                    scaledYVelocity = linearVelocity.getY() * CONSTANTS.getMaxLinearSpeed().in(MetersPerSecond);
+            double scaledXVelocity = linearVelocity.getX() * Constants.getMaxLinearSpeed().in(MetersPerSecond),
+                    scaledYVelocity = linearVelocity.getY() * Constants.getMaxLinearSpeed().in(MetersPerSecond);
 
             // Run Velocities.
-            if (CONSTANTS.isDrivingModeFieldRelative()) {
+            if (Constants.isDrivingModeFieldRelative()) {
                 driveBase.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(scaledXVelocity, scaledYVelocity,
                         omega, driveBase.getRotation()));
             } else {
@@ -164,11 +164,11 @@ public class DriveCommands {
             @Override
             public void initialize() {
                 // TODO: Use same units when calculating KP.
-                pid = new PIDController(CONSTANTS.getMaxAngularSpeed().in(RadiansPerSecond) / 90 /* degrees */, 0, 0);
+                pid = new PIDController(Constants.getMaxAngularSpeed().in(RadiansPerSecond) / 90 /* degrees */, 0, 0);
                 pid.setSetpoint(0); // Degrees from target.
                 pid.setTolerance(1/* degree(s) */);
                 pid.enableContinuousInput(-180, 180); // Degrees.
-                if (CONSTANTS.hasFlywheelSubsystem())
+                if (Constants.hasFlywheelSubsystem())
                     flywheel.start();
             }
 
@@ -194,15 +194,15 @@ public class DriveCommands {
                 double omega = pid.calculate(-degreesToTarget);
 
                 omega = MathUtil.clamp(omega, // TODO: Use same units when calculating KP.
-                        -CONSTANTS.getMaxAngularSpeed().in(RadiansPerSecond),
-                        CONSTANTS.getMaxAngularSpeed().in(RadiansPerSecond));
+                        -Constants.getMaxAngularSpeed().in(RadiansPerSecond),
+                        Constants.getMaxAngularSpeed().in(RadiansPerSecond));
 
                 // Scale Velocities to between 0 and Max.
-                double scaledXVelocity = linearVelocity.getX() * CONSTANTS.getMaxLinearSpeed().in(MetersPerSecond),
-                        scaledYVelocity = linearVelocity.getY() * CONSTANTS.getMaxLinearSpeed().in(MetersPerSecond);
+                double scaledXVelocity = linearVelocity.getX() * Constants.getMaxLinearSpeed().in(MetersPerSecond),
+                        scaledYVelocity = linearVelocity.getY() * Constants.getMaxLinearSpeed().in(MetersPerSecond);
 
                 // Run Velocities.
-                if (CONSTANTS.isDrivingModeFieldRelative()) {
+                if (Constants.isDrivingModeFieldRelative()) {
                     driveBase.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(scaledXVelocity, scaledYVelocity,
                             omega, driveBase.getRotation()));
                 } else {
@@ -235,7 +235,7 @@ public class DriveCommands {
 
         };
         aimingDrive.addRequirements(driveBase);
-        if (CONSTANTS.hasFlywheelSubsystem())
+        if (Constants.hasFlywheelSubsystem())
             aimingDrive.addRequirements(flywheel);
         return aimingDrive;
     }
@@ -249,7 +249,7 @@ public class DriveCommands {
                 () -> {
                     double linearMagnitude = calculateLinearMagnitude(xSupplier, ySupplier);
                     double omega = MathUtil.applyDeadband(-omegaSupplier.getAsDouble(),
-                            CONSTANTS.getJoystickDeadband());
+                            Constants.getJoystickDeadband());
                     omega = Math.copySign(omega * omega, omega);
 
                     // Calcaulate new linear velocity.
@@ -258,14 +258,14 @@ public class DriveCommands {
                             .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d())).getTranslation();
 
                     // Scale Velocities to between 0 and Max.
-                    Measure<Velocity<Distance>> scaledXVelocity = CONSTANTS.getMaxLinearSpeed()
+                    Measure<Velocity<Distance>> scaledXVelocity = Constants.getMaxLinearSpeed()
                             .times(linearVelocity.getX());
-                    Measure<Velocity<Distance>> scaledYVelocity = CONSTANTS.getMaxLinearSpeed()
+                    Measure<Velocity<Distance>> scaledYVelocity = Constants.getMaxLinearSpeed()
                             .times(linearVelocity.getY());
-                    Measure<Velocity<Angle>> scaledOmegaVelocity = CONSTANTS.getMaxAngularSpeed().times(omega);
+                    Measure<Velocity<Angle>> scaledOmegaVelocity = Constants.getMaxAngularSpeed().times(omega);
 
                     // Run Velocities.
-                    if (CONSTANTS.isDrivingModeFieldRelative()) {
+                    if (Constants.isDrivingModeFieldRelative()) {
                         driveBase.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(scaledXVelocity, scaledYVelocity,
                                 scaledOmegaVelocity, driveBase.getRotation()));
                     } else {

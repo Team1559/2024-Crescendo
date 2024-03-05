@@ -2,7 +2,6 @@ package frc.robot.subsystems.vision;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
-import static frc.robot.Constants.CONSTANTS;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -13,6 +12,8 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.io.vision.VisionInputsAutoLogged;
 import frc.robot.io.vision.VisionIo;
+
+import frc.robot.Constants;
 
 public class Vision extends SubsystemBase {
 
@@ -37,9 +38,9 @@ public class Vision extends SubsystemBase {
             if (inputs.havePose) {
 
                 Vector<N3> estimateStandardDeviations = VecBuilder.fill(
-                        inputs.distanceToTarget.in(Meters) * CONSTANTS.getCameraLinearStandardDeviation().in(Meters),
-                        inputs.distanceToTarget.in(Meters) * CONSTANTS.getCameraLinearStandardDeviation().in(Meters),
-                        CONSTANTS.getCameraRotationalStandardDeviation().in(Degrees));
+                        inputs.distanceToTarget.in(Meters) * Constants.getCameraLinearStandardDeviation().in(Meters),
+                        inputs.distanceToTarget.in(Meters) * Constants.getCameraLinearStandardDeviation().in(Meters),
+                        Constants.getCameraRotationalStandardDeviation().in(Degrees));
 
                 poseEstimator.addVisionMeasurement(inputs.pose, inputs.timestamp, estimateStandardDeviations);
             }

@@ -9,6 +9,8 @@ import edu.wpi.first.units.Voltage;
 /**
  * No functionality provided because none needed for replay.
  */
+import frc.robot.Constants;
+
 public class SwerveModuleIoReplay implements SwerveModuleIo {
 
     @Override
