@@ -72,10 +72,10 @@ public abstract class MotorIoSparkMax implements MotorIo {
         }
         inputs.faults = faults.toArray(new String[0]);
 
-        inputs.temperature = getTemperature();
-
         inputs.positionAbsolute = getAbsolutePosition();
         inputs.positionTarget = targetPosition;
+
+        inputs.temperature = getTemperature();
 
         inputs.voltsActual = getVoltage();
         inputs.voltsAvailable = Volts.of(motor.getBusVoltage());
@@ -133,5 +133,13 @@ public abstract class MotorIoSparkMax implements MotorIo {
         targetVoltage = voltage;
         targetPosition = null;
         targetVelocity = null;
+    }
+
+    @Override
+    public void stop() {
+        motor.stopMotor();
+        targetPosition = null;
+        targetVelocity = null;
+        targetVoltage = null;
     }
 }

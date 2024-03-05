@@ -1,6 +1,7 @@
 package frc.robot.io.motor;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 
 import com.revrobotics.CANSparkBase.IdleMode;
@@ -10,7 +11,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
-import edu.wpi.first.units.Units;
 import edu.wpi.first.units.Velocity;
 import frc.robot.Constants;
 import frc.robot.Constants.PID;
@@ -41,6 +41,6 @@ public class MotorIoNeo550Brushless extends MotorIoSparkMax {
 
     public Measure<Temperature> getMaxSafeTemperature() {
         // https://www.revrobotics.com/neo-550-brushless-motor-locked-rotor-testing
-        return Units.Celsius.of(40);
+        return Celsius.of(40);
     }
 }

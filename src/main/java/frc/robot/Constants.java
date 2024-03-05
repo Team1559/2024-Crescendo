@@ -408,6 +408,10 @@ public class Constants {
         return new PID(.1, 0, 0);
     }
 
+    public static double getClimberRotationsPerInch() {
+        return (5 * 5) * (5D / 3);
+    }
+
     // #endregion
 
     // #region: ----- Feeder -----

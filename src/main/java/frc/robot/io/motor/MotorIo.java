@@ -60,4 +60,6 @@ public interface MotorIo {
     public void setVelocity(Measure<Velocity<Angle>> velocity);
 
     public void setVoltage(Measure<Voltage> voltage);
+
+    public void stop();
 }

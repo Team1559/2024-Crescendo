@@ -1,8 +1,6 @@
 package frc.robot.io.motor;
 
 import static edu.wpi.first.units.Units.Celsius;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
@@ -14,8 +12,8 @@ import edu.wpi.first.units.Voltage;
 public class MotorIoReplay implements MotorIo {
 
     Rotation2d position = Rotation2d.fromRotations(0);
-    Measure<Velocity<Angle>> velocity = RotationsPerSecond.zero();
-    Measure<Voltage> voltage = Volts.zero();
+    Measure<Velocity<Angle>> velocity;
+    Measure<Voltage> voltage;
 
     @Override
     public void updateInputs(MotorIoInputs inputs) {
@@ -60,5 +58,11 @@ public class MotorIoReplay implements MotorIo {
     @Override
     public void setVoltage(Measure<Voltage> voltage) {
         this.voltage = voltage;
+    }
+
+    @Override
+    public void stop() {
+        velocity = null;
+        voltage = null;
     }
 }

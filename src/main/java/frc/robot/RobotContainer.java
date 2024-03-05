@@ -202,6 +202,10 @@ public class RobotContainer { // TODO: Merge into the Robot class.
             new Trigger(flywheel::isTemperatureTooHigh).whileTrue(flywheel.stopCommand()
                     .alongWith(leds.setDynamicPatternCommand(Constants.getMotorOverheatEmergencyPattern(), false)));
         }
+        if (Constants.hasClimberSubsystem()) {
+            new Trigger(climber::isTemperatureTooHigh).whileTrue(climber.stopCommand()
+                    .alongWith(leds.setDynamicPatternCommand(Constants.getMotorOverheatEmergencyPattern(), false)));
+        }
         // TODO: Make a generic SingleMotorSubsystem overheat command.
         if (Constants.hasIntakeSubsystem()) {
             new Trigger(intake::isTemperatureTooHigh).whileTrue(intake.stopCommand()

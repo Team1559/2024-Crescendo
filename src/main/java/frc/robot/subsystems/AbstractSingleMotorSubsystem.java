@@ -80,7 +80,7 @@ public abstract class AbstractSingleMotorSubsystem extends SubsystemBase {
     }
 
     public void stop() {
-        setVelocity(RevolutionsPerSecond.zero());
+        io.stop();
     }
 
     // ========================= Commands =========================
