@@ -187,6 +187,18 @@ public class Constants {
         return DriverStation.getAlliance().orElse(getDefaultAllianceForAuto());
     };
 
+    public static Color getAllianceColor() {
+        return getAlliance() == Alliance.Blue ? getAllianceBlueColor() : getAllianceRedColor();
+    };
+
+    public static Color getAllianceBlueColor() {
+        return Color.kBlue;
+    };
+
+    public static Color getAllianceRedColor() {
+        return Color.kBlue;
+    };
+
     /**
      * @return The side of the field that the automation paths are made for.
      */
