@@ -1,6 +1,3 @@
-// https://github.com/LimelightVision/limelightlib-wpijava
-//LimelightHelpers v1.2.1 (March 1, 2023)
-
 package frc.robot.util;
 
 import java.io.IOException;
@@ -27,6 +24,11 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
+/**
+ * Source: <a href=
+ * "https://github.com/LimelightVision/limelightlib-wpijava">LimelightHelpers
+ * v1.2.1 (March 1, 2023)</a>.
+ */
 public class LimelightHelpers {
 
     public static class LimelightTarget_Retro {
@@ -136,6 +138,9 @@ public class LimelightHelpers {
 
         @JsonProperty("t6t_rs")
         private double[] targetPose_RobotSpace;
+
+        @JsonProperty("botpose_tagcount")
+        private int tagCount;
 
         public Pose3d getCameraPose_TargetSpace() {
             return toPose3D(cameraPose_TargetSpace);

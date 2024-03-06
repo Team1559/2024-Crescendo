@@ -64,7 +64,7 @@ public class Climber extends SubsystemBase {
 
     private final boolean isLMotorInverted;
 
-    Measure<Distance> targetHeight;
+    Measure<Distance> targetHeightLeft, targetHeightRight;
 
     private final ClimberInputsAutoLogged motorLInputs = new ClimberInputsAutoLogged();
     private final ClimberInputsAutoLogged motorRInputs = new ClimberInputsAutoLogged();
@@ -105,14 +105,14 @@ public class Climber extends SubsystemBase {
     public void periodic() {
 
         // Log Inputs.
-        updateInputs(motorLInputs, motorL);
+        updateInputs(motorLInputs, motorL, targetHeightLeft);
         Logger.processInputs("Climber/Climber/LeftMotor", motorLInputs);
 
-        updateInputs(motorRInputs, motorR);
+        updateInputs(motorRInputs, motorR, targetHeightRight);
         Logger.processInputs("Climber/Climber/RightMotor", motorRInputs);
     }
 
-    private void updateInputs(ClimberInputsAutoLogged inputs, CANSparkMax motor) {
+    private void updateInputs(ClimberInputsAutoLogged inputs, CANSparkMax motor, Measure<Distance> targetHeight) {
 
         inputs.powerPercentage = (float) motor.getAppliedOutput();
 
@@ -143,25 +143,17 @@ public class Climber extends SubsystemBase {
 
     // ========================= Functions =========================
 
-    public void modifyHeight(Measure<Distance> change) {
-        setHeight(getHeight().plus(change));
-    }
-
-    public void setHeight(Measure<Distance> height) {
-        // TODO: Clamp height.
-        setPosition(Rotation2d.fromRotations(height.in(Inches) * Constants.getClimberRotationsPerInch()));
-        targetHeight = height;
-    }
-
-    private void setPosition(Rotation2d position) {
-        motorL.getPIDController().setReference(isLMotorInverted ? -position.getRotations() : position.getRotations(),
-                CANSparkMax.ControlType.kPosition);
-        motorR.getPIDController().setReference(isLMotorInverted ? position.getRotations() : -position.getRotations(),
-                CANSparkMax.ControlType.kPosition);
-    }
-
+    /** @return The average height of both motors. */
     public Measure<Distance> getHeight() {
         return Inches.of(getPosition().getRotations() / Constants.getClimberRotationsPerInch());
+    }
+
+    public Measure<Distance> getHeightLeft() {
+        return Inches.of(getPositionLeft().getRotations() / Constants.getClimberRotationsPerInch());
+    }
+
+    public Measure<Distance> getHeightRight() {
+        return Inches.of(getPositionRight().getRotations() / Constants.getClimberRotationsPerInch());
     }
 
     public Measure<Temperature> getMaxSafeTemperature() {
@@ -170,7 +162,28 @@ public class Climber extends SubsystemBase {
     }
 
     private Rotation2d getPosition() {
-        return Rotation2d.fromRotations((motorL.getEncoder().getPosition() + motorR.getEncoder().getPosition()) / 2);
+        return getPositionLeft().plus(getPositionRight()).div(2);
+    }
+
+    private Rotation2d getPositionLeft() {
+        return Rotation2d.fromRotations(motorR.getEncoder().getPosition());
+    }
+
+    private Rotation2d getPositionRight() {
+        return Rotation2d.fromRotations(motorL.getEncoder().getPosition());
+    }
+
+    /** @return The average target hight of both motors. */
+    public Measure<Distance> getTargetHeight() {
+        return targetHeightLeft.plus(targetHeightRight).divide(2);
+    }
+
+    public Measure<Distance> getTargetHeightLeft() {
+        return targetHeightLeft;
+    }
+
+    public Measure<Distance> getTargetHeightRight() {
+        return targetHeightRight;
     }
 
     /** @return The Temperature of the hottest motor. */
@@ -178,24 +191,85 @@ public class Climber extends SubsystemBase {
         return Units.Celsius.of(Math.max(motorL.getMotorTemperature(), motorR.getMotorTemperature()));
     }
 
-    public Measure<Distance> getTargetHeight() {
-        return targetHeight;
-    }
-
     public boolean isTemperatureTooHigh() {
         return getTemperature().gt(getMaxSafeTemperature().times(Constants.getMotorSafeTemperatureBuffer()));
+    }
+
+    /** Changes the current height of both motors by the given amount. */
+    public void modifyHeight(Measure<Distance> change) {
+        setHeight(getHeight().plus(change));
+    }
+
+    /** Changes the current height of the left motor by the given amount. */
+    public void modifyHeightLeft(Measure<Distance> change) {
+        setHeightLeft(getHeightLeft().plus(change));
+    }
+
+    /** Changes the current height of the right motor by the given amount. */
+    public void modifyHeightRight(Measure<Distance> change) {
+        setHeightRight(getHeightRight().plus(change));
+    }
+
+    /** Changes the current height of both motors by the given amount. */
+    public void modifyTargetHeight(Measure<Distance> change) {
+        setHeight(getTargetHeight().plus(change));
+    }
+
+    /** Changes the current height of the left motor by the given amount. */
+    public void modifyTargetHeightLeft(Measure<Distance> change) {
+        setHeightLeft(getTargetHeightLeft().plus(change));
+    }
+
+    /** Changes the current height of the right motor by the given amount. */
+    public void modifyTargetHeightRight(Measure<Distance> change) {
+        setHeightRight(getTargetHeightRight().plus(change));
+    }
+
+    public void setHeight(Measure<Distance> height) {
+        setHeightLeft(height);
+        setHeightRight(height);
+    }
+
+    public void setHeightLeft(Measure<Distance> height) {
+        targetHeightLeft = height;
+        // TODO: Clamp height and log clamped height separatly.
+        setPositionLeft(Rotation2d.fromRotations(height.in(Inches) * Constants.getClimberRotationsPerInch()));
+    }
+
+    public void setHeightRight(Measure<Distance> height) {
+        targetHeightRight = height;
+        // TODO: Clamp height and log clamped height separatly.
+        setPositionRight(Rotation2d.fromRotations(height.in(Inches) * Constants.getClimberRotationsPerInch()));
+    }
+
+    private void setPositionLeft(Rotation2d position) {
+        motorL.getPIDController().setReference(isLMotorInverted ? -position.getRotations() : position.getRotations(),
+                CANSparkMax.ControlType.kPosition);
+    }
+
+    private void setPositionRight(Rotation2d position) {
+        motorR.getPIDController().setReference(isLMotorInverted ? position.getRotations() : -position.getRotations(),
+                CANSparkMax.ControlType.kPosition);
     }
 
     public void stop() {
         motorL.stopMotor();
         motorR.stopMotor();
-        targetHeight = null;
+        targetHeightLeft = targetHeightRight = null;
     }
 
     // ========================= Commands =========================
 
     public Command modifyHeightCommand(Measure<Distance> change) {
         return new InstantCommand(() -> modifyHeight(change), this);
+    }
+
+    public Command modifyTargetHeightLeftCommand(Measure<Distance> change) {
+        return new InstantCommand(() -> modifyTargetHeightLeft(change));
+    }
+
+    public Command modifyTargetHeightRightCommand(Measure<Distance> change) {
+        return new InstantCommand(() -> modifyTargetHeightRight(change));
     }
 
     public Command setHeightCommand(Measure<Distance> height) {

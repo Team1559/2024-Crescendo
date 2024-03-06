@@ -7,8 +7,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.util.LimelightHelpers;
-
-import frc.robot.Constants;
+import frc.robot.util.LimelightHelpers.LimelightResults;
 
 public class VisionIoLimelight implements VisionIo {
 
@@ -27,12 +26,15 @@ public class VisionIoLimelight implements VisionIo {
     public void updateInputs(VisionInputs inputs) {
 
         double[] data = LimelightHelpers.getBotPose_wpiBlue(cameraName);
+        LimelightResults results = LimelightHelpers.getLatestResults(cameraName);
         if (data.length < 6 || (data[0] == 0 && data[1] == 0)) {
 
             inputs.havePose = false;
             inputs.pose = new Pose2d();
             inputs.timestamp = 0;
         } else {
+
+            inputs.numberOfTargets = results.targetingResults.targets_Fiducials.length;
 
             double[] targetData = LimelightHelpers.getTargetPose_CameraSpace(cameraName);
 

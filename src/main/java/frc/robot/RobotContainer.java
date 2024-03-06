@@ -14,7 +14,10 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.io.gyro.GyroIoPigeon2;
@@ -221,12 +224,20 @@ public class RobotContainer { // TODO: Merge into the Robot class.
             NamedCommands.registerCommand("Spin Up Flywheel", flywheel.spinUpFlywheelCommand());
         }
         if (Constants.hasFeederSubsystem() && Constants.hasNoteSensorSubsystem() && Constants.hasAimerSubsystem()) {
+
+            Command autoShootCommand = CompositeCommands.shootAutonomousCommand(feeder, leds, noteSensor);
+
             NamedCommands.registerCommand("Auto Shoot", new SequentialCommandGroup(
                     new ParallelCommandGroup(
                             swerveBase.turnToTargetCommand(Constants::getSpeakerLocation, 4.5),
                             aimer.aimAtTargetCommand(Constants::getSpeakerLocation, swerveBase::getTranslation)
                                     .andThen(aimer.waitUntilAtTargetCommand())),
-                    CompositeCommands.shootAutonomousCommand(feeder, leds, noteSensor)));
+                    autoShootCommand));
+
+            NamedCommands.registerCommand("JUST SHOOT",
+                    new ParallelDeadlineGroup(new WaitCommand(13),
+                            aimer.setAngleCommand(Rotation2d.fromDegrees(36.7))
+                                    .andThen(new WaitUntilCommand(() -> aimer.atTarget())).andThen(autoShootCommand)));
         }
 
         // ---------- Set-up Autonomous Choices ----------
@@ -236,13 +247,16 @@ public class RobotContainer { // TODO: Merge into the Robot class.
 
         // #region: ==================== Tele-Op ===============================
         // #region: ---------- Configure Controller 0 for Pilot ----------
+
         pilot.leftTrigger().whileTrue(CompositeCommands.autoAimAndManuallyDriveCommand(swerveBase, flywheel, aimer,
                 pilot::getLeftY, pilot::getLeftX,
                 Constants::getSpeakerLocation));
         pilot.rightTrigger().whileTrue(CompositeCommands.autoAimAndManuallyDriveCommand(swerveBase, flywheel, aimer,
                 pilot::getLeftY, pilot::getLeftX,
                 Constants::getAmpLocation));
+        pilot.leftTrigger().onFalse(aimer.setAngleCommand(Rotation2d.fromDegrees(2)));
         pilot.y().onTrue(swerveBase.resetFieldOrientationCommand());
+
         // #endregion
 
         // #region: ---------- Configure Controller 1 for Co-Pilot ----------
@@ -251,6 +265,7 @@ public class RobotContainer { // TODO: Merge into the Robot class.
             if (Constants.hasNoteSensorSubsystem()) {
                 coPilot.leftTrigger().and(not(noteSensor::isObjectDetected)).whileTrue(new ParallelCommandGroup(
                         CompositeCommands.intakeStartStopCommand(intake, feeder), flywheel.stopCommand()));
+
             }
             coPilot.x().whileTrue(CompositeCommands.reverseShooterAndIntakeCommand(intake, feeder, flywheel));
         }
@@ -265,8 +280,21 @@ public class RobotContainer { // TODO: Merge into the Robot class.
         }
 
         if (Constants.hasClimberSubsystem()) {
-            coPilot.povUp().whileTrue(climber.modifyHeightCommand(Inches.of(0.05)));
-            coPilot.povDown().whileTrue(climber.modifyHeightCommand(Inches.of(-0.1)));
+            Trigger noModifier = new Trigger(coPilot.y().or(coPilot.b()).negate());
+
+            coPilot.povUp().and(noModifier)
+                    .whileTrue(climber.modifyTargetHeightLeftCommand(Inches.of(0.1)).repeatedly());
+            coPilot.povUp().and(coPilot.y())
+                    .whileTrue(climber.modifyTargetHeightLeftCommand(Inches.of(0.1)).repeatedly());
+            coPilot.povUp().and(coPilot.b())
+                    .whileTrue(climber.modifyTargetHeightLeftCommand(Inches.of(0.1)).repeatedly());
+
+            coPilot.povDown().and(noModifier)
+                    .whileTrue(climber.modifyTargetHeightRightCommand(Inches.of(-0.1)).repeatedly());
+            coPilot.povDown().and(coPilot.y())
+                    .whileTrue(climber.modifyTargetHeightRightCommand(Inches.of(-0.1)).repeatedly());
+            coPilot.povDown().and(coPilot.b())
+                    .whileTrue(climber.modifyTargetHeightRightCommand(Inches.of(-0.1)).repeatedly());
         }
 
         if (Constants.hasTraverserSubsystem()) {
