@@ -123,7 +123,7 @@ public class GameRobotConstants extends AbstractConstants {
     @Override
     public double getFeederForwardVelocity() {
         // TODO: Configure Value.
-        return 3666;
+        return getIntakeForwardVelocity() / 4;
     }
 
     @Override
@@ -164,7 +164,7 @@ public class GameRobotConstants extends AbstractConstants {
     @Override
     public double getIntakeForwardVelocity() {
         // TODO: Configure Value.
-        return 8250;
+        return 11000;
     }
 
     @Override

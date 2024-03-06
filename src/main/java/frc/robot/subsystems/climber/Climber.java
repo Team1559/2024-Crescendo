@@ -24,28 +24,28 @@ public class Climber extends SubsystemBase {
         public double currentAveragePositionRotations;
         // TODO: Add currentAverageHeightInches
 
-        public double targetHeightInches;
-        public double targetRotations;
+        public double leftSetpointRotations;
+        public double rightSetpointRotations;
     }
 
     private static final double ROTATIONS_PER_INCH = (5 * 5) * (5D / 3);
 
     private final CANSparkMax motorL = new CANSparkMax(CONSTANTS.getClimberMotorIdLeft(), MotorType.kBrushless);
     private final CANSparkMax motorR = new CANSparkMax(CONSTANTS.getClimberMotorIdRight(), MotorType.kBrushless);
-    private final PIDController controller = new PIDController(CONSTANTS.getAimerPid().P, CONSTANTS.getAimerPid().I,
-            CONSTANTS.getAimerPid().D);
+    private final PIDController leftController = CONSTANTS.getClimberPid().createController();
+    private final PIDController rightController = CONSTANTS.getClimberPid().createController();
 
     private final ClimberInputsAutoLogged inputs = new ClimberInputsAutoLogged();
 
     public Climber() {
         motorL.setInverted(true);
-        motorR.setInverted(true);
+        motorR.setInverted(false);
         motorL.setIdleMode(IdleMode.kBrake);
         motorR.setIdleMode(IdleMode.kBrake);
         motorL.setSmartCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentLimit());
         motorR.setSmartCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentLimit());
         motorL.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
-        motorL.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
+        motorR.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
     }
 
     @Override
@@ -56,11 +56,12 @@ public class Climber extends SubsystemBase {
         Logger.processInputs("Climber/Climber", inputs);
 
         // Set Voltages.
-        if (controller.getSetpoint() != 0) {
-            double outputL = controller.calculate(inputs.currentLeftPositionRotations);
-            double outputR = controller.calculate(inputs.currentRightPositionRotations);
-            // TODO: Clamp the Voltage between Min/Max.
+        if (leftController.getSetpoint() != 0) {
+            double outputL = leftController.calculate(inputs.currentLeftPositionRotations);
             motorL.setVoltage(outputL);
+        }
+        if (rightController.getSetpoint() != 0) {
+            double outputR = rightController.calculate(inputs.currentRightPositionRotations);
             motorR.setVoltage(outputR);
         }
     }
@@ -72,24 +73,39 @@ public class Climber extends SubsystemBase {
         inputs.currentAveragePositionRotations = (inputs.currentLeftPositionRotations
                 + inputs.currentRightPositionRotations) / 2;
 
-        inputs.targetRotations = controller.getSetpoint();
-        inputs.targetHeightInches = inputs.targetRotations / ROTATIONS_PER_INCH;
+        inputs.leftSetpointRotations = leftController.getSetpoint();
+        inputs.rightSetpointRotations = rightController.getSetpoint();
     }
 
     // ========================= Functions =========================
     // TODO: Take in Measure<Distance> instead.
-    public void setTargetHeight(double heightInches) {
-        controller.setSetpoint(heightInches * ROTATIONS_PER_INCH);
+    public void setTargetHeight(double height) {
+        setTargetHeightLeft(height);
+        setTargetHeightRight(height);
+    }
+
+    public void setTargetHeightLeft(double height) {
+        double setpoint = height * ROTATIONS_PER_INCH;
+        leftController.setSetpoint(setpoint);
+    }
+
+    public void setTargetHeightRight(double height) {
+        double setpoint = height * ROTATIONS_PER_INCH;
+        rightController.setSetpoint(setpoint);
     }
 
     // TODO: Take in Measure<Distance> instead.
     public void modifyTargetHeight(double changeHeightInches) {
-        setTargetHeight(controller.getSetpoint() / ROTATIONS_PER_INCH + changeHeightInches);
+        modifyTargetHeightLeft(changeHeightInches);
+        modifyTargetHeightRight(changeHeightInches);
     }
 
-    // TODO: Return a Measure<Distance> instead.
-    public double getCurrentTargetHeightInches() {
-        return controller.getSetpoint() / ROTATIONS_PER_INCH;
+    public void modifyTargetHeightLeft(double changeHeightInches) {
+        setTargetHeightLeft(leftController.getSetpoint() / ROTATIONS_PER_INCH + changeHeightInches);
+    }
+
+    public void modifyTargetHeightRight(double changeHeightInches) {
+        setTargetHeightRight(rightController.getSetpoint() / ROTATIONS_PER_INCH + changeHeightInches);
     }
 
     // ========================= Commands =========================
@@ -100,6 +116,14 @@ public class Climber extends SubsystemBase {
 
     public Command incrementTargetHeightCommand(double incrementInches) {
         return new InstantCommand(() -> modifyTargetHeight(incrementInches), this);
+    }
+
+    public Command incrementLeftHeightCommand(double increment) {
+        return new InstantCommand(() -> modifyTargetHeightLeft(increment));
+    }
+
+    public Command incrementRightHeightCommand(double increment) {
+        return new InstantCommand(() -> modifyTargetHeightRight(increment));
     }
 
     // TODO: Create all Commanp Functions.

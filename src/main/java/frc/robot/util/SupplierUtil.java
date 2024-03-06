@@ -12,4 +12,8 @@ public class SupplierUtil {
     public static BooleanSupplier not(BooleanSupplier booleanSupplier) {
         return () -> !booleanSupplier.getAsBoolean();
     }
+
+    public static BooleanSupplier xor(BooleanSupplier supplier1, BooleanSupplier supplier2) {
+        return () -> supplier1.getAsBoolean() != supplier2.getAsBoolean();
+    }
 }
