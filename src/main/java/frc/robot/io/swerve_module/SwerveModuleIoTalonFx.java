@@ -39,7 +39,7 @@ import edu.wpi.first.units.Voltage;
  * </p>
  */
 import frc.robot.Constants;
-import frc.robot.subsystems.base.SwerveModule.WheelModuleIndex;
+import frc.robot.subsystems.drive.SwerveModule.WheelModuleIndex;
 
 public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 

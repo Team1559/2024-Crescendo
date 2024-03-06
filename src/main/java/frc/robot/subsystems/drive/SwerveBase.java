@@ -1,8 +1,11 @@
-package frc.robot.subsystems.base;
+package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
+
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
@@ -13,15 +16,19 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
@@ -29,13 +36,14 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.io.gyro.GyroIo;
 import frc.robot.io.gyro.GyroIoInputsAutoLogged;
 import frc.robot.io.swerve_module.SwerveModuleIo;
-import frc.robot.subsystems.base.SwerveModule.WheelModuleIndex;
+import frc.robot.subsystems.drive.SwerveModule.WheelModuleIndex;
 import frc.robot.util.LocalAdStarAk;
 
 public class SwerveBase extends SubsystemBase {
@@ -59,6 +67,27 @@ public class SwerveBase extends SubsystemBase {
 
         return new SwerveBase(gyroIo, swerveModuleIo, swerveModuleIo.clone(), swerveModuleIo.clone(),
                 swerveModuleIo.clone());
+    }
+
+    /**
+     * Calculates and squares the linear magnitude for the swerve drive
+     * 
+     * @param xSupplier Joystick x
+     * @param ySupplier Joystick Y
+     * @return linear magnitude
+     */
+    public static double calculateLinearMagnitude(DoubleSupplier xSupplier, DoubleSupplier ySupplier) {
+        double magnitude = Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+        double clampedMagnitude = MathUtil.applyDeadband(magnitude, Constants.getJoystickDeadband());
+        // Square values, for more precision at slow speeds
+        return Math.pow(clampedMagnitude, 2);
+    }
+
+    public static Rotation2d calculateLinearDirection(DoubleSupplier xSupplier, DoubleSupplier ySupplier) {
+        Rotation2d stickDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+        return Constants.getAlliance() == Alliance.Red
+                ? stickDirection
+                : stickDirection.plus(Rotation2d.fromDegrees(180));
     }
 
     // ========================= Object Level ===================================
@@ -160,6 +189,7 @@ public class SwerveBase extends SubsystemBase {
     }
 
     // ========================= Functions =====================================
+
     public Pose2d getEstimatedPosition() {
         return poseEstimator.getEstimatedPosition();
     }
@@ -249,6 +279,7 @@ public class SwerveBase extends SubsystemBase {
     }
 
     // ========================= Helper Methods ================================
+
     private SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
         for (int i = 0; i < modules.length; i++) {
@@ -263,7 +294,7 @@ public class SwerveBase extends SubsystemBase {
         }
     }
 
-    // ========================= Commands =====================================
+    // ========================= Function Commands =============================
 
     public Command resetFieldOrientationCommand() {
         return new InstantCommand(this::resetFieldOrientation);
@@ -272,4 +303,138 @@ public class SwerveBase extends SubsystemBase {
     public Command stopCommand() {
         return new InstantCommand(this::stop);
     }
+
+    // ========================= Game Commands =================================
+
+    public Command manualDriveDefaultCommand(DoubleSupplier xSupplier, DoubleSupplier ySupplier,
+            DoubleSupplier omegaSupplier) {
+
+        return Commands.run(
+                () -> {
+                    double linearMagnitude = calculateLinearMagnitude(xSupplier, ySupplier);
+                    double omega = MathUtil.applyDeadband(-omegaSupplier.getAsDouble(),
+                            Constants.getJoystickDeadband());
+                    omega = Math.copySign(omega * omega, omega);
+
+                    // Calcaulate new linear velocity.
+                    Rotation2d linearDirection = calculateLinearDirection(xSupplier, ySupplier);
+                    Translation2d linearVelocity = new Pose2d(new Translation2d(), linearDirection)
+                            .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d())).getTranslation();
+
+                    // Scale Velocities to between 0 and Max.
+                    Measure<Velocity<Distance>> scaledXVelocity = Constants.getMaxLinearSpeed()
+                            .times(linearVelocity.getX());
+                    Measure<Velocity<Distance>> scaledYVelocity = Constants.getMaxLinearSpeed()
+                            .times(linearVelocity.getY());
+                    Measure<Velocity<Angle>> scaledOmegaVelocity = Constants.getMaxAngularSpeed().times(omega);
+
+                    // Run Velocities.
+                    if (Constants.isDrivingModeFieldRelative()) {
+                        runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(scaledXVelocity, scaledYVelocity,
+                                scaledOmegaVelocity, getRotation()));
+                    } else {
+                        runVelocity(new ChassisSpeeds(scaledXVelocity, scaledYVelocity, scaledOmegaVelocity));
+                    }
+                },
+                this);
+    }
+
+    /**
+     * This method will create a command to spin the robot the specified amount at a
+     * given speed. The robot
+     * will always take the shortest path.
+     * 
+     * @param driveBase      The robot to spin.
+     * @param rotationAmount The amount the robot rotates.
+     * @param speed          The speed to spin at. (must be a positive number
+     *                       greater
+     *                       than 0).
+     * @return The created command.
+     */
+    public Command spinCommand(Rotation2d rotationAmount, double speed) {
+
+        if (speed <= 0) {
+            throw new RuntimeException("Robot cannot spin because velocity is negative or zero:  " + speed);
+        }
+
+        Command spinCommand = new Command() {
+
+            private Rotation2d targetRotation;
+
+            @Override
+            public void initialize() {
+                Rotation2d startingRotation = getRotation();
+                targetRotation = startingRotation.plus(rotationAmount);
+            }
+
+            @Override
+            public void execute() {
+
+                Rotation2d current = getRotation();
+                double delta = targetRotation.minus(current).getDegrees();
+
+                double rampOmega = Math.max(Math.min(Math.abs(delta) / 50 /* degrees */, 1.0), .01);
+                double omega = Math.copySign(speed, delta) * rampOmega;
+
+                runVelocity(new ChassisSpeeds(0, 0, omega));
+
+                Logger.recordOutput("DriveCommands/spinCommand/delta", delta);
+                Logger.recordOutput("DriveCommands/spinCommand/rampOmega", rampOmega);
+                Logger.recordOutput("DriveCommands/spinCommand/omega", omega);
+            }
+
+            @Override
+            public boolean isFinished() {
+                Rotation2d current = getRotation();
+                double delta = targetRotation.minus(current).getDegrees();
+                return Math.abs(delta) < .5 /* degrees */;
+            }
+
+            @Override
+            public void end(boolean interrupted) {
+                stop();
+            }
+        };
+
+        spinCommand.addRequirements(this);
+
+        return spinCommand;
+    }
+
+    public Command turnToTargetCommand(Supplier<Translation3d> target, double speed) {
+
+        Command spinCommand = new Command() {
+
+            private Command spinCommand;
+
+            @Override
+            public void initialize() {
+                // Rotating plus 180 degrees to position the back of the robot to the target.
+                Rotation2d rotation = getRotationToTarget(target.get().toTranslation2d())
+                        .plus(Rotation2d.fromDegrees(180));
+                spinCommand = spinCommand(rotation, speed);
+                spinCommand.initialize();
+            }
+
+            @Override
+            public void execute() {
+                spinCommand.execute();
+            }
+
+            @Override
+            public boolean isFinished() {
+                return spinCommand.isFinished();
+            }
+
+            @Override
+            public void end(boolean interrupted) {
+                spinCommand.end(interrupted);
+            }
+        };
+
+        spinCommand.addRequirements(this);
+
+        return spinCommand;
+    }
+
 }

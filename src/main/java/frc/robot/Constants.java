@@ -46,7 +46,7 @@ import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
-import frc.robot.subsystems.base.SwerveModule.WheelModuleIndex;
+import frc.robot.subsystems.drive.SwerveModule.WheelModuleIndex;
 
 public class Constants {
 

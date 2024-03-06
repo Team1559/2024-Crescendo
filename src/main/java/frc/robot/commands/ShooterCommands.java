@@ -43,10 +43,6 @@ public class ShooterCommands {
         }, feeder);
     }
 
-    public static Command defaultFlywheelCommand(Flywheel flywheel) {
-        return new SequentialCommandGroup(new WaitCommand(.25), flywheel.stopCommand());
-    }
-
     // ========================= Other Commands =========================
 
     public static Command intakeStartStopCommand(Intake intake, Feeder feeder) {
@@ -91,7 +87,7 @@ public class ShooterCommands {
     public static Command shootAutonomousCommand(Feeder feeder, Leds leds, NoteSensor noteSensor) {
         return new SequentialCommandGroup(
                 feeder.startCommand(),
-                LedCommands.blinkCommand(leds, Color.kOrange),
+                leds.blinkCommand(Color.kOrange),
                 noteSensor.waitForNoObjectCommand(),
                 new WaitCommand(.25),
                 feeder.stopCommand());
@@ -108,13 +104,6 @@ public class ShooterCommands {
 
         // TODO: Spin up flywheelsm if not already spinning.
         return group;
-    }
-
-    public static Command spinUpFlywheelCommand(Flywheel flywheel) {
-        return new SequentialCommandGroup(
-                flywheel.startCommand(),
-                new WaitCommand(1) // TODO: Tune.
-        );
     }
 
     public static Command stopIntakeFeederCommand(Intake intake, Feeder feeder, Leds leds) {

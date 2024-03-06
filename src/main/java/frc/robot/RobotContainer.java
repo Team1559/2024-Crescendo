@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.LedCommands;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.io.gyro.GyroIoPigeon2;
 import frc.robot.io.gyro.GyroIoSimAndReplay;
@@ -29,10 +28,10 @@ import frc.robot.io.swerve_module.SwerveModuleIoSim;
 import frc.robot.io.swerve_module.SwerveModuleIoTalonFx;
 import frc.robot.io.vision.VisionIoLimelight;
 import frc.robot.io.vision.VisionIoSimAndReplay;
-import frc.robot.subsystems.base.SwerveBase;
-import frc.robot.subsystems.base.SwerveModule.WheelModuleIndex;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.Traverser;
+import frc.robot.subsystems.drive.SwerveBase;
+import frc.robot.subsystems.drive.SwerveModule.WheelModuleIndex;
 import frc.robot.subsystems.led.Leds;
 import frc.robot.subsystems.shooter.Aimer;
 import frc.robot.subsystems.shooter.Feeder;
@@ -55,7 +54,7 @@ public class RobotContainer { // TODO: Merge into the Robot class.
 
     private final LoggedDashboardChooser<Command> autoChooser;
 
-    private final SwerveBase driveBase;
+    private final SwerveBase swerveBase;
 
     final Aimer aimer;
     final Climber climber;
@@ -79,7 +78,7 @@ public class RobotContainer { // TODO: Merge into the Robot class.
         // #region: Initialize DriveBase Subsystem.
         switch (Constants.getCurrentOperatingMode()) {
             case REAL_WORLD:
-                driveBase = new SwerveBase(
+                swerveBase = new SwerveBase(
                         new GyroIoPigeon2(Constants.getGyroId(), Constants.getCanivoreId()),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_LEFT),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_RIGHT),
@@ -87,11 +86,11 @@ public class RobotContainer { // TODO: Merge into the Robot class.
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
                 break;
             case SIMULATION:
-                driveBase = SwerveBase.createSimOrReplaySwerveBase(new GyroIoSimAndReplay(),
+                swerveBase = SwerveBase.createSimOrReplaySwerveBase(new GyroIoSimAndReplay(),
                         new SwerveModuleIoSim(DCMotor.getKrakenX60(1), DCMotor.getFalcon500(1)));
                 break;
             case LOG_REPLAY:
-                driveBase = SwerveBase.createSimOrReplaySwerveBase(new GyroIoSimAndReplay(),
+                swerveBase = SwerveBase.createSimOrReplaySwerveBase(new GyroIoSimAndReplay(),
                         new SwerveModuleIoReplay());
                 break;
             default:
@@ -135,14 +134,14 @@ public class RobotContainer { // TODO: Merge into the Robot class.
         switch (Constants.getCurrentOperatingMode()) {
             case REAL_WORLD:
                 vision = Constants.hasVisionSubsystem()
-                        ? new Vision(driveBase.poseEstimator, new VisionIoLimelight(Constants.getCameraNameFront()),
+                        ? new Vision(swerveBase.poseEstimator, new VisionIoLimelight(Constants.getCameraNameFront()),
                                 new VisionIoLimelight(Constants.getCameraNameBack()))
                         : null;
                 break;
             case SIMULATION:
             case LOG_REPLAY:
                 vision = Constants.hasVisionSubsystem()
-                        ? new Vision(driveBase.poseEstimator, new VisionIoSimAndReplay())
+                        ? new Vision(swerveBase.poseEstimator, new VisionIoSimAndReplay())
                         : null;
                 break;
             default:
@@ -170,12 +169,12 @@ public class RobotContainer { // TODO: Merge into the Robot class.
 
         // #region: ==================== Default Commands & Triggers ===========
         // #region: ---------- Configure Default Commands ----------
-        driveBase.setDefaultCommand(
-                DriveCommands.manualDriveDefaultCommand(driveBase, pilot::getLeftY, pilot::getLeftX, pilot::getRightX));
+        swerveBase.setDefaultCommand(
+                swerveBase.manualDriveDefaultCommand(pilot::getLeftY, pilot::getLeftX, pilot::getRightX));
         if (Constants.hasFlywheelSubsystem()) {
-            flywheel.setDefaultCommand(ShooterCommands.defaultFlywheelCommand(flywheel));
+            flywheel.setDefaultCommand(flywheel.defaultFlywheelCommand());
         }
-        leds.setDefaultCommand(LedCommands.defaultLedCommand(leds));
+        leds.setDefaultCommand(leds.defaultLedCommand());
 
         // #endregion
 
@@ -187,8 +186,8 @@ public class RobotContainer { // TODO: Merge into the Robot class.
         // #endregion
 
         // #region: ---------- Motor Overheat Triggers ----------
-        new Trigger(driveBase::isTemperatureTooHigh)
-                .whileTrue(driveBase.stopCommand()
+        new Trigger(swerveBase::isTemperatureTooHigh)
+                .whileTrue(swerveBase.stopCommand()
                         .alongWith(leds.setDynamicPatternCommand(Constants.getMotorOverheatEmergencyPattern(), false)));
         if (Constants.hasFlywheelSubsystem()) {
             new Trigger(flywheel::isTemperatureTooHigh).whileTrue(flywheel.stopCommand()
@@ -216,18 +215,18 @@ public class RobotContainer { // TODO: Merge into the Robot class.
 
         // #region: ==================== Autonomous ============================
         // ---------- Create Named Commands for use by Path Planner ----------
-        NamedCommands.registerCommand("Spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
+        NamedCommands.registerCommand("Spin 180", swerveBase.spinCommand(Rotation2d.fromDegrees(180), 1));
         if (Constants.hasIntakeSubsystem() && Constants.hasFeederSubsystem()) {
             NamedCommands.registerCommand("StartIntake", ShooterCommands.intakeStartStopCommand(intake, feeder));
         }
         if (Constants.hasFlywheelSubsystem()) {
-            NamedCommands.registerCommand("Spin Up Flywheel", ShooterCommands.spinUpFlywheelCommand(flywheel));
+            NamedCommands.registerCommand("Spin Up Flywheel", flywheel.spinUpFlywheelCommand());
         }
         if (Constants.hasFeederSubsystem() && Constants.hasNoteSensorSubsystem() && Constants.hasAimerSubsystem()) {
             NamedCommands.registerCommand("Auto Shoot", new SequentialCommandGroup(
                     new ParallelCommandGroup(
-                            DriveCommands.turnToTargetCommand(driveBase, Constants::getSpeakerLocation, 4.5),
-                            aimer.aimAtTargetCommand(Constants::getSpeakerLocation, driveBase::getTranslation)
+                            swerveBase.turnToTargetCommand(Constants::getSpeakerLocation, 4.5),
+                            aimer.aimAtTargetCommand(Constants::getSpeakerLocation, swerveBase::getTranslation)
                                     .andThen(aimer.waitUntilAtTargetCommand())),
                     ShooterCommands.shootAutonomousCommand(feeder, leds, noteSensor)));
         }
@@ -239,13 +238,13 @@ public class RobotContainer { // TODO: Merge into the Robot class.
 
         // #region: ==================== Tele-Op ===============================
         // #region: ---------- Configure Controller 0 for Pilot ----------
-        pilot.leftTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel, aimer,
+        pilot.leftTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(swerveBase, flywheel, aimer,
                 pilot::getLeftY, pilot::getLeftX,
                 Constants::getSpeakerLocation));
-        pilot.rightTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel, aimer,
+        pilot.rightTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(swerveBase, flywheel, aimer,
                 pilot::getLeftY, pilot::getLeftX,
                 Constants::getAmpLocation));
-        pilot.y().onTrue(driveBase.resetFieldOrientationCommand());
+        pilot.y().onTrue(swerveBase.resetFieldOrientationCommand());
         // #endregion
 
         // #region: ---------- Configure Controller 1 for Co-Pilot ----------

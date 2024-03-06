@@ -16,15 +16,9 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
-import frc.robot.subsystems.base.SwerveBase;
+import frc.robot.subsystems.drive.SwerveBase;
 import frc.robot.subsystems.shooter.Aimer;
 import frc.robot.subsystems.shooter.Flywheel;
 
@@ -32,27 +26,6 @@ public class DriveCommands {
 
     /** Makes this class non-instantiable. */
     private DriveCommands() {
-    }
-
-    /**
-     * Calculates and squares the linear magnitude for the swerve drive
-     * 
-     * @param xSupplier Joystick x
-     * @param ySupplier Joystick Y
-     * @return linear magnitude
-     */
-    private static double calculateLinearMagnitude(DoubleSupplier xSupplier, DoubleSupplier ySupplier) {
-        double magnitude = Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble());
-        double clampedMagnitude = MathUtil.applyDeadband(magnitude, Constants.getJoystickDeadband());
-        // Square values, for more precision at slow speeds
-        return Math.pow(clampedMagnitude, 2);
-    }
-
-    private static Rotation2d calculateLinearDirection(DoubleSupplier xSupplier, DoubleSupplier ySupplier) {
-        Rotation2d stickDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
-        return Constants.getAlliance() == Alliance.Red
-                ? stickDirection
-                : stickDirection.plus(Rotation2d.fromDegrees(180));
     }
 
     public static class AutoAimDriveCommand extends Command {
@@ -93,9 +66,9 @@ public class DriveCommands {
 
         @Override
         public void execute() {
-            double linearMagnitude = calculateLinearMagnitude(xVelocity, yVelocity);
+            double linearMagnitude = SwerveBase.calculateLinearMagnitude(xVelocity, yVelocity);
             // Calcaulate new linear velocity.
-            Rotation2d linearDirection = calculateLinearDirection(xVelocity, yVelocity);
+            Rotation2d linearDirection = SwerveBase.calculateLinearDirection(xVelocity, yVelocity);
             Translation2d linearVelocity = new Pose2d(new Translation2d(), linearDirection)
                     .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d())).getTranslation();
 
@@ -174,9 +147,9 @@ public class DriveCommands {
 
             @Override
             public void execute() {
-                double linearMagnitude = calculateLinearMagnitude(xSupplier, ySupplier);
+                double linearMagnitude = SwerveBase.calculateLinearMagnitude(xSupplier, ySupplier);
                 // Calcaulate new linear velocity.
-                Rotation2d linearDirection = calculateLinearDirection(xSupplier, ySupplier);
+                Rotation2d linearDirection = SwerveBase.calculateLinearDirection(xSupplier, ySupplier);
                 Translation2d linearVelocity = new Pose2d(new Translation2d(), linearDirection)
                         .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d())).getTranslation();
 
@@ -238,149 +211,6 @@ public class DriveCommands {
         if (Constants.hasFlywheelSubsystem())
             aimingDrive.addRequirements(flywheel);
         return aimingDrive;
-    }
-
-    public static Command manualDriveDefaultCommand(SwerveBase driveBase,
-            DoubleSupplier xSupplier,
-            DoubleSupplier ySupplier,
-            DoubleSupplier omegaSupplier) {
-
-        return Commands.run(
-                () -> {
-                    double linearMagnitude = calculateLinearMagnitude(xSupplier, ySupplier);
-                    double omega = MathUtil.applyDeadband(-omegaSupplier.getAsDouble(),
-                            Constants.getJoystickDeadband());
-                    omega = Math.copySign(omega * omega, omega);
-
-                    // Calcaulate new linear velocity.
-                    Rotation2d linearDirection = calculateLinearDirection(xSupplier, ySupplier);
-                    Translation2d linearVelocity = new Pose2d(new Translation2d(), linearDirection)
-                            .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d())).getTranslation();
-
-                    // Scale Velocities to between 0 and Max.
-                    Measure<Velocity<Distance>> scaledXVelocity = Constants.getMaxLinearSpeed()
-                            .times(linearVelocity.getX());
-                    Measure<Velocity<Distance>> scaledYVelocity = Constants.getMaxLinearSpeed()
-                            .times(linearVelocity.getY());
-                    Measure<Velocity<Angle>> scaledOmegaVelocity = Constants.getMaxAngularSpeed().times(omega);
-
-                    // Run Velocities.
-                    if (Constants.isDrivingModeFieldRelative()) {
-                        driveBase.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(scaledXVelocity, scaledYVelocity,
-                                scaledOmegaVelocity, driveBase.getRotation()));
-                    } else {
-                        driveBase.runVelocity(new ChassisSpeeds(scaledXVelocity, scaledYVelocity, scaledOmegaVelocity));
-                    }
-                },
-                driveBase);
-    }
-
-    /**
-     * This method will create a command to spin the robot the specified amount at a
-     * given speed. The robot
-     * will always take the shortest path.
-     * 
-     * @param driveBase     The robot to spin.
-     * @param Roationamount The amount the robot rotates.
-     * @param speed         The speed to spin at. (must be a positive number greater
-     *                      than 0).
-     * @return The created command.
-     */
-    public static Command spinCommand(SwerveBase driveBase, Rotation2d rotationAmount, double speed) {
-
-        if (speed <= 0) {
-            throw new RuntimeException("Robot cannot spin because velocity is negative or zero:  " + speed);
-        }
-
-        Command spinCommand = new Command() {
-
-            private Rotation2d targetRotation;
-
-            @Override
-            public void initialize() {
-                Rotation2d startingRotation = driveBase.getRotation();
-                targetRotation = startingRotation.plus(rotationAmount);
-            }
-
-            @Override
-            public void execute() {
-
-                Rotation2d current = driveBase.getRotation();
-                double delta = targetRotation.minus(current).getDegrees();
-
-                double rampOmega = Math.max(Math.min(Math.abs(delta) / 50 /* degrees */, 1.0), .01);
-                double omega = Math.copySign(speed, delta) * rampOmega;
-
-                driveBase.runVelocity(new ChassisSpeeds(0, 0, omega));
-
-                Logger.recordOutput("DriveCommands/spinCommand/delta", delta);
-                Logger.recordOutput("DriveCommands/spinCommand/rampOmega", rampOmega);
-                Logger.recordOutput("DriveCommands/spinCommand/omega", omega);
-            }
-
-            @Override
-            public boolean isFinished() {
-                Rotation2d current = driveBase.getRotation();
-                double delta = targetRotation.minus(current).getDegrees();
-                return Math.abs(delta) < .5 /* degrees */;
-            }
-
-            @Override
-            public void end(boolean interrupted) {
-                driveBase.stop();
-            }
-        };
-
-        spinCommand.addRequirements(driveBase);
-
-        return spinCommand;
-    }
-
-    // TODO: Create method to duplaicate turnToTargetCommand functionality using a
-    // SwerveControllerCommand.
-    // public static SwerveControllerCommand
-    // turnToTargetSwerveControllerCommand(DriveBase driveBase, Translation2d
-    // target, double speed)
-
-    // TODO: Create method to duplaicate turnToTargetCommand functionality using a
-    // PIDCommand.
-    // public static PIDCommand turnToTargetPidCommand(DriveBase driveBase,
-    // Translation2d target, double speed)
-
-    public static Command turnToTargetCommand(SwerveBase driveBase, Supplier<Translation3d> target, double speed) {
-
-        Command spinCommand = new Command() {
-
-            private Command spinCommand;
-
-            @Override
-            public void initialize() {
-                // Rotating plus 180 degrees to postion the back of the robot to the target.
-                Rotation2d rotation = driveBase.getRotationToTarget(target.get().toTranslation2d())
-                        .plus(Rotation2d.fromDegrees(180));
-                spinCommand = spinCommand(driveBase, rotation, speed);
-                spinCommand.initialize();
-            }
-
-            @Override
-            public void execute() {
-                spinCommand.execute();
-            }
-
-            @Override
-            public boolean isFinished() {
-                return spinCommand.isFinished();
-            }
-
-            @Override
-            public void end(boolean interrupted) {
-                spinCommand.end(interrupted);
-            }
-        };
-
-        spinCommand.addRequirements(driveBase);
-
-        return spinCommand;
     }
 
 }
