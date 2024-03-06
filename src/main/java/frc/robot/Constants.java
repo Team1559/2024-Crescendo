@@ -682,8 +682,9 @@ public class Constants {
         CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs();
         currentLimitsConfigs.SupplyCurrentLimitEnable = true;
         currentLimitsConfigs.SupplyCurrentLimit = 40.0;
-        currentLimitsConfigs.SupplyCurrentThreshold = 80.0;
-        currentLimitsConfigs.SupplyTimeThreshold = 0.5;
+        // TODO: Determine if needed.
+        // currentLimitsConfigs.SupplyCurrentThreshold = 60.0;
+        // currentLimitsConfigs.SupplyTimeThreshold = 0.5;
         talonFXConfiguration.CurrentLimits = currentLimitsConfigs;
 
         MotorOutputConfigs driveMotorOutputConfigs = new MotorOutputConfigs();

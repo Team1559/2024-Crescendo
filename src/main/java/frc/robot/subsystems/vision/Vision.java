@@ -10,10 +10,9 @@ import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.io.vision.VisionInputsAutoLogged;
 import frc.robot.io.vision.VisionIo;
-
-import frc.robot.Constants;
 
 public class Vision extends SubsystemBase {
 
@@ -37,10 +36,11 @@ public class Vision extends SubsystemBase {
 
             if (inputs.havePose) {
 
-                Vector<N3> estimateStandardDeviations = VecBuilder.fill(
-                        inputs.distanceToTarget.in(Meters) * Constants.getCameraLinearStandardDeviation().in(Meters),
-                        inputs.distanceToTarget.in(Meters) * Constants.getCameraLinearStandardDeviation().in(Meters),
-                        Constants.getCameraRotationalStandardDeviation().in(Degrees));
+                double weightedLinearStandardDeviation = inputs.distanceToTarget.in(Meters)
+                        * Constants.getCameraLinearStandardDeviation().in(Meters) / inputs.numberOfTargets;
+
+                Vector<N3> estimateStandardDeviations = VecBuilder.fill(weightedLinearStandardDeviation,
+                        weightedLinearStandardDeviation, Constants.getCameraRotationalStandardDeviation().in(Degrees));
 
                 poseEstimator.addVisionMeasurement(inputs.pose, inputs.timestamp, estimateStandardDeviations);
             }

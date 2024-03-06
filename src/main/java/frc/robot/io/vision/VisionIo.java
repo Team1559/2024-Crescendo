@@ -12,6 +12,7 @@ public interface VisionIo {
     public static class VisionInputs {
         public Measure<Distance> distanceToTarget;
         public boolean havePose = false;
+        public int numberOfTargets = 0;
         public Pose2d pose = new Pose2d();
         public double timestamp;
     }
