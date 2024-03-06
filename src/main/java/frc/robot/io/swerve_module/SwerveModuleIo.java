@@ -53,6 +53,8 @@ public interface SwerveModuleIo {
         public Measure<Velocity<Angle>> steerMotorVelocityTarget = RotationsPerSecond.zero();
     }
 
+    public SwerveModuleIo clone();
+
     /**
      * @return The maximum safe operating temperature of these motors.
      */

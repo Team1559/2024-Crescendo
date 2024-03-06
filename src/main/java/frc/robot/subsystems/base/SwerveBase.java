@@ -40,11 +40,28 @@ import frc.robot.util.LocalAdStarAk;
 
 public class SwerveBase extends SubsystemBase {
 
+    // ========================= Class Level ===================================
+
     @AutoLog
     static class DriveBaseInputs {
         public Pose2d estimatedPosition;
         public Measure<Velocity<Distance>> estimatedSpeed;
     }
+
+    public static SwerveBase createSimOrReplaySwerveBase(GyroIo gyroIo, SwerveModuleIo swerveModuleIo) {
+        switch (Constants.getCurrentOperatingMode()) {
+            case SIMULATION:
+            case LOG_REPLAY:
+                break;
+            default:
+                throw new RuntimeException("Invalid Operating Mode: " + Constants.getCurrentOperatingMode() + "!");
+        }
+
+        return new SwerveBase(gyroIo, swerveModuleIo, swerveModuleIo.clone(), swerveModuleIo.clone(),
+                swerveModuleIo.clone());
+    }
+
+    // ========================= Object Level ===================================
 
     private final String LOG_PATH = "Drive/Base";
 
@@ -57,12 +74,9 @@ public class SwerveBase extends SubsystemBase {
     private final SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
     private Pose2d lastPosition;
 
-    private DriveBaseInputsAutoLogged inputs = new DriveBaseInputsAutoLogged();
+    private final DriveBaseInputsAutoLogged inputs = new DriveBaseInputsAutoLogged();
 
-    public SwerveBase(GyroIo gyroIo,
-            SwerveModuleIo flModuleI,
-            SwerveModuleIo frModuleIo,
-            SwerveModuleIo blModuleIo,
+    public SwerveBase(GyroIo gyroIo, SwerveModuleIo flModuleI, SwerveModuleIo frModuleIo, SwerveModuleIo blModuleIo,
             SwerveModuleIo brModuleIo) {
 
         // -------------------- Instantiate Hardware --------------------
@@ -90,7 +104,7 @@ public class SwerveBase extends SubsystemBase {
                 kinematics, gyroInputs.yawPosition, modulePositions,
                 new Pose2d(0, 0, gyroInputs.yawPosition),
                 VecBuilder.fill(0.01, 0.01, 0.01), // TODO: Why not use default number?
-                VecBuilder.fill(1, 1, 1)); // placeholder, will be filled in by vision
+                VecBuilder.fill(1, 1, 1)); // placeholder, will be filled in by vision.
 
         lastPosition = getEstimatedPosition();
 

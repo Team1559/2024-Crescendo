@@ -18,8 +18,9 @@ public class SwerveModuleIoSim implements SwerveModuleIo {
     private static final double LOOP_PERIOD_SECS = 0.02;
     private static final Measure<Voltage> MAX_VOLTAGE = Volts.of(12);
 
-    private final DCMotorSim driveSim;
-    private final DCMotorSim turnSim;
+    private final DCMotor driveMotorSim, turnMotorSim;
+
+    private final DCMotorSim driveSim, turnSim;
 
     private final Rotation2d cancoderOffset = new Rotation2d(Math.random() * 2.0 * Math.PI);
 
@@ -30,9 +31,18 @@ public class SwerveModuleIoSim implements SwerveModuleIo {
         // TODO: Configure `gearing` & `jKgMetersSquared`.
         driveSim = new DCMotorSim(driveMotorSim, 6.75, 0.025);
         turnSim = new DCMotorSim(turnMotorSim, 150.0 / 7.0, 0.004);
+
+        this.driveMotorSim = driveMotorSim;
+        this.turnMotorSim = turnMotorSim;
+    }
+
+    @Override
+    public SwerveModuleIoSim clone() {
+        return new SwerveModuleIoSim(driveMotorSim, turnMotorSim);
     }
 
     // ========================= Functions =========================
+
     @Override
     public Measure<Temperature> getMaxSafeMotorTemperature() {
         return Celsius.of(Double.MAX_VALUE);

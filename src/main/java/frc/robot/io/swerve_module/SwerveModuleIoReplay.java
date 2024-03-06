@@ -6,12 +6,12 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Voltage;
 
-/**
- * No functionality provided because none needed for replay.
- */
-import frc.robot.Constants;
-
 public class SwerveModuleIoReplay implements SwerveModuleIo {
+
+    @Override
+    public SwerveModuleIoReplay clone() {
+        return new SwerveModuleIoReplay();
+    }
 
     @Override
     public Measure<Temperature> getMaxSafeMotorTemperature() {

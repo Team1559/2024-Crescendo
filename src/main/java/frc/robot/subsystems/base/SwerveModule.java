@@ -45,10 +45,13 @@ public class SwerveModule {
     private final WheelModuleIndex index;
 
     private final SimpleMotorFeedforward driveFeedForward;
+
     private final PIDController driveFeedback;
     private final PIDController turnFeedback;
+
     private Rotation2d angleSetpoint; // Setpoint for closed loop control, null for open loop.
     private Double speedSetpoint; // Setpoint for closed loop control, null for open loop.
+
     private Rotation2d turnRelativeOffset; // Relative + Offset = Absolute.
 
     public SwerveModule(SwerveModuleIo io, WheelModuleIndex index) {
@@ -61,11 +64,13 @@ public class SwerveModule {
         switch (Constants.getCurrentOperatingMode()) {
             case REAL_WORLD:
             case LOG_REPLAY:
+                // TODO: Move to Constants and Tune.
                 driveFeedForward = new SimpleMotorFeedforward(0.1, 0.13);
                 driveFeedback = new PIDController(0.05, 0.0, 0.0);
                 turnFeedback = new PIDController(7.0, 0.0, 0.0);
                 break;
             case SIMULATION:
+                // TODO: Move to Constants and Tune.
                 driveFeedForward = new SimpleMotorFeedforward(0.0, 0.13);
                 driveFeedback = new PIDController(0.1, 0.0, 0.0);
                 turnFeedback = new PIDController(10.0, 0.0, 0.0);
@@ -80,7 +85,7 @@ public class SwerveModule {
     public void periodic() {
 
         io.updateInputs(inputs);
-        Logger.processInputs("Drive/Module_m" + index, inputs);
+        Logger.processInputs("Drive/" + index.name(), inputs);
 
         // On first cycle, reset relative turn encoder.
         // Wait until absolute angle is nonzero in case it wasn't initialized yet.
@@ -102,11 +107,12 @@ public class SwerveModule {
                 // towards the setpoint, its velocity should increase. This is achieved by
                 // taking the component of the velocity in the direction of the setpoint.
                 double adjustSpeedSetpoint = speedSetpoint * Math.cos(turnFeedback.getPositionError());
-
-                // Run drive controller/
                 double velocityRadPerSec = adjustSpeedSetpoint / Constants.getWheelRadius().in(Meters);
-                io.setDriveVoltage(Volts.of(driveFeedForward.calculate(velocityRadPerSec) + driveFeedback
-                        .calculate(inputs.driveMotorVelocityActual.in(RadiansPerSecond), velocityRadPerSec)));
+
+                // Run drive controller.
+                io.setDriveVoltage(Volts.of(driveFeedForward.calculate(velocityRadPerSec) +
+                        driveFeedback.calculate(inputs.driveMotorVelocityActual.in(RadiansPerSecond),
+                                velocityRadPerSec)));
             }
         }
     }

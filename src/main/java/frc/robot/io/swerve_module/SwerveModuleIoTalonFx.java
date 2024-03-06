@@ -67,7 +67,11 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 
     private final Rotation2d absoluteEncoderOffset;
 
+    private final WheelModuleIndex wheelModuleIndex;
+
     public SwerveModuleIoTalonFx(WheelModuleIndex index) {
+
+        wheelModuleIndex = index;
 
         absoluteEncoderOffset = Constants.getSwerveModuleEncoderOffsets().get(index);
 
@@ -188,6 +192,11 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         inputs.driveMotorVoltsAvailable = Volts.of(steerMotorSupplyVoltage.getValue());
         // Not Currently Supported. (TODO)
         // inputs.steerMotorVelocityTarget = RotationsPerSecond.zero();
+    }
+
+    @Override
+    public SwerveModuleIoTalonFx clone() {
+        return new SwerveModuleIoTalonFx(wheelModuleIndex);
     }
 
     // ========================= Functions =========================

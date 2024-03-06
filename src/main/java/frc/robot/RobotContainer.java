@@ -87,19 +87,11 @@ public class RobotContainer { // TODO: Merge into the Robot class.
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
                 break;
             case SIMULATION:
-                driveBase = new SwerveBase(
-                        new GyroIoSimAndReplay(),
-                        new SwerveModuleIoSim(DCMotor.getKrakenX60(1), DCMotor.getFalcon500(1)),
-                        new SwerveModuleIoSim(DCMotor.getKrakenX60(1), DCMotor.getFalcon500(1)),
-                        new SwerveModuleIoSim(DCMotor.getKrakenX60(1), DCMotor.getFalcon500(1)),
+                driveBase = SwerveBase.createSimOrReplaySwerveBase(new GyroIoSimAndReplay(),
                         new SwerveModuleIoSim(DCMotor.getKrakenX60(1), DCMotor.getFalcon500(1)));
                 break;
             case LOG_REPLAY:
-                driveBase = new SwerveBase(
-                        new GyroIoSimAndReplay(),
-                        new SwerveModuleIoReplay(),
-                        new SwerveModuleIoReplay(),
-                        new SwerveModuleIoReplay(),
+                driveBase = SwerveBase.createSimOrReplaySwerveBase(new GyroIoSimAndReplay(),
                         new SwerveModuleIoReplay());
                 break;
             default:
