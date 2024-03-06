@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -16,119 +16,61 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.io.motor.MotorIoNeo550Brushless;
 import frc.robot.subsystems.drive.SwerveBase;
+import frc.robot.subsystems.led.Leds;
 import frc.robot.subsystems.shooter.Aimer;
+import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
+import frc.robot.subsystems.shooter.Intake;
+import frc.robot.subsystems.shooter.NoteSensor;
 
-public class DriveCommands {
+/**
+ * Only used for commands that use multiple subsystems.
+ * <p>
+ * Single subsystem commands should be in their subsystem class.
+ * </p>
+ */
+public class CompositeCommands {
 
-    /** Makes this class non-instantiable. */
-    private DriveCommands() {
+    /** Makes Class non-instantiable */
+    private CompositeCommands() {
     }
 
-    public static class AutoAimDriveCommand extends Command {
-        private final SwerveBase driveBase;
-        private final Flywheel flywheel;
-        private final Aimer aimer;
-
-        private final DoubleSupplier xVelocity;
-        private final DoubleSupplier yVelocity;
-        private final Supplier<Translation3d> target;
-
-        private final PIDController pid;
-
-        public AutoAimDriveCommand(SwerveBase driveBase, Flywheel flywheel, Aimer aimer, DoubleSupplier xVelocity,
-                DoubleSupplier yVelocity,
-                Supplier<Translation3d> target) {
-            this.driveBase = driveBase;
-            this.flywheel = flywheel;
-            this.aimer = aimer;
-
-            this.xVelocity = xVelocity;
-            this.yVelocity = yVelocity;
-            this.target = target;
-
-            pid = new PIDController(Constants.getMaxAngularSpeed().in(RadiansPerSecond) / 90, 0, 0);
-            pid.setTolerance(1);
-            pid.enableContinuousInput(-180, 180);
-        }
-
-        @Override
-        public void initialize() {
-            pid.setSetpoint(0);
-
-            if (flywheel != null) {
-                flywheel.start();
-            }
-        }
-
-        @Override
-        public void execute() {
-            double linearMagnitude = SwerveBase.calculateLinearMagnitude(xVelocity, yVelocity);
-            // Calcaulate new linear velocity.
-            Rotation2d linearDirection = SwerveBase.calculateLinearDirection(xVelocity, yVelocity);
-            Translation2d linearVelocity = new Pose2d(new Translation2d(), linearDirection)
-                    .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d())).getTranslation();
-
-            // Calculate omega velocity.
-            double degreesToTarget = driveBase.getRotationToTarget(target.get().toTranslation2d())
-                    .plus(Rotation2d.fromDegrees(180))
-                    .getDegrees();
-            /*
-             * Range:
-             * - If kd = 0: minimumInput * kp - ki <-> maximumInput * kp + ki.
-             * - If kd != 0: -Double.MAX_VALUE <-> Double.MAX_VALUE.
-             */
-            // We are inverting the direction because degreesToTarget is our "correction",
-            // but the PIDController wants our "position".
-            double omega = pid.calculate(-degreesToTarget);
-
-            omega = MathUtil.clamp(omega, // TODO: Use same units when calculating KP.
-                    -Constants.getMaxAngularSpeed().in(RadiansPerSecond),
-                    Constants.getMaxAngularSpeed().in(RadiansPerSecond));
-
-            // Scale Velocities to between 0 and Max.
-            double scaledXVelocity = linearVelocity.getX() * Constants.getMaxLinearSpeed().in(MetersPerSecond),
-                    scaledYVelocity = linearVelocity.getY() * Constants.getMaxLinearSpeed().in(MetersPerSecond);
-
-            // Run Velocities.
-            if (Constants.isDrivingModeFieldRelative()) {
-                driveBase.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(scaledXVelocity, scaledYVelocity,
-                        omega, driveBase.getRotation()));
+    // ========================= Default Commands =========================
+    public static Command defaultIntakeCommand(Intake intake, NoteSensor sensor) {
+        return Commands.run(() -> {
+            if (sensor.isObjectDetected()) {
+                intake.stop();
             } else {
-                driveBase.runVelocity(new ChassisSpeeds(scaledXVelocity, scaledYVelocity, omega));
+                intake.start();
             }
-
-            aimer.aimAtTarget(target.get(), driveBase.getEstimatedPosition().getTranslation());
-
-            // TODO: Add Turning LEDs to Green, when close enough to shoot.
-
-            // Log Calculated Values.
-            Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/degreesToTarget", degreesToTarget);
-            Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/vxMetersPerSecond", scaledXVelocity);
-            Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/vyMetersPerSecond", scaledYVelocity);
-            Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/omegaRadiansPerSecond", omega);
-        }
-
-        @Override
-        public boolean isFinished() {
-            return false;
-        }
-
-        @Override
-        public void end(boolean interrupted) {
-            pid.close();
-        }
+        }, intake);
     }
 
-    public static Command autoAimAndManuallyDriveCommand(SwerveBase driveBase,
-            Flywheel flywheel,
-            Aimer aimer,
-            DoubleSupplier xSupplier,
-            DoubleSupplier ySupplier,
-            Supplier<Translation3d> target) {
+    public static Command defaultFeederCommand(Feeder feeder, NoteSensor sensor) {
+        return Commands.run(() -> {
+            if (sensor.isObjectDetected()) {
+                feeder.stop();
+            } else {
+                feeder.start();
+            }
+        }, feeder);
+    }
+
+    // ========================= Other Commands =========================
+
+    public static Command autoAimAndManuallyDriveCommand(SwerveBase driveBase, Flywheel flywheel, Aimer aimer,
+            DoubleSupplier xSupplier, DoubleSupplier ySupplier, Supplier<Translation3d> target) {
 
         Command aimingDrive = new Command() {
 
@@ -213,4 +155,72 @@ public class DriveCommands {
         return aimingDrive;
     }
 
+    public static Command intakeStartStopCommand(Intake intake, Feeder feeder) {
+        return new StartEndCommand(
+                () -> {
+                    intake.start();
+                    feeder.start();
+                },
+                () -> {
+                    intake.stop();
+                    feeder.stop();
+                },
+                intake, feeder);
+    }
+
+    public static Command reverseShooterAndIntakeCommand(Intake intake, Feeder feeder, Flywheel flywheel) {
+        return new ParallelCommandGroup(new StartEndCommand(flywheel::reverse, flywheel::stop, flywheel),
+                new StartEndCommand(feeder::reverse, feeder::stop, feeder),
+                new StartEndCommand(intake::reverse, intake::stop, intake));
+    }
+
+    public static Command reverseShooterCommand(Flywheel flywheel, Feeder feeder, Leds leds) {
+        Command reverseShooterCommand = new Command() {
+            @Override
+            public void execute() {
+                flywheel.reverse();
+                feeder.reverse();
+                leds.setDynamicPattern(new Color[] { Color.kRed, Color.kRed, Color.kBlack, Color.kBlack }, true);
+            }
+
+            @Override
+            public void end(boolean interrupted) {
+                flywheel.stop();
+                feeder.stop();
+                leds.setAllianceColor();
+            }
+        };
+        reverseShooterCommand.addRequirements(flywheel, feeder, leds);
+        return reverseShooterCommand;
+    }
+
+    public static Command shootAutonomousCommand(Feeder feeder, Leds leds, NoteSensor noteSensor) {
+        return new SequentialCommandGroup(
+                feeder.startCommand(),
+                leds.blinkCommand(Color.kOrange),
+                noteSensor.waitForNoObjectCommand(),
+                new WaitCommand(.25),
+                feeder.stopCommand());
+    }
+
+    public static Command shootTeleopCommand(Feeder feeder, Flywheel flywheel, Intake intake, NoteSensor noteSensor,
+            Leds leds) {
+
+        ParallelRaceGroup group = new ParallelRaceGroup(new StartEndCommand(intake::start, intake::stop, intake),
+                new StartEndCommand(() -> feeder.setVelocity(MotorIoNeo550Brushless.MAX_VELOCITY), feeder::stop,
+                        feeder),
+                leds.setColorCommand(Color.kPurple).repeatedly(),
+                noteSensor.waitForNoObjectCommand(), new WaitCommand(5));
+
+        // TODO: Spin up flywheelsm if not already spinning.
+        return group;
+    }
+
+    public static Command stopIntakeFeederCommand(Intake intake, Feeder feeder, Leds leds) {
+        return new InstantCommand(() -> {
+            intake.stop();
+            feeder.stop();
+            leds.setDynamicPattern(new Color[] { Color.kRed, Color.kRed, Color.kBlack, Color.kBlack }, true);
+        }, intake, feeder);
+    }
 }
