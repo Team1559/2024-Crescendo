@@ -15,6 +15,7 @@ public interface VisionIo {
         public int numberOfTargets = 0;
         public Pose2d pose = new Pose2d();
         public double timestamp;
+        // public int[] fIds = new int[0];
     }
 
     public String getName();
