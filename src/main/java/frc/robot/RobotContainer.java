@@ -183,7 +183,7 @@ public class RobotContainer { // TODO: Merge into the Robot class.
 
         // #region: ---------- Configure Command Triggers ----------
         if (Constants.hasNoteSensorSubsystem()) {
-            new Trigger((noteSensor::isObjectDetected)).whileTrue(leds.setColorCommand(Color.kGreen));
+            new Trigger((noteSensor::isObjectDetectedOnSwitch)).whileTrue(leds.setColorCommand(Color.kGreen));
         }
         // TODO: Add LED Trigger for Ready to Shoot.
         // #endregion
@@ -264,7 +264,7 @@ public class RobotContainer { // TODO: Merge into the Robot class.
         if (Constants.hasIntakeSubsystem() && Constants.hasFeederSubsystem() && Constants.hasFlywheelSubsystem()) {
 
             if (Constants.hasNoteSensorSubsystem()) {
-                coPilot.leftTrigger().and(not(noteSensor::isObjectDetected)).whileTrue(new ParallelCommandGroup(
+                coPilot.leftTrigger().and(not(noteSensor::isObjectDetectedOnSwitch)).whileTrue(new ParallelCommandGroup(
                         ShootCommands.intakeStartStopCommand(intake, feeder), flywheel.stopCommand()));
 
             }

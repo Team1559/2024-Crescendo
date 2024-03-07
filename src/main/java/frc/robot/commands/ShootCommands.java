@@ -31,7 +31,7 @@ public class ShootCommands {
     // ========================= Default Commands =========================
     public static Command defaultIntakeCommand(Intake intake, NoteSensor sensor) {
         return Commands.run(() -> {
-            if (sensor.isObjectDetected()) {
+            if (sensor.isObjectDetectedOnSwitch()) {
                 intake.stop();
             } else {
                 intake.start();
@@ -41,7 +41,7 @@ public class ShootCommands {
 
     public static Command defaultFeederCommand(Feeder feeder, NoteSensor sensor) {
         return Commands.run(() -> {
-            if (sensor.isObjectDetected()) {
+            if (sensor.isObjectDetectedOnSwitch()) {
                 feeder.stop();
             } else {
                 feeder.start();
@@ -98,7 +98,7 @@ public class ShootCommands {
         return new SequentialCommandGroup(
                 feeder.startCommand(),
                 LedCommands.blinkCommand(leds, Color.kOrange),
-                noteSensor.waitForNoObjectCommand(),
+                noteSensor.waitForNoObjectOnSwitchCommand(),
                 new WaitCommand(.25),
                 feeder.stopCommand());
     }
@@ -110,7 +110,7 @@ public class ShootCommands {
                 new StartEndCommand(() -> feeder.setVelocity(MotorIoNeo550Brushless.MAX_VELOCITY), feeder::stop,
                         feeder),
                 leds.setColorCommand(Color.kPurple).repeatedly(),
-                noteSensor.waitForNoObjectCommand(), new WaitCommand(5));
+                noteSensor.waitForNoObjectOnSwitchCommand(), new WaitCommand(5));
 
         // TODO: Spin up flywheelsm if not already spinning.
         return group;

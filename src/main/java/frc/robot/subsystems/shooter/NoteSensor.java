@@ -25,7 +25,7 @@ public class NoteSensor extends SubsystemBase {
 
     @Override
     public void periodic() {
-        inputs.isObjectDetected = isObjectDetected();
+        inputs.isObjectDetected = isObjectDetectedOnSwitch();
         Logger.processInputs("Shooter/NoteSensor", inputs);
     }
 
@@ -34,16 +34,16 @@ public class NoteSensor extends SubsystemBase {
      * 
      * @return limit switch state;
      */
-    public boolean isObjectDetected() {
+    public boolean isObjectDetectedOnSwitch() {
         return !limitSwitch.get();
     }
 
     // ========================= Commands =========================
-    public Command waitForObjectCommand() {
-        return new WaitUntilCommand(this::isObjectDetected);
+    public Command waitForObjectOnSwitchCommand() {
+        return new WaitUntilCommand(this::isObjectDetectedOnSwitch);
     }
 
-    public Command waitForNoObjectCommand() {
-        return new WaitUntilCommand(() -> !isObjectDetected());
+    public Command waitForNoObjectOnSwitchCommand() {
+        return new WaitUntilCommand(() -> !isObjectDetectedOnSwitch());
     }
 }
