@@ -70,7 +70,7 @@ public class SwerveModuleIoSim implements SwerveModuleIo {
         driveSim.update(LOOP_PERIOD_SECS);
         turnSim.update(LOOP_PERIOD_SECS);
 
-        // ---------- CANCoder ----------
+        // ---------- CAN Coder ----------
         inputs.cancoderOffsetPosition = new Rotation2d(turnSim.getAngularPositionRad());
         inputs.cancoderAbsolutePosition = inputs.cancoderAbsolutePosition.plus(cancoderOffset);
 

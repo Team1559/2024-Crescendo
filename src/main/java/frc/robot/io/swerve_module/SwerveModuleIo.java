@@ -20,7 +20,7 @@ public interface SwerveModuleIo {
     @AutoLog
     static class SwerveModuleIoInputs {
 
-        // ---------- CANCoder ----------
+        // ---------- CAN Coder ----------
         public Rotation2d cancoderOffsetPosition = new Rotation2d();
         public Rotation2d cancoderAbsolutePosition = new Rotation2d();
 

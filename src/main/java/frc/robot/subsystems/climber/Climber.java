@@ -264,12 +264,12 @@ public class Climber extends SubsystemBase {
         return new InstantCommand(() -> modifyHeight(change), this);
     }
 
-    public Command modifyTargetHeightLeftCommand(Measure<Distance> change) {
-        return new InstantCommand(() -> modifyTargetHeightLeft(change));
+    public Command modifyHeightLeftCommand(Measure<Distance> change) {
+        return new InstantCommand(() -> modifyHeightLeft(change));
     }
 
-    public Command modifyTargetHeightRightCommand(Measure<Distance> change) {
-        return new InstantCommand(() -> modifyTargetHeightRight(change));
+    public Command modifyHeightRightCommand(Measure<Distance> change) {
+        return new InstantCommand(() -> modifyHeightRight(change));
     }
 
     public Command setHeightCommand(Measure<Distance> height) {

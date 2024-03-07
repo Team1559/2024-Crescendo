@@ -152,7 +152,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
 
         BaseStatusSignal.refreshAll(statusSignalArray);
 
-        // ---------- CANCoder ----------
+        // ---------- CAN Coder ----------
         inputs.cancoderAbsolutePosition = Rotation2d.fromRotations(cancoderAbsolutePosition.getValueAsDouble());
         inputs.cancoderOffsetPosition = inputs.cancoderAbsolutePosition.minus(absoluteEncoderOffset);
 
