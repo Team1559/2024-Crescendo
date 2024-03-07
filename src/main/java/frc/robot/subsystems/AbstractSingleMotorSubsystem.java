@@ -2,6 +2,10 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.units.Angle;
@@ -17,6 +21,9 @@ import frc.robot.io.motor.MotorIo;
 import frc.robot.io.motor.MotorIoInputsAutoLogged;
 
 public abstract class AbstractSingleMotorSubsystem extends SubsystemBase {
+
+    public static List<AbstractSingleMotorSubsystem> instantiatedSubsystems = Collections
+            .synchronizedList(new LinkedList<>());
 
     protected final Measure<Velocity<Angle>> DEFAULT_FORWARDS_VELOCITY;
     protected final Measure<Velocity<Angle>> DEFAULT_REVERSE_VELOCITY;
@@ -49,6 +56,8 @@ public abstract class AbstractSingleMotorSubsystem extends SubsystemBase {
         String packageName = packagePath[packagePath.length - 1];
         String name = packageName + "/" + getClass().getName();
         super.setName(name);
+
+        instantiatedSubsystems.add(this);
     }
 
     @Override
