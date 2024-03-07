@@ -32,7 +32,6 @@ public class VisionIoLimelight implements VisionIo {
             // https://docs.limelightvision.io/docs/docs-limelight/pipeline-apriltag/apriltag-robot-localization#using-wpilibs-pose-estimator
             Translation2d t = new Translation2d(data[0], data[1]);
             Rotation2d r = Rotation2d.fromDegrees(data[5]);
-
             double[] targetdata = LimelightHelpers.getTargetPose_CameraSpace(cameraName);
             inputs.distanceToTarget = Math.hypot(targetdata[0], targetdata[1]);
             double translationStdDev = inputs.distanceToTarget * LINEAR_STD_DEV_RATIO
@@ -44,6 +43,11 @@ public class VisionIoLimelight implements VisionIo {
             inputs.havePose = true;
             inputs.pose = new Pose2d(t, r);
             inputs.timestamp = Timer.getFPGATimestamp() - data[6] / 1000.0;
+            // int[] tempFIDs = new int[results.targetingResults.targets_Fiducials.length];
+            // for (int i = 0; i < results.targetingResults.targets_Fiducials.length; i++) {
+            // tempFIDs[i] = (int) results.targetingResults.targets_Fiducials[i].fiducialID;
+            // }
+            // inputs.fIds = tempFIDs;
         }
     }
 }
