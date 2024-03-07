@@ -1,8 +1,8 @@
 package frc.robot;
 
+import org.littletonrobotics.junction.BetterLogger;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
@@ -29,32 +29,29 @@ public class Robot extends LoggedRobot {
 
             case REAL_WORLD:
                 // Running on a real robot, log to a USB stick ("/U/logs")
-                Logger.addDataReceiver(new WPILOGWriter());
-                Logger.addDataReceiver(new NT4Publisher());
+                BetterLogger.addDataReceiver(new WPILOGWriter());
+                BetterLogger.addDataReceiver(new NT4Publisher());
                 break;
 
             case SIMULATION:
                 // Running a physics simulator, log to NT
-                Logger.addDataReceiver(new NT4Publisher());
+                BetterLogger.addDataReceiver(new NT4Publisher());
                 break;
 
             case LOG_REPLAY:
                 // Replaying a log, set up replay source
                 setUseTiming(false); // Run as fast as possible
                 String logPath = LogFileUtil.findReplayLog();
-                Logger.setReplaySource(new WPILOGReader(logPath));
-                Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+                BetterLogger.setReplaySource(new WPILOGReader(logPath));
+                BetterLogger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
                 break;
 
             default:
                 throw new RuntimeException("Unknown Run Mode: " + Constants.getCurrentOperatingMode());
         }
 
-        // See http://bit.ly/3YIzFZ6 for more information on timestamps in AdvantageKit.
-        // Logger.disableDeterministicTimestamps()
-
         // Start AdvantageKit logger
-        Logger.start();
+        BetterLogger.start();
 
         // Instantiate our RobotContainer. This will perform all our button bindings,
         // and put our autonomous chooser on the dashboard.
