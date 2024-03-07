@@ -88,6 +88,12 @@ public class VisionIoLimelight implements VisionIo {
             inputs.estimateStdDevs[0] = translationStdDev;
             inputs.estimateStdDevs[1] = translationStdDev;
             inputs.estimateStdDevs[2] = ROTATION_STD_DEV;
+
+            // int[] tempFIDs = new int[results.targetingResults.targets_Fiducials.length];
+            // for (int i = 0; i < results.targetingResults.targets_Fiducials.length; i++) {
+            // tempFIDs[i] = (int) results.targetingResults.targets_Fiducials[i].fiducialID;
+            // }
+            // inputs.fIds = tempFIDs;
         }
     }
 }

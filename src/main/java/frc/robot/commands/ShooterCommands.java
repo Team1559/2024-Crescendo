@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import static frc.robot.constants.AbstractConstants.CONSTANTS;
+
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -9,7 +11,10 @@ import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.subsystems.base.DriveBase;
 import frc.robot.subsystems.led.Leds;
+import frc.robot.subsystems.shooter.Aimer;
 import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.Intake;
@@ -130,5 +135,12 @@ public class ShooterCommands {
         return new ParallelCommandGroup(new StartEndCommand(flywheel::reverse, flywheel::stop, flywheel),
                 new StartEndCommand(feeder::reverse, feeder::stop, feeder),
                 new StartEndCommand(intake::reverse, intake::stop, intake));
+    }
+
+    public static Command autoAimAtSpeakerCommand(DriveBase driveBase, Aimer aimer) {
+        return new ParallelCommandGroup(
+                DriveCommands.turnToTargetCommand(driveBase, CONSTANTS::getSpeakerLocation, 4.5), new InstantCommand(
+                        () -> aimer.aimAtTarget(CONSTANTS.getSpeakerLocation(), driveBase.getPose().getTranslation())))
+                .andThen(new WaitUntilCommand(aimer::atTarget));
     }
 }

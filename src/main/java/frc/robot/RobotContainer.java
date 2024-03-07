@@ -10,8 +10,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -230,22 +228,23 @@ public class RobotContainer {
             NamedCommands.registerCommand("Spin Up Flywheel", ShooterCommands.spinUpFlywheelCommand(flywheel));
         }
 
-        Command aimAtSpeakerCommand = Commands.parallel(
-                DriveCommands.turnToTargetCommand(driveBase, CONSTANTS::getSpeakerLocation, 4.5), new InstantCommand(
-                        () -> aimer.aimAtTarget(CONSTANTS.getSpeakerLocation(), driveBase.getPose().getTranslation())))
-                .andThen(new WaitUntilCommand(aimer::atTarget));
+        Command aimAtSpeakerCommand = ShooterCommands.autoAimAtSpeakerCommand(driveBase, aimer);
         Command autoShootCommand;
+        Command initialShootCommand;
         if (CONSTANTS.hasFeederSubsystem() && CONSTANTS.hasNoteSensorSubsystem()) {
             autoShootCommand = ShooterCommands.shootAutonomousCommand(feeder, leds, noteSensor);
+            initialShootCommand = ShooterCommands.shootAutonomousCommand(feeder, leds, noteSensor);
+            ShooterCommands.shootAutonomousCommand(feeder, leds, noteSensor);
         } else {
             autoShootCommand = LedCommands.blinkCommand(leds, Color.kOrange);
+            initialShootCommand = LedCommands.blinkCommand(leds, Color.kOrange);
         }
         NamedCommands.registerCommand("Auto Shoot",
                 new ParallelDeadlineGroup(new WaitCommand(13),
                         new SequentialCommandGroup(aimAtSpeakerCommand, autoShootCommand)));
-        NamedCommands.registerCommand("JUST SHOOT",
-                new ParallelDeadlineGroup(new WaitCommand(13), aimer.setTargetAngleCommand(Rotation2d.fromDegrees(36.7))
-                        .andThen(new WaitUntilCommand(() -> aimer.atTarget())).andThen(autoShootCommand)));
+        NamedCommands.registerCommand("Initial Shoot",
+                aimer.setTargetAngleCommand(Rotation2d.fromDegrees(36.7))
+                        .andThen(new WaitUntilCommand(() -> aimer.atTarget())).andThen(autoShootCommand));
 
         // ---------- Set-up Autonomous Choices ----------
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

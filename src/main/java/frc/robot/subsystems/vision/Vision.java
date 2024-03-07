@@ -26,6 +26,7 @@ public class Vision extends SubsystemBase {
         public double distanceToTarget;
         public double timestamp;
         public double[] estimateStdDevs = new double[3];
+        // public int[] fIds = new int[0];
     }
 
     public Vision(SwerveDrivePoseEstimator poseEstimator, VisionIo... ios) {
