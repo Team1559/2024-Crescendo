@@ -97,7 +97,7 @@ public interface MotorSubsystem extends Subsystem {
     public Rotation2d getCurrentRelativePosition();
 
     /**
-     * @return The voltage that is currently being set to the motor.
+     * @return The speed that is motor is currently spinning at.
      *         <p>
      *         <b>Note:</b> This may be different than {@link #getTargetVelocity()}.
      *         </p>

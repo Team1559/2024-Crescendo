@@ -19,7 +19,7 @@ import frc.robot.io.motor.MotorIo;
 import frc.robot.io.motor.MotorIoInputsAutoLogged;
 import frc.robot.util.MathUtils;
 
-public abstract class SingleMotorSubsystem extends SubsystemBase implements MotorSubsystem {
+public class SingleMotorSubsystem extends SubsystemBase implements MotorSubsystem {
 
     @AutoLog
     static class SingleMotorSubsystemInputs {
@@ -38,7 +38,7 @@ public abstract class SingleMotorSubsystem extends SubsystemBase implements Moto
     private final Measure<Velocity<Angle>> defaultForwardVelocity, defaultReverseVelocity;
     private final Measure<Voltage> defaultForwardVoltage, defaultReverseVoltage;
 
-    private final SingleMotorSubsystemInputsAutoLogged subsystemInputs = new SingleMotorSubsystemInputsAutoLogged();
+    protected final SingleMotorSubsystemInputsAutoLogged subsystemInputs = new SingleMotorSubsystemInputsAutoLogged();
 
     private boolean isRunning = false;
 
@@ -217,12 +217,6 @@ public abstract class SingleMotorSubsystem extends SubsystemBase implements Moto
     }
 
     @Override
-    public boolean isTemperatureTooHigh() {
-        return motorIo.getTemperature()
-                .gt(motorIo.getMaxSafeTemperature().times(Constants.getMotorSafeTemperatureBuffer()));
-    }
-
-    @Override
     public Rotation2d getTargetPosition() {
         return subsystemInputs.targetPosition;
     }
@@ -235,6 +229,12 @@ public abstract class SingleMotorSubsystem extends SubsystemBase implements Moto
     @Override
     public Measure<Voltage> getTargetVoltage() {
         return subsystemInputs.targetVoltage;
+    }
+
+    @Override
+    public boolean isTemperatureTooHigh() {
+        return motorIo.getTemperature()
+                .gt(motorIo.getMaxSafeTemperature().times(Constants.getMotorSafeTemperatureBuffer()));
     }
 
     // -------------------- Setters --------------------
