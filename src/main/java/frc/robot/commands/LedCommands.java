@@ -19,7 +19,8 @@ public class LedCommands {
 
     public static Command defaultLedCommand(Leds leds, NoteSensor noteSensor) {
         return Commands.run(() -> {
-            if (noteSensor.isObjectDetectedOnSwitch()) {
+            // Need to check for null because of practice robot
+            if (noteSensor != null && noteSensor.isObjectDetectedOnSwitch()) {
                 leds.setColor(Color.kGreen);
             }
             else {
