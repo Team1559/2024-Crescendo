@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.BetterLogger;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -182,8 +182,8 @@ public class Flywheel extends SubsystemBase {
         // lInputs.velocityTarget =
         // rInputs.velocityTarget =
 
-        Logger.processInputs("Shooter/Flywheel/LeftMotor", lInputs);
-        Logger.processInputs("Shooter/Flywheel/RightMotor", rInputs);
+        BetterLogger.processInputs("Shooter/Flywheel/LeftMotor", lInputs);
+        BetterLogger.processInputs("Shooter/Flywheel/RightMotor", rInputs);
     }
 
     // ========================= Functions =====================================

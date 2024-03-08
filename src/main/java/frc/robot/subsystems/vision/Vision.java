@@ -3,7 +3,7 @@ package frc.robot.subsystems.vision;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 
-import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.BetterLogger;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
@@ -32,7 +32,7 @@ public class Vision extends SubsystemBase {
         for (VisionIo io : ios) {
 
             io.updateInputs(inputs);
-            Logger.processInputs("Vision/" + io.getName(), inputs);
+            BetterLogger.processInputs("Vision/" + io.getName(), inputs);
 
             if (inputs.havePose) {
 

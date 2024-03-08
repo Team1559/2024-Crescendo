@@ -1,7 +1,7 @@
 package frc.robot.subsystems.shooter;
 
 import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.BetterLogger;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,7 +26,7 @@ public class NoteSensor extends SubsystemBase {
     @Override
     public void periodic() {
         inputs.isObjectDetected = isObjectDetectedOnSwitch();
-        Logger.processInputs("Shooter/NoteSensor", inputs);
+        BetterLogger.processInputs("Shooter/NoteSensor", inputs);
     }
 
     /**

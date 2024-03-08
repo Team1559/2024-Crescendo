@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.BetterLogger;
 
 import com.revrobotics.CANSparkBase.FaultID;
 import com.revrobotics.CANSparkBase.IdleMode;
@@ -106,10 +106,10 @@ public class Climber extends SubsystemBase {
 
         // Log Inputs.
         updateInputs(motorLInputs, motorL, targetHeightLeft);
-        Logger.processInputs("Climber/Climber/LeftMotor", motorLInputs);
+        BetterLogger.processInputs("Climber/Climber/LeftMotor", motorLInputs);
 
         updateInputs(motorRInputs, motorR, targetHeightRight);
-        Logger.processInputs("Climber/Climber/RightMotor", motorRInputs);
+        BetterLogger.processInputs("Climber/Climber/RightMotor", motorRInputs);
     }
 
     private void updateInputs(ClimberInputsAutoLogged inputs, CANSparkMax motor, Measure<Distance> targetHeight) {

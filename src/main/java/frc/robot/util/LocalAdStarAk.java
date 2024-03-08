@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.littletonrobotics.junction.BetterLogger;
 import org.littletonrobotics.junction.LogTable;
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 import com.pathplanner.lib.path.GoalEndState;
@@ -30,11 +30,11 @@ public class LocalAdStarAk implements Pathfinder {
      */
     @Override
     public boolean isNewPathAvailable() {
-        if (Logger.hasReplaySource()) {
+        if (BetterLogger.hasReplaySource()) {
             io.updateIsNewPathAvailable();
         }
 
-        Logger.processInputs("LocalADStarAK", io);
+        BetterLogger.processInputs("LocalADStarAK", io);
 
         return io.isNewPathAvailable;
     }
@@ -49,11 +49,11 @@ public class LocalAdStarAk implements Pathfinder {
      */
     @Override
     public PathPlannerPath getCurrentPath(PathConstraints constraints, GoalEndState goalEndState) {
-        if (Logger.hasReplaySource()) {
+        if (BetterLogger.hasReplaySource()) {
             io.updateCurrentPathPoints(constraints, goalEndState);
         }
 
-        Logger.processInputs("LocalADStarAK", io);
+        BetterLogger.processInputs("LocalADStarAK", io);
 
         if (io.currentPathPoints.isEmpty()) {
             return null;
@@ -71,7 +71,7 @@ public class LocalAdStarAk implements Pathfinder {
      */
     @Override
     public void setStartPosition(Translation2d startPosition) {
-        if (Logger.hasReplaySource()) {
+        if (BetterLogger.hasReplaySource()) {
             io.adStar.setStartPosition(startPosition);
         }
     }
@@ -84,7 +84,7 @@ public class LocalAdStarAk implements Pathfinder {
      */
     @Override
     public void setGoalPosition(Translation2d goalPosition) {
-        if (Logger.hasReplaySource()) {
+        if (BetterLogger.hasReplaySource()) {
             io.adStar.setGoalPosition(goalPosition);
         }
     }

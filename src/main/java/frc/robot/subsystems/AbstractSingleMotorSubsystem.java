@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.BetterLogger;
 
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
@@ -68,7 +68,7 @@ public abstract class AbstractSingleMotorSubsystem extends SubsystemBase {
 
         // Log Inputs.
         io.updateInputs(inputs);
-        Logger.processInputs(getName(), inputs);
+        BetterLogger.processInputs(getName(), inputs);
     }
 
     // ========================= Functions =========================

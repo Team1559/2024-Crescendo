@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.BetterLogger;
 
 import com.revrobotics.CANSparkBase.FaultID;
 import com.revrobotics.CANSparkBase.IdleMode;
@@ -123,7 +123,7 @@ public class Aimer extends SubsystemBase {
 
         // Update Inputs.
         updateInputs();
-        Logger.processInputs("Shooter/Aimer", inputs);
+        BetterLogger.processInputs("Shooter/Aimer", inputs);
 
         // Set Voltages.
         if (controller.getSetpoint() != 0) {
@@ -193,11 +193,11 @@ public class Aimer extends SubsystemBase {
     public void aimAtTarget(Translation3d target, Translation2d currentPosition) {
 
         double distanceMeters = currentPosition.getDistance(target.toTranslation2d());
-        Logger.recordOutput("Shooter/Aimer/DistanceToTarget", distanceMeters);
+        BetterLogger.recordOutput("Shooter/Aimer/DistanceToTarget", distanceMeters);
 
         Rotation2d angle = Rotation2d
                 .fromDegrees(1.42 * distanceMeters * distanceMeters - 15.8 * distanceMeters + 55.3);
-        Logger.recordOutput("Shooter/Aimer/CalculatedTargetAngleInDegrees", angle.getDegrees());
+        BetterLogger.recordOutput("Shooter/Aimer/CalculatedTargetAngleInDegrees", angle.getDegrees());
 
         setAngle(angle);
     }
