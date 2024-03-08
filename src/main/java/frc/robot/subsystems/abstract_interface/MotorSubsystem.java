@@ -15,6 +15,36 @@ import frc.robot.Constants;
 
 public interface MotorSubsystem extends Subsystem {
 
+    // ========================= Configuration =================================
+
+    /**
+     * Restricts the motor speed both "forwards" and in "reverse". If the subsystem
+     * it told to go faster, it will cap the speed to this maximum value.
+     * 
+     * @param maxVelocity The fastest (inclusive) the motor can go.
+     */
+    public void setMaxVelocity(Measure<Velocity<Angle>> maxVelocity);
+
+    /**
+     * Restricts the volts (both positive and negative) that will be sent to the
+     * motor. If the subsystem it told to exceed this threshold, it will cap the
+     * voltage to this maximum value.
+     * 
+     * @param maxVoltage The maximum voltage (inclusive) to send to the motor.
+     */
+    public void setMaxVoltage(Measure<Voltage> maxVoltage);
+
+    /**
+     * Restricts the motor movement. If the subsystem is told to move its position
+     * outside this range, it will just go to the edge of the range.
+     * 
+     * @param minPosition The "lowest" / most "reverse" (inclusive) the motor can
+     *                    go, or {@code null} if there is no limit.
+     * @param maxPosition The "highest" / most "forward" (inclusive) the motor can
+     *                    go, or {@code null} if there is no limit.
+     */
+    public void setMinAndMaxPositions(Rotation2d minPosition, Rotation2d maxPosition);
+
     // ========================= Periodic ======================================
 
     @Override

@@ -17,15 +17,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.io.motor.MotorIo;
 import frc.robot.io.motor.MotorIoInputsAutoLogged;
+import frc.robot.util.MathUtils;
 
 public abstract class SingleMotorSubsystem extends SubsystemBase implements MotorSubsystem {
 
     @AutoLog
     static class SingleMotorSubsystemInputs {
 
-        public Measure<Velocity<Angle>> targetVelocity;
-        public Measure<Voltage> targetVoltage;
-        public Rotation2d targetPosition;
+        public Measure<Velocity<Angle>> targetVelocity, targetVelocityClamped;
+        public Measure<Voltage> targetVoltage, targetVoltageClamped;
+        public Rotation2d targetPosition, targetPositionClamped;
     }
 
     public static List<SingleMotorSubsystem> instantiatedSubsystems = Collections
@@ -40,6 +41,10 @@ public abstract class SingleMotorSubsystem extends SubsystemBase implements Moto
     private final SingleMotorSubsystemInputsAutoLogged subsystemInputs = new SingleMotorSubsystemInputsAutoLogged();
 
     private boolean isRunning = false;
+
+    private Measure<Velocity<Angle>> maximumVelocity;
+    private Measure<Voltage> maximumVoltage;
+    private Rotation2d maximumPosition, minimumPosition;
 
     // ========================= Constructors & Config =========================
 
@@ -82,6 +87,7 @@ public abstract class SingleMotorSubsystem extends SubsystemBase implements Moto
      *                              {@link #forward()} method.
      * @param defaultReverseVoltage The voltage that will be used by the
      *                              {@link #reverse()} method.
+     *                              or {@code null} if there is no limit.
      * @param velocities            <i>Ignore.</i> (Used to allow constructor
      *                              overloading with generics.)
      */
@@ -107,6 +113,22 @@ public abstract class SingleMotorSubsystem extends SubsystemBase implements Moto
         instantiatedSubsystems.add(this);
     }
 
+    @Override
+    public void setMaxVelocity(Measure<Velocity<Angle>> maxVelocity) {
+        this.maximumVelocity = maxVelocity;
+    }
+
+    @Override
+    public void setMaxVoltage(Measure<Voltage> maxVoltage) {
+        this.maximumVoltage = maxVoltage;
+    }
+
+    @Override
+    public void setMinAndMaxPositions(Rotation2d minPosition, Rotation2d maxPosition) {
+        this.minimumPosition = minPosition;
+        this.maximumPosition = maxPosition;
+    }
+
     // ========================= Periodic ======================================
 
     @Override
@@ -116,14 +138,14 @@ public abstract class SingleMotorSubsystem extends SubsystemBase implements Moto
         // Have to tell the motor to run repeatedly, or the Safety Protocols will stop
         // it. See:
         // https://docs.wpilib.org/en/stable/docs/software/hardware-apis/motors/wpi-drive-classes.html#motor-safety
-        if (subsystemInputs.targetPosition != null) {
-            motorIo.setPosition(subsystemInputs.targetPosition);
+        if (subsystemInputs.targetPositionClamped != null) {
+            motorIo.setPosition(subsystemInputs.targetPositionClamped);
             isRunning = true;
-        } else if (subsystemInputs.targetVelocity != null) {
-            motorIo.setVelocity(subsystemInputs.targetVelocity);
+        } else if (subsystemInputs.targetVelocityClamped != null) {
+            motorIo.setVelocity(subsystemInputs.targetVelocityClamped);
             isRunning = true;
-        } else if (subsystemInputs.targetVoltage != null) {
-            motorIo.setVoltage(subsystemInputs.targetVoltage);
+        } else if (subsystemInputs.targetVoltageClamped != null) {
+            motorIo.setVoltage(subsystemInputs.targetVoltageClamped);
             isRunning = true;
         } else if (isRunning) { // Avoids setting up a callback for stop.
             motorIo.stop();
@@ -219,22 +241,40 @@ public abstract class SingleMotorSubsystem extends SubsystemBase implements Moto
 
     @Override
     public void setPosition(Rotation2d position) {
+
         subsystemInputs.targetVelocity = null;
+        subsystemInputs.targetVelocityClamped = null;
+
         subsystemInputs.targetVoltage = null;
+        subsystemInputs.targetVoltageClamped = null;
+
         subsystemInputs.targetPosition = position;
+        subsystemInputs.targetPositionClamped = MathUtils.clamp(position, minimumPosition, maximumPosition);
     }
 
     @Override
     public void setVelocity(Measure<Velocity<Angle>> velocity) {
-        subsystemInputs.targetPosition = null;
-        subsystemInputs.targetVoltage = null;
+
         subsystemInputs.targetVelocity = velocity;
+        subsystemInputs.targetVelocityClamped = MathUtils.clamp(velocity, maximumVelocity);
+
+        subsystemInputs.targetVoltage = null;
+        subsystemInputs.targetVoltageClamped = null;
+
+        subsystemInputs.targetPosition = null;
+        subsystemInputs.targetPositionClamped = null;
     }
 
     @Override
     public void setVoltage(Measure<Voltage> voltage) {
-        subsystemInputs.targetPosition = null;
+
         subsystemInputs.targetVelocity = null;
+        subsystemInputs.targetVelocityClamped = null;
+
         subsystemInputs.targetVoltage = voltage;
+        subsystemInputs.targetVoltageClamped = MathUtils.clamp(voltage, maximumVoltage);
+
+        subsystemInputs.targetPosition = null;
+        subsystemInputs.targetPositionClamped = null;
     }
 }
