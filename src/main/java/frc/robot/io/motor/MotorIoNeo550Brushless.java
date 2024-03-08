@@ -13,7 +13,7 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Velocity;
 import frc.robot.Constants;
-import frc.robot.Constants.PID;
+import frc.robot.Constants.PidValues;
 
 public class MotorIoNeo550Brushless extends MotorIoSparkMax {
 
@@ -26,7 +26,7 @@ public class MotorIoNeo550Brushless extends MotorIoSparkMax {
      * @param inverted True if the motor direction should be inverted
      */
     public MotorIoNeo550Brushless(int motorId, boolean inverted, IdleMode idleMode, Rotation2d absoluteEncoderOffset,
-            PID pidValues) {
+            PidValues pidValues) {
         super(motorId, inverted, idleMode, absoluteEncoderOffset, pidValues);
 
         motor.setSmartCurrentLimit((int) Constants.getNeo550BrushlessCurrentLimit().in(Amps));

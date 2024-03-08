@@ -34,7 +34,7 @@ public class ShootCommands {
             if (sensor.isObjectDetectedOnSwitch()) {
                 intake.stop();
             } else {
-                intake.start();
+                intake.forward();
             }
         }, intake);
     }
@@ -44,7 +44,7 @@ public class ShootCommands {
             if (sensor.isObjectDetectedOnSwitch()) {
                 feeder.stop();
             } else {
-                feeder.start();
+                feeder.forward();
             }
         }, feeder);
     }
@@ -58,8 +58,8 @@ public class ShootCommands {
     public static Command intakeStartStopCommand(Intake intake, Feeder feeder) {
         return new StartEndCommand(
                 () -> {
-                    intake.start();
-                    feeder.start();
+                    intake.forward();
+                    feeder.forward();
                 },
                 () -> {
                     intake.stop();
@@ -96,7 +96,7 @@ public class ShootCommands {
 
     public static Command shootAutonomousCommand(Feeder feeder, Leds leds, NoteSensor noteSensor) {
         return new SequentialCommandGroup(
-                feeder.startCommand(),
+                feeder.forwardCommand(),
                 LedCommands.blinkCommand(leds, Color.kOrange),
                 noteSensor.waitForNoObjectOnSwitchCommand(),
                 new WaitCommand(.25),
@@ -106,7 +106,7 @@ public class ShootCommands {
     public static Command shootTeleopCommand(Feeder feeder, Flywheel flywheel, Intake intake, NoteSensor noteSensor,
             Leds leds) {
 
-        ParallelRaceGroup group = new ParallelRaceGroup(new StartEndCommand(intake::start, intake::stop, intake),
+        ParallelRaceGroup group = new ParallelRaceGroup(new StartEndCommand(intake::forward, intake::stop, intake),
                 new StartEndCommand(() -> feeder.setVelocity(MotorIoNeo550Brushless.MAX_VELOCITY), feeder::stop,
                         feeder),
                 leds.setColorCommand(Color.kPurple).repeatedly(),

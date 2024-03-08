@@ -68,18 +68,18 @@ public class Constants {
     /**
      * Contains PID values and a Feed Forward (FF) value.
      */
-    public static class PID {
+    public static class PidValues {
 
         public final double P, I, D, FF;
 
         /**
          * Constructs this PID object with a FF value of 0.
          */
-        public PID(double p, double i, double d) {
+        public PidValues(double p, double i, double d) {
             this(p, i, d, 0);
         }
 
-        public PID(double p, double i, double d, double ff) {
+        public PidValues(double p, double i, double d, double ff) {
             P = p;
             I = i;
             D = d;
@@ -369,8 +369,8 @@ public class Constants {
         return uniqueCanBusId(22, getCanivoreId());
     }
 
-    public static PID getAimerPid() {
-        return new PID(.6, 0, 0, 0.7);
+    public static PidValues getAimerPid() {
+        return new PidValues(.6, 0, 0, 0.7);
     }
 
     // #endregion
@@ -416,8 +416,8 @@ public class Constants {
         return uniqueCanBusId(24, getCanivoreId());
     }
 
-    public static PID getClimberPid() {
-        return new PID(.1, 0, 0);
+    public static PidValues getClimberPid() {
+        return new PidValues(.1, 0, 0);
     }
 
     public static double getClimberRotationsPerInch() {
@@ -435,8 +435,8 @@ public class Constants {
         return true;
     }
 
-    public static PID getFeederPidValues() {
-        return new PID(0.33 / Constants.getFeederVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000);
+    public static PidValues getFeederPidValues() {
+        return new PidValues(0.33 / Constants.getFeederVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000);
     }
 
     public static Measure<Velocity<Angle>> getFeederVelocityForward() {
@@ -495,8 +495,8 @@ public class Constants {
         return true;
     }
 
-    public static PID getIntakePidValues() {
-        return new PID(0.33 / Constants.getIntakeVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000);
+    public static PidValues getIntakePidValues() {
+        return new PidValues(0.33 / Constants.getIntakeVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000);
     }
 
     public static Measure<Velocity<Angle>> getIntakeVelocityForward() {
@@ -596,8 +596,8 @@ public class Constants {
         return true;
     }
 
-    public static PID getTraverserPidValues() {
-        return new PID(0.33 / Constants.getTraverserVelocity().in(RevolutionsPerSecond), 0, 0, 11.0 / 11000);
+    public static PidValues getTraverserPidValues() {
+        return new PidValues(0.33 / Constants.getTraverserVelocity().in(RevolutionsPerSecond), 0, 0, 11.0 / 11000);
     }
 
     public static Measure<Velocity<Angle>> getTraverserVelocity() {

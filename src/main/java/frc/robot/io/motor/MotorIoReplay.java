@@ -31,6 +31,11 @@ public class MotorIoReplay implements MotorIo {
     }
 
     @Override
+    public Rotation2d getRelativePosition() {
+        return position.plus(Rotation2d.fromDegrees(0));
+    }
+
+    @Override
     public Measure<Temperature> getTemperature() {
         return Celsius.zero();
     }

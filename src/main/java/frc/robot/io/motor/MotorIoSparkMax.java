@@ -19,9 +19,19 @@ import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
-import frc.robot.Constants.PID;
+import frc.robot.Constants.PidValues;
 
 public abstract class MotorIoSparkMax implements MotorIo {
+
+    /**
+     * <ul>
+     * <li><b>P:</b> {@code 1}</li>
+     * <li><b>I:</b> {@code 0}</li>
+     * <li><b>D:</b> {@code 0}</li>
+     * <li><b>FF:</b> {@code 0}</li>
+     * </ul>
+     */
+    public static PidValues DEFAULT_PID_VALUES = new PidValues(1, 0, 0, 0);
 
     protected final boolean isInverted;
     protected final CANSparkMax motor;
@@ -34,11 +44,18 @@ public abstract class MotorIoSparkMax implements MotorIo {
     /**
      * Create a new subsystem for a single SparkMax-controlled motor in voltage mode
      * 
-     * @param motorId  Motor CAN ID
-     * @param inverted True if the motor direction should be inverted
+     * @param motorId   Motor CAN ID
+     * @param inverted  True if the motor direction should be inverted
+     * @param idleMode  What the motor should do when no commands are being sent to
+     *                  it.
+     * @param pidValues The values to configure the motors built in PID Controller.
+     *                  <p>
+     *                  (If {@code null}, the the {@link #DEFAULT_PID_VALUES} will
+     *                  be used.)
+     *                  </p>
      */
     public MotorIoSparkMax(int motorId, boolean inverted, IdleMode idleMode, Rotation2d absoluteEncoderOffset,
-            PID pidValues) {
+            PidValues pidValues) {
 
         // Create & Configure Motor.
         motor = new CANSparkMax(motorId, MotorType.kBrushless);
@@ -51,6 +68,7 @@ public abstract class MotorIoSparkMax implements MotorIo {
         this.absoluteEncoderOffset = absoluteEncoderOffset;
 
         // Configure piD Controller.
+        pidValues = pidValues == null ? DEFAULT_PID_VALUES : pidValues;
         motor.getPIDController().setP(pidValues.P);
         motor.getPIDController().setI(pidValues.I);
         motor.getPIDController().setD(pidValues.D);
@@ -90,6 +108,11 @@ public abstract class MotorIoSparkMax implements MotorIo {
     @Override
     public Rotation2d getAbsolutePosition() {
         return Rotation2d.fromRotations(motor.getAbsoluteEncoder().getPosition()).plus(absoluteEncoderOffset);
+    }
+
+    @Override
+    public Rotation2d getRelativePosition() {
+        return Rotation2d.fromRotations(motor.getEncoder().getPosition());
     }
 
     @Override

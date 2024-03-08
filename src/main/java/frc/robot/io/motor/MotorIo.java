@@ -49,6 +49,11 @@ public interface MotorIo {
      */
     public Rotation2d getAbsolutePosition();
 
+    /**
+     * @return The position from the relative encoder.
+     */
+    public Rotation2d getRelativePosition();
+
     public Measure<Temperature> getTemperature();
 
     public Measure<Velocity<Angle>> getVelocity();
