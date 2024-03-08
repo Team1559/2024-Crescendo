@@ -14,7 +14,9 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -235,10 +237,10 @@ public class RobotContainer { // TODO: Merge into the Robot class.
                                     .andThen(aimer.waitUntilAtTargetCommand())),
                     ShootCommands.shootAutonomousCommand(feeder, leds, noteSensor)));
 
-            NamedCommands.registerCommand("JUST SHOOT",
-                    aimer.setAngleCommand(Rotation2d.fromDegrees(36.7))
+            NamedCommands.registerCommand("Delayed Manual Shot",
+                    new ParallelDeadlineGroup(new WaitCommand(12), aimer.setAngleCommand(Rotation2d.fromDegrees(36.7))
                             .andThen(new WaitUntilCommand(() -> aimer.atTarget()))
-                            .andThen(ShootCommands.shootAutonomousCommand(feeder, leds, noteSensor)));
+                            .andThen(ShootCommands.shootAutonomousCommand(feeder, leds, noteSensor))));
         }
 
         // ---------- Set-up Autonomous Choices ----------
@@ -248,15 +250,17 @@ public class RobotContainer { // TODO: Merge into the Robot class.
 
         // #region: ==================== Tele-Op ===============================
         // #region: ---------- Configure Controller 0 for Pilot ----------
+        if (Constants.hasAimerSubsystem() && Constants.hasFlywheelSubsystem()) {
+            pilot.leftTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(swerveBase, flywheel, aimer,
+                    pilot::getLeftY, pilot::getLeftX,
+                    Constants::getSpeakerLocation));
+            pilot.rightTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(swerveBase, flywheel, aimer,
+                    pilot::getLeftY, pilot::getLeftX,
+                    Constants::getAmpLocation));
+            pilot.leftTrigger().onFalse(aimer.setAngleCommand(Rotation2d.fromDegrees(2)));
+            pilot.y().onTrue(swerveBase.resetFieldOrientationCommand());
 
-        pilot.leftTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(swerveBase, flywheel, aimer,
-                pilot::getLeftY, pilot::getLeftX,
-                Constants::getSpeakerLocation));
-        pilot.rightTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(swerveBase, flywheel, aimer,
-                pilot::getLeftY, pilot::getLeftX,
-                Constants::getAmpLocation));
-        pilot.leftTrigger().onFalse(aimer.setAngleCommand(Rotation2d.fromDegrees(2)));
-        pilot.y().onTrue(swerveBase.resetFieldOrientationCommand());
+        }
 
         // #endregion
 

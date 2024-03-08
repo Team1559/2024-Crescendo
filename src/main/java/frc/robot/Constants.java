@@ -164,16 +164,13 @@ public class Constants {
 
     // ==================== "CONSTANTS" (Ctrl + K, Ctrl + 8 to fold regions) ===
     // #region: --------------- Game Robot / Technician ------------------------
-    private static final boolean FORCE_GAME_ROBOT_CONSTANTS = true;
+    private static final boolean FORCE_GAME_ROBOT_CONSTANTS = false;
 
-    @SuppressWarnings("unused")
     private static boolean isGameRobot() {
         String roboRioSerialNumber = System.getenv("serialnum");
         roboRioSerialNumber = roboRioSerialNumber == null ? "" : roboRioSerialNumber.trim();
 
-        return FORCE_GAME_ROBOT_CONSTANTS
-                || roboRioSerialNumber.equalsIgnoreCase("03282B9F" /* Game Robot */)
-                || !roboRioSerialNumber.equalsIgnoreCase("03282BB6" /* Test Robot */);
+        return FORCE_GAME_ROBOT_CONSTANTS || !roboRioSerialNumber.equalsIgnoreCase("03282BB6" /* Test Robot */);
     }
 
     // #endregion
@@ -269,7 +266,7 @@ public class Constants {
         if (isGameRobot()) {
             return true;
         } else {
-            return true;
+            return false;
         }
     }
 
