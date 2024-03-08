@@ -1,12 +1,11 @@
 package frc.robot.subsystems.shooter;
 
-import static frc.robot.constants.AbstractConstants.CONSTANTS;
+import frc.robot.Constants;
+import frc.robot.io.motor.MotorIo;
+import frc.robot.subsystems.AbstractSingleMotorSubsystem;
 
-import frc.robot.subsystems.single_motor.SingleMotorIo;
-import frc.robot.subsystems.single_motor.SingleMotorSubsystem;
-
-public class Intake extends SingleMotorSubsystem {
-    public Intake(SingleMotorIo io) {
-        super("Shooter/Intake", io, CONSTANTS.getIntakeForwardVelocity(), CONSTANTS.getIntakeReverseVelocity());
+public class Intake extends AbstractSingleMotorSubsystem {
+    public Intake(MotorIo io) {
+        super(io, Constants.getIntakeVelocityForward(), Constants.getIntakeVelocityReverse());
     }
 }
