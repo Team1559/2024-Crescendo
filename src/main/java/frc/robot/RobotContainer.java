@@ -11,7 +11,6 @@ import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -177,15 +176,8 @@ public class RobotContainer { // TODO: Merge into the Robot class.
         if (Constants.hasFlywheelSubsystem()) {
             flywheel.setDefaultCommand(ShootCommands.defaultFlywheelCommand(flywheel));
         }
-        leds.setDefaultCommand(LedCommands.defaultLedCommand(leds));
+        leds.setDefaultCommand(LedCommands.defaultLedCommand(leds, noteSensor));
 
-        // #endregion
-
-        // #region: ---------- Configure Command Triggers ----------
-        if (Constants.hasNoteSensorSubsystem()) {
-            new Trigger((noteSensor::isObjectDetectedOnSwitch)).whileTrue(leds.setColorCommand(Color.kGreen));
-        }
-        // TODO: Add LED Trigger for Ready to Shoot.
         // #endregion
 
         // #region: ---------- Motor Overheat Triggers ----------

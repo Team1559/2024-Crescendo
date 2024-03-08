@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.led.Leds;
+import frc.robot.subsystems.shooter.NoteSensor;
 
 public class LedCommands {
 
@@ -16,9 +17,14 @@ public class LedCommands {
 
     // ========================= Default Commands =========================
 
-    public static Command defaultLedCommand(Leds leds) {
+    public static Command defaultLedCommand(Leds leds, NoteSensor noteSensor) {
         return Commands.run(() -> {
-            leds.setAllianceColor();
+            if (noteSensor.isObjectDetectedOnSwitch()) {
+                leds.setColor(Color.kGreen);
+            }
+            else {
+                leds.setAllianceColor();
+            }
         }, leds);
     }
 

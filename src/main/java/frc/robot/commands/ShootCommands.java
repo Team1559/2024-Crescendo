@@ -95,22 +95,24 @@ public class ShootCommands {
     }
 
     public static Command shootAutonomousCommand(Feeder feeder, Leds leds, NoteSensor noteSensor) {
-        return new SequentialCommandGroup(
-                feeder.startCommand(),
-                LedCommands.blinkCommand(leds, Color.kOrange),
+
+        ParallelRaceGroup group = new ParallelRaceGroup(
+            new StartEndCommand(() -> feeder.setVelocity(MotorIoNeo550Brushless.MAX_VELOCITY), feeder::stop, feeder),
                 noteSensor.waitForNoObjectOnSwitchCommand(),
-                new WaitCommand(.25),
-                feeder.stopCommand());
+                new WaitCommand(5));
+
+        return group;
     }
 
     public static Command shootTeleopCommand(Feeder feeder, Flywheel flywheel, Intake intake, NoteSensor noteSensor,
             Leds leds) {
 
-        ParallelRaceGroup group = new ParallelRaceGroup(new StartEndCommand(intake::start, intake::stop, intake),
-                new StartEndCommand(() -> feeder.setVelocity(MotorIoNeo550Brushless.MAX_VELOCITY), feeder::stop,
-                        feeder),
-                leds.setColorCommand(Color.kPurple).repeatedly(),
-                noteSensor.waitForNoObjectOnSwitchCommand(), new WaitCommand(5));
+        ParallelRaceGroup group = new ParallelRaceGroup(
+            new StartEndCommand(intake::start, intake::stop, intake),
+            new StartEndCommand(() -> feeder.setVelocity(MotorIoNeo550Brushless.MAX_VELOCITY), feeder::stop, feeder),
+            leds.setColorCommand(Color.kPurple).repeatedly(),
+            noteSensor.waitForNoObjectOnSwitchCommand(), 
+            new WaitCommand(5));
 
         // TODO: Spin up flywheelsm if not already spinning.
         return group;
