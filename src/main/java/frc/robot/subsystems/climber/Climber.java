@@ -123,8 +123,4 @@ public class Climber extends DualMotorSubsystem {
     public Command setHeightCommand(Measure<Distance> height) {
         return new InstantCommand(() -> setHeight(height), this);
     }
-
-    public Command stopCommand() {
-        return new InstantCommand(this::stop, this);
-    }
 }
