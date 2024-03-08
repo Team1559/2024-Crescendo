@@ -101,6 +101,29 @@ public class SingleMotorSubsystem extends SubsystemBase implements MotorSubsyste
         config();
     }
 
+    /**
+     * Constricts a Single Motor Subsystem with no default velocities or voltages.
+     * <p>
+     * This means that the {@link #forward()} and {@link #reverse()} methods will do
+     * nothing.
+     * </p>
+     * 
+     * @param motorIo The Motor that belongs to this
+     *                {@link Subsystem}.
+     *                <p>
+     *                (<i>Note:</i> It should not be in any other
+     *                {@link Subsystem}.)
+     *                </p>
+     */
+    protected SingleMotorSubsystem(MotorIo motorIo) {
+        this.motorIo = motorIo;
+        this.defaultForwardVelocity = null;
+        this.defaultReverseVelocity = null;
+        this.defaultForwardVoltage = null;
+        this.defaultReverseVoltage = null;
+        config();
+    }
+
     private void config() {
 
         // Set Name.
@@ -111,6 +134,7 @@ public class SingleMotorSubsystem extends SubsystemBase implements MotorSubsyste
 
         // Add to Collection.
         instantiatedSubsystems.add(this);
+        MotorSubsystem.instantiatedSubsystems.add(this);
     }
 
     @Override

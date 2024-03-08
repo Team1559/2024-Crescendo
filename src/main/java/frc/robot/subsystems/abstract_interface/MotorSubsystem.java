@@ -1,5 +1,9 @@
 package frc.robot.subsystems.abstract_interface;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
@@ -14,6 +18,8 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
 
 public interface MotorSubsystem extends Subsystem {
+
+    public static List<MotorSubsystem> instantiatedSubsystems = Collections.synchronizedList(new LinkedList<>());
 
     // ========================= Configuration =================================
 
@@ -192,37 +198,37 @@ public interface MotorSubsystem extends Subsystem {
     // -------------------- Setters --------------------
 
     /**
-     * Runs the motor to a given position.
+     * Runs the motor(s) to a given position.
      * 
-     * @param position The position to run the motor to.
+     * @param position The position to run the motor(s) to.
      *                 <p>
-     *                 <i>Note:</i> A positive value runs the motor in the
-     *                 "forwards" direction, and a negative value runs the motor in
-     *                 the "reverse" direction.
+     *                 <i>Note:</i> A positive value runs the motor(s) in the
+     *                 "forwards" direction, and a negative value runs the motor(s)
+     *                 in the "reverse" direction.
      *                 </p>
      */
     public void setPosition(Rotation2d position);
 
     /**
-     * Runs the motor at the given velocity.
+     * Runs the motor(s) at the given velocity.
      * 
-     * @param velocity The speed at which to run the motor at.
+     * @param velocity The speed at which to run the motor(s) at.
      *                 <p>
-     *                 <i>Note:</i> A positive value runs the motor in the
-     *                 "forwards" direction, and a negative value runs the motor in
-     *                 the "reverse" direction.
+     *                 <i>Note:</i> A positive value runs the motor(s) in the
+     *                 "forwards" direction, and a negative value runs the motor(s)
+     *                 in the "reverse" direction.
      *                 </p>
      */
     public void setVelocity(Measure<Velocity<Angle>> velocity);
 
     /**
-     * Runs the motor at the given voltage.
+     * Runs the motor(s) at the given voltage.
      * 
-     * @param voltage How many volts to send to the motor.
+     * @param voltage How many volts to send to the motor(s).
      *                <p>
-     *                <i>Note:</i> A positive value runs the motor in the "forwards"
-     *                direction, and a negative value runs the motor in the
-     *                "reverse" direction.
+     *                <i>Note:</i> A positive value runs the motor(s) in the
+     *                "forwards" direction, and a negative value runs the motor(s)
+     *                in the "reverse" direction.
      *                </p>
      */
     public void setVoltage(Measure<Voltage> voltage);

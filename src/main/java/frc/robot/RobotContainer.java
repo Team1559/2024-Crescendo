@@ -30,7 +30,7 @@ import frc.robot.io.swerve_module.SwerveModuleIoSim;
 import frc.robot.io.swerve_module.SwerveModuleIoTalonFx;
 import frc.robot.io.vision.VisionIoLimelight;
 import frc.robot.io.vision.VisionIoSimAndReplay;
-import frc.robot.subsystems.abstract_interface.SingleMotorSubsystem;
+import frc.robot.subsystems.abstract_interface.MotorSubsystem;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.Traverser;
 import frc.robot.subsystems.drive.SwerveBase;
@@ -193,17 +193,14 @@ public class RobotContainer { // TODO: Merge into the Robot class.
         new Trigger(swerveBase::isTemperatureTooHigh)
                 .whileTrue(swerveBase.stopCommand()
                         .alongWith(leds.setDynamicPatternCommand(Constants.getMotorOverheatEmergencyPattern(), false)));
+
         if (Constants.hasFlywheelSubsystem()) {
             new Trigger(flywheel::isTemperatureTooHigh).whileTrue(flywheel.stopCommand()
                     .alongWith(leds.setDynamicPatternCommand(Constants.getMotorOverheatEmergencyPattern(), false)));
         }
-        if (Constants.hasClimberSubsystem()) {
-            new Trigger(climber::isTemperatureTooHigh).whileTrue(climber.stopCommand()
-                    .alongWith(leds.setDynamicPatternCommand(Constants.getMotorOverheatEmergencyPattern(), false)));
-        }
 
-        for (SingleMotorSubsystem singleMotorSubsystem : SingleMotorSubsystem.instantiatedSubsystems) {
-            new Trigger(singleMotorSubsystem::isTemperatureTooHigh).whileTrue(singleMotorSubsystem.stopCommand()
+        for (MotorSubsystem motorSubsystem : MotorSubsystem.instantiatedSubsystems) {
+            new Trigger(motorSubsystem::isTemperatureTooHigh).whileTrue(motorSubsystem.stopCommand()
                     .alongWith(leds.setDynamicPatternCommand(Constants.getMotorOverheatEmergencyPattern(), false)));
         }
 
