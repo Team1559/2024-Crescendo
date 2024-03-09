@@ -1,4 +1,7 @@
-package frc.robot.util;
+// https://github.com/LimelightVision/limelightlib-wpijava
+//LimelightHelpers v1.2.1 (March 1, 2023)
+
+package frc.robot.subsystems.vision;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -24,11 +27,6 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-/**
- * Source: <a href=
- * "https://github.com/LimelightVision/limelightlib-wpijava">LimelightHelpers
- * v1.2.1 (March 1, 2023)</a>.
- */
 public class LimelightHelpers {
 
     public static class LimelightTarget_Retro {

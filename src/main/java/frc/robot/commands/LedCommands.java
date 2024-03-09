@@ -10,19 +10,9 @@ import frc.robot.subsystems.led.Leds;
 
 public class LedCommands {
 
-    /** Makes Class non-instantiable */
+    /** Private to prevent instantiation. */
     private LedCommands() {
     }
-
-    // ========================= Default Commands =========================
-
-    public static Command defaultLedCommand(Leds leds) {
-        return Commands.run(() -> {
-            leds.setAllianceColor();
-        }, leds);
-    }
-
-    // ========================= Other Commands =========================
 
     /**
      * Blink the LEDs to specified Color and then return to Alliance color
@@ -52,4 +42,9 @@ public class LedCommands {
         return blinkCommand;
     }
 
+    public static Command defaultLedCommand(Leds leds) {
+        return Commands.run(() -> {
+            leds.setAllianceColor();
+        }, leds);
+    }
 }

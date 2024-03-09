@@ -12,12 +12,11 @@ public class NoteSensor extends SubsystemBase {
 
     @AutoLog
     static class NoteSensorInputs {
-        public boolean isObjectDetected;
+        public boolean isObjectDetectedSwitch;
     }
 
-    private final DigitalInput limitSwitch;
-
     private NoteSensorInputsAutoLogged inputs = new NoteSensorInputsAutoLogged();
+    private final DigitalInput limitSwitch;
 
     public NoteSensor(int channel) {
         limitSwitch = new DigitalInput(channel);
@@ -25,8 +24,12 @@ public class NoteSensor extends SubsystemBase {
 
     @Override
     public void periodic() {
-        inputs.isObjectDetected = isObjectDetectedOnSwitch();
-        Logger.processInputs("Shooter/NoteSensor", inputs);
+        updateInputs();
+        Logger.processInputs("Shooter/Color Sensor", inputs);
+    }
+
+    private void updateInputs() {
+        inputs.isObjectDetectedSwitch = !limitSwitch.get();
     }
 
     /**
@@ -34,16 +37,16 @@ public class NoteSensor extends SubsystemBase {
      * 
      * @return limit switch state;
      */
-    public boolean isObjectDetectedOnSwitch() {
-        return !limitSwitch.get();
+    public boolean isObjectDetectedSwitch() {
+        return inputs.isObjectDetectedSwitch;
     }
 
     // ========================= Commands =========================
-    public Command waitForObjectOnSwitchCommand() {
-        return new WaitUntilCommand(this::isObjectDetectedOnSwitch);
+    public Command waitForObjectCommandSwitch() {
+        return new WaitUntilCommand(this::isObjectDetectedSwitch);
     }
 
-    public Command waitForNoObjectOnSwitchCommand() {
-        return new WaitUntilCommand(() -> !isObjectDetectedOnSwitch());
+    public Command waitForNoObjectCommandSwitch() {
+        return new WaitUntilCommand(() -> !isObjectDetectedSwitch());
     }
 }
