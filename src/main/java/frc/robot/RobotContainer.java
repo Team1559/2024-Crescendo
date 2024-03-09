@@ -246,6 +246,12 @@ public class RobotContainer {
                 aimer.setTargetAngleCommand(Rotation2d.fromDegrees(36.7))
                         .andThen(new WaitUntilCommand(() -> aimer.atTarget())).andThen(initialShootCommand));
 
+        NamedCommands.registerCommand("Delayed Manual Shot",
+                new ParallelDeadlineGroup(new WaitCommand(12),
+                        aimer.setTargetAngleCommand(Rotation2d.fromDegrees(36.7))
+                                .andThen(new WaitUntilCommand(() -> aimer.atTarget()))
+                                .andThen(ShooterCommands.shootAutonomousCommand(feeder, noteSensor))));
+
         // ---------- Set-up Autonomous Choices ----------
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
