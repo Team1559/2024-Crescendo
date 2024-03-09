@@ -244,7 +244,7 @@ public class RobotContainer {
                         new SequentialCommandGroup(aimAtSpeakerCommand, autoShootCommand)));
         NamedCommands.registerCommand("Initial Shoot",
                 aimer.setTargetAngleCommand(Rotation2d.fromDegrees(36.7))
-                        .andThen(new WaitUntilCommand(() -> aimer.atTarget())).andThen(autoShootCommand));
+                        .andThen(new WaitUntilCommand(() -> aimer.atTarget())).andThen(initialShootCommand));
 
         // ---------- Set-up Autonomous Choices ----------
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
