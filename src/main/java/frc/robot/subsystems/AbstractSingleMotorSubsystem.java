@@ -46,8 +46,12 @@ public abstract class AbstractSingleMotorSubsystem extends SubsystemBase {
         this.appliedVelocity = RevolutionsPerSecond.zero();
 
         String[] packagePath = getClass().getPackageName().split(".");
-        String packageName = packagePath[packagePath.length - 1];
-        String name = packageName + "/" + getClass().getName();
+        String name = "";
+        if (packagePath.length > 0) {
+            String packageName = packagePath[packagePath.length - 1];
+            name += packageName + "/";
+        }
+        name += getClass().getName();
         super.setName(name);
     }
 
