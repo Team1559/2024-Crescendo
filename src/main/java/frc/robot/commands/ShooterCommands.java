@@ -95,22 +95,25 @@ public class ShooterCommands {
         return reverseShooterCommand;
     }
 
-    public static Command shootAutonomousCommand(Feeder feeder, Leds leds, NoteSensor noteSensor) {
-        return new SequentialCommandGroup(
-                feeder.startCommand(),
-                LedCommands.blinkCommand(leds, Color.kOrange),
+    public static Command shootAutonomousCommand(Feeder feeder, NoteSensor noteSensor) {
+
+        ParallelRaceGroup group = new ParallelRaceGroup(
+                new StartEndCommand(() -> feeder.setVelocity(11000), feeder::stop,
+                        feeder),
                 noteSensor.waitForNoObjectCommandSwitch(),
-                new WaitCommand(.25),
-                feeder.stopCommand());
+                new WaitCommand(5));
+
+        return group;
     }
 
-    public static Command shootTeleopCommand(Feeder feeder, Flywheel flywheel, Intake intake, NoteSensor noteSensor,
-            Leds leds) {
+    public static Command shootTeleopCommand(Feeder feeder, Flywheel flywheel, Intake intake, NoteSensor noteSensor) {
 
-        ParallelRaceGroup group = new ParallelRaceGroup(new StartEndCommand(intake::start, intake::stop, intake),
-                new StartEndCommand(() -> feeder.setVelocity(11000), feeder::stop, feeder),
-                leds.setColorCommand(Color.kPurple).repeatedly(),
-                noteSensor.waitForNoObjectCommandSwitch(), new WaitCommand(5));
+        ParallelRaceGroup group = new ParallelRaceGroup(
+                new StartEndCommand(intake::start, intake::stop, intake),
+                new StartEndCommand(() -> feeder.setVelocity(11000), feeder::stop,
+                        feeder),
+                noteSensor.waitForNoObjectCommandSwitch(),
+                new WaitCommand(5));
 
         // TODO: Spin up flywheelsm if not already spinning.
         return group;

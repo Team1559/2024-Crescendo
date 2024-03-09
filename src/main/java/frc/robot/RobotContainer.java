@@ -232,9 +232,9 @@ public class RobotContainer {
         Command autoShootCommand;
         Command initialShootCommand;
         if (CONSTANTS.hasFeederSubsystem() && CONSTANTS.hasNoteSensorSubsystem()) {
-            autoShootCommand = ShooterCommands.shootAutonomousCommand(feeder, leds, noteSensor);
-            initialShootCommand = ShooterCommands.shootAutonomousCommand(feeder, leds, noteSensor);
-            ShooterCommands.shootAutonomousCommand(feeder, leds, noteSensor);
+            autoShootCommand = ShooterCommands.shootAutonomousCommand(feeder, noteSensor);
+            initialShootCommand = ShooterCommands.shootAutonomousCommand(feeder, noteSensor);
+            ShooterCommands.shootAutonomousCommand(feeder, noteSensor);
         } else {
             autoShootCommand = LedCommands.blinkCommand(leds, Color.kOrange);
             initialShootCommand = LedCommands.blinkCommand(leds, Color.kOrange);
@@ -280,7 +280,7 @@ public class RobotContainer {
 
             if (CONSTANTS.hasNoteSensorSubsystem()) {
                 coPilot.rightTrigger()
-                        .onTrue(ShooterCommands.shootTeleopCommand(feeder, flywheel, intake, noteSensor, leds));
+                        .onTrue(ShooterCommands.shootTeleopCommand(feeder, flywheel, intake, noteSensor));
             }
             coPilot.a().whileTrue(ShooterCommands.reverseShooterCommand(flywheel, feeder, leds));
         }
