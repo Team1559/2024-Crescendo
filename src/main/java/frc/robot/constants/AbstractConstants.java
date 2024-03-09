@@ -222,11 +222,11 @@ public abstract class AbstractConstants {
 
     // #region: ----- Climber --------
     public int getClimberMotorIdLeft() {
-        return 25;
+        return 27;
     }
 
     public int getClimberMotorIdRight() {
-        return 24;
+        return 26;
     }
 
     public abstract PID getClimberPid();
@@ -244,11 +244,11 @@ public abstract class AbstractConstants {
     }
 
     public int getAimerMotorIdLeft() {
-        return uniqueCanBusId(23, getCanivoreId());
+        return uniqueCanBusId(23);
     }
 
     public int getAimerMotorIdRight() {
-        return uniqueCanBusId(22, getCanivoreId());
+        return uniqueCanBusId(22);
     }
 
     public abstract PID getAimerPid();
@@ -270,7 +270,7 @@ public abstract class AbstractConstants {
 
     // #region: ----- Feeder -----
     public int getFeederMotorId() {
-        return uniqueCanBusId(21, getCanivoreId());
+        return uniqueCanBusId(21);
     }
 
     public abstract boolean isFeederMortorInverted();
@@ -283,11 +283,11 @@ public abstract class AbstractConstants {
 
     // #region: ----- Flywheel -----
     public int getFlywheelMotorIdLeft() {
-        return uniqueCanBusId(24, getCanivoreId());
+        return uniqueCanBusId(25);
     }
 
     public int getFlywheelMotorIdRight() {
-        return uniqueCanBusId(25, getCanivoreId());
+        return uniqueCanBusId(24);
     }
 
     public abstract double getFlywheelForwardVoltage();
