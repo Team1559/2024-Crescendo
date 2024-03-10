@@ -8,6 +8,12 @@
         {
           "type": "named",
           "data": {
+            "name": "Spin Up Flywheel"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Delayed Manual Shot"
           }
         },

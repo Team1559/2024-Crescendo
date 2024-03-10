@@ -95,11 +95,11 @@ public class ShooterCommands {
         return reverseShooterCommand;
     }
 
-    public static Command shootAutonomousCommand(Feeder feeder, NoteSensor noteSensor) {
+    public static Command shootAutonomousCommand(Feeder feeder, NoteSensor noteSensor, Intake intake) {
 
         ParallelRaceGroup group = new ParallelRaceGroup(
-                new StartEndCommand(() -> feeder.setVelocity(11000), feeder::stop,
-                        feeder),
+                new StartEndCommand(feeder::start, feeder::stop, feeder),
+                new StartEndCommand(intake::start, intake::stop, intake),
                 noteSensor.waitForNoObjectCommandSwitch(),
                 new WaitCommand(5));
 

@@ -240,7 +240,7 @@ public abstract class AbstractConstants {
     public abstract Rotation2d getAimerEncoderOffset();
 
     public int getAimerEncoderPort() {
-        return uniqueRoboRioPort(5, RoboRioPortArrays.DIO);
+        return uniqueRoboRioPort(0, RoboRioPortArrays.DIO);
     }
 
     public int getAimerMotorIdLeft() {
@@ -264,7 +264,7 @@ public abstract class AbstractConstants {
 
     // #region: ----- Limit Switch -----
     public static int getLimitSwitchChannel() {
-        return 2;
+        return 5;
     }
     // #endregion
 
@@ -283,11 +283,11 @@ public abstract class AbstractConstants {
 
     // #region: ----- Flywheel -----
     public int getFlywheelMotorIdLeft() {
-        return uniqueCanBusId(25);
+        return uniqueCanBusId(24);
     }
 
     public int getFlywheelMotorIdRight() {
-        return uniqueCanBusId(24);
+        return uniqueCanBusId(25);
     }
 
     public abstract double getFlywheelForwardVoltage();

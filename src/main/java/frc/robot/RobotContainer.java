@@ -10,6 +10,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -126,7 +127,7 @@ public class RobotContainer {
                         new SwerveModuleIoSim());
                 feeder = CONSTANTS.hasFeederSubsystem()
                         ? new Feeder(new SingleMotorIoNeo550Brushless(CONSTANTS.getFeederMotorId(),
-                                CONSTANTS.isFeederMortorInverted(), 0, 0, 0, 1)) // TODO constants
+                                CONSTANTS.isFeederMortorInverted(), 0, 0, 0, 2)) // TODO constants
                         : null;
                 intake = CONSTANTS.hasIntakeSubsystem()
                         ? new Intake(new SingleMotorIoNeo550Brushless(CONSTANTS.getIntakeMotorId(),
@@ -223,7 +224,10 @@ public class RobotContainer {
         // #region: ==================== Autonomous ============================
         // ---------- Create Named Commands for use by Path Planner ----------
         NamedCommands.registerCommand("Spin 180", DriveCommands.spinCommand(driveBase, Rotation2d.fromDegrees(180), 1));
-        NamedCommands.registerCommand("StartIntake", new ShooterCommands.IntakeCommand(intake, feeder));
+        NamedCommands.registerCommand("StartIntake", new InstantCommand(() -> {
+            intake.start();
+            feeder.start();
+        }));
         if (CONSTANTS.hasFlywheelSubsystem()) {
             NamedCommands.registerCommand("Spin Up Flywheel", ShooterCommands.spinUpFlywheelCommand(flywheel));
         }
@@ -232,16 +236,15 @@ public class RobotContainer {
         Command autoShootCommand;
         Command initialShootCommand;
         if (CONSTANTS.hasFeederSubsystem() && CONSTANTS.hasNoteSensorSubsystem()) {
-            autoShootCommand = ShooterCommands.shootAutonomousCommand(feeder, noteSensor);
-            initialShootCommand = ShooterCommands.shootAutonomousCommand(feeder, noteSensor);
-            ShooterCommands.shootAutonomousCommand(feeder, noteSensor);
+            autoShootCommand = ShooterCommands.shootAutonomousCommand(feeder, noteSensor, intake);
+            initialShootCommand = ShooterCommands.shootAutonomousCommand(feeder, noteSensor, intake);
+            ShooterCommands.shootAutonomousCommand(feeder, noteSensor, intake);
         } else {
             autoShootCommand = LedCommands.blinkCommand(leds, Color.kOrange);
             initialShootCommand = LedCommands.blinkCommand(leds, Color.kOrange);
         }
         NamedCommands.registerCommand("Auto Shoot",
-                new ParallelDeadlineGroup(new WaitCommand(13),
-                        new SequentialCommandGroup(aimAtSpeakerCommand, autoShootCommand)));
+                new SequentialCommandGroup(aimAtSpeakerCommand, autoShootCommand));
         NamedCommands.registerCommand("Initial Shoot",
                 aimer.setTargetAngleCommand(Rotation2d.fromDegrees(36.7))
                         .andThen(new WaitUntilCommand(() -> aimer.atTarget())).andThen(initialShootCommand));
@@ -250,7 +253,7 @@ public class RobotContainer {
                 new ParallelDeadlineGroup(new WaitCommand(12),
                         aimer.setTargetAngleCommand(Rotation2d.fromDegrees(36.7))
                                 .andThen(new WaitUntilCommand(() -> aimer.atTarget()))
-                                .andThen(ShooterCommands.shootAutonomousCommand(feeder, noteSensor))));
+                                .andThen(ShooterCommands.shootAutonomousCommand(feeder, noteSensor, intake))));
 
         // ---------- Set-up Autonomous Choices ----------
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -275,8 +278,7 @@ public class RobotContainer {
         if (CONSTANTS.hasIntakeSubsystem() && CONSTANTS.hasFeederSubsystem()) {
 
             if (CONSTANTS.hasNoteSensorSubsystem()) {
-                // .and(not(noteSensor::isObjectDetectedSwitch))
-                coPilot.leftTrigger()
+                coPilot.leftTrigger().and(noteSensor::isObjectNotDetectedSwitch)
                         .whileTrue(new ParallelCommandGroup(new IntakeCommand(intake, feeder), flywheel.stopCommand()));
             }
             coPilot.x().whileTrue(ShooterCommands.reverseShooterAndIntakeCommand(intake, feeder, flywheel));
