@@ -13,7 +13,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
@@ -249,8 +248,8 @@ public class RobotContainer { // TODO: Merge into the Robot class.
         if (Constants.hasIntakeSubsystem() && Constants.hasFeederSubsystem() && Constants.hasFlywheelSubsystem()) {
 
             if (Constants.hasNoteSensorSubsystem()) {
-                coPilot.leftTrigger().and(not(noteSensor::isObjectDetectedOnSwitch)).whileTrue(new ParallelCommandGroup(
-                        ShootCommands.intakeStartStopCommand(intake, feeder), flywheel.stopCommand()));
+                coPilot.leftTrigger().and(not(noteSensor::isObjectDetectedOnSwitch))
+                        .whileTrue(ShootCommands.runIntakeCommand(flywheel, feeder, intake));
 
             }
             coPilot.x().whileTrue(ShootCommands.reverseShooterAndIntakeCommand(intake, feeder, flywheel));

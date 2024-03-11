@@ -40,10 +40,6 @@ public class NoteSensor extends SubsystemBase {
     }
 
     // ========================= Commands =========================
-    public Command waitForObjectOnSwitchCommand() {
-        return CommandUtils.addName(getName(), new WaitUntilCommand(this::isObjectDetectedOnSwitch));
-    }
-
     public Command waitForNoObjectOnSwitchCommand() {
         return CommandUtils.addName(getName(), new WaitUntilCommand(() -> !isObjectDetectedOnSwitch()));
     }

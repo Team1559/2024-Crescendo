@@ -102,6 +102,14 @@ public class ShootCommands {
         return CommandUtils.addName(reverseShooterCommand);
     }
 
+    public static Command runIntakeCommand(Flywheel flywheel, Feeder feeder, Intake intake) {
+
+        Command command = new ParallelCommandGroup(ShootCommands.intakeStartStopCommand(intake, feeder),
+                flywheel.stopCommand());
+
+        return CommandUtils.addName(command);
+    }
+
     public static Command shootAutonomousCommand(Feeder feeder, Leds leds, NoteSensor noteSensor) {
         Command command = new SequentialCommandGroup(
                 feeder.forwardCommand(),

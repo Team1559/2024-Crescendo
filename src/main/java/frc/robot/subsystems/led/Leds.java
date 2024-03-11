@@ -198,16 +198,6 @@ public class Leds extends SubsystemBase {
     // ========================= Function Commands =============================
 
     /**
-     * Dims/Brightens the lights
-     * 
-     * @param isDimming are lights being dimmed or brightened
-     * @return
-     */
-    public Command changeBrightnessCommand(boolean isDimming) {
-        return CommandUtils.addName(getName(), new InstantCommand(() -> changeBrightness(isDimming), this));
-    }
-
-    /**
      * Set the lights to a scrolling pattern
      * 
      * @param pattern                  Pattern the LEDs are being set to
@@ -228,24 +218,5 @@ public class Leds extends SubsystemBase {
      */
     public Command setColorCommand(Color color) {
         return CommandUtils.addName(getName(), new InstantCommand(() -> setColor(color), this));
-    }
-
-    public Command setAllianceColorCommand() {
-        return CommandUtils.addName(getName(), new InstantCommand(this::setAllianceColor, this));
-    }
-
-    /**
-     * Sets a static pattern to the LEDs
-     * 
-     * @param subsystem LEDs being set
-     * @param pattern   Pattern being set to the LEDs
-     * @return
-     */
-    public Command setStaticPatternCommand(Color[] pattern) {
-        return CommandUtils.addName(getName(), new InstantCommand(() -> setStaticPattern(pattern), this));
-    }
-
-    public Command turnOffCommand() {
-        return CommandUtils.addName(getName(), new InstantCommand(this::turnOff, this));
     }
 }

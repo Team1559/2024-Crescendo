@@ -120,8 +120,4 @@ public class Climber extends DualMotorSubsystem {
     public Command modifyHeightRightCommand(Measure<Distance> change) {
         return CommandUtils.addName(getName(), new InstantCommand(() -> modifyHeightRight(change)));
     }
-
-    public Command setHeightCommand(Measure<Distance> height) {
-        return CommandUtils.addName(getName(), new InstantCommand(() -> setHeight(height), this));
-    }
 }
