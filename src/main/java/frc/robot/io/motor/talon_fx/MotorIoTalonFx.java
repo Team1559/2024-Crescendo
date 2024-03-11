@@ -1,4 +1,4 @@
-package frc.robot.io.motor;
+package frc.robot.io.motor.talon_fx;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
@@ -32,6 +32,7 @@ import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import frc.robot.Constants;
 import frc.robot.Constants.PidValues;
+import frc.robot.io.motor.MotorIo;
 import frc.robot.util.MathUtils;
 
 public abstract class MotorIoTalonFx implements MotorIo {

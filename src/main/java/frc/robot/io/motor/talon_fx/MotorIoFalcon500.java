@@ -1,4 +1,4 @@
-package frc.robot.io.motor;
+package frc.robot.io.motor.talon_fx;
 
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 import static edu.wpi.first.units.Units.Volts;

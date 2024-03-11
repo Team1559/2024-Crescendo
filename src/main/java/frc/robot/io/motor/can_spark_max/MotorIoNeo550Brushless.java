@@ -1,4 +1,4 @@
-package frc.robot.io.motor;
+package frc.robot.io.motor.can_spark_max;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
@@ -16,7 +16,7 @@ import edu.wpi.first.units.Voltage;
 import frc.robot.Constants;
 import frc.robot.Constants.PidValues;
 
-public class MotorIoNeo550Brushless extends MotorIoSparkMax {
+public class MotorIoNeo550Brushless extends MotorIoCanSparkMax {
 
     public MotorIoNeo550Brushless(int motorId, boolean inverted, IdleMode idleMode, Rotation2d absoluteEncoderOffset,
             PidValues pidValues) {

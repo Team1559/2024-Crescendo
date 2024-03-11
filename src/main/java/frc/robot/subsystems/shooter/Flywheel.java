@@ -8,7 +8,7 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import frc.robot.Constants;
-import frc.robot.io.motor.MotorIoFalcon500;
+import frc.robot.io.motor.talon_fx.MotorIoFalcon500;
 import frc.robot.subsystems.abstract_interface.DualMotorSubsystem;
 
 public class Flywheel extends DualMotorSubsystem {

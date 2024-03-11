@@ -1,4 +1,4 @@
-package frc.robot.io.motor;
+package frc.robot.io.motor.can_spark_max;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
@@ -20,9 +20,10 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import frc.robot.Constants.PidValues;
+import frc.robot.io.motor.MotorIo;
 import frc.robot.util.MathUtils;
 
-public abstract class MotorIoSparkMax implements MotorIo {
+public abstract class MotorIoCanSparkMax implements MotorIo {
 
     protected final boolean isInverted;
     protected final CANSparkMax motor;
@@ -49,7 +50,7 @@ public abstract class MotorIoSparkMax implements MotorIo {
      *                              will be used.)
      *                              </p>
      */
-    public MotorIoSparkMax(int motorId, boolean inverted, IdleMode idleMode, Rotation2d absoluteEncoderOffset,
+    public MotorIoCanSparkMax(int motorId, boolean inverted, IdleMode idleMode, Rotation2d absoluteEncoderOffset,
             PidValues pidValues) {
 
         // Create & Configure Motor.
