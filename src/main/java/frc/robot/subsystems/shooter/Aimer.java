@@ -1,236 +1,171 @@
 package frc.robot.subsystems.shooter;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Celsius;
-import static edu.wpi.first.units.Units.RevolutionsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.BetterLogger;
+import org.littletonrobotics.junction.Logger;
 
-import com.revrobotics.CANSparkBase.FaultID;
 import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Current;
+import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Temperature;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
+import frc.robot.io.motor.MotorIoNeo550Brushless;
+import frc.robot.subsystems.abstract_interface.DualMotorSubsystem;
+import frc.robot.util.MathUtils;
 
-public class Aimer extends SubsystemBase {
+public class Aimer extends DualMotorSubsystem {
 
     @AutoLog
     static class AimerInputs {
 
         // ---------- Encoder ----------
-        public double currentAngleInDegrees;
-        public double targetAngleClampedInDegrees;
-        public double targetAngleInDegrees;
-        public double currentVsTargetAngleClampedInDegrees;
+        public Rotation2d angleCurrent;
+        public Rotation2d angleTarget;
+        public Rotation2d angleTargetClamped;
+        public Rotation2d angelCurrentVsTargetClamped;
 
-        // ---------- Motor ----------
+        // ---------- Target ----------
         public boolean atTarget = false;
-
-        public Measure<Current> lCurrentActual = Amps.zero();
-        public Measure<Current> rCurrentActual = Amps.zero();
-
-        public String[] lFaults = new String[0];
-        public String[] rFaults = new String[0];
-
-        public Rotation2d lPositionAbsolute = new Rotation2d();
-        public Rotation2d rPositionAbsolute = new Rotation2d();
-
-        /** From -1 to 1. */
-        public float lPowerPercentage = 0;
-        /** From -1 to 1. */
-        public float rPowerPercentage = 0;
-
-        public Measure<Temperature> lMotorTemp = Celsius.zero();
-        public Measure<Temperature> rMotorTemp = Celsius.zero();
-
-        public Measure<Velocity<Angle>> lVelocityActual = RotationsPerSecond.zero();
-        public Measure<Velocity<Angle>> rVelocityActual = RotationsPerSecond.zero();
-
-        public Measure<Voltage> lVoltsActual = Volts.zero();
-        public Measure<Voltage> rVoltsActual = Volts.zero();
-
-        public Measure<Voltage> lVoltsAvailable = Volts.zero();
-        public Measure<Voltage> rVoltsAvailable = Volts.zero();
-
-        public Measure<Voltage> voltsTarget;
+        public Measure<Distance> distanceToTarget;
     }
 
-    private final DutyCycleEncoder encoder = new DutyCycleEncoder(Constants.getAimerEncoderPort());
-
-    // TODO: Update CANSparkMax variables as MotorIo variables.
-    private final CANSparkMax motorL;
-    private final CANSparkMax motorR;
-
-    private final PIDController controller = Constants.getAimerPid().createController();
-
-    private final boolean isLMotorInverted;
-
-    private Rotation2d targetAngle, targetAngleClamped;
-    private Measure<Voltage> targetVoltage;
+    // TODO: Wire Encoder to Motors.
+    private final DutyCycleEncoder encoder;
+    private final PIDController pidController;
 
     private final AimerInputsAutoLogged inputs = new AimerInputsAutoLogged();
 
-    /**
-     * Create a new subsystem for two motors controlled by CANspark Controller
-     **/
+    public Measure<Distance> distanceToTarget;
+    private Rotation2d calculatedTargetAngle, targetAngle, targetAngleClamped;
+
+    // ========================= Constructors ==================================
+
     public Aimer() {
+        super(
+                new MotorIoNeo550Brushless(Constants.getAimerMotorIdLeft(), false, IdleMode.kBrake,
+                        Rotation2d.fromRotations(0), null),
+                new MotorIoNeo550Brushless(Constants.getAimerMotorIdRight(), true, IdleMode.kBrake,
+                        Rotation2d.fromRotations(0), null));
 
-        motorL = new CANSparkMax(Constants.getAimerMotorIdLeft(), MotorType.kBrushless);
-        motorR = new CANSparkMax(Constants.getAimerMotorIdRight(), MotorType.kBrushless);
+        encoder = new DutyCycleEncoder(Constants.getAimerEncoderPort());
 
-        // Randomly flips back. TODO: Figure out why?
-        motorL.setInverted(false);
-        motorR.setInverted(false);
-        isLMotorInverted = false;
-
-        motorL.setIdleMode(IdleMode.kBrake);
-        motorR.setIdleMode(IdleMode.kBrake);
-
-        motorL.setSmartCurrentLimit((int) Constants.getNeo550BrushlessCurrentLimit().in(Amps));
-        motorR.setSmartCurrentLimit((int) Constants.getNeo550BrushlessCurrentLimit().in(Amps));
-
-        motorL.setSecondaryCurrentLimit(Constants.getNeo550BrushlessCurrentSecondaryLimit().in(Amps));
-        motorR.setSecondaryCurrentLimit(Constants.getNeo550BrushlessCurrentSecondaryLimit().in(Amps));
+        pidController = Constants.getAimerPid().createController();
     }
+
+    // ========================= Periodic ======================================
 
     @Override
     public void periodic() {
 
         // Update Inputs.
         updateInputs();
-        BetterLogger.processInputs("Shooter/Aimer", inputs);
+        Logger.processInputs(getName(), inputs);
 
         // Set Voltages.
-        if (controller.getSetpoint() != 0) {
-            double ff = Constants.getAimerPid().FF * Rotation2d.fromDegrees(inputs.targetAngleInDegrees).getCos();
-            double output = ff + controller.calculate(inputs.currentAngleInDegrees);
-            output = MathUtil.clamp(output, -2, 2);
-            targetVoltage = Volts.of(output);
+        if (targetAngleClamped != null) {
+
+            double ff = Constants.getAimerPid().FF * targetAngleClamped.getCos();
+
+            pidController.setSetpoint(targetAngleClamped.getDegrees());
+            double output = pidController.calculate(inputs.angleCurrent.getDegrees());
+
+            double volts = MathUtil.clamp(ff + output, -2, 2);
+            Measure<Voltage> voltage = Volts.of(volts);
 
             // TODO: What if motors are not moving evenly?
-            motorL.setVoltage(isLMotorInverted ? -output : output);
-            motorR.setVoltage(isLMotorInverted ? output : -output);
+            setVoltage(voltage);
         }
     }
 
     private void updateInputs() {
 
         // ---------- Encoder ----------
-        inputs.currentAngleInDegrees = getEncoderAbsolutePosition().getDegrees();
-        inputs.targetAngleInDegrees = targetAngle.getDegrees();
-        inputs.targetAngleClampedInDegrees = targetAngleClamped.getDegrees();
-        inputs.currentVsTargetAngleClampedInDegrees = inputs.targetAngleClampedInDegrees - inputs.currentAngleInDegrees;
+        inputs.angleCurrent = getEncoderAbsolutePosition();
+        inputs.angleTarget = targetAngle;
+        inputs.angleTargetClamped = targetAngleClamped;
+        inputs.angelCurrentVsTargetClamped = targetAngleClamped.minus(inputs.angleCurrent);
 
         // ---------- Motor ----------
-        inputs.atTarget = atTarget();
-
-        inputs.lCurrentActual = Amps.of(motorL.getOutputCurrent());
-        inputs.rCurrentActual = Amps.of(motorR.getOutputCurrent());
-
-        List<String> lFaults = new LinkedList<>();
-        List<String> rFaults = new LinkedList<>();
-        for (FaultID faultID : FaultID.values()) {
-            if (motorL.getFault(faultID)) {
-                lFaults.add(faultID.name());
-            }
-            if (motorR.getFault(faultID)) {
-                rFaults.add(faultID.name());
-            }
-        }
-        inputs.lFaults = lFaults.toArray(new String[0]);
-        inputs.rFaults = rFaults.toArray(new String[0]);
-
-        inputs.lPositionAbsolute = Rotation2d.fromRotations(motorL.getAbsoluteEncoder().getPosition());
-        inputs.rPositionAbsolute = Rotation2d.fromRotations(motorR.getAbsoluteEncoder().getPosition());
-
-        /** From -1 to 1. */
-        inputs.lPowerPercentage = (float) motorL.getAppliedOutput();
-        /** From -1 to 1. */
-        inputs.rPowerPercentage = (float) motorR.getAppliedOutput();
-
-        inputs.lMotorTemp = Units.Celsius.of(motorL.getMotorTemperature());
-        inputs.rMotorTemp = Units.Celsius.of(motorR.getMotorTemperature());
-
-        inputs.lVelocityActual = RevolutionsPerSecond.of(motorL.getEncoder().getVelocity());
-        inputs.rVelocityActual = RevolutionsPerSecond.of(motorR.getEncoder().getVelocity());
-
-        inputs.lVoltsActual = Volts.of(motorL.getBusVoltage() * motorL.getAppliedOutput());
-        inputs.rVoltsActual = Volts.of(motorR.getBusVoltage() * motorR.getAppliedOutput());
-
-        inputs.lVoltsAvailable = Volts.of(motorL.getBusVoltage());
-        inputs.rVoltsAvailable = Volts.of(motorR.getBusVoltage());
-
-        inputs.voltsTarget = targetVoltage;
+        inputs.atTarget = isAtTarget();
+        inputs.distanceToTarget = distanceToTarget;
     }
 
     // ========================= Functions =====================================
 
+    // -------------------- Actions --------------------
+
     public void aimAtTarget(Translation3d target, Translation2d currentPosition) {
 
-        double distanceMeters = currentPosition.getDistance(target.toTranslation2d());
-        BetterLogger.recordOutput("Shooter/Aimer/DistanceToTarget", distanceMeters);
+        double distanceToTargetInMeters = currentPosition.getDistance(target.toTranslation2d());
+        distanceToTarget = Meters.of(distanceToTargetInMeters);
 
-        Rotation2d angle = Rotation2d
-                .fromDegrees(1.42 * distanceMeters * distanceMeters - 15.8 * distanceMeters + 55.3);
-        BetterLogger.recordOutput("Shooter/Aimer/CalculatedTargetAngleInDegrees", angle.getDegrees());
+        calculatedTargetAngle = Rotation2d.fromDegrees(
+                1.42 * distanceToTargetInMeters * distanceToTargetInMeters - 15.8 * distanceToTargetInMeters + 55.3);
 
-        setAngle(angle);
+        setAnglePrivate(calculatedTargetAngle);
     }
 
-    /**
-     * @return {@code true} if within error margin of target.
-     */
-    public boolean atTarget() {
-        return Math.abs(targetAngleClamped.minus(getEncoderAbsolutePosition()).getDegrees()) <= Math
-                .abs(Constants.getAimerErrorThreshold().getDegrees());
-    }
+    // -------------------- Getters --------------------
 
     public Rotation2d getEncoderAbsolutePosition() {
         // Invert angle as encoder is mounted "backwards".
         return Rotation2d.fromRotations(-encoder.getAbsolutePosition()).plus(Constants.getAimerEncoderOffset());
     }
 
+    /**
+     * @return {@code true} if within error margin of target.
+     */
+    public boolean isAtTarget() {
+        return Math.abs(targetAngleClamped.minus(getEncoderAbsolutePosition()).getDegrees()) <= Math
+                .abs(Constants.getAimerErrorThreshold().getDegrees());
+    }
+
+    // -------------------- Modifiers --------------------
+
     public void modifyAngle(Rotation2d change) {
-        setAngle(getEncoderAbsolutePosition().plus(change));
+        if (targetAngle == null) {
+            setAngle(change);
+        } else {
+            setAngle(getEncoderAbsolutePosition().plus(change));
+        }
     }
 
     public void modifyTargetAngle(Rotation2d change) {
-        setAngle(targetAngle.plus(change));
+        if (targetAngle == null) {
+            setAngle(change);
+        } else {
+            setAngle(targetAngle.plus(change));
+        }
     }
+
+    // -------------------- Setters --------------------
 
     public void setAngle(Rotation2d angle) {
 
-        double clampedAngle = MathUtil.clamp(angle.getDegrees(), Constants.getAimerAngleRange().get_0().getDegrees(),
-                Constants.getAimerAngleRange().get_1().getDegrees());
-        controller.setSetpoint(clampedAngle);
+        distanceToTarget = null;
+        calculatedTargetAngle = null;
 
+        setAnglePrivate(angle);
+    }
+
+    private void setAnglePrivate(Rotation2d angle) {
         targetAngle = angle;
-        targetAngleClamped = Rotation2d.fromDegrees(clampedAngle);
+        targetAngleClamped = MathUtils.clamp(angle, Constants.getAimerAngleRange().get_0(),
+                Constants.getAimerAngleRange().get_1());
     }
 
     // ========================= Commands ======================================
@@ -252,6 +187,6 @@ public class Aimer extends SubsystemBase {
     }
 
     public Command waitUntilAtTargetCommand() {
-        return new WaitUntilCommand(this::atTarget);
+        return new WaitUntilCommand(this::isAtTarget);
     }
 }
