@@ -89,7 +89,7 @@ public class DriveCommands {
 
     // ========================= Other Commands ================================
 
-    public static Command autoAimAndManuallyDriveCommand(SwerveBase swerveBase, Flywheel flywheel, Aimer aimer,
+    public static Command autoAimAndManuallyDriveCommand(SwerveBase swerveBase, Aimer aimer, Flywheel flywheel,
             DoubleSupplier xSupplier, DoubleSupplier ySupplier, Supplier<Translation3d> target) {
 
         Command aimingDrive = new Command() {
@@ -178,7 +178,7 @@ public class DriveCommands {
         return CommandUtils.addName(aimingDrive);
     }
 
-    public static Command autoShootCommand(SwerveBase swerveBase, Feeder feeder, Aimer aimer, NoteSensor noteSensor,
+    public static Command autoShootCommand(SwerveBase swerveBase, Aimer aimer, Feeder feeder, NoteSensor noteSensor,
             Leds leds) {
         Command command = new SequentialCommandGroup(
                 new ParallelCommandGroup(

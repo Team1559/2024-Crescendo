@@ -219,7 +219,7 @@ public class RobotContainer { // TODO: Merge into the Robot class.
         if (Constants.hasFeederSubsystem() && Constants.hasAimerSubsystem() && Constants.hasNoteSensorSubsystem()) {
 
             NamedCommands.registerCommand("Auto Shoot",
-                    DriveCommands.autoShootCommand(swerveBase, feeder, aimer, noteSensor, leds));
+                    DriveCommands.autoShootCommand(swerveBase, aimer, feeder, noteSensor, leds));
 
             NamedCommands.registerCommand("JUST SHOOT",
                     ShootCommands.autoJustShootCommand(feeder, aimer, noteSensor, leds));
@@ -233,10 +233,10 @@ public class RobotContainer { // TODO: Merge into the Robot class.
         // #region: ==================== Tele-Op ===============================
         // #region: ---------- Configure Controller 0 for Pilot ----------
 
-        pilot.leftTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(swerveBase, flywheel, aimer,
+        pilot.leftTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(swerveBase, aimer, flywheel,
                 pilot::getLeftY, pilot::getLeftX,
                 Constants::getSpeakerLocation));
-        pilot.rightTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(swerveBase, flywheel, aimer,
+        pilot.rightTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(swerveBase, aimer, flywheel,
                 pilot::getLeftY, pilot::getLeftX,
                 Constants::getAmpLocation));
         pilot.leftTrigger().onFalse(aimer.setAngleCommand(Rotation2d.fromDegrees(2)));
