@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.util.CommandUtils;
 
 public class NoteSensor extends SubsystemBase {
 
@@ -40,10 +41,10 @@ public class NoteSensor extends SubsystemBase {
 
     // ========================= Commands =========================
     public Command waitForObjectOnSwitchCommand() {
-        return new WaitUntilCommand(this::isObjectDetectedOnSwitch);
+        return CommandUtils.addName(getName(), new WaitUntilCommand(this::isObjectDetectedOnSwitch));
     }
 
     public Command waitForNoObjectOnSwitchCommand() {
-        return new WaitUntilCommand(() -> !isObjectDetectedOnSwitch());
+        return CommandUtils.addName(getName(), new WaitUntilCommand(() -> !isObjectDetectedOnSwitch()));
     }
 }

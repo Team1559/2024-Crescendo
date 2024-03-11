@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.util.CommandUtils;
 
 public class Leds extends SubsystemBase {
 
@@ -203,7 +204,7 @@ public class Leds extends SubsystemBase {
      * @return
      */
     public Command changeBrightnessCommand(boolean isDimming) {
-        return new InstantCommand(() -> changeBrightness(isDimming), this);
+        return CommandUtils.addName(getName(), new InstantCommand(() -> changeBrightness(isDimming), this));
     }
 
     /**
@@ -215,7 +216,8 @@ public class Leds extends SubsystemBase {
      * @return
      */
     public Command setDynamicPatternCommand(Color[] pattern, boolean isDynamicPatternForwards) {
-        return new InstantCommand(() -> setDynamicPattern(pattern, isDynamicPatternForwards), this);
+        return CommandUtils.addName(getName(),
+                new InstantCommand(() -> setDynamicPattern(pattern, isDynamicPatternForwards), this));
     }
 
     /**
@@ -225,11 +227,11 @@ public class Leds extends SubsystemBase {
      * @return
      */
     public Command setColorCommand(Color color) {
-        return new InstantCommand(() -> setColor(color), this);
+        return CommandUtils.addName(getName(), new InstantCommand(() -> setColor(color), this));
     }
 
     public Command setAllianceColorCommand() {
-        return new InstantCommand(this::setAllianceColor, this);
+        return CommandUtils.addName(getName(), new InstantCommand(this::setAllianceColor, this));
     }
 
     /**
@@ -240,10 +242,10 @@ public class Leds extends SubsystemBase {
      * @return
      */
     public Command setStaticPatternCommand(Color[] pattern) {
-        return new InstantCommand(() -> setStaticPattern(pattern), this);
+        return CommandUtils.addName(getName(), new InstantCommand(() -> setStaticPattern(pattern), this));
     }
 
     public Command turnOffCommand() {
-        return new InstantCommand(this::turnOff, this);
+        return CommandUtils.addName(getName(), new InstantCommand(this::turnOff, this));
     }
 }

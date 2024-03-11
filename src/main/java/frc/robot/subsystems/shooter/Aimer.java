@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
 import frc.robot.io.motor.can_spark_max.MotorIoNeo550Brushless;
 import frc.robot.subsystems.abstract_interface.DualMotorSubsystem;
+import frc.robot.util.CommandUtils;
 import frc.robot.util.MathUtils;
 
 public class Aimer extends DualMotorSubsystem {
@@ -171,22 +172,23 @@ public class Aimer extends DualMotorSubsystem {
     // ========================= Commands ======================================
 
     public Command aimAtTargetCommand(Supplier<Translation3d> target, Supplier<Translation2d> currentPosition) {
-        return new InstantCommand(() -> this.aimAtTarget(target.get(), currentPosition.get()), this);
+        return CommandUtils.addName(getName(),
+                new InstantCommand(() -> this.aimAtTarget(target.get(), currentPosition.get()), this));
     }
 
     public Command modifyAngleCommand(Rotation2d change) {
-        return new InstantCommand(() -> modifyAngle(change), this);
+        return CommandUtils.addName(getName(), new InstantCommand(() -> modifyAngle(change), this));
     }
 
     public Command modifyTargetAngleCommand(Rotation2d change) {
-        return new InstantCommand(() -> modifyTargetAngle(change), this);
+        return CommandUtils.addName(getName(), new InstantCommand(() -> modifyTargetAngle(change), this));
     }
 
     public Command setAngleCommand(Rotation2d angle) {
-        return new InstantCommand(() -> setAngle(angle), this);
+        return CommandUtils.addName(getName(), new InstantCommand(() -> setAngle(angle), this));
     }
 
     public Command waitUntilAtTargetCommand() {
-        return new WaitUntilCommand(this::isAtTarget);
+        return CommandUtils.addName(getName(), new WaitUntilCommand(this::isAtTarget));
     }
 }

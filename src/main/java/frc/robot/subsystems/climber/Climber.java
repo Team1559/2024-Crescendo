@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants;
 import frc.robot.io.motor.can_spark_max.MotorIoNeo550Brushless;
 import frc.robot.subsystems.abstract_interface.DualMotorSubsystem;
+import frc.robot.util.CommandUtils;
 import frc.robot.util.MathUtils;
 
 public class Climber extends DualMotorSubsystem {
@@ -109,18 +110,18 @@ public class Climber extends DualMotorSubsystem {
     // ========================= Commands ======================================
 
     public Command modifyHeightCommand(Measure<Distance> change) {
-        return new InstantCommand(() -> modifyHeight(change), this);
+        return CommandUtils.addName(getName(), new InstantCommand(() -> modifyHeight(change), this));
     }
 
     public Command modifyHeightLeftCommand(Measure<Distance> change) {
-        return new InstantCommand(() -> modifyHeightLeft(change));
+        return CommandUtils.addName(getName(), new InstantCommand(() -> modifyHeightLeft(change)));
     }
 
     public Command modifyHeightRightCommand(Measure<Distance> change) {
-        return new InstantCommand(() -> modifyHeightRight(change));
+        return CommandUtils.addName(getName(), new InstantCommand(() -> modifyHeightRight(change)));
     }
 
     public Command setHeightCommand(Measure<Distance> height) {
-        return new InstantCommand(() -> setHeight(height), this);
+        return CommandUtils.addName(getName(), new InstantCommand(() -> setHeight(height), this));
     }
 }
