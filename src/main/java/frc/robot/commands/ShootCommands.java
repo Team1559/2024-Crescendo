@@ -116,7 +116,7 @@ public class ShootCommands {
 
     public static Command spinUpFlywheelCommand(Flywheel flywheel) {
         return new SequentialCommandGroup(
-                flywheel.startCommand(),
+                flywheel.forwardCommand(),
                 new WaitCommand(1) // TODO: Tune.
         );
     }

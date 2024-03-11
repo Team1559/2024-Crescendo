@@ -32,7 +32,7 @@ public class SingleMotorSubsystem extends SubsystemBase implements MotorSubsyste
     public static List<SingleMotorSubsystem> instantiatedSubsystems = Collections
             .synchronizedList(new LinkedList<>());
 
-    private final MotorIo motorIo;
+    public final MotorIo motorIo;
     private final MotorIoInputsAutoLogged ioInputs = new MotorIoInputsAutoLogged();
 
     private final Measure<Velocity<Angle>> defaultForwardVelocity, defaultReverseVelocity;

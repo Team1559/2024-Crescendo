@@ -31,7 +31,7 @@ public abstract class DualMotorSubsystem extends SubsystemBase implements MotorS
     public static List<DualMotorSubsystem> instantiatedSubsystems = Collections
             .synchronizedList(new LinkedList<>());
 
-    private final SingleMotorSubsystem leftMotor, rightMotor;
+    protected final SingleMotorSubsystem leftMotor, rightMotor;
 
     private final DualMotorSubsystemInputsAutoLogged subsystemInputs = new DualMotorSubsystemInputsAutoLogged();
 

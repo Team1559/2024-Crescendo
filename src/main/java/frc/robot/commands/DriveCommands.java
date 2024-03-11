@@ -87,7 +87,7 @@ public class DriveCommands {
                 pid.setTolerance(1/* degree(s) */);
                 pid.enableContinuousInput(-180, 180); // Degrees.
                 if (Constants.hasFlywheelSubsystem())
-                    flywheel.start();
+                    flywheel.forward();
             }
 
             @Override

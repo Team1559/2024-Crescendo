@@ -194,11 +194,6 @@ public class RobotContainer { // TODO: Merge into the Robot class.
                 .whileTrue(swerveBase.stopCommand()
                         .alongWith(leds.setDynamicPatternCommand(Constants.getMotorOverheatEmergencyPattern(), false)));
 
-        if (Constants.hasFlywheelSubsystem()) {
-            new Trigger(flywheel::isTemperatureTooHigh).whileTrue(flywheel.stopCommand()
-                    .alongWith(leds.setDynamicPatternCommand(Constants.getMotorOverheatEmergencyPattern(), false)));
-        }
-
         for (MotorSubsystem motorSubsystem : MotorSubsystem.instantiatedSubsystems) {
             new Trigger(motorSubsystem::isTemperatureTooHigh).whileTrue(motorSubsystem.stopCommand()
                     .alongWith(leds.setDynamicPatternCommand(Constants.getMotorOverheatEmergencyPattern(), false)));
