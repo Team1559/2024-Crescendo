@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.SwerveBase;
+import frc.robot.subsystems.led.Leds;
 import frc.robot.subsystems.shooter.Aimer;
 import frc.robot.subsystems.shooter.Flywheel;
 
@@ -33,7 +34,7 @@ public class DriveCommands {
     private DriveCommands() {
     }
 
-    // ========================= Default Commands =========================
+    // ========================= Default Commands ==============================
 
     public static Command manualDriveDefaultCommand(SwerveBase swerveBase, DoubleSupplier xSupplier,
             DoubleSupplier ySupplier,
@@ -70,7 +71,14 @@ public class DriveCommands {
                 swerveBase);
     }
 
-    // ========================= Other Commands =========================
+    // ========================= Trigger Commands ==============================
+
+    public static Command overheatedMotorShutdownCommand(SwerveBase swerveBase, Leds leds) {
+        return swerveBase.stopCommand()
+                .alongWith(leds.setDynamicPatternCommand(Constants.getMotorOverheatEmergencyPattern(), false));
+    }
+
+    // ========================= Other Commands ================================
 
     public static Command autoAimAndManuallyDriveCommand(SwerveBase swerveBase, Flywheel flywheel, Aimer aimer,
             DoubleSupplier xSupplier, DoubleSupplier ySupplier, Supplier<Translation3d> target) {

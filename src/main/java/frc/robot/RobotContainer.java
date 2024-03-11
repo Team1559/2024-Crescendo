@@ -1,6 +1,5 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Inches;
 import static frc.robot.util.SupplierUtil.not;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -171,32 +170,37 @@ public class RobotContainer { // TODO: Merge into the Robot class.
         // #endregion
 
         // #region: ==================== Default Commands & Triggers ===========
+
         // #region: ---------- Configure Default Commands ----------
-        swerveBase.setDefaultCommand(
-                DriveCommands.manualDriveDefaultCommand(swerveBase, pilot::getLeftY, pilot::getLeftX,
-                        pilot::getRightX));
+
+        swerveBase.setDefaultCommand(DriveCommands.manualDriveDefaultCommand(swerveBase,
+                pilot::getLeftY, pilot::getLeftX, pilot::getRightX));
+
         if (Constants.hasFlywheelSubsystem()) {
             flywheel.setDefaultCommand(ShootCommands.defaultFlywheelCommand(flywheel));
         }
+
         leds.setDefaultCommand(LedCommands.defaultLedCommand(leds));
 
         // #endregion
 
         // #region: ---------- Configure Command Triggers ----------
+
         if (Constants.hasNoteSensorSubsystem()) {
-            new Trigger((noteSensor::isObjectDetectedOnSwitch)).whileTrue(leds.setColorCommand(Color.kGreen));
+            new Trigger(noteSensor::isObjectDetectedOnSwitch).whileTrue(leds.setColorCommand(Color.kGreen));
         }
+
         // TODO: Add LED Trigger for Ready to Shoot.
+
         // #endregion
 
         // #region: ---------- Motor Overheat Triggers ----------
         new Trigger(swerveBase::isTemperatureTooHigh)
-                .whileTrue(swerveBase.stopCommand()
-                        .alongWith(leds.setDynamicPatternCommand(Constants.getMotorOverheatEmergencyPattern(), false)));
+                .whileTrue(DriveCommands.overheatedMotorShutdownCommand(swerveBase, leds));
 
         for (MotorSubsystem motorSubsystem : MotorSubsystem.instantiatedSubsystems) {
-            new Trigger(motorSubsystem::isTemperatureTooHigh).whileTrue(motorSubsystem.stopCommand()
-                    .alongWith(leds.setDynamicPatternCommand(Constants.getMotorOverheatEmergencyPattern(), false)));
+            new Trigger(motorSubsystem::isTemperatureTooHigh)
+                    .whileTrue(ShootCommands.overheatedMotorShutdownCommand(motorSubsystem, leds));
         }
 
         // #endregion

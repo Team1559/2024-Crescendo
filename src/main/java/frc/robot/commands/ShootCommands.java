@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.Constants;
+import frc.robot.subsystems.abstract_interface.MotorSubsystem;
 import frc.robot.subsystems.led.Leds;
 import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
@@ -50,6 +52,13 @@ public class ShootCommands {
 
     public static Command defaultFlywheelCommand(Flywheel flywheel) {
         return new SequentialCommandGroup(new WaitCommand(.25), flywheel.stopCommand());
+    }
+
+    // ========================= Trigger Commands ==============================
+
+    public static Command overheatedMotorShutdownCommand(MotorSubsystem motorSubsystem, Leds leds) {
+        return motorSubsystem.stopCommand()
+                .alongWith(leds.setDynamicPatternCommand(Constants.getMotorOverheatEmergencyPattern(), false));
     }
 
     // ========================= Other Commands =========================
