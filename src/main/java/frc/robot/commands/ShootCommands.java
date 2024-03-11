@@ -3,8 +3,6 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -33,25 +31,6 @@ public class ShootCommands {
     }
 
     // ========================= Default Commands =========================
-    public static Command defaultIntakeCommand(Intake intake, NoteSensor sensor) {
-        return Commands.run(() -> {
-            if (sensor.isObjectDetectedOnSwitch()) {
-                intake.stop();
-            } else {
-                intake.forward();
-            }
-        }, intake);
-    }
-
-    public static Command defaultFeederCommand(Feeder feeder, NoteSensor sensor) {
-        return Commands.run(() -> {
-            if (sensor.isObjectDetectedOnSwitch()) {
-                feeder.stop();
-            } else {
-                feeder.forward();
-            }
-        }, feeder);
-    }
 
     public static Command defaultFlywheelCommand(Flywheel flywheel) {
         return new SequentialCommandGroup(new WaitCommand(.25), flywheel.stopCommand());
@@ -137,13 +116,5 @@ public class ShootCommands {
                 flywheel.forwardCommand(),
                 new WaitCommand(1) // TODO: Tune.
         );
-    }
-
-    public static Command stopIntakeFeederCommand(Intake intake, Feeder feeder, Leds leds) {
-        return new InstantCommand(() -> {
-            intake.stop();
-            feeder.stop();
-            leds.setDynamicPattern(new Color[] { Color.kRed, Color.kRed, Color.kBlack, Color.kBlack }, true);
-        }, intake, feeder);
     }
 }
