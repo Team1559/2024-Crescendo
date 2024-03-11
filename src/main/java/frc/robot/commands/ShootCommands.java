@@ -17,6 +17,7 @@ import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.Intake;
 import frc.robot.subsystems.shooter.NoteSensor;
+import frc.robot.util.CommandUtils;
 
 /**
  * Only used for commands that use multiple subsystems.
@@ -33,26 +34,32 @@ public class ShootCommands {
     // ========================= Default Commands =========================
 
     public static Command defaultFlywheelCommand(Flywheel flywheel) {
-        return new SequentialCommandGroup(new WaitCommand(.25), flywheel.stopCommand());
+        Command command = new SequentialCommandGroup(new WaitCommand(.25), flywheel.stopCommand());
+
+        return CommandUtils.addName(command);
     }
 
     // ========================= Trigger Commands ==============================
 
     public static Command overheatedMotorShutdownCommand(MotorSubsystem motorSubsystem, Leds leds) {
-        return motorSubsystem.stopCommand()
+        Command command = motorSubsystem.stopCommand()
                 .alongWith(leds.setDynamicPatternCommand(Constants.getMotorOverheatEmergencyPattern(), false));
+
+        return CommandUtils.addName(command);
     }
 
     // ========================= Other Commands =========================
 
     public static Command autoJustShootCommand(Feeder feeder, Aimer aimer, NoteSensor noteSensor, Leds leds) {
-        return aimer.setAngleCommand(Rotation2d.fromDegrees(36.7))
+        Command command = aimer.setAngleCommand(Rotation2d.fromDegrees(36.7))
                 .andThen(new WaitUntilCommand(() -> aimer.isAtTarget()))
                 .andThen(ShootCommands.shootAutonomousCommand(feeder, leds, noteSensor));
+
+        return CommandUtils.addName(command);
     }
 
     public static Command intakeStartStopCommand(Intake intake, Feeder feeder) {
-        return new StartEndCommand(
+        Command command = new StartEndCommand(
                 () -> {
                     intake.forward();
                     feeder.forward();
@@ -62,12 +69,16 @@ public class ShootCommands {
                     feeder.stop();
                 },
                 intake, feeder);
+
+        return CommandUtils.addName(command);
     }
 
     public static Command reverseShooterAndIntakeCommand(Intake intake, Feeder feeder, Flywheel flywheel) {
-        return new ParallelCommandGroup(new StartEndCommand(flywheel::reverse, flywheel::stop, flywheel),
+        Command command = new ParallelCommandGroup(new StartEndCommand(flywheel::reverse, flywheel::stop, flywheel),
                 new StartEndCommand(feeder::reverse, feeder::stop, feeder),
                 new StartEndCommand(intake::reverse, intake::stop, intake));
+
+        return CommandUtils.addName(command);
     }
 
     public static Command reverseShooterCommand(Flywheel flywheel, Feeder feeder, Leds leds) {
@@ -87,16 +98,19 @@ public class ShootCommands {
             }
         };
         reverseShooterCommand.addRequirements(flywheel, feeder, leds);
-        return reverseShooterCommand;
+
+        return CommandUtils.addName(reverseShooterCommand);
     }
 
     public static Command shootAutonomousCommand(Feeder feeder, Leds leds, NoteSensor noteSensor) {
-        return new SequentialCommandGroup(
+        Command command = new SequentialCommandGroup(
                 feeder.forwardCommand(),
                 LedCommands.blinkCommand(leds, Color.kOrange),
                 noteSensor.waitForNoObjectOnSwitchCommand(),
                 new WaitCommand(.25),
                 feeder.stopCommand());
+
+        return CommandUtils.addName(command);
     }
 
     public static Command shootTeleopCommand(Feeder feeder, Flywheel flywheel, Intake intake, NoteSensor noteSensor,
@@ -107,14 +121,17 @@ public class ShootCommands {
                 leds.setColorCommand(Color.kPurple).repeatedly(),
                 noteSensor.waitForNoObjectOnSwitchCommand(), new WaitCommand(5));
 
-        // TODO: Spin up flywheelsm if not already spinning.
-        return group;
+        // TODO: Spin up flywheel if not already spinning.
+
+        return CommandUtils.addName(group);
     }
 
     public static Command spinUpFlywheelCommand(Flywheel flywheel) {
-        return new SequentialCommandGroup(
+        Command command = new SequentialCommandGroup(
                 flywheel.forwardCommand(),
                 new WaitCommand(1) // TODO: Tune.
         );
+
+        return CommandUtils.addName(command);
     }
 }

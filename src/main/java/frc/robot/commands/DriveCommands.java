@@ -31,6 +31,7 @@ import frc.robot.subsystems.shooter.Aimer;
 import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.NoteSensor;
+import frc.robot.util.CommandUtils;
 
 public class DriveCommands {
 
@@ -44,7 +45,7 @@ public class DriveCommands {
             DoubleSupplier ySupplier,
             DoubleSupplier omegaSupplier) {
 
-        return Commands.run(
+        Command command = Commands.run(
                 () -> {
                     double linearMagnitude = SwerveBase.calculateLinearMagnitude(xSupplier, ySupplier);
                     double omega = MathUtil.applyDeadband(-omegaSupplier.getAsDouble(),
@@ -73,13 +74,17 @@ public class DriveCommands {
                     }
                 },
                 swerveBase);
+
+        return CommandUtils.addName(command);
     }
 
     // ========================= Trigger Commands ==============================
 
     public static Command overheatedMotorShutdownCommand(SwerveBase swerveBase, Leds leds) {
-        return swerveBase.stopCommand()
+        Command command = swerveBase.stopCommand()
                 .alongWith(leds.setDynamicPatternCommand(Constants.getMotorOverheatEmergencyPattern(), false));
+
+        return CommandUtils.addName(command);
     }
 
     // ========================= Other Commands ================================
@@ -170,17 +175,19 @@ public class DriveCommands {
         aimingDrive.addRequirements(swerveBase);
         if (Constants.hasFlywheelSubsystem())
             aimingDrive.addRequirements(flywheel);
-        return aimingDrive;
+        return CommandUtils.addName(aimingDrive);
     }
 
     public static Command autoShootCommand(SwerveBase swerveBase, Feeder feeder, Aimer aimer, NoteSensor noteSensor,
             Leds leds) {
-        return new SequentialCommandGroup(
+        Command command = new SequentialCommandGroup(
                 new ParallelCommandGroup(
                         DriveCommands.turnToTargetCommand(swerveBase, Constants::getSpeakerLocation, 4.5),
                         aimer.aimAtTargetCommand(Constants::getSpeakerLocation, swerveBase::getTranslation)
                                 .andThen(aimer.waitUntilAtTargetCommand())),
                 ShootCommands.shootAutonomousCommand(feeder, leds, noteSensor));
+
+        return CommandUtils.addName(command);
     }
 
     /**
@@ -278,6 +285,6 @@ public class DriveCommands {
 
         spinCommand.addRequirements(swerveBase);
 
-        return spinCommand;
+        return CommandUtils.addName(spinCommand);
     }
 }
