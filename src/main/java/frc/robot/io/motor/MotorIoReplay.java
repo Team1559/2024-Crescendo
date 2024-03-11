@@ -1,6 +1,8 @@
 package frc.robot.io.motor;
 
 import static edu.wpi.first.units.Units.Celsius;
+import static edu.wpi.first.units.Units.RevolutionsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
@@ -26,12 +28,22 @@ public class MotorIoReplay implements MotorIo {
     }
 
     @Override
-    public Rotation2d getAbsolutePosition() {
+    public Measure<Velocity<Angle>> getMaxSafeVelocity() {
+        return RevolutionsPerSecond.of(Double.POSITIVE_INFINITY);
+    }
+
+    @Override
+    public Measure<Voltage> getMaxSafeVoltage() {
+        return Volts.of(Double.POSITIVE_INFINITY);
+    }
+
+    @Override
+    public Rotation2d getPositionAbsolute() {
         return position;
     }
 
     @Override
-    public Rotation2d getRelativePosition() {
+    public Rotation2d getPositionRelative() {
         return position.plus(Rotation2d.fromDegrees(0));
     }
 

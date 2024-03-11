@@ -227,7 +227,7 @@ public class RobotContainer { // TODO: Merge into the Robot class.
 
             NamedCommands.registerCommand("JUST SHOOT",
                     aimer.setAngleCommand(Rotation2d.fromDegrees(36.7))
-                            .andThen(new WaitUntilCommand(() -> aimer.atTarget()))
+                            .andThen(new WaitUntilCommand(() -> aimer.isAtTarget()))
                             .andThen(ShootCommands.shootAutonomousCommand(feeder, leds, noteSensor)));
         }
 

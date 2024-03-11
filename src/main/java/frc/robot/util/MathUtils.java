@@ -65,7 +65,7 @@ public class MathUtils {
         } else if (minuend != null) {
             return minuend;
         } else {
-            return subtrahend.unaryMinus();
+            return Rotation2d.fromRotations(0).minus(subtrahend);
         }
     }
 }

@@ -127,10 +127,7 @@ public class SingleMotorSubsystem extends SubsystemBase implements MotorSubsyste
     private void config() {
 
         // Set Name.
-        String[] packagePath = getClass().getPackageName().split(".");
-        String packageName = packagePath[packagePath.length - 1];
-        String name = packageName + "/" + getClass().getName();
-        super.setName(name);
+        super.setName(MotorSubsystem.getSubsystemName(this.getClass()));
 
         // Add to Collection.
         instantiatedSubsystems.add(this);
@@ -200,6 +197,11 @@ public class SingleMotorSubsystem extends SubsystemBase implements MotorSubsyste
     }
 
     @Override
+    public void forwardMaxVelocity() {
+        setVelocity(motorIo.getMaxSafeVelocity());
+    }
+
+    @Override
     public void reverse() {
         if (subsystemInputs.targetVelocity != null) {
             setVelocity(defaultReverseVelocity);
@@ -208,6 +210,11 @@ public class SingleMotorSubsystem extends SubsystemBase implements MotorSubsyste
         } else {
             motorIo.stop();
         }
+    }
+
+    @Override
+    public void reverseMaxVelocity() {
+        setVelocity(motorIo.getMaxSafeVelocity().negate());
     }
 
     @Override
@@ -222,12 +229,12 @@ public class SingleMotorSubsystem extends SubsystemBase implements MotorSubsyste
 
     @Override
     public Rotation2d getCurrentAbsolutePosition() {
-        return motorIo.getAbsolutePosition();
+        return motorIo.getPositionAbsolute();
     }
 
     @Override
     public Rotation2d getCurrentRelativePosition() {
-        return motorIo.getRelativePosition();
+        return motorIo.getPositionRelative();
     }
 
     @Override

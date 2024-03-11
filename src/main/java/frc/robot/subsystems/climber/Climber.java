@@ -21,9 +21,9 @@ public class Climber extends DualMotorSubsystem {
     public Climber() {
         super(
                 new MotorIoNeo550Brushless(Constants.getClimberMotorIdLeft(), true, IdleMode.kBrake,
-                        Rotation2d.fromRotations(0), Constants.getAimerPid()),
+                        Rotation2d.fromRotations(0), Constants.getClimberPid()),
                 new MotorIoNeo550Brushless(Constants.getClimberMotorIdRight(), false, IdleMode.kBrake,
-                        Rotation2d.fromRotations(0), Constants.getAimerPid()));
+                        Rotation2d.fromRotations(0), Constants.getClimberPid()));
 
         // TODO: Clamp height.
         // setMinAndMaxPositions(, );

@@ -3,6 +3,7 @@ package frc.robot.subsystems.abstract_interface;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
@@ -18,6 +19,24 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
 
 public interface MotorSubsystem extends Subsystem {
+
+    // ========================= Static Helper Methods =========================
+    public static String getSubsystemName(Class<? extends Subsystem> subsystemClass) {
+
+        String packagePath = Optional.of(subsystemClass.getPackageName()).orElse("");
+        String[] packageSegments = packagePath.split("\\.");
+
+        String name = "";
+        if (packageSegments.length > 0) {
+            String lastPackageName = packageSegments[packageSegments.length - 1];
+            name = lastPackageName + "/";
+        }
+        name += subsystemClass.getSimpleName();
+
+        return name;
+    }
+
+    // ========================= Static Variables =================================
 
     public static List<MotorSubsystem> instantiatedSubsystems = Collections.synchronizedList(new LinkedList<>());
 
@@ -70,6 +89,12 @@ public interface MotorSubsystem extends Subsystem {
     public void forward();
 
     /**
+     * Runs the motor in the "forwards" direction at the maximum safe velocity of
+     * the motor(s).
+     */
+    public void forwardMaxVelocity();
+
+    /**
      * Runs the motor in the "reverse" direction at the default reverse velocity or
      * voltage.
      * <p>
@@ -78,6 +103,12 @@ public interface MotorSubsystem extends Subsystem {
      * </p>
      */
     public void reverse();
+
+    /**
+     * Runs the motor in the "reverse" direction at the maximum safe velocity of the
+     * motor(s).
+     */
+    public void reverseMaxVelocity();
 
     /**
      * Stops the motor.
@@ -255,6 +286,23 @@ public interface MotorSubsystem extends Subsystem {
     }
 
     /**
+     * @return A {@link Command} that calls {@link #forwardMaxVelocity()} on
+     *         {@link Command#initialize()}.
+     */
+    default Command forwardMaxVelocityCommand() {
+        return new InstantCommand(this::forwardMaxVelocity, this);
+    }
+
+    /**
+     * @return A {@link Command} that calls {@link #forwardMaxVelocity()} on
+     *         {@link Command#initialize()} and {@link #stop()} on
+     *         {@link Command#end()}.
+     */
+    default Command forwardMaxVelocityThenStopCommand() {
+        return new StartEndCommand(this::forwardMaxVelocity, this::stop, this);
+    }
+
+    /**
      * @return A {@link Command} that calls {@link #reverse()} on
      *         {@link Command#initialize()}.
      */
@@ -269,6 +317,23 @@ public interface MotorSubsystem extends Subsystem {
      */
     default Command reverseThenStopCommand() {
         return new StartEndCommand(this::reverse, this::stop, this);
+    }
+
+    /**
+     * @return A {@link Command} that calls {@link #reverse()} on
+     *         {@link Command#initialize()}.
+     */
+    default Command reverseMaxVelocityCommand() {
+        return new InstantCommand(this::reverseMaxVelocity, this);
+    }
+
+    /**
+     * @return A {@link Command} that calls {@link #reverse()} on
+     *         {@link Command#initialize()} and {@link #stop()} on
+     *         {@link Command#end()}.
+     */
+    default Command reverseMaxVelocityThenStopCommand() {
+        return new StartEndCommand(this::reverseMaxVelocity, this::stop, this);
     }
 
     /**

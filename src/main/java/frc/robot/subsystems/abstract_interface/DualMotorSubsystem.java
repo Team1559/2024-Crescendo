@@ -133,13 +133,11 @@ public abstract class DualMotorSubsystem extends SubsystemBase implements MotorS
     private void config() {
 
         // Set Name.
-        String[] packagePath = getClass().getPackageName().split(".");
-        String packageName = packagePath[packagePath.length - 1];
-        String name = packageName + "/" + getClass().getName();
-
+        String name = MotorSubsystem.getSubsystemName(this.getClass());
         super.setName(name);
+
         leftMotor.setName(name + ":L");
-        rightMotor.setName(name + ":L");
+        rightMotor.setName(name + ":R");
 
         // Add to Collection.
         instantiatedSubsystems.add(this);
@@ -198,6 +196,12 @@ public abstract class DualMotorSubsystem extends SubsystemBase implements MotorS
         rightMotor.forward();
     }
 
+    @Override
+    public void forwardMaxVelocity() {
+        leftMotor.forwardMaxVelocity();
+        rightMotor.forwardMaxVelocity();
+    }
+
     /**
      * Runs the left motor in the "forwards" direction at the default forwards
      * velocity or voltage.
@@ -226,6 +230,12 @@ public abstract class DualMotorSubsystem extends SubsystemBase implements MotorS
     public void reverse() {
         leftMotor.reverse();
         rightMotor.reverse();
+    }
+
+    @Override
+    public void reverseMaxVelocity() {
+        leftMotor.reverseMaxVelocity();
+        rightMotor.reverseMaxVelocity();
     }
 
     /**
