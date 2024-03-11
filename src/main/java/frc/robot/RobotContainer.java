@@ -209,7 +209,7 @@ public class RobotContainer { // TODO: Merge into the Robot class.
                 DriveCommands.spinCommand(swerveBase, Rotation2d.fromDegrees(180), 1));
 
         if (Constants.hasIntakeSubsystem() && Constants.hasFeederSubsystem()) {
-            NamedCommands.registerCommand("StartIntake", ShootCommands.intakeStartStopCommand(intake, feeder));
+            NamedCommands.registerCommand("StartIntake", ShootCommands.intakeStartStopCommand(feeder, intake));
         }
 
         if (Constants.hasFlywheelSubsystem()) {
@@ -222,7 +222,7 @@ public class RobotContainer { // TODO: Merge into the Robot class.
                     DriveCommands.autoShootCommand(swerveBase, aimer, feeder, noteSensor, leds));
 
             NamedCommands.registerCommand("JUST SHOOT",
-                    ShootCommands.autoJustShootCommand(feeder, aimer, noteSensor, leds));
+                    ShootCommands.autoJustShootCommand(aimer, feeder, noteSensor, leds));
         }
 
         // ---------- Set-up Autonomous Choices ----------
@@ -249,10 +249,10 @@ public class RobotContainer { // TODO: Merge into the Robot class.
 
             if (Constants.hasNoteSensorSubsystem()) {
                 coPilot.leftTrigger().and(not(noteSensor::isObjectDetectedOnSwitch))
-                        .whileTrue(ShootCommands.runIntakeCommand(flywheel, feeder, intake));
+                        .whileTrue(ShootCommands.runIntakeCommand(feeder, flywheel, intake));
 
             }
-            coPilot.x().whileTrue(ShootCommands.reverseShooterAndIntakeCommand(intake, feeder, flywheel));
+            coPilot.x().whileTrue(ShootCommands.reverseShooterAndIntakeCommand(feeder, flywheel, intake));
         }
 
         if (Constants.hasFeederSubsystem() && Constants.hasFlywheelSubsystem()) {
@@ -261,7 +261,7 @@ public class RobotContainer { // TODO: Merge into the Robot class.
                 coPilot.rightTrigger()
                         .onTrue(ShootCommands.shootTeleopCommand(feeder, flywheel, intake, noteSensor, leds));
             }
-            coPilot.a().whileTrue(ShootCommands.reverseShooterCommand(flywheel, feeder, leds));
+            coPilot.a().whileTrue(ShootCommands.reverseShooterCommand(feeder, flywheel, leds));
         }
 
         if (Constants.hasClimberSubsystem()) {

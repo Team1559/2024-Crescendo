@@ -185,7 +185,7 @@ public class DriveCommands {
                         DriveCommands.turnToTargetCommand(swerveBase, Constants::getSpeakerLocation, 4.5),
                         aimer.aimAtTargetCommand(Constants::getSpeakerLocation, swerveBase::getTranslation)
                                 .andThen(aimer.waitUntilAtTargetCommand())),
-                ShootCommands.shootAutonomousCommand(feeder, leds, noteSensor));
+                ShootCommands.shootAutonomousCommand(feeder, noteSensor, leds));
 
         return CommandUtils.addName(command);
     }

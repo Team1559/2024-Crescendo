@@ -50,15 +50,15 @@ public class ShootCommands {
 
     // ========================= Other Commands =========================
 
-    public static Command autoJustShootCommand(Feeder feeder, Aimer aimer, NoteSensor noteSensor, Leds leds) {
+    public static Command autoJustShootCommand(Aimer aimer, Feeder feeder, NoteSensor noteSensor, Leds leds) {
         Command command = aimer.setAngleCommand(Rotation2d.fromDegrees(36.7))
                 .andThen(new WaitUntilCommand(() -> aimer.isAtTarget()))
-                .andThen(ShootCommands.shootAutonomousCommand(feeder, leds, noteSensor));
+                .andThen(ShootCommands.shootAutonomousCommand(feeder, noteSensor, leds));
 
         return CommandUtils.addName(command);
     }
 
-    public static Command intakeStartStopCommand(Intake intake, Feeder feeder) {
+    public static Command intakeStartStopCommand(Feeder feeder, Intake intake) {
         Command command = new StartEndCommand(
                 () -> {
                     intake.forward();
@@ -73,7 +73,7 @@ public class ShootCommands {
         return CommandUtils.addName(command);
     }
 
-    public static Command reverseShooterAndIntakeCommand(Intake intake, Feeder feeder, Flywheel flywheel) {
+    public static Command reverseShooterAndIntakeCommand(Feeder feeder, Flywheel flywheel, Intake intake) {
         Command command = new ParallelCommandGroup(new StartEndCommand(flywheel::reverse, flywheel::stop, flywheel),
                 new StartEndCommand(feeder::reverse, feeder::stop, feeder),
                 new StartEndCommand(intake::reverse, intake::stop, intake));
@@ -81,7 +81,7 @@ public class ShootCommands {
         return CommandUtils.addName(command);
     }
 
-    public static Command reverseShooterCommand(Flywheel flywheel, Feeder feeder, Leds leds) {
+    public static Command reverseShooterCommand(Feeder feeder, Flywheel flywheel, Leds leds) {
         Command reverseShooterCommand = new Command() {
             @Override
             public void execute() {
@@ -102,15 +102,15 @@ public class ShootCommands {
         return CommandUtils.addName(reverseShooterCommand);
     }
 
-    public static Command runIntakeCommand(Flywheel flywheel, Feeder feeder, Intake intake) {
+    public static Command runIntakeCommand(Feeder feeder, Flywheel flywheel, Intake intake) {
 
-        Command command = new ParallelCommandGroup(ShootCommands.intakeStartStopCommand(intake, feeder),
+        Command command = new ParallelCommandGroup(ShootCommands.intakeStartStopCommand(feeder, intake),
                 flywheel.stopCommand());
 
         return CommandUtils.addName(command);
     }
 
-    public static Command shootAutonomousCommand(Feeder feeder, Leds leds, NoteSensor noteSensor) {
+    public static Command shootAutonomousCommand(Feeder feeder, NoteSensor noteSensor, Leds leds) {
         Command command = new SequentialCommandGroup(
                 feeder.forwardCommand(),
                 LedCommands.blinkCommand(leds, Color.kOrange),
