@@ -11,24 +11,17 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.opencv.core.Mat.Tuple2;
 
-import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -627,26 +620,6 @@ public class Constants {
 
     // #region: ----- Falcon 500 Motor -----
 
-    @SuppressWarnings("unchecked")
-    public static Map<String, StatusSignal<Boolean>> getAllGetFaultStatusSignalMethods(TalonFX motor) {
-        Map<String, StatusSignal<Boolean>> faults = new HashMap<>();
-        Class<?> c = motor.getClass();
-        Method[] publicMethods = c.getMethods();
-        for (int i = 0; i < publicMethods.length; i++) {
-            Method method = publicMethods[i];
-            String[] parts = method.toString().split("_");
-            if (parts.length == 2 && parts[0].equals("public static StatusSignal<Boolean> getFault")) {
-                try {
-                    faults.put(parts[1].split("(")[0], (StatusSignal<Boolean>) method.invoke(motor));
-                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                    // Ignore.
-                    e.printStackTrace();
-                }
-            }
-        }
-        return faults;
-    }
-
     /**
      * See: <a href=
      * "https://www.chiefdelphi.com/uploads/short-url/eVYO5tVOYZecwq6Tl2kURlFZFgq.pdf">Falcon
@@ -656,17 +629,6 @@ public class Constants {
      */
     public static Measure<Temperature> getFalcon500MaxTemperature() {
         return Celsius.of(109);
-    }
-
-    public static String[] getFaults(Map<String, StatusSignal<Boolean>> faultStatusSignals) {
-
-        List<String> faults = new LinkedList<>();
-        for (Entry<String, StatusSignal<Boolean>> entry : faultStatusSignals.entrySet()) {
-            if (entry.getValue().getValue()) {
-                faults.add(entry.getKey());
-            }
-        }
-        return faults.toArray(new String[0]);
     }
 
     // #endregion

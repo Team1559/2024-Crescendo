@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.io.motor.MotorIoTalonFx;
 
 public class Flywheel extends SubsystemBase {
 
@@ -97,8 +98,8 @@ public class Flywheel extends SubsystemBase {
                 InvertedValue.Clockwise_Positive /* inverted */, NeutralModeValue.Coast));
 
         // ---------- Define Loggable Fields ----------
-        flywheelLFaults = Constants.getAllGetFaultStatusSignalMethods(flywheelMotorL);
-        flywheelRFaults = Constants.getAllGetFaultStatusSignalMethods(flywheelMotorR);
+        flywheelLFaults = MotorIoTalonFx.getAllGetFaultStatusSignalMethods(flywheelMotorL);
+        flywheelRFaults = MotorIoTalonFx.getAllGetFaultStatusSignalMethods(flywheelMotorR);
 
         statusSignals.addAll(flywheelLFaults.values());
         statusSignals.addAll(flywheelRFaults.values());
@@ -157,8 +158,8 @@ public class Flywheel extends SubsystemBase {
         lInputs.currentAvailable = Amps.of(flywheelLSupplyCurrent.getValue());
         rInputs.currentAvailable = Amps.of(flywheelRSupplyCurrent.getValue());
 
-        lInputs.faults = Constants.getFaults(flywheelLFaults);
-        rInputs.faults = Constants.getFaults(flywheelRFaults);
+        lInputs.faults = MotorIoTalonFx.getFaults(flywheelLFaults);
+        rInputs.faults = MotorIoTalonFx.getFaults(flywheelRFaults);
 
         lInputs.temperature = Celsius.of(flywheelLDeviceTemp.getValue());
         rInputs.temperature = Celsius.of(flywheelRDeviceTemp.getValue());

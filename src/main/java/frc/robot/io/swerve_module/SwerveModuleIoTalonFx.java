@@ -39,6 +39,7 @@ import edu.wpi.first.units.Voltage;
  * </p>
  */
 import frc.robot.Constants;
+import frc.robot.io.motor.MotorIoTalonFx;
 import frc.robot.subsystems.drive.SwerveModule.WheelModuleIndex;
 
 public class SwerveModuleIoTalonFx implements SwerveModuleIo {
@@ -108,8 +109,8 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         statusSignals.add(driveMotorDutyCycle = driveMotor.getDutyCycle());
         statusSignals.add(steerMotorDutyCycle = steerMotor.getDutyCycle());
 
-        driveMotorFaults = Constants.getAllGetFaultStatusSignalMethods(driveMotor);
-        steerMotorFaults = Constants.getAllGetFaultStatusSignalMethods(steerMotor);
+        driveMotorFaults = MotorIoTalonFx.getAllGetFaultStatusSignalMethods(driveMotor);
+        steerMotorFaults = MotorIoTalonFx.getAllGetFaultStatusSignalMethods(steerMotor);
 
         statusSignals.addAll(driveMotorFaults.values());
         statusSignals.addAll(steerMotorFaults.values());
@@ -159,7 +160,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         // ---------- Drive Motor ----------
         inputs.driveMotorCurrentActual = Amps.of(driveMotorTorqueCurrent.getValue());
         inputs.driveMotorCurrentAvailable = Amps.of(driveMotorSupplyCurrent.getValue());
-        inputs.driveMotorFaults = Constants.getFaults(driveMotorFaults);
+        inputs.driveMotorFaults = MotorIoTalonFx.getFaults(driveMotorFaults);
         // Inverted so autonomous sees the robot moving in the correct direction.
         inputs.driveMotorPositionAbsolute = Rotation2d
                 .fromRadians(Units.rotationsToRadians(-driveMotorPosition.getValueAsDouble())
@@ -178,7 +179,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         // ---------- Steer Motor ----------
         inputs.steerMotorCurrentActual = Amps.of(steerMotorTorqueCurrent.getValue());
         inputs.driveMotorCurrentAvailable = Amps.of(steerMotorSupplyCurrent.getValue());
-        inputs.steerMotorFaults = Constants.getFaults(steerMotorFaults);
+        inputs.steerMotorFaults = MotorIoTalonFx.getFaults(steerMotorFaults);
         inputs.steerMotorPositionAbsolute = Rotation2d
                 .fromRotations(steerMotorPosition.getValueAsDouble() / Constants.getGearRatioOfTurnWheel())
                 .plus(Rotation2d.fromRadians(0));
