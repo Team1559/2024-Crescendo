@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
+import frc.robot.util.CommandUtils;
 
 public interface MotorSubsystem extends Subsystem {
 
@@ -273,7 +274,7 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#initialize()}.
      */
     default Command forwardCommand() {
-        return new InstantCommand(this::forward, this);
+        return CommandUtils.addName(getName(), new InstantCommand(this::forward, this));
     }
 
     /**
@@ -282,7 +283,7 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#end()}.
      */
     default Command forwardThenStopCommand() {
-        return new StartEndCommand(this::forward, this::stop, this);
+        return CommandUtils.addName(getName(), new StartEndCommand(this::forward, this::stop, this));
     }
 
     /**
@@ -290,7 +291,7 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#initialize()}.
      */
     default Command forwardMaxVelocityCommand() {
-        return new InstantCommand(this::forwardMaxVelocity, this);
+        return CommandUtils.addName(getName(), new InstantCommand(this::forwardMaxVelocity, this));
     }
 
     /**
@@ -299,7 +300,7 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#end()}.
      */
     default Command forwardMaxVelocityThenStopCommand() {
-        return new StartEndCommand(this::forwardMaxVelocity, this::stop, this);
+        return CommandUtils.addName(getName(), new StartEndCommand(this::forwardMaxVelocity, this::stop, this));
     }
 
     /**
@@ -307,7 +308,7 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#initialize()}.
      */
     default Command reverseCommand() {
-        return new InstantCommand(this::reverse, this);
+        return CommandUtils.addName(getName(), new InstantCommand(this::reverse, this));
     }
 
     /**
@@ -316,7 +317,7 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#end()}.
      */
     default Command reverseThenStopCommand() {
-        return new StartEndCommand(this::reverse, this::stop, this);
+        return CommandUtils.addName(getName(), new StartEndCommand(this::reverse, this::stop, this));
     }
 
     /**
@@ -324,7 +325,7 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#initialize()}.
      */
     default Command reverseMaxVelocityCommand() {
-        return new InstantCommand(this::reverseMaxVelocity, this);
+        return CommandUtils.addName(getName(), new InstantCommand(this::reverseMaxVelocity, this));
     }
 
     /**
@@ -333,7 +334,7 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#end()}.
      */
     default Command reverseMaxVelocityThenStopCommand() {
-        return new StartEndCommand(this::reverseMaxVelocity, this::stop, this);
+        return CommandUtils.addName(getName(), new StartEndCommand(this::reverseMaxVelocity, this::stop, this));
     }
 
     /**
@@ -341,7 +342,7 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#initialize()}.
      */
     default Command stopCommand() {
-        return new InstantCommand(this::stop, this);
+        return CommandUtils.addName(getName(), new InstantCommand(this::stop, this));
     }
 
     // -------------------- Modifiers --------------------
@@ -351,7 +352,7 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#initialize()}.
      */
     default Command modifyPositionCommand(Rotation2d positionChange) {
-        return new InstantCommand(() -> modifyPosition(positionChange), this);
+        return CommandUtils.addName(getName(), new InstantCommand(() -> modifyPosition(positionChange), this));
     }
 
     /**
@@ -360,7 +361,8 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#end()}.
      */
     default Command modifyPositionThenStopCommand(Rotation2d positionChange) {
-        return new StartEndCommand(() -> modifyPosition(positionChange), this::stop, this);
+        return CommandUtils.addName(getName(),
+                new StartEndCommand(() -> modifyPosition(positionChange), this::stop, this));
     }
 
     /**
@@ -369,13 +371,13 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#end()}.
      */
     default Command modifyPositionContinuouslyThenStopCommand(Rotation2d positionChange) {
-        return new FunctionalCommand(
+        return CommandUtils.addName(getName(), new FunctionalCommand(
                 () -> {
                 },
                 () -> modifyPosition(positionChange),
                 (interrupted) -> this.stop(),
                 () -> false,
-                this);
+                this));
     }
 
     /**
@@ -384,7 +386,7 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#initialize()}.
      */
     default Command modifyTargetPositionCommand(Rotation2d positionChange) {
-        return new InstantCommand(() -> modifyTargetPosition(positionChange), this);
+        return CommandUtils.addName(getName(), new InstantCommand(() -> modifyTargetPosition(positionChange), this));
     }
 
     /**
@@ -394,7 +396,8 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#end()}.
      */
     default Command modifyTargetPositionThenStopCommand(Rotation2d positionChange) {
-        return new StartEndCommand(() -> modifyTargetPosition(positionChange), this::stop, this);
+        return CommandUtils.addName(getName(),
+                new StartEndCommand(() -> modifyTargetPosition(positionChange), this::stop, this));
     }
 
     /**
@@ -402,7 +405,7 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#initialize()}.
      */
     default Command modifyVelocityCommand(Measure<Velocity<Angle>> velocityChange) {
-        return new InstantCommand(() -> modifyVelocity(velocityChange), this);
+        return CommandUtils.addName(getName(), new InstantCommand(() -> modifyVelocity(velocityChange), this));
     }
 
     /**
@@ -411,7 +414,8 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#end()}.
      */
     default Command modifyVelocityThenStopCommand(Measure<Velocity<Angle>> velocityChange) {
-        return new StartEndCommand(() -> modifyVelocity(velocityChange), this::stop, this);
+        return CommandUtils.addName(getName(),
+                new StartEndCommand(() -> modifyVelocity(velocityChange), this::stop, this));
     }
 
     /**
@@ -420,13 +424,13 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#end()}.
      */
     default Command modifyVelocityContinuouslyThenStopCommand(Measure<Velocity<Angle>> velocityChange) {
-        return new FunctionalCommand(
+        return CommandUtils.addName(getName(), new FunctionalCommand(
                 () -> {
                 },
                 () -> modifyVelocity(velocityChange),
                 (interrupted) -> this.stop(),
                 () -> false,
-                this);
+                this));
     }
 
     /**
@@ -434,7 +438,7 @@ public interface MotorSubsystem extends Subsystem {
      *         on {@link Command#initialize()}.
      */
     default Command modifyTargetVelocityCommand(Measure<Velocity<Angle>> velocityChange) {
-        return new InstantCommand(() -> modifyTargetVelocity(velocityChange), this);
+        return CommandUtils.addName(getName(), new InstantCommand(() -> modifyTargetVelocity(velocityChange), this));
     }
 
     /**
@@ -443,7 +447,8 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#end()}.
      */
     default Command modifyTargetVelocityThenStopCommand(Measure<Velocity<Angle>> velocityChange) {
-        return new StartEndCommand(() -> modifyTargetVelocity(velocityChange), this::stop, this);
+        return CommandUtils.addName(getName(),
+                new StartEndCommand(() -> modifyTargetVelocity(velocityChange), this::stop, this));
     }
 
     /**
@@ -451,7 +456,7 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#initialize()}.
      */
     default Command modifyVoltageCommand(Measure<Voltage> voltageChange) {
-        return new InstantCommand(() -> modifyVoltage(voltageChange), this);
+        return CommandUtils.addName(getName(), new InstantCommand(() -> modifyVoltage(voltageChange), this));
     }
 
     /**
@@ -460,7 +465,8 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#end()}.
      */
     default Command modifyVoltageThenStopCommand(Measure<Voltage> voltageChange) {
-        return new StartEndCommand(() -> modifyVoltage(voltageChange), this::stop, this);
+        return CommandUtils.addName(getName(),
+                new StartEndCommand(() -> modifyVoltage(voltageChange), this::stop, this));
     }
 
     /**
@@ -469,13 +475,13 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#end()}.
      */
     default Command modifyVoltageContinuouslyThenStopCommand(Measure<Voltage> voltageChange) {
-        return new FunctionalCommand(
+        return CommandUtils.addName(getName(), new FunctionalCommand(
                 () -> {
                 },
                 () -> modifyVoltage(voltageChange),
                 (interrupted) -> this.stop(),
                 () -> false,
-                this);
+                this));
     }
 
     /**
@@ -483,7 +489,7 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#initialize()}.
      */
     default Command modifyTargetVoltageCommand(Measure<Voltage> voltageChange) {
-        return new InstantCommand(() -> modifyTargetVoltage(voltageChange), this);
+        return CommandUtils.addName(getName(), new InstantCommand(() -> modifyTargetVoltage(voltageChange), this));
     }
 
     /**
@@ -492,7 +498,8 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#end()}.
      */
     default Command modifyTargetVoltageThenStopCommand(Measure<Voltage> voltageChange) {
-        return new StartEndCommand(() -> modifyTargetVoltage(voltageChange), this::stop, this);
+        return CommandUtils.addName(getName(),
+                new StartEndCommand(() -> modifyTargetVoltage(voltageChange), this::stop, this));
     }
 
     // -------------------- Setters --------------------
@@ -502,7 +509,7 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#initialize()}.
      */
     default Command setPositionCommand(Rotation2d position) {
-        return new InstantCommand(() -> setPosition(position), this);
+        return CommandUtils.addName(getName(), new InstantCommand(() -> setPosition(position), this));
     }
 
     /**
@@ -511,7 +518,7 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#end()}.
      */
     default Command setPositionThenStopCommand(Rotation2d position) {
-        return new StartEndCommand(() -> setPosition(position), this::stop, this);
+        return CommandUtils.addName(getName(), new StartEndCommand(() -> setPosition(position), this::stop, this));
     }
 
     /**
@@ -519,7 +526,7 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#initialize()}.
      */
     default Command setVelocityCommand(Measure<Velocity<Angle>> velocity) {
-        return new InstantCommand(() -> setVelocity(velocity), this);
+        return CommandUtils.addName(getName(), new InstantCommand(() -> setVelocity(velocity), this));
     }
 
     /**
@@ -528,7 +535,7 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#end()}.
      */
     default Command setVelocityThenStopCommand(Measure<Velocity<Angle>> velocity) {
-        return new StartEndCommand(() -> setVelocity(velocity), this::stop, this);
+        return CommandUtils.addName(getName(), new StartEndCommand(() -> setVelocity(velocity), this::stop, this));
     }
 
     /**
@@ -536,7 +543,7 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#initialize()}.
      */
     default Command setVoltageCommand(Measure<Voltage> voltage) {
-        return new InstantCommand(() -> setVoltage(voltage), this);
+        return CommandUtils.addName(getName(), new InstantCommand(() -> setVoltage(voltage), this));
     }
 
     /**
@@ -545,7 +552,7 @@ public interface MotorSubsystem extends Subsystem {
      *         {@link Command#end()}.
      */
     default Command setVoltageThenStopCommand(Measure<Voltage> voltage) {
-        return new StartEndCommand(() -> setVoltage(voltage), this::stop, this);
+        return CommandUtils.addName(getName(), new StartEndCommand(() -> setVoltage(voltage), this::stop, this));
     }
 
     // -------------------- Waits --------------------
@@ -558,6 +565,6 @@ public interface MotorSubsystem extends Subsystem {
     default Command waitUntilTemperatureIsNotTooHighCommand() {
         Command command = new WaitUntilCommand(() -> !this.isTemperatureTooHigh());
         command.addRequirements(this);
-        return command;
+        return CommandUtils.addName(getName(), command);
     }
 }
