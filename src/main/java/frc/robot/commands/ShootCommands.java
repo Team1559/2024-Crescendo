@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -9,9 +10,11 @@ import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
 import frc.robot.subsystems.abstract_interface.MotorSubsystem;
 import frc.robot.subsystems.led.Leds;
+import frc.robot.subsystems.shooter.Aimer;
 import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.Intake;
@@ -62,6 +65,12 @@ public class ShootCommands {
     }
 
     // ========================= Other Commands =========================
+
+    public static Command autoJustShootCommand(Feeder feeder, Aimer aimer, NoteSensor noteSensor, Leds leds) {
+        return aimer.setAngleCommand(Rotation2d.fromDegrees(36.7))
+                .andThen(new WaitUntilCommand(() -> aimer.isAtTarget()))
+                .andThen(ShootCommands.shootAutonomousCommand(feeder, leds, noteSensor));
+    }
 
     public static Command intakeStartStopCommand(Intake intake, Feeder feeder) {
         return new StartEndCommand(

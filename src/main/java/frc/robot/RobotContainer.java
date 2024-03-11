@@ -1,5 +1,6 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
 import static frc.robot.util.SupplierUtil.not;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -13,8 +14,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
@@ -209,25 +208,22 @@ public class RobotContainer { // TODO: Merge into the Robot class.
         // ---------- Create Named Commands for use by Path Planner ----------
         NamedCommands.registerCommand("Spin 180",
                 DriveCommands.spinCommand(swerveBase, Rotation2d.fromDegrees(180), 1));
+
         if (Constants.hasIntakeSubsystem() && Constants.hasFeederSubsystem()) {
             NamedCommands.registerCommand("StartIntake", ShootCommands.intakeStartStopCommand(intake, feeder));
         }
+
         if (Constants.hasFlywheelSubsystem()) {
             NamedCommands.registerCommand("Spin Up Flywheel", ShootCommands.spinUpFlywheelCommand(flywheel));
         }
-        if (Constants.hasFeederSubsystem() && Constants.hasNoteSensorSubsystem() && Constants.hasAimerSubsystem()) {
 
-            NamedCommands.registerCommand("Auto Shoot", new SequentialCommandGroup(
-                    new ParallelCommandGroup(
-                            DriveCommands.turnToTargetCommand(swerveBase, Constants::getSpeakerLocation, 4.5),
-                            aimer.aimAtTargetCommand(Constants::getSpeakerLocation, swerveBase::getTranslation)
-                                    .andThen(aimer.waitUntilAtTargetCommand())),
-                    ShootCommands.shootAutonomousCommand(feeder, leds, noteSensor)));
+        if (Constants.hasFeederSubsystem() && Constants.hasAimerSubsystem() && Constants.hasNoteSensorSubsystem()) {
+
+            NamedCommands.registerCommand("Auto Shoot",
+                    DriveCommands.autoShootCommand(swerveBase, feeder, aimer, noteSensor, leds));
 
             NamedCommands.registerCommand("JUST SHOOT",
-                    aimer.setAngleCommand(Rotation2d.fromDegrees(36.7))
-                            .andThen(new WaitUntilCommand(() -> aimer.isAtTarget()))
-                            .andThen(ShootCommands.shootAutonomousCommand(feeder, leds, noteSensor)));
+                    ShootCommands.autoJustShootCommand(feeder, aimer, noteSensor, leds));
         }
 
         // ---------- Set-up Autonomous Choices ----------
