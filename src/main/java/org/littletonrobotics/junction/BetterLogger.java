@@ -53,26 +53,29 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import us.hebi.quickbuf.ProtoMessage;
 
 // MUST update every time the AdvantageKit Vendor Dependency is updates!
+// - Current Version: 3.1.1
+// - https://github.com/Mechanical-Advantage/AdvantageKit/blob/580d72efa0c587a4682df35afe70aa394ec57e77/junction/core/src/org/littletonrobotics/junction/Logger.java
 // After updating:
 // - Replace all used of Logger with BetterLogger.
 // - Replace every call to LogTable's constructors(s) or clone method(s) with BetterLogTable.
 
 /** Central class for recording and replaying log data. */
 public class BetterLogger {
-
     private static final int receiverQueueCapcity = 500; // 10s at 50Hz
 
     private static boolean running = false;
+    private static long cycleCount = 0;
     private static LogTable entry = new BetterLogTable(0);
     private static LogTable outputTable;
     private static Map<String, String> metadata = new HashMap<>();
     private static ConsoleSource console;
     private static List<LoggedDashboardInput> dashboardInputs = new ArrayList<>();
-    private static Supplier<ByteBuffer> urclSupplier = null;
+    private static Supplier<ByteBuffer[]> urclSupplier = null;
     private static boolean deterministicTimestamps = true;
 
     private static LogReplaySource replaySource;
-    private static final BlockingQueue<LogTable> receiverQueue = new ArrayBlockingQueue<LogTable>(receiverQueueCapcity);
+    private static final BlockingQueue<LogTable> receiverQueue = new ArrayBlockingQueue<LogTable>(
+            receiverQueueCapcity);
     private static final ReceiverThread receiverThread = new ReceiverThread(receiverQueue);
     private static boolean receiverQueueFault = false;
 
@@ -123,10 +126,13 @@ public class BetterLogger {
      * usage shown below.
      * 
      * <pre>
-     * <code>Logger.registerURCL(URCL.startExternal());</code>
+     * <code>BetterLogger.registerURCL(URCL.startExternal());</code>
      * </pre>
+     * 
+     * <p>
+     * <b>Important: This function requires URCL 2024.1.0 or later.</b>
      */
-    public static void registerURCL(Supplier<ByteBuffer> logSupplier) {
+    public static void registerURCL(Supplier<ByteBuffer[]> logSupplier) {
         urclSupplier = logSupplier;
     }
 
@@ -235,6 +241,7 @@ public class BetterLogger {
      * timestamp and globally logged data.
      */
     static void periodicBeforeUser() {
+        cycleCount++;
         if (running) {
             // Capture conduit data
             ConduitApi conduit = ConduitApi.getInstance();
@@ -266,18 +273,32 @@ public class BetterLogger {
             if (urclSupplier != null
                     && replaySource == null
                     && RobotBase.isReal()) {
-                ByteBuffer buffer = urclSupplier.get();
-                buffer.rewind();
-                byte[] bytes = new byte[buffer.remaining()];
-                buffer.get(bytes);
-                entry.put("URCL", new LogValue(bytes, "URCL"));
+                ByteBuffer[] buffers = urclSupplier.get();
+                if (buffers.length == 3) {
+                    for (int i = 0; i < 3; i++) {
+                        buffers[i].rewind();
+                        byte[] bytes = new byte[buffers[i].remaining()];
+                        buffers[i].get(bytes);
+                        switch (i) {
+                            case 0:
+                                entry.put("URCL/Raw/Persistent", new LogValue(bytes, "URCLr2_persistent"));
+                                break;
+                            case 1:
+                                entry.put("URCL/Raw/Periodic", new LogValue(bytes, "URCLr2_periodic"));
+                                break;
+                            case 2:
+                                entry.put("URCL/Raw/Aliases", new LogValue(bytes, "URCLr2_aliases"));
+                                break;
+                        }
+                    }
+                }
             }
             long saveDataEnd = getRealTimestamp();
 
             // Log output data
-            recordOutput("Logger/ConduitPeriodicMS", (conduitCaptureEnd - conduitCaptureStart) / 1000.0);
-            recordOutput("Logger/SavePeriodicMS", (saveDataEnd - saveDataStart) / 1000.0);
-            recordOutput("Logger/QueuedCycles", receiverQueue.size());
+            recordOutput("BetterLogger/ConduitPeriodicMS", (conduitCaptureEnd - conduitCaptureStart) / 1000.0);
+            recordOutput("BetterLogger/SavePeriodicMS", (saveDataEnd - saveDataStart) / 1000.0);
+            recordOutput("BetterLogger/QueuedCycles", receiverQueue.size());
         } else {
             // Retrieve new data even if logger is disabled
             ConduitApi.getInstance().captureData();
@@ -308,8 +329,8 @@ public class BetterLogger {
             long consoleCaptureEnd = getRealTimestamp();
 
             // Record timing data
-            recordOutput("Logger/AutoLogPeriodicMS", (consoleCaptureStart - autoLogStart) / 1000.0);
-            recordOutput("Logger/ConsolePeriodicMS", (consoleCaptureEnd - consoleCaptureStart) / 1000.0);
+            recordOutput("BetterLogger/AutoLogPeriodicMS", (consoleCaptureStart - autoLogStart) / 1000.0);
+            recordOutput("BetterLogger/ConsolePeriodicMS", (consoleCaptureEnd - consoleCaptureStart) / 1000.0);
             recordOutput("LoggedRobot/UserCodeMS", userCodeLength / 1000.0);
             long periodicAfterLength = consoleCaptureEnd - autoLogStart;
             recordOutput("LoggedRobot/LogPeriodicMS", (periodicBeforeLength + periodicAfterLength) / 1000.0);
@@ -417,6 +438,21 @@ public class BetterLogger {
      */
     public static long getRealTimestamp() {
         return HALUtil.getFPGATime();
+    }
+
+    /**
+     * Runs the provided callback function every N loop cycles. This method can be
+     * used
+     * to update inputs or log outputs at a lower rate than the standard loop cycle.
+     * 
+     * <p>
+     * <b>Note that this method must be called periodically to continue running the
+     * callback function</b>.
+     */
+    public static void runEveryN(int n, Runnable function) {
+        if (cycleCount % n == 0) {
+            function.run();
+        }
     }
 
     /**
@@ -765,7 +801,8 @@ public class BetterLogger {
         if (running) {
             try {
                 // Use reflection because we don't explicitly depend on the shimmed classes
-                Mechanism2d.class.getMethod("akitLog", LogTable.class).invoke(value, outputTable.getSubtable(key));
+                Mechanism2d.class.getMethod("akitLog", BetterLogTable.class).invoke(value,
+                        outputTable.getSubtable(key));
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
                     | NoSuchMethodException
                     | SecurityException e) {
