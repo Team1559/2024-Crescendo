@@ -350,11 +350,11 @@ public class Constants {
     }
 
     public static Rotation2d getAimerEncoderOffset() {
-        return Rotation2d.fromRadians(2.599);
+        return Rotation2d.fromDegrees(90.5);
     }
 
     public static int getAimerEncoderPort() {
-        return uniqueRoboRioPort(5, RoboRioPortArrays.DIO);
+        return uniqueRoboRioPort(0, RoboRioPortArrays.DIO);
     }
 
     public static Rotation2d getAimerErrorThreshold() {
@@ -362,11 +362,11 @@ public class Constants {
     }
 
     public static int getAimerMotorIdLeft() {
-        return uniqueCanBusId(23, getCanivoreId());
+        return uniqueCanBusId(23);
     }
 
     public static int getAimerMotorIdRight() {
-        return uniqueCanBusId(22, getCanivoreId());
+        return uniqueCanBusId(22);
     }
 
     public static PID getAimerPid() {
@@ -409,11 +409,11 @@ public class Constants {
     }
 
     public static int getClimberMotorIdLeft() {
-        return uniqueCanBusId(25, getCanivoreId());
+        return uniqueCanBusId(27);
     }
 
     public static int getClimberMotorIdRight() {
-        return uniqueCanBusId(24, getCanivoreId());
+        return uniqueCanBusId(26);
     }
 
     public static PID getClimberPid() {
@@ -428,7 +428,7 @@ public class Constants {
 
     // #region: ----- Feeder -----
     public static int getFeederMotorId() {
-        return uniqueCanBusId(21, getCanivoreId());
+        return uniqueCanBusId(21);
     }
 
     public static boolean isFeederMotorInverted() {
@@ -440,8 +440,7 @@ public class Constants {
     }
 
     public static Measure<Velocity<Angle>> getFeederVelocityForward() {
-        // TODO: Configure Value.
-        return getIntakeVelocityForward().divide(4);
+        return getIntakeVelocityForward().divide(2);
     }
 
     public static Measure<Velocity<Angle>> getFeederVelocityReverse() {
@@ -453,11 +452,11 @@ public class Constants {
 
     // #region: ----- Flywheel -----
     public static int getFlywheelMotorIdLeft() {
-        return uniqueCanBusId(24, getCanivoreId());
+        return uniqueCanBusId(24);
     }
 
     public static int getFlywheelMotorIdRight() {
-        return uniqueCanBusId(25, getCanivoreId());
+        return uniqueCanBusId(25);
     }
 
     public static Measure<Voltage> getFlywheelForwardVoltage() {
@@ -488,7 +487,7 @@ public class Constants {
     // #region: ----- Intake -----
 
     public static int getIntakeMotorId() {
-        return uniqueCanBusId(20, getCanivoreId());
+        return uniqueCanBusId(20);
     }
 
     public static boolean isIntakeMotorInverted() {
@@ -534,7 +533,7 @@ public class Constants {
     // #region: ----- Note Sensor -----
 
     public static int getNoteSensorChannel() {
-        return uniqueRoboRioPort(2, RoboRioPortArrays.DIO);
+        return uniqueRoboRioPort(5, RoboRioPortArrays.DIO);
     }
 
     // #endregion
@@ -544,10 +543,10 @@ public class Constants {
         if (isGameRobot()) {
             return new HashMap<>() {
                 {
-                    put(WheelModuleIndex.FRONT_LEFT, Rotation2d.fromRadians(0.120));
-                    put(WheelModuleIndex.FRONT_RIGHT, Rotation2d.fromRadians(-0.023));
-                    put(WheelModuleIndex.BACK_LEFT, Rotation2d.fromRadians(2.789));
-                    put(WheelModuleIndex.BACK_RIGHT, Rotation2d.fromRadians(0.853));
+                    put(WheelModuleIndex.FRONT_LEFT, Rotation2d.fromRadians(0.15339807878856412));
+                    put(WheelModuleIndex.FRONT_RIGHT, Rotation2d.fromRadians(-0.34821363885004053));
+                    put(WheelModuleIndex.BACK_LEFT, Rotation2d.fromRadians(2.794912995527638));
+                    put(WheelModuleIndex.BACK_RIGHT, Rotation2d.fromRadians(0.8958447801252143));
                 }
             };
         } else {
