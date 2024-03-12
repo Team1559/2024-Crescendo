@@ -1,7 +1,5 @@
 package frc.robot;
 
-import static frc.robot.constants.AbstractConstants.CONSTANTS;
-
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -13,15 +11,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
-/**
- * The VM is configured to automatically run this class, and to call the
- * functions corresponding to
- * each mode, as described in the TimedRobot documentation. If you change the
- * name of this class or
- * the package after creating this project, you must also update the
- * build.gradle file in the
- * project.
- */
 public class Robot extends LoggedRobot {
 
     private Command autonomousCommand;
@@ -36,7 +25,7 @@ public class Robot extends LoggedRobot {
     public void robotInit() {
 
         // Set up data receivers & replay source
-        switch (CONSTANTS.getCurrentOperatingMode()) {
+        switch (Constants.getCurrentOperatingMode()) {
 
             case REAL_WORLD:
                 // Running on a real robot, log to a USB stick ("/U/logs")
@@ -58,7 +47,7 @@ public class Robot extends LoggedRobot {
                 break;
 
             default:
-                throw new RuntimeException("Unknown Run Mode: " + CONSTANTS.getCurrentOperatingMode());
+                throw new RuntimeException("Unknown Run Mode: " + Constants.getCurrentOperatingMode());
         }
 
         // See http://bit.ly/3YIzFZ6 for more information on timestamps in AdvantageKit.
@@ -102,13 +91,17 @@ public class Robot extends LoggedRobot {
     @Override
     public void autonomousInit() {
         autonomousCommand = robotContainer.getAutonomousCommand();
-        // if (CONSTANTS.hasClimberSubsystem()) {
-        // CommandScheduler.getInstance().schedule(robotContainer.climber.setTargetHeightCommand(.5));
+
+        // TODO: Keep or discard depending on final Climber design.
+        // if (Constants.hasClimberSubsystem()) {
+        // CommandScheduler.getInstance().schedule(robotContainer.climber.setHeightCommand(Centimeters.of(1)));
         // }
-        if (CONSTANTS.hasAimerSubsystem()) {
+
+        if (Constants.hasAimerSubsystem()) {
             CommandScheduler.getInstance()
-                    .schedule(robotContainer.aimer.setTargetAngleCommand(Rotation2d.fromDegrees(2)));
+                    .schedule(robotContainer.aimer.setAngleCommand(Rotation2d.fromDegrees(2)));
         }
+
         // schedule the autonomous command (example)
         if (autonomousCommand != null) {
             autonomousCommand.schedule();

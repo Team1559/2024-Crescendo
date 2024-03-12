@@ -34,5 +34,9 @@
     "java.debug.settings.onBuildFailureProceed": true,
     "editor.codeActionsOnSave": {
         "source.organizeImports": "explicit"
-    }
+    },
+    "java.completion.favoriteStaticMembers": [
+        "frc.robot.util.SupplierUtil.*",
+        "edu.wpi.first.units.Units.*"
+    ]
 }
