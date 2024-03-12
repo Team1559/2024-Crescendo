@@ -1,8 +1,7 @@
-package frc.robot.subsystems.vision;
+package frc.robot.io.vision;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
-import static frc.robot.constants.AbstractConstants.CONSTANTS;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -12,12 +11,11 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.subsystems.vision.LimelightHelpers.LimelightResults;
-import frc.robot.subsystems.vision.Vision.VisionInputs;
+import frc.robot.Constants;
+import frc.robot.util.LimelightHelpers;
+import frc.robot.util.LimelightHelpers.LimelightResults;
 
 public class VisionIoLimelight implements VisionIo {
-    private static final double LINEAR_STD_DEV_RATIO = 0.5;
-    private static final double ROTATION_STD_DEV = 1;
 
     private static final double FIELD_X_SIZE = 16.54;
     private static final double FIELD_Y_SIZE = 8.21;
@@ -31,7 +29,8 @@ public class VisionIoLimelight implements VisionIo {
         this.cameraName = cameraName;
     }
 
-    public String name() {
+    @Override
+    public String getName() {
         return this.cameraName;
     }
 
@@ -46,7 +45,7 @@ public class VisionIoLimelight implements VisionIo {
             Measure<Distance> distance = Meters.of(pose.getTranslation().getDistance(lastPose.getTranslation()));
             Measure<Time> time = Seconds.of(timestamp - lastPoseTime);
             Measure<Velocity<Distance>> speed = distance.per(time);
-            if (speed.gt(CONSTANTS.getMaxLinearSpeed().times(MAX_SPEED_FACTOR))) {
+            if (speed.gt(Constants.getMaxLinearSpeed().times(MAX_SPEED_FACTOR))) {
                 // Not possible for the robot to have moved that far that fast
                 return false;
             }
@@ -55,17 +54,18 @@ public class VisionIoLimelight implements VisionIo {
     }
 
     public void updateInputs(VisionInputs inputs) {
+
         double[] data = LimelightHelpers.getBotPose_wpiBlue(cameraName);
         LimelightResults results = LimelightHelpers.getLatestResults(cameraName);
         if (data.length < 6 || (data[0] == 0 && data[1] == 0)) {
+
             inputs.havePose = false;
             inputs.pose = new Pose2d();
             inputs.timestamp = 0;
         } else {
+
             // https://docs.limelightvision.io/docs/docs-limelight/pipeline-apriltag/apriltag-robot-localization#using-wpilibs-pose-estimator
-            Translation2d t = new Translation2d(data[0], data[1]);
-            Rotation2d r = Rotation2d.fromDegrees(data[5]);
-            Pose2d pose = new Pose2d(t, r);
+            Pose2d pose = new Pose2d(new Translation2d(data[0], data[1]), Rotation2d.fromDegrees(data[5]));
             double timestamp = Timer.getFPGATimestamp() - data[6] / 1000.0;
 
             if (!isPlausiblePose(pose, timestamp)) {
@@ -81,13 +81,11 @@ public class VisionIoLimelight implements VisionIo {
             lastPose = pose;
             lastPoseTime = timestamp;
 
-            double[] targetdata = LimelightHelpers.getTargetPose_CameraSpace(cameraName);
-            inputs.distanceToTarget = Math.hypot(targetdata[0], targetdata[1]);
-            double translationStdDev = inputs.distanceToTarget * LINEAR_STD_DEV_RATIO
-                    / results.targetingResults.targets_Fiducials.length;
-            inputs.estimateStdDevs[0] = translationStdDev;
-            inputs.estimateStdDevs[1] = translationStdDev;
-            inputs.estimateStdDevs[2] = ROTATION_STD_DEV;
+            inputs.numberOfTargets = results.targetingResults.targets_Fiducials.length;
+
+            double[] targetData = LimelightHelpers.getTargetPose_CameraSpace(cameraName);
+
+            inputs.distanceToTarget = Meters.of(Math.hypot(targetData[0], targetData[1]));
 
             // int[] tempFIDs = new int[results.targetingResults.targets_Fiducials.length];
             // for (int i = 0; i < results.targetingResults.targets_Fiducials.length; i++) {
