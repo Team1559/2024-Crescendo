@@ -30,6 +30,7 @@ import frc.robot.subsystems.led.Leds;
 import frc.robot.subsystems.shooter.Aimer;
 import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
+import frc.robot.subsystems.shooter.Intake;
 import frc.robot.subsystems.shooter.NoteSensor;
 import frc.robot.util.CommandUtils;
 
@@ -178,14 +179,14 @@ public class DriveCommands {
         return CommandUtils.addName(aimingDrive);
     }
 
-    public static Command autoShootCommand(SwerveBase swerveBase, Aimer aimer, Feeder feeder, NoteSensor noteSensor,
-            Leds leds) {
+    public static Command autoShootCommand(SwerveBase swerveBase, Aimer aimer, Feeder feeder, Intake intake,
+            NoteSensor noteSensor) {
         Command command = new SequentialCommandGroup(
                 new ParallelCommandGroup(
                         DriveCommands.turnToTargetCommand(swerveBase, Constants::getSpeakerLocation, 4.5),
                         aimer.aimAtTargetCommand(Constants::getSpeakerLocation, swerveBase::getTranslation)
                                 .andThen(aimer.waitUntilAtTargetCommand())),
-                ShootCommands.shootAutonomousCommand(feeder, noteSensor, leds));
+                ShooterCommands.shootAutonomousCommand(feeder, intake, noteSensor));
 
         return CommandUtils.addName(command);
     }
