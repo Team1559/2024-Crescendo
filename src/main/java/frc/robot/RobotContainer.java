@@ -12,9 +12,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
@@ -210,7 +207,7 @@ public class RobotContainer { // TODO: Merge into the Robot class.
         NamedCommands.registerCommand("Spin 180",
                 DriveCommands.spinCommand(swerveBase, Rotation2d.fromDegrees(180), 1));
 
-        if (Constants.hasIntakeSubsystem() && Constants.hasFeederSubsystem()) {
+        if (Constants.hasFeederSubsystem() && Constants.hasIntakeSubsystem()) {
             NamedCommands.registerCommand("StartIntake", ShooterCommands.intakeStartStopCommand(feeder, intake));
         }
 
@@ -228,10 +225,7 @@ public class RobotContainer { // TODO: Merge into the Robot class.
                     ShooterCommands.autoJustShootCommand(aimer, feeder, intake, noteSensor));
 
             NamedCommands.registerCommand("Delayed Manual Shot",
-                    new ParallelDeadlineGroup(new WaitCommand(12),
-                            aimer.setAngleCommand(Rotation2d.fromDegrees(36.7))
-                                    .andThen(new WaitUntilCommand(aimer::isAtTarget))
-                                    .andThen(ShooterCommands.shootAutonomousCommand(feeder, intake, noteSensor))));
+                    ShooterCommands.autoDelayedManualShotCommand(aimer, feeder, intake, noteSensor));
         }
 
         // ---------- Set-up Autonomous Choices ----------
@@ -254,7 +248,7 @@ public class RobotContainer { // TODO: Merge into the Robot class.
         // #endregion
 
         // #region: ---------- Configure Controller 1 for Co-Pilot ----------
-        if (Constants.hasIntakeSubsystem() && Constants.hasFeederSubsystem() && Constants.hasFlywheelSubsystem()) {
+        if (Constants.hasFeederSubsystem() && Constants.hasFlywheelSubsystem() && Constants.hasIntakeSubsystem()) {
 
             if (Constants.hasNoteSensorSubsystem()) {
                 coPilot.leftTrigger().and(noteSensor::isObjectNotDetectedSwitch)

@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -51,6 +52,27 @@ public class ShooterCommands {
 
     // ========================= Other Commands =========================
 
+    public static Command autoDelayedManualShotCommand(Aimer aimer, Feeder feeder, Intake intake,
+            NoteSensor noteSensor) {
+
+        Command command = new ParallelDeadlineGroup(
+                new WaitCommand(12),
+                aimer.setAngleCommand(Rotation2d.fromDegrees(36.7)).andThen(new WaitUntilCommand(aimer::isAtTarget))
+                        .andThen(ShooterCommands.shootAutonomousCommand(feeder, intake, noteSensor)));
+
+        return CommandUtils.addName(command);
+    }
+
+    public static Command autoIntakeStartCommand(Feeder feeder, Intake intake) {
+
+        Command command = new InstantCommand(() -> {
+            intake.forward();
+            feeder.forward();
+        });
+
+        return CommandUtils.addName(command);
+    }
+
     public static Command autoJustShootCommand(Aimer aimer, Feeder feeder, Intake intake, NoteSensor noteSensor) {
 
         Command command = aimer.setAngleCommand(Rotation2d.fromDegrees(36.7))
@@ -58,13 +80,6 @@ public class ShooterCommands {
                 .andThen(ShooterCommands.shootAutonomousCommand(feeder, intake, noteSensor));
 
         return CommandUtils.addName(command);
-    }
-
-    public static Command autoIntakeStartCommand(Intake intake, Feeder feeder) {
-        return new InstantCommand(() -> {
-            intake.forward();
-            feeder.forward();
-        });
     }
 
     public static Command intakeStartStopCommand(Feeder feeder, Intake intake) {
