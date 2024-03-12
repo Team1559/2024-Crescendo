@@ -127,9 +127,10 @@ public class Aimer extends SubsystemBase {
 
         // Set Voltages.
         if (controller.getSetpoint() != 0) {
+
             double ff = Constants.getAimerPid().FF * Rotation2d.fromDegrees(inputs.targetAngleInDegrees).getCos();
             double output = ff + controller.calculate(inputs.currentAngleInDegrees);
-            output = MathUtil.clamp(output, -2, 2);
+            output = MathUtil.clamp(output, -1, 2);
             targetVoltage = Volts.of(output);
 
             // TODO: What if motors are not moving evenly?

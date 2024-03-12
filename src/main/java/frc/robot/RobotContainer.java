@@ -14,13 +14,15 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.LedCommands;
-import frc.robot.commands.ShootCommands;
+import frc.robot.commands.ShooterCommands;
 import frc.robot.io.gyro.GyroIoPigeon2;
 import frc.robot.io.gyro.GyroIoSimAndReplay;
 import frc.robot.io.motor.MotorIoNeo550Brushless;
@@ -175,7 +177,7 @@ public class RobotContainer { // TODO: Merge into the Robot class.
                 DriveCommands.manualDriveDefaultCommand(swerveBase, pilot::getLeftY, pilot::getLeftX,
                         pilot::getRightX));
         if (Constants.hasFlywheelSubsystem()) {
-            flywheel.setDefaultCommand(ShootCommands.defaultFlywheelCommand(flywheel));
+            flywheel.setDefaultCommand(ShooterCommands.defaultFlywheelCommand(flywheel));
         }
         leds.setDefaultCommand(LedCommands.defaultLedCommand(leds));
 
@@ -220,12 +222,15 @@ public class RobotContainer { // TODO: Merge into the Robot class.
         // ---------- Create Named Commands for use by Path Planner ----------
         NamedCommands.registerCommand("Spin 180",
                 DriveCommands.spinCommand(swerveBase, Rotation2d.fromDegrees(180), 1));
+
         if (Constants.hasIntakeSubsystem() && Constants.hasFeederSubsystem()) {
-            NamedCommands.registerCommand("StartIntake", ShootCommands.intakeStartStopCommand(intake, feeder));
+            NamedCommands.registerCommand("StartIntake", ShooterCommands.autoIntakeStartCommand(intake, feeder));
         }
+
         if (Constants.hasFlywheelSubsystem()) {
-            NamedCommands.registerCommand("Spin Up Flywheel", ShootCommands.spinUpFlywheelCommand(flywheel));
+            NamedCommands.registerCommand("Spin Up Flywheel", ShooterCommands.spinUpFlywheelCommand(flywheel));
         }
+
         if (Constants.hasFeederSubsystem() && Constants.hasNoteSensorSubsystem() && Constants.hasAimerSubsystem()) {
 
             NamedCommands.registerCommand("Auto Shoot", new SequentialCommandGroup(
@@ -233,12 +238,18 @@ public class RobotContainer { // TODO: Merge into the Robot class.
                             DriveCommands.turnToTargetCommand(swerveBase, Constants::getSpeakerLocation, 4.5),
                             aimer.aimAtTargetCommand(Constants::getSpeakerLocation, swerveBase::getTranslation)
                                     .andThen(aimer.waitUntilAtTargetCommand())),
-                    ShootCommands.shootAutonomousCommand(feeder, leds, noteSensor)));
+                    ShooterCommands.shootAutonomousCommand(feeder, noteSensor, intake)));
 
-            NamedCommands.registerCommand("JUST SHOOT",
+            NamedCommands.registerCommand("Initial Shoot",
                     aimer.setAngleCommand(Rotation2d.fromDegrees(36.7))
                             .andThen(new WaitUntilCommand(() -> aimer.atTarget()))
-                            .andThen(ShootCommands.shootAutonomousCommand(feeder, leds, noteSensor)));
+                            .andThen(ShooterCommands.shootAutonomousCommand(feeder, noteSensor, intake)));
+
+            NamedCommands.registerCommand("Delayed Manual Shot",
+                    new ParallelDeadlineGroup(new WaitCommand(12),
+                            aimer.setAngleCommand(Rotation2d.fromDegrees(36.7))
+                                    .andThen(new WaitUntilCommand(() -> aimer.atTarget()))
+                                    .andThen(ShooterCommands.shootAutonomousCommand(feeder, noteSensor, intake))));
         }
 
         // ---------- Set-up Autonomous Choices ----------
@@ -265,19 +276,18 @@ public class RobotContainer { // TODO: Merge into the Robot class.
 
             if (Constants.hasNoteSensorSubsystem()) {
                 coPilot.leftTrigger().and(not(noteSensor::isObjectDetectedOnSwitch)).whileTrue(new ParallelCommandGroup(
-                        ShootCommands.intakeStartStopCommand(intake, feeder), flywheel.stopCommand()));
-
+                        ShooterCommands.intakeStartStopCommand(intake, feeder), flywheel.stopCommand()));
             }
-            coPilot.x().whileTrue(ShootCommands.reverseShooterAndIntakeCommand(intake, feeder, flywheel));
+
+            coPilot.x().whileTrue(ShooterCommands.reverseShooterAndIntakeCommand(intake, feeder, flywheel));
         }
 
         if (Constants.hasFeederSubsystem() && Constants.hasFlywheelSubsystem()) {
 
             if (Constants.hasIntakeSubsystem() && Constants.hasNoteSensorSubsystem()) {
-                coPilot.rightTrigger()
-                        .onTrue(ShootCommands.shootTeleopCommand(feeder, flywheel, intake, noteSensor, leds));
+                coPilot.rightTrigger().onTrue(ShooterCommands.shootTeleopCommand(feeder, flywheel, intake, noteSensor));
             }
-            coPilot.a().whileTrue(ShootCommands.reverseShooterCommand(flywheel, feeder, leds));
+            coPilot.a().whileTrue(ShooterCommands.reverseShooterCommand(flywheel, feeder, leds));
         }
 
         if (Constants.hasClimberSubsystem()) {

@@ -38,6 +38,10 @@ public class NoteSensor extends SubsystemBase {
         return !limitSwitch.get();
     }
 
+    public boolean isObjectNotDetectedSwitch() {
+        return !inputs.isObjectDetectedSwitch;
+    }
+
     // ========================= Commands =========================
     public Command waitForObjectOnSwitchCommand() {
         return new WaitUntilCommand(this::isObjectDetectedOnSwitch);
