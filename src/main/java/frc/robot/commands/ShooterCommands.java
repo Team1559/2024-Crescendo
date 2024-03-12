@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -25,10 +26,10 @@ import frc.robot.util.CommandUtils;
  * Single subsystem commands should be in their subsystem class.
  * </p>
  */
-public class ShootCommands {
+public class ShooterCommands {
 
     /** Makes Class non-instantiable */
-    private ShootCommands() {
+    private ShooterCommands() {
     }
 
     // ========================= Default Commands =========================
@@ -50,12 +51,20 @@ public class ShootCommands {
 
     // ========================= Other Commands =========================
 
-    public static Command autoJustShootCommand(Aimer aimer, Feeder feeder, NoteSensor noteSensor, Leds leds) {
+    public static Command autoJustShootCommand(Aimer aimer, Feeder feeder, Intake intake, NoteSensor noteSensor) {
+
         Command command = aimer.setAngleCommand(Rotation2d.fromDegrees(36.7))
-                .andThen(new WaitUntilCommand(() -> aimer.isAtTarget()))
-                .andThen(ShootCommands.shootAutonomousCommand(feeder, noteSensor, leds));
+                .andThen(new WaitUntilCommand(aimer::isAtTarget))
+                .andThen(ShooterCommands.shootAutonomousCommand(feeder, intake, noteSensor));
 
         return CommandUtils.addName(command);
+    }
+
+    public static Command autoIntakeStartCommand(Intake intake, Feeder feeder) {
+        return new InstantCommand(() -> {
+            intake.forward();
+            feeder.forward();
+        });
     }
 
     public static Command intakeStartStopCommand(Feeder feeder, Intake intake) {
@@ -104,30 +113,32 @@ public class ShootCommands {
 
     public static Command runIntakeCommand(Feeder feeder, Flywheel flywheel, Intake intake) {
 
-        Command command = new ParallelCommandGroup(ShootCommands.intakeStartStopCommand(feeder, intake),
+        Command command = new ParallelCommandGroup(ShooterCommands.intakeStartStopCommand(feeder, intake),
                 flywheel.stopCommand());
 
         return CommandUtils.addName(command);
     }
 
-    public static Command shootAutonomousCommand(Feeder feeder, NoteSensor noteSensor, Leds leds) {
-        Command command = new SequentialCommandGroup(
-                feeder.forwardCommand(),
-                LedCommands.blinkCommand(leds, Color.kOrange),
-                noteSensor.waitForNoObjectOnSwitchCommand(),
-                new WaitCommand(.25),
-                feeder.stopCommand());
+    public static Command shootAutonomousCommand(Feeder feeder, Intake intake, NoteSensor noteSensor) {
 
-        return CommandUtils.addName(command);
+        ParallelRaceGroup group = new ParallelRaceGroup(
+                feeder.forwardThenStopCommand(),
+                intake.forwardThenStopCommand(),
+                // TODO: May want to wait a little after the note is no longer sensed.
+                noteSensor.waitForNoObjectOnSwitchCommand(),
+                new WaitCommand(5));
+
+        return CommandUtils.addName(group);
     }
 
-    public static Command shootTeleopCommand(Feeder feeder, Flywheel flywheel, Intake intake, NoteSensor noteSensor,
-            Leds leds) {
+    public static Command shootTeleopCommand(Feeder feeder, Flywheel flywheel, Intake intake, NoteSensor noteSensor) {
 
-        ParallelRaceGroup group = new ParallelRaceGroup(new StartEndCommand(intake::forward, intake::stop, intake),
+        // TODO: Have this run until the Co-Pilot stops pushing the button.
+        ParallelRaceGroup group = new ParallelRaceGroup(
+                new StartEndCommand(intake::forward, intake::stop, intake),
                 feeder.forwardMaxVelocityThenStopCommand(),
-                leds.setColorCommand(Color.kPurple).repeatedly(),
-                noteSensor.waitForNoObjectOnSwitchCommand(), new WaitCommand(5));
+                noteSensor.waitForNoObjectOnSwitchCommand(),
+                new WaitCommand(5));
 
         // TODO: Spin up flywheel if not already spinning.
 

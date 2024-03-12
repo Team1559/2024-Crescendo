@@ -13,7 +13,7 @@ public class NoteSensor extends SubsystemBase {
 
     @AutoLog
     static class NoteSensorInputs {
-        public boolean isObjectDetected;
+        public boolean isObjectDetectedOnSwitch;
     }
 
     private final DigitalInput limitSwitch;
@@ -26,7 +26,7 @@ public class NoteSensor extends SubsystemBase {
 
     @Override
     public void periodic() {
-        inputs.isObjectDetected = isObjectDetectedOnSwitch();
+        inputs.isObjectDetectedOnSwitch = isObjectDetectedOnSwitch();
         BetterLogger.processInputs("Shooter/NoteSensor", inputs);
     }
 
@@ -37,6 +37,10 @@ public class NoteSensor extends SubsystemBase {
      */
     public boolean isObjectDetectedOnSwitch() {
         return !limitSwitch.get();
+    }
+
+    public boolean isObjectNotDetectedSwitch() {
+        return !inputs.isObjectDetectedOnSwitch;
     }
 
     // ========================= Commands =========================

@@ -84,7 +84,7 @@ public class Aimer extends DualMotorSubsystem {
             pidController.setSetpoint(targetAngleClamped.getDegrees());
             double output = pidController.calculate(inputs.angleCurrent.getDegrees());
 
-            double volts = MathUtil.clamp(ff + output, -2, 2);
+            double volts = MathUtil.clamp(ff + output, -1, 2);
             Measure<Voltage> voltage = Volts.of(volts);
 
             // TODO: What if motors are not moving evenly?

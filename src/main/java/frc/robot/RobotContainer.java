@@ -1,7 +1,6 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Inches;
-import static frc.robot.util.SupplierUtil.not;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -13,11 +12,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.LedCommands;
-import frc.robot.commands.ShootCommands;
+import frc.robot.commands.ShooterCommands;
 import frc.robot.io.gyro.GyroIoPigeon2;
 import frc.robot.io.gyro.GyroIoSimAndReplay;
 import frc.robot.io.motor.MotorIoReplay;
@@ -175,7 +177,7 @@ public class RobotContainer { // TODO: Merge into the Robot class.
                 pilot::getLeftY, pilot::getLeftX, pilot::getRightX));
 
         if (Constants.hasFlywheelSubsystem()) {
-            flywheel.setDefaultCommand(ShootCommands.defaultFlywheelCommand(flywheel));
+            flywheel.setDefaultCommand(ShooterCommands.defaultFlywheelCommand(flywheel));
         }
 
         leds.setDefaultCommand(LedCommands.defaultLedCommand(leds));
@@ -198,7 +200,7 @@ public class RobotContainer { // TODO: Merge into the Robot class.
 
         for (MotorSubsystem motorSubsystem : MotorSubsystem.instantiatedSubsystems) {
             new Trigger(motorSubsystem::isTemperatureTooHigh)
-                    .whileTrue(ShootCommands.overheatedMotorShutdownCommand(motorSubsystem, leds));
+                    .whileTrue(ShooterCommands.overheatedMotorShutdownCommand(motorSubsystem, leds));
         }
 
         // #endregion
@@ -209,20 +211,27 @@ public class RobotContainer { // TODO: Merge into the Robot class.
                 DriveCommands.spinCommand(swerveBase, Rotation2d.fromDegrees(180), 1));
 
         if (Constants.hasIntakeSubsystem() && Constants.hasFeederSubsystem()) {
-            NamedCommands.registerCommand("StartIntake", ShootCommands.intakeStartStopCommand(feeder, intake));
+            NamedCommands.registerCommand("StartIntake", ShooterCommands.intakeStartStopCommand(feeder, intake));
         }
 
         if (Constants.hasFlywheelSubsystem()) {
-            NamedCommands.registerCommand("Spin Up Flywheel", ShootCommands.spinUpFlywheelCommand(flywheel));
+            NamedCommands.registerCommand("Spin Up Flywheel", ShooterCommands.spinUpFlywheelCommand(flywheel));
         }
 
-        if (Constants.hasFeederSubsystem() && Constants.hasAimerSubsystem() && Constants.hasNoteSensorSubsystem()) {
+        if (Constants.hasAimerSubsystem() && Constants.hasFeederSubsystem() && Constants.hasIntakeSubsystem()
+                && Constants.hasNoteSensorSubsystem()) {
 
             NamedCommands.registerCommand("Auto Shoot",
-                    DriveCommands.autoShootCommand(swerveBase, aimer, feeder, noteSensor, leds));
+                    DriveCommands.autoShootCommand(swerveBase, aimer, feeder, intake, noteSensor));
 
-            NamedCommands.registerCommand("JUST SHOOT",
-                    ShootCommands.autoJustShootCommand(aimer, feeder, noteSensor, leds));
+            NamedCommands.registerCommand("Initial Shoot",
+                    ShooterCommands.autoJustShootCommand(aimer, feeder, intake, noteSensor));
+
+            NamedCommands.registerCommand("Delayed Manual Shot",
+                    new ParallelDeadlineGroup(new WaitCommand(12),
+                            aimer.setAngleCommand(Rotation2d.fromDegrees(36.7))
+                                    .andThen(new WaitUntilCommand(aimer::isAtTarget))
+                                    .andThen(ShooterCommands.shootAutonomousCommand(feeder, intake, noteSensor))));
         }
 
         // ---------- Set-up Autonomous Choices ----------
@@ -248,20 +257,19 @@ public class RobotContainer { // TODO: Merge into the Robot class.
         if (Constants.hasIntakeSubsystem() && Constants.hasFeederSubsystem() && Constants.hasFlywheelSubsystem()) {
 
             if (Constants.hasNoteSensorSubsystem()) {
-                coPilot.leftTrigger().and(not(noteSensor::isObjectDetectedOnSwitch))
-                        .whileTrue(ShootCommands.runIntakeCommand(feeder, flywheel, intake));
+                coPilot.leftTrigger().and(noteSensor::isObjectNotDetectedSwitch)
+                        .whileTrue(ShooterCommands.runIntakeCommand(feeder, flywheel, intake));
 
             }
-            coPilot.x().whileTrue(ShootCommands.reverseShooterAndIntakeCommand(feeder, flywheel, intake));
+            coPilot.x().whileTrue(ShooterCommands.reverseShooterAndIntakeCommand(feeder, flywheel, intake));
         }
 
         if (Constants.hasFeederSubsystem() && Constants.hasFlywheelSubsystem()) {
 
             if (Constants.hasIntakeSubsystem() && Constants.hasNoteSensorSubsystem()) {
-                coPilot.rightTrigger()
-                        .onTrue(ShootCommands.shootTeleopCommand(feeder, flywheel, intake, noteSensor, leds));
+                coPilot.rightTrigger().onTrue(ShooterCommands.shootTeleopCommand(feeder, flywheel, intake, noteSensor));
             }
-            coPilot.a().whileTrue(ShootCommands.reverseShooterCommand(feeder, flywheel, leds));
+            coPilot.a().whileTrue(ShooterCommands.reverseShooterCommand(feeder, flywheel, leds));
         }
 
         if (Constants.hasClimberSubsystem()) {

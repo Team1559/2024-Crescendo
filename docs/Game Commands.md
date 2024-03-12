@@ -1,5 +1,6 @@
+#### Back to [README](/README.md)
 
-# Robot Commands
+# Game Commands
 
 ## Controllers
 * **Pilot Controller:** `[P]`
@@ -23,6 +24,8 @@ These are Commands that are triggered by things other then the controllers.
     * Any Motor exceeding their recommended temperature range, will be disabled until its temperature returns to a safe range
         * (For safety)
     * LEDs will flash $\color{yellow}Yellow$ while the motor is disabled
+
+<br/>
 
 # Controller Commands
 These Commands are triggered by the controllers.
