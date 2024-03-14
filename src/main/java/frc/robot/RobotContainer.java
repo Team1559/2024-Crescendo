@@ -296,16 +296,15 @@ public class RobotContainer {
 
         if (CONSTANTS.hasClimberSubsystem()) {
             Trigger noModifier = new Trigger(coPilot.y().or(coPilot.b()).negate());
+            // coPilot.povUp().whileTrue(climber.setVoltageUpCommand());
+            // coPilot.povDown().whileTrue(climber.setVoltageDownCommand());
+            coPilot.povUp().and(noModifier).whileTrue(climber.setVoltageUpCommand());
+            coPilot.povUp().and(coPilot.y()).whileTrue(climber.setLeftVoltageUpCommand());
+            coPilot.povUp().and(coPilot.b()).whileTrue(climber.setRightVoltageUpCommand());
 
-            
-
-            coPilot.povUp().and(noModifier).whileTrue(climber.incrementTargetHeightCommand(.1).repeatedly());
-            coPilot.povUp().and(coPilot.y()).whileTrue(climber.incrementLeftHeightCommand(.1).repeatedly());
-            coPilot.povUp().and(coPilot.b()).whileTrue(climber.incrementRightHeightCommand(.1).repeatedly());
-
-            coPilot.povDown().and(noModifier).whileTrue(climber.incrementTargetHeightCommand(-.1).repeatedly());
-            coPilot.povDown().and(coPilot.y()).whileTrue(climber.incrementLeftHeightCommand(-.1).repeatedly());
-            coPilot.povDown().and(coPilot.b()).whileTrue(climber.incrementRightHeightCommand(-.1).repeatedly());
+            coPilot.povDown().and(noModifier).whileTrue(climber.setVoltageDownCommand());
+            coPilot.povDown().and(coPilot.y()).whileTrue(climber.setLeftVoltageDownCommand());
+            coPilot.povDown().and(coPilot.b()).whileTrue(climber.setRightVoltageDownCommand());
         }
 
         if (CONSTANTS.hasTraverserSubsystem()) {
