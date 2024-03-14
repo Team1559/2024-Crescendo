@@ -8,19 +8,13 @@
         {
           "type": "named",
           "data": {
-            "name": "Spin Up Flywheel"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Auto Shoot"
+            "name": "Initial Shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Get out of the way Close"
+            "pathName": "Leave Right"
           }
         }
       ]

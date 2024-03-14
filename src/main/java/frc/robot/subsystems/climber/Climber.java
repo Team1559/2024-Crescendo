@@ -67,15 +67,15 @@ public class Climber extends SubsystemBase {
     }
 
     public Command setVoltageUpCommand() {
-        return new StartEndCommand(() -> setVoltage(3), () -> setVoltage(0), this);
+        return new StartEndCommand(() -> setVoltage(10), () -> setVoltage(0), this);
     }
 
     public Command setLeftVoltageUpCommand() {
-        return new StartEndCommand(() -> setVoltageLeft(3), () -> setVoltageLeft(0), this);
+        return new StartEndCommand(() -> setVoltageLeft(10), () -> setVoltageLeft(0), this);
     }
 
     public Command setRightVoltageUpCommand() {
-        return new StartEndCommand(() -> setVoltageRight(3), () -> setVoltageRight(0), this);
+        return new StartEndCommand(() -> setVoltageRight(10), () -> setVoltageRight(0), this);
     }
 
     public Command setVoltageDownCommand() {
