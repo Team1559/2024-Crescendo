@@ -100,6 +100,7 @@ public class ShooterCommands {
         ParallelRaceGroup group = new ParallelRaceGroup(
                 new StartEndCommand(feeder::start, feeder::stop, feeder),
                 new StartEndCommand(intake::start, intake::stop, intake),
+                // TODO: May want to wait a little after the note is no longer sensed.
                 noteSensor.waitForNoObjectCommandSwitch(),
                 new WaitCommand(5));
 
@@ -108,6 +109,7 @@ public class ShooterCommands {
 
     public static Command shootTeleopCommand(Feeder feeder, Flywheel flywheel, Intake intake, NoteSensor noteSensor) {
 
+        // TODO: Have this run until the Co-Pilot stops pushing the button.
         ParallelRaceGroup group = new ParallelRaceGroup(
                 new StartEndCommand(intake::start, intake::stop, intake),
                 new StartEndCommand(() -> feeder.setVelocity(11000), feeder::stop,
