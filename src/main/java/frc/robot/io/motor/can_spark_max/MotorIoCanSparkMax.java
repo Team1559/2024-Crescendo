@@ -1,4 +1,4 @@
-package frc.robot.io.motor;
+package frc.robot.io.motor.can_spark_max;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
@@ -19,26 +19,39 @@ import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
-import frc.robot.Constants.PID;
+import frc.robot.Constants.PidValues;
+import frc.robot.io.motor.MotorIo;
+import frc.robot.util.MathUtils;
 
-public abstract class MotorIoSparkMax implements MotorIo {
+public abstract class MotorIoCanSparkMax implements MotorIo {
 
     protected final boolean isInverted;
     protected final CANSparkMax motor;
     protected final Rotation2d absoluteEncoderOffset;
 
     protected Rotation2d targetPosition;
-    protected Measure<Velocity<Angle>> targetVelocity;
-    protected Measure<Voltage> targetVoltage;
+    protected Measure<Velocity<Angle>> targetVelocity, targetVelocityClamped;
+    protected Measure<Voltage> targetVoltage, targetVoltageClamped;
 
     /**
      * Create a new subsystem for a single SparkMax-controlled motor in voltage mode
      * 
-     * @param motorId  Motor CAN ID
-     * @param inverted True if the motor direction should be inverted
+     * @param motorId               Motor CAN ID
+     * @param inverted              True if the motor direction should be inverted
+     * @param idleMode              What the motor should do when no commands are
+     *                              being sent to
+     *                              it.
+     * @param absoluteEncoderOffset The offset for the internal/external encoder.
+     * @param pidValues             The values to configure the motors built in PID
+     *                              Controller.
+     *                              <p>
+     *                              (If {@code null}, the the
+     *                              {@link MotorIo#DEFAULT_PID_VALUES}
+     *                              will be used.)
+     *                              </p>
      */
-    public MotorIoSparkMax(int motorId, boolean inverted, IdleMode idleMode, Rotation2d absoluteEncoderOffset,
-            PID pidValues) {
+    public MotorIoCanSparkMax(int motorId, boolean inverted, IdleMode idleMode, Rotation2d absoluteEncoderOffset,
+            PidValues pidValues) {
 
         // Create & Configure Motor.
         motor = new CANSparkMax(motorId, MotorType.kBrushless);
@@ -51,6 +64,7 @@ public abstract class MotorIoSparkMax implements MotorIo {
         this.absoluteEncoderOffset = absoluteEncoderOffset;
 
         // Configure piD Controller.
+        pidValues = pidValues == null ? DEFAULT_PID_VALUES : pidValues;
         motor.getPIDController().setP(pidValues.P);
         motor.getPIDController().setI(pidValues.I);
         motor.getPIDController().setD(pidValues.D);
@@ -61,6 +75,7 @@ public abstract class MotorIoSparkMax implements MotorIo {
     public void updateInputs(MotorIoInputs inputs) {
 
         inputs.currentActual = Amps.of(motor.getOutputCurrent());
+        // currentAvailable= // Not Supported.
 
         List<String> faults = new LinkedList<>();
         for (FaultID faultID : FaultID.values()) {
@@ -70,7 +85,8 @@ public abstract class MotorIoSparkMax implements MotorIo {
         }
         inputs.faults = faults.toArray(new String[0]);
 
-        inputs.positionAbsolute = getAbsolutePosition();
+        inputs.positionAbsolute = getPositionAbsolute();
+        inputs.positionRelative = getPositionRelative();
         inputs.positionTarget = targetPosition;
 
         inputs.powerPercentage = (float) motor.getAppliedOutput();
@@ -79,17 +95,31 @@ public abstract class MotorIoSparkMax implements MotorIo {
 
         inputs.velocityActual = getVelocity();
         inputs.velocityTarget = targetVelocity;
+        inputs.velocityTargetClamped = targetVelocityClamped;
 
         inputs.voltsActual = getVoltage();
         inputs.voltsAvailable = Volts.of(motor.getBusVoltage());
         inputs.voltsTarget = targetVoltage;
+        inputs.voltsTargetClamped = targetVoltageClamped;
     }
 
     // ========================= Functions =========================
 
     @Override
-    public Rotation2d getAbsolutePosition() {
+    public Rotation2d getPositionAbsolute() {
         return Rotation2d.fromRotations(motor.getAbsoluteEncoder().getPosition()).plus(absoluteEncoderOffset);
+    }
+
+    @Override
+    public Rotation2d getPositionRelative() {
+
+        Rotation2d positionRelative = Rotation2d.fromRotations(motor.getEncoder().getPosition());
+
+        // Forces the Rotation2d object to detect if the continuous input threshold has
+        // been exceeded and account for it.
+        positionRelative = positionRelative.plus(Rotation2d.fromDegrees(0));
+
+        return positionRelative;
     }
 
     @Override
@@ -109,30 +139,41 @@ public abstract class MotorIoSparkMax implements MotorIo {
 
     @Override
     public void setPosition(Rotation2d position) {
-        motor.getPIDController().setReference(isInverted ? -position.getRotations() : position.getRotations(),
-                CANSparkMax.ControlType.kPosition);
+
         targetPosition = position;
         targetVelocity = null;
+        targetVelocityClamped = null;
         targetVoltage = null;
+        targetVoltageClamped = null;
+
+        motor.getPIDController().setReference(isInverted ? -position.getRotations() : position.getRotations(),
+                CANSparkMax.ControlType.kPosition);
     }
 
     @Override
     public void setVelocity(Measure<Velocity<Angle>> velocity) {
-        motor.getPIDController().setReference(
-                isInverted ? velocity.negate().in(RevolutionsPerSecond) : velocity.in(RevolutionsPerSecond),
-                CANSparkMax.ControlType.kVelocity);
-        targetVelocity = velocity;
+
         targetPosition = null;
+        targetVelocity = velocity;
+        targetVelocityClamped = MathUtils.clamp(velocity, getMaxSafeVelocity());
         targetVoltage = null;
+        targetVoltageClamped = null;
+
+        motor.getPIDController().setReference(isInverted ? targetVelocityClamped.negate().in(RevolutionsPerSecond)
+                : targetVelocityClamped.in(RevolutionsPerSecond), CANSparkMax.ControlType.kVelocity);
     }
 
     @Override
     public void setVoltage(Measure<Voltage> voltage) {
-        motor.getPIDController().setReference(isInverted ? voltage.negate().in(Volts) : voltage.in(Volts),
-                CANSparkMax.ControlType.kVoltage);
-        targetVoltage = voltage;
+
         targetPosition = null;
         targetVelocity = null;
+        targetVelocityClamped = null;
+        targetVoltage = voltage;
+        targetVoltageClamped = MathUtils.clamp(voltage, getMaxSafeVoltage());
+
+        motor.getPIDController().setReference(isInverted ? targetVoltageClamped.negate().in(Volts)
+                : targetVoltageClamped.in(Volts), CANSparkMax.ControlType.kVoltage);
     }
 
     @Override

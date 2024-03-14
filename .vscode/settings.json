@@ -2,8 +2,9 @@
     "[java]": {
         "editor.defaultFormatter": "redhat.java"
     },
-    "java.configuration.updateBuildConfiguration": "automatic",
-    "java.server.launchMode": "Standard",
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit"
+    },
     "files.exclude": {
         "**/.git": true,
         "**/.svn": true,
@@ -17,6 +18,13 @@
         "**/.factorypath": true,
         "**/*~": true
     },
+    "java.completion.favoriteStaticMembers": [
+        "edu.wpi.first.units.Units.*",
+        "frc.robot.util.SupplierUtil.*"
+    ],
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.debug.settings.onBuildFailureProceed": true,
+    "java.server.launchMode": "Standard",
     "java.test.config": [
         {
             "name": "WPIlibUnitTests",
@@ -30,13 +38,5 @@
             }
         },
     ],
-    "java.test.defaultConfig": "WPIlibUnitTests",
-    "java.debug.settings.onBuildFailureProceed": true,
-    "editor.codeActionsOnSave": {
-        "source.organizeImports": "explicit"
-    },
-    "java.completion.favoriteStaticMembers": [
-        "frc.robot.util.SupplierUtil.*",
-        "edu.wpi.first.units.Units.*"
-    ]
+    "java.test.defaultConfig": "WPIlibUnitTests"
 }

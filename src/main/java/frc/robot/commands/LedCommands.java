@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.led.Leds;
+import frc.robot.util.CommandUtils;
 
 public class LedCommands {
 
@@ -17,9 +18,10 @@ public class LedCommands {
     // ========================= Default Commands =========================
 
     public static Command defaultLedCommand(Leds leds) {
-        return Commands.run(() -> {
+        Command command = Commands.run(() -> {
             leds.setAllianceColor();
         }, leds);
+        return CommandUtils.addName(command);
     }
 
     // ========================= Other Commands =========================
@@ -49,7 +51,6 @@ public class LedCommands {
             }
         };
         blinkCommand.addRequirements(leds);
-        return blinkCommand;
+        return CommandUtils.addName(blinkCommand);
     }
-
 }

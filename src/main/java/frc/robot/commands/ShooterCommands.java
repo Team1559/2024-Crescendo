@@ -1,20 +1,25 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.io.motor.MotorIoNeo550Brushless;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.Constants;
+import frc.robot.subsystems.abstract_interface.MotorSubsystem;
 import frc.robot.subsystems.led.Leds;
+import frc.robot.subsystems.shooter.Aimer;
 import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.Intake;
 import frc.robot.subsystems.shooter.NoteSensor;
+import frc.robot.util.CommandUtils;
 
 /**
  * Only used for commands that use multiple subsystems.
@@ -29,59 +34,78 @@ public class ShooterCommands {
     }
 
     // ========================= Default Commands =========================
-    public static Command defaultIntakeCommand(Intake intake, NoteSensor sensor) {
-        return Commands.run(() -> {
-            if (sensor.isObjectDetectedOnSwitch()) {
-                intake.stop();
-            } else {
-                intake.start();
-            }
-        }, intake);
-    }
-
-    public static Command defaultFeederCommand(Feeder feeder, NoteSensor sensor) {
-        return Commands.run(() -> {
-            if (sensor.isObjectDetectedOnSwitch()) {
-                feeder.stop();
-            } else {
-                feeder.start();
-            }
-        }, feeder);
-    }
 
     public static Command defaultFlywheelCommand(Flywheel flywheel) {
-        return new SequentialCommandGroup(new WaitCommand(.25), flywheel.stopCommand());
+        Command command = new SequentialCommandGroup(new WaitCommand(.25), flywheel.stopCommand());
+
+        return CommandUtils.addName(command);
+    }
+
+    // ========================= Trigger Commands ==============================
+
+    public static Command overheatedMotorShutdownCommand(MotorSubsystem motorSubsystem, Leds leds) {
+        Command command = motorSubsystem.stopCommand()
+                .alongWith(leds.setDynamicPatternCommand(Constants.getMotorOverheatEmergencyPattern(), false));
+
+        return CommandUtils.addName(command);
     }
 
     // ========================= Other Commands =========================
 
-    public static Command autoIntakeStartCommand(Intake intake, Feeder feeder) {
-        return new InstantCommand(() -> {
-            intake.start();
-            feeder.start();
-        });
+    public static Command autoDelayedManualShotCommand(Aimer aimer, Feeder feeder, Intake intake,
+            NoteSensor noteSensor) {
+
+        Command command = new ParallelDeadlineGroup(
+                new WaitCommand(12),
+                aimer.setAngleCommand(Rotation2d.fromDegrees(36.7)).andThen(new WaitUntilCommand(aimer::isAtTarget))
+                        .andThen(ShooterCommands.shootAutonomousCommand(feeder, intake, noteSensor)));
+
+        return CommandUtils.addName(command);
     }
 
-    public static Command intakeStartStopCommand(Intake intake, Feeder feeder) {
-        return new StartEndCommand(
+    public static Command autoIntakeStartCommand(Feeder feeder, Intake intake) {
+
+        Command command = new InstantCommand(() -> {
+            intake.forward();
+            feeder.forward();
+        });
+
+        return CommandUtils.addName(command);
+    }
+
+    public static Command autoJustShootCommand(Aimer aimer, Feeder feeder, Intake intake, NoteSensor noteSensor) {
+
+        Command command = aimer.setAngleCommand(Rotation2d.fromDegrees(36.7))
+                .andThen(new WaitUntilCommand(aimer::isAtTarget))
+                .andThen(ShooterCommands.shootAutonomousCommand(feeder, intake, noteSensor));
+
+        return CommandUtils.addName(command);
+    }
+
+    public static Command intakeStartStopCommand(Feeder feeder, Intake intake) {
+        Command command = new StartEndCommand(
                 () -> {
-                    intake.start();
-                    feeder.start();
+                    intake.forward();
+                    feeder.forward();
                 },
                 () -> {
                     intake.stop();
                     feeder.stop();
                 },
                 intake, feeder);
+
+        return CommandUtils.addName(command);
     }
 
-    public static Command reverseShooterAndIntakeCommand(Intake intake, Feeder feeder, Flywheel flywheel) {
-        return new ParallelCommandGroup(new StartEndCommand(flywheel::reverse, flywheel::stop, flywheel),
+    public static Command reverseShooterAndIntakeCommand(Feeder feeder, Flywheel flywheel, Intake intake) {
+        Command command = new ParallelCommandGroup(new StartEndCommand(flywheel::reverse, flywheel::stop, flywheel),
                 new StartEndCommand(feeder::reverse, feeder::stop, feeder),
                 new StartEndCommand(intake::reverse, intake::stop, intake));
+
+        return CommandUtils.addName(command);
     }
 
-    public static Command reverseShooterCommand(Flywheel flywheel, Feeder feeder, Leds leds) {
+    public static Command reverseShooterCommand(Feeder feeder, Flywheel flywheel, Leds leds) {
         Command reverseShooterCommand = new Command() {
             @Override
             public void execute() {
@@ -98,47 +122,50 @@ public class ShooterCommands {
             }
         };
         reverseShooterCommand.addRequirements(flywheel, feeder, leds);
-        return reverseShooterCommand;
+
+        return CommandUtils.addName(reverseShooterCommand);
     }
 
-    public static Command shootAutonomousCommand(Feeder feeder, NoteSensor noteSensor, Intake intake) {
+    public static Command runIntakeCommand(Feeder feeder, Flywheel flywheel, Intake intake) {
+
+        Command command = new ParallelCommandGroup(ShooterCommands.intakeStartStopCommand(feeder, intake),
+                flywheel.stopCommand());
+
+        return CommandUtils.addName(command);
+    }
+
+    public static Command shootAutonomousCommand(Feeder feeder, Intake intake, NoteSensor noteSensor) {
 
         ParallelRaceGroup group = new ParallelRaceGroup(
-                new StartEndCommand(feeder::start, feeder::stop, feeder),
-                new StartEndCommand(intake::start, intake::stop, intake),
+                feeder.forwardThenStopCommand(),
+                intake.forwardThenStopCommand(),
                 // TODO: May want to wait a little after the note is no longer sensed.
                 noteSensor.waitForNoObjectOnSwitchCommand(),
                 new WaitCommand(5));
 
-        return group;
+        return CommandUtils.addName(group);
     }
 
     public static Command shootTeleopCommand(Feeder feeder, Flywheel flywheel, Intake intake, NoteSensor noteSensor) {
 
         // TODO: Have this run until the Co-Pilot stops pushing the button.
         ParallelRaceGroup group = new ParallelRaceGroup(
-                new StartEndCommand(intake::start, intake::stop, intake),
-                new StartEndCommand(() -> feeder.setVelocity(MotorIoNeo550Brushless.MAX_VELOCITY), feeder::stop,
-                        feeder),
+                new StartEndCommand(intake::forward, intake::stop, intake),
+                feeder.forwardMaxVelocityThenStopCommand(),
                 noteSensor.waitForNoObjectOnSwitchCommand(),
                 new WaitCommand(5));
 
-        // TODO: Spin up flywheelsm if not already spinning.
-        return group;
+        // TODO: Spin up flywheel if not already spinning.
+
+        return CommandUtils.addName(group);
     }
 
     public static Command spinUpFlywheelCommand(Flywheel flywheel) {
-        return new SequentialCommandGroup(
-                flywheel.startCommand(),
+        Command command = new SequentialCommandGroup(
+                flywheel.forwardCommand(),
                 new WaitCommand(1) // TODO: Tune.
         );
-    }
 
-    public static Command stopIntakeFeederCommand(Intake intake, Feeder feeder, Leds leds) {
-        return new InstantCommand(() -> {
-            intake.stop();
-            feeder.stop();
-            leds.setDynamicPattern(new Color[] { Color.kRed, Color.kRed, Color.kBlack, Color.kBlack }, true);
-        }, intake, feeder);
+        return CommandUtils.addName(command);
     }
 }

@@ -8,8 +8,12 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.BaseUnits;
+import edu.wpi.first.units.PublicTemperature;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.util.ReflectionUtils;
 
 public class Robot extends LoggedRobot {
 
@@ -18,13 +22,21 @@ public class Robot extends LoggedRobot {
 
     /**
      * This function is run when the robot is first started up and should be used
-     * for any
-     * initialization code.
+     * for any initialization code.
      */
     @Override
     public void robotInit() {
 
-        // Set up data receivers & replay source
+        // ---------- Set Base Units ----------
+        // Change Temperature Base Unit from Kelvin to Celsius.
+        ReflectionUtils.modifyStaticFinalField(BaseUnits.class, "Temperature",
+                new PublicTemperature(x -> x, x -> x, "Celsius", "°C"));
+        ReflectionUtils.modifyStaticFinalField(Units.class, "Celsius",
+                BaseUnits.Temperature);
+        ReflectionUtils.modifyStaticFinalField(Units.class, "Kelvin",
+                Units.derive(Units.Celsius).offset(-273.15).named("Kelvin").symbol("K").make());
+
+        // Set up data receivers & replay source.
         switch (Constants.getCurrentOperatingMode()) {
 
             case REAL_WORLD:
@@ -50,11 +62,16 @@ public class Robot extends LoggedRobot {
                 throw new RuntimeException("Unknown Run Mode: " + Constants.getCurrentOperatingMode());
         }
 
-        // See http://bit.ly/3YIzFZ6 for more information on timestamps in AdvantageKit.
-        // Logger.disableDeterministicTimestamps()
-
-        // Start AdvantageKit logger
+        // Start AdvantageKit logger.
         Logger.start();
+
+        // Log All Commands.
+        CommandScheduler.getInstance().onCommandInitialize((command) -> {
+            Logger.recordOutput("Commands", command.getName() + ":initialize");
+        });
+        CommandScheduler.getInstance().onCommandFinish((command) -> {
+            Logger.recordOutput("Commands", command.getName() + ":finish");
+        });
 
         // Instantiate our RobotContainer. This will perform all our button bindings,
         // and put our autonomous chooser on the dashboard.

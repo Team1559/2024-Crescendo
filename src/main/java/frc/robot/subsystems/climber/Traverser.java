@@ -1,32 +1,31 @@
 package frc.robot.subsystems.climber;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.Constants;
 import frc.robot.io.motor.MotorIo;
-import frc.robot.subsystems.AbstractSingleMotorSubsystem;
+import frc.robot.subsystems.abstract_interface.SingleMotorSubsystem;
 
-public class Traverser extends AbstractSingleMotorSubsystem {
+public class Traverser extends SingleMotorSubsystem {
 
     public Traverser(MotorIo io) {
-        super(io, Constants.getTraverserVelocity(), Constants.getTraverserVelocity());
+        super(io, Constants.getTraverserVelocity(), Constants.getTraverserVelocity().negate());
     }
 
     // ========================= Functions =========================
     public void traverserLeft() {
-        setVelocity(DEFAULT_FORWARDS_VELOCITY);
+        forward();
     }
 
     public void traverserRight() {
-        setVelocity(DEFAULT_FORWARDS_VELOCITY.negate());
+        reverse();
     }
 
     // ========================= Commands =========================
-    public Command traverserLeftStopCommand() {
-        return new StartEndCommand(this::traverserLeft, this::stop, this);
+    public Command traverserLeftThenStopCommand() {
+        return forwardThenStopCommand();
     }
 
-    public Command traverserRightStopCommand() {
-        return new StartEndCommand(this::traverserRight, this::stop, this);
+    public Command traverserRightThenStopCommand() {
+        return reverseThenStopCommand();
     }
 }

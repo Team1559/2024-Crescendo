@@ -11,24 +11,17 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.opencv.core.Mat.Tuple2;
 
-import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -68,18 +61,18 @@ public class Constants {
     /**
      * Contains PID values and a Feed Forward (FF) value.
      */
-    public static class PID {
+    public static class PidValues {
 
         public final double P, I, D, FF;
 
         /**
          * Constructs this PID object with a FF value of 0.
          */
-        public PID(double p, double i, double d) {
+        public PidValues(double p, double i, double d) {
             this(p, i, d, 0);
         }
 
-        public PID(double p, double i, double d, double ff) {
+        public PidValues(double p, double i, double d, double ff) {
             P = p;
             I = i;
             D = d;
@@ -369,8 +362,8 @@ public class Constants {
         return uniqueCanBusId(22);
     }
 
-    public static PID getAimerPid() {
-        return new PID(.6, 0, 0, 0.7);
+    public static PidValues getAimerPid() {
+        return new PidValues(.6, 0, 0, 0.7);
     }
 
     // #endregion
@@ -416,8 +409,8 @@ public class Constants {
         return uniqueCanBusId(26);
     }
 
-    public static PID getClimberPid() {
-        return new PID(.1, 0, 0);
+    public static PidValues getClimberPid() {
+        return new PidValues(.1, 0, 0);
     }
 
     public static double getClimberRotationsPerInch() {
@@ -435,8 +428,8 @@ public class Constants {
         return true;
     }
 
-    public static PID getFeederPidValues() {
-        return new PID(0.33 / Constants.getFeederVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000);
+    public static PidValues getFeederPidValues() {
+        return new PidValues(0.33 / Constants.getFeederVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000);
     }
 
     public static Measure<Velocity<Angle>> getFeederVelocityForward() {
@@ -494,8 +487,8 @@ public class Constants {
         return true;
     }
 
-    public static PID getIntakePidValues() {
-        return new PID(0.33 / Constants.getIntakeVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000);
+    public static PidValues getIntakePidValues() {
+        return new PidValues(0.33 / Constants.getIntakeVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000);
     }
 
     public static Measure<Velocity<Angle>> getIntakeVelocityForward() {
@@ -595,8 +588,8 @@ public class Constants {
         return true;
     }
 
-    public static PID getTraverserPidValues() {
-        return new PID(0.33 / Constants.getTraverserVelocity().in(RevolutionsPerSecond), 0, 0, 11.0 / 11000);
+    public static PidValues getTraverserPidValues() {
+        return new PidValues(0.33 / Constants.getTraverserVelocity().in(RevolutionsPerSecond), 0, 0, 11.0 / 11000);
     }
 
     public static Measure<Velocity<Angle>> getTraverserVelocity() {
@@ -626,26 +619,6 @@ public class Constants {
 
     // #region: ----- Falcon 500 Motor -----
 
-    @SuppressWarnings("unchecked")
-    public static Map<String, StatusSignal<Boolean>> getAllGetFaultStatusSignalMethods(TalonFX motor) {
-        Map<String, StatusSignal<Boolean>> faults = new HashMap<>();
-        Class<?> c = motor.getClass();
-        Method[] publicMethods = c.getMethods();
-        for (int i = 0; i < publicMethods.length; i++) {
-            Method method = publicMethods[i];
-            String[] parts = method.toString().split("_");
-            if (parts.length == 2 && parts[0].equals("public static StatusSignal<Boolean> getFault")) {
-                try {
-                    faults.put(parts[1].split("(")[0], (StatusSignal<Boolean>) method.invoke(motor));
-                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                    // Ignore.
-                    e.printStackTrace();
-                }
-            }
-        }
-        return faults;
-    }
-
     /**
      * See: <a href=
      * "https://www.chiefdelphi.com/uploads/short-url/eVYO5tVOYZecwq6Tl2kURlFZFgq.pdf">Falcon
@@ -655,17 +628,6 @@ public class Constants {
      */
     public static Measure<Temperature> getFalcon500MaxTemperature() {
         return Celsius.of(109);
-    }
-
-    public static String[] getFaults(Map<String, StatusSignal<Boolean>> faultStatusSignals) {
-
-        List<String> faults = new LinkedList<>();
-        for (Entry<String, StatusSignal<Boolean>> entry : faultStatusSignals.entrySet()) {
-            if (entry.getValue().getValue()) {
-                faults.add(entry.getKey());
-            }
-        }
-        return faults.toArray(new String[0]);
     }
 
     // #endregion

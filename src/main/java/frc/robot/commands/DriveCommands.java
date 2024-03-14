@@ -22,10 +22,17 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.SwerveBase;
+import frc.robot.subsystems.led.Leds;
 import frc.robot.subsystems.shooter.Aimer;
+import frc.robot.subsystems.shooter.Feeder;
 import frc.robot.subsystems.shooter.Flywheel;
+import frc.robot.subsystems.shooter.Intake;
+import frc.robot.subsystems.shooter.NoteSensor;
+import frc.robot.util.CommandUtils;
 
 public class DriveCommands {
 
@@ -33,13 +40,13 @@ public class DriveCommands {
     private DriveCommands() {
     }
 
-    // ========================= Default Commands =========================
+    // ========================= Default Commands ==============================
 
     public static Command manualDriveDefaultCommand(SwerveBase swerveBase, DoubleSupplier xSupplier,
             DoubleSupplier ySupplier,
             DoubleSupplier omegaSupplier) {
 
-        return Commands.run(
+        Command command = Commands.run(
                 () -> {
                     double linearMagnitude = SwerveBase.calculateLinearMagnitude(xSupplier, ySupplier);
                     double omega = MathUtil.applyDeadband(-omegaSupplier.getAsDouble(),
@@ -68,11 +75,22 @@ public class DriveCommands {
                     }
                 },
                 swerveBase);
+
+        return CommandUtils.addName(command);
     }
 
-    // ========================= Other Commands =========================
+    // ========================= Trigger Commands ==============================
 
-    public static Command autoAimAndManuallyDriveCommand(SwerveBase swerveBase, Flywheel flywheel, Aimer aimer,
+    public static Command overheatedMotorShutdownCommand(SwerveBase swerveBase, Leds leds) {
+        Command command = swerveBase.stopCommand()
+                .alongWith(leds.setDynamicPatternCommand(Constants.getMotorOverheatEmergencyPattern(), false));
+
+        return CommandUtils.addName(command);
+    }
+
+    // ========================= Other Commands ================================
+
+    public static Command autoAimAndManuallyDriveCommand(SwerveBase swerveBase, Aimer aimer, Flywheel flywheel,
             DoubleSupplier xSupplier, DoubleSupplier ySupplier, Supplier<Translation3d> target) {
 
         Command aimingDrive = new Command() {
@@ -87,7 +105,7 @@ public class DriveCommands {
                 pid.setTolerance(1/* degree(s) */);
                 pid.enableContinuousInput(-180, 180); // Degrees.
                 if (Constants.hasFlywheelSubsystem())
-                    flywheel.start();
+                    flywheel.forward();
             }
 
             @Override
@@ -132,9 +150,12 @@ public class DriveCommands {
                 // TODO: Add Turning LEDs to Green, when close enough to shoot.
 
                 // Log Calculated Values.
-                Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/degreesToTarget", degreesToTarget);
-                Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/vxMetersPerSecond", scaledXVelocity);
-                Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/vyMetersPerSecond", scaledYVelocity);
+                Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/degreesToTarget",
+                        degreesToTarget);
+                Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/vxMetersPerSecond",
+                        scaledXVelocity);
+                Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/vyMetersPerSecond",
+                        scaledYVelocity);
                 Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/omegaRadiansPerSecond", omega);
             }
 
@@ -155,7 +176,19 @@ public class DriveCommands {
         aimingDrive.addRequirements(swerveBase);
         if (Constants.hasFlywheelSubsystem())
             aimingDrive.addRequirements(flywheel);
-        return aimingDrive;
+        return CommandUtils.addName(aimingDrive);
+    }
+
+    public static Command autoShootCommand(SwerveBase swerveBase, Aimer aimer, Feeder feeder, Intake intake,
+            NoteSensor noteSensor) {
+        Command command = new SequentialCommandGroup(
+                new ParallelCommandGroup(
+                        DriveCommands.turnToTargetCommand(swerveBase, Constants::getSpeakerLocation, 4.5),
+                        aimer.aimAtTargetCommand(Constants::getSpeakerLocation, swerveBase::getTranslation)
+                                .andThen(aimer.waitUntilAtTargetCommand())),
+                ShooterCommands.shootAutonomousCommand(feeder, intake, noteSensor));
+
+        return CommandUtils.addName(command);
     }
 
     /**
@@ -253,6 +286,6 @@ public class DriveCommands {
 
         spinCommand.addRequirements(swerveBase);
 
-        return spinCommand;
+        return CommandUtils.addName(spinCommand);
     }
 }

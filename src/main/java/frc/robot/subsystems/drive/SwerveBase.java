@@ -39,6 +39,7 @@ import frc.robot.io.gyro.GyroIo;
 import frc.robot.io.gyro.GyroIoInputsAutoLogged;
 import frc.robot.io.swerve_module.SwerveModuleIo;
 import frc.robot.subsystems.drive.SwerveModule.WheelModuleIndex;
+import frc.robot.util.CommandUtils;
 import frc.robot.util.LocalAdStarAk;
 
 public class SwerveBase extends SubsystemBase {
@@ -292,10 +293,10 @@ public class SwerveBase extends SubsystemBase {
     // ========================= Function Commands =============================
 
     public Command resetFieldOrientationCommand() {
-        return new InstantCommand(this::resetFieldOrientation);
+        return CommandUtils.addName(getName(), new InstantCommand(this::resetFieldOrientation));
     }
 
     public Command stopCommand() {
-        return new InstantCommand(this::stop);
+        return CommandUtils.addName(getName(), new InstantCommand(this::stop));
     }
 }

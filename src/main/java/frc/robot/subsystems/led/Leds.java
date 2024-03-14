@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.util.CommandUtils;
 
 public class Leds extends SubsystemBase {
 
@@ -197,16 +198,6 @@ public class Leds extends SubsystemBase {
     // ========================= Function Commands =============================
 
     /**
-     * Dims/Brightens the lights
-     * 
-     * @param isDimming are lights being dimmed or brightened
-     * @return
-     */
-    public Command changeBrightnessCommand(boolean isDimming) {
-        return new InstantCommand(() -> changeBrightness(isDimming), this);
-    }
-
-    /**
      * Set the lights to a scrolling pattern
      * 
      * @param pattern                  Pattern the LEDs are being set to
@@ -215,7 +206,8 @@ public class Leds extends SubsystemBase {
      * @return
      */
     public Command setDynamicPatternCommand(Color[] pattern, boolean isDynamicPatternForwards) {
-        return new InstantCommand(() -> setDynamicPattern(pattern, isDynamicPatternForwards), this);
+        return CommandUtils.addName(getName(),
+                new InstantCommand(() -> setDynamicPattern(pattern, isDynamicPatternForwards), this));
     }
 
     /**
@@ -225,25 +217,6 @@ public class Leds extends SubsystemBase {
      * @return
      */
     public Command setColorCommand(Color color) {
-        return new InstantCommand(() -> setColor(color), this);
-    }
-
-    public Command setAllianceColorCommand() {
-        return new InstantCommand(this::setAllianceColor, this);
-    }
-
-    /**
-     * Sets a static pattern to the LEDs
-     * 
-     * @param subsystem LEDs being set
-     * @param pattern   Pattern being set to the LEDs
-     * @return
-     */
-    public Command setStaticPatternCommand(Color[] pattern) {
-        return new InstantCommand(() -> setStaticPattern(pattern), this);
-    }
-
-    public Command turnOffCommand() {
-        return new InstantCommand(this::turnOff, this);
+        return CommandUtils.addName(getName(), new InstantCommand(() -> setColor(color), this));
     }
 }
