@@ -270,7 +270,8 @@ public class RobotContainer {
                 pilot::getLeftY,
                 pilot::getLeftX,
                 CONSTANTS::getAmpLocation));
-        pilot.leftTrigger().onFalse(aimer.setTargetAngleCommand(Rotation2d.fromDegrees(2)));
+        pilot.leftTrigger().onFalse(flywheel.stopCommand().andThen(new WaitUntilCommand(1))
+                .andThen(aimer.setTargetAngleCommand(CONSTANTS.getAimerAngleRange().get_0())));
         pilot.y().onTrue(driveBase.resetFieldOrientationCommand());
         // #endregion
 
@@ -295,6 +296,8 @@ public class RobotContainer {
 
         if (CONSTANTS.hasClimberSubsystem()) {
             Trigger noModifier = new Trigger(coPilot.y().or(coPilot.b()).negate());
+
+            
 
             coPilot.povUp().and(noModifier).whileTrue(climber.incrementTargetHeightCommand(.1).repeatedly());
             coPilot.povUp().and(coPilot.y()).whileTrue(climber.incrementLeftHeightCommand(.1).repeatedly());

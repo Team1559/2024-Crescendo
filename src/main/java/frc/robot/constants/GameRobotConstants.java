@@ -100,7 +100,7 @@ public class GameRobotConstants extends AbstractConstants {
     // #region: ----- Aimer -----
     @Override
     public Tuple2<Rotation2d> getAimerAngleRange() {
-        return new Tuple2<Rotation2d>(Rotation2d.fromDegrees(1), Rotation2d.fromDegrees(40));
+        return new Tuple2<Rotation2d>(Rotation2d.fromDegrees(10), Rotation2d.fromDegrees(40));
     }
 
     @Override

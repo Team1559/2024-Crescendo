@@ -55,6 +55,7 @@ public class Aimer extends SubsystemBase {
         motorR.setSmartCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentLimit());
         motorL.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
         motorR.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
+        setTargetAngle(Rotation2d.fromDegrees(12));
     }
 
     @Override
@@ -67,7 +68,7 @@ public class Aimer extends SubsystemBase {
             double kF = 0.7;
             double ff = kF * Rotation2d.fromDegrees(inputs.targetAngleDegrees).getCos();
             double output = ff + controller.calculate(inputs.currentAngleDegrees);
-            output = MathUtil.clamp(output, -1, 2);
+            output = MathUtil.clamp(output, -.5, 2);
             motorL.setVoltage(output);
             motorR.setVoltage(output);
         }
