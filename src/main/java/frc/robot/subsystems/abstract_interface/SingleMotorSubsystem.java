@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.BetterLogger;
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
@@ -174,11 +174,11 @@ public class SingleMotorSubsystem extends SubsystemBase implements MotorSubsyste
         }
 
         // Log Subsystem Inputs.
-        BetterLogger.processInputs(getName(), subsystemInputs);
+        Logger.processInputs(getName(), subsystemInputs);
 
         // Log Motor Inputs.
         motorIo.updateInputs(ioInputs);
-        BetterLogger.processInputs(getName(), ioInputs);
+        Logger.processInputs(getName(), ioInputs);
     }
 
     // ========================= Functions =====================================

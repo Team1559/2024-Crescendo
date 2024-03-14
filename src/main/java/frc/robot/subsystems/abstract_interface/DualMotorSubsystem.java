@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.BetterLogger;
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
@@ -183,7 +183,7 @@ public abstract class DualMotorSubsystem extends SubsystemBase implements MotorS
         subsystemInputs.targetPositionClampedDifference = MathUtils.difference(
                 leftMotor.subsystemInputs.targetPositionClamped, rightMotor.subsystemInputs.targetPositionClamped);
 
-        BetterLogger.processInputs(getName(), subsystemInputs);
+        Logger.processInputs(getName(), subsystemInputs);
     }
 
     // ========================= Functions =====================================

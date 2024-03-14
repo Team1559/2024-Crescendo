@@ -7,7 +7,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.BetterLogger;
+import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.pathfinding.Pathfinding;
@@ -144,10 +144,10 @@ public class SwerveBase extends SubsystemBase {
                 Constants::shouldFlipPath,
                 this);
         Pathfinding.setPathfinder(new LocalAdStarAk());
-        PathPlannerLogging.setLogActivePathCallback(activePath -> BetterLogger.recordOutput("PathPlanner/ActivePath",
+        PathPlannerLogging.setLogActivePathCallback(activePath -> Logger.recordOutput("PathPlanner/ActivePath",
                 activePath.toArray(new Pose2d[activePath.size()])));
         PathPlannerLogging
-                .setLogTargetPoseCallback(targetPose -> BetterLogger.recordOutput("PathPlanner/TargetPos", targetPose));
+                .setLogTargetPoseCallback(targetPose -> Logger.recordOutput("PathPlanner/TargetPos", targetPose));
 
         // TODO: Figure out why the robot is not starting at 0,0.
         setPose(new Pose2d(new Translation2d(),
@@ -169,7 +169,7 @@ public class SwerveBase extends SubsystemBase {
 
         // ---------- Log Gyro Inputs ----------
         gyroIO.updateInputs(gyroInputs);
-        BetterLogger.processInputs("Drive/Gyro", gyroInputs);
+        Logger.processInputs("Drive/Gyro", gyroInputs);
 
         // ---------- Update Position Estimator ----------
         updateModulePositions();
@@ -181,7 +181,7 @@ public class SwerveBase extends SubsystemBase {
                 .of(lastPosition.getTranslation().getDistance(getEstimatedPosition().getTranslation()))
                 .per(Seconds.of(1 / 50));
         lastPosition = getEstimatedPosition();
-        BetterLogger.processInputs(LOG_PATH, inputs);
+        Logger.processInputs(LOG_PATH, inputs);
     }
 
     // ========================= Functions =====================================
@@ -261,8 +261,8 @@ public class SwerveBase extends SubsystemBase {
         }
 
         // Log setpoint states.
-        BetterLogger.recordOutput(LOG_PATH + "/Setpoints", setpointStates);
-        BetterLogger.recordOutput(LOG_PATH + "/SetpointsOptimized", optimizedSetpointStates);
+        Logger.recordOutput(LOG_PATH + "/Setpoints", setpointStates);
+        Logger.recordOutput(LOG_PATH + "/SetpointsOptimized", optimizedSetpointStates);
     }
 
     /** Resets the current odometry pose. */

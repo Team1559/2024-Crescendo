@@ -1,15 +1,19 @@
 package frc.robot;
 
-import org.littletonrobotics.junction.BetterLogger;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.BaseUnits;
+import edu.wpi.first.units.PublicTemperature;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.util.ReflectionUtils;
 
 public class Robot extends LoggedRobot {
 
@@ -18,50 +22,60 @@ public class Robot extends LoggedRobot {
 
     /**
      * This function is run when the robot is first started up and should be used
-     * for any
-     * initialization code.
+     * for any initialization code.
      */
     @Override
     public void robotInit() {
 
-        // Set up data receivers & replay source
+        // ---------- Set Base Units ----------
+        // Change Temperature Base Unit from Kelvin to Celsius.
+        ReflectionUtils.modifyStaticFinalField(BaseUnits.class, "Temperature",
+                new PublicTemperature(x -> x, x -> x, "Celsius", "°C"));
+        ReflectionUtils.modifyStaticFinalField(Units.class, "Celsius",
+                BaseUnits.Temperature);
+        ReflectionUtils.modifyStaticFinalField(Units.class, "Kelvin",
+                Units.derive(Units.Celsius).offset(-273.15).named("Kelvin").symbol("K").make());
+
+        // Set up data receivers & replay source.
         switch (Constants.getCurrentOperatingMode()) {
 
             case REAL_WORLD:
                 // Running on a real robot, log to a USB stick ("/U/logs")
-                BetterLogger.addDataReceiver(new WPILOGWriter());
-                BetterLogger.addDataReceiver(new NT4Publisher());
+                Logger.addDataReceiver(new WPILOGWriter());
+                Logger.addDataReceiver(new NT4Publisher());
                 break;
 
             case SIMULATION:
                 // Running a physics simulator, log to NT
-                BetterLogger.addDataReceiver(new NT4Publisher());
+                Logger.addDataReceiver(new NT4Publisher());
                 break;
 
             case LOG_REPLAY:
                 // Replaying a log, set up replay source
                 setUseTiming(false); // Run as fast as possible
                 String logPath = LogFileUtil.findReplayLog();
-                BetterLogger.setReplaySource(new WPILOGReader(logPath));
-                BetterLogger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+                Logger.setReplaySource(new WPILOGReader(logPath));
+                Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
                 break;
 
             default:
                 throw new RuntimeException("Unknown Run Mode: " + Constants.getCurrentOperatingMode());
         }
 
-        // Start AdvantageKit logger
-        BetterLogger.start();
+        // Start AdvantageKit logger.
+        Logger.start();
+
+        // Log All Commands.
+        CommandScheduler.getInstance().onCommandInitialize((command) -> {
+            Logger.recordOutput("Commands", command.getName() + ":initialize");
+        });
+        CommandScheduler.getInstance().onCommandFinish((command) -> {
+            Logger.recordOutput("Commands", command.getName() + ":finish");
+        });
 
         // Instantiate our RobotContainer. This will perform all our button bindings,
         // and put our autonomous chooser on the dashboard.
         robotContainer = new RobotContainer();
-        CommandScheduler.getInstance().onCommandInitialize((command) -> {
-            BetterLogger.recordOutput("Commands", command.getName() + ":initialize");
-        });
-        CommandScheduler.getInstance().onCommandFinish((command) -> {
-            BetterLogger.recordOutput("Commands", command.getName() + ":finish");
-        });
     }
 
     /** This function is called periodically during all modes. */

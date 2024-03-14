@@ -6,7 +6,7 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
-import org.littletonrobotics.junction.BetterLogger;
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -85,7 +85,7 @@ public class SwerveModule {
     public void periodic() {
 
         io.updateInputs(inputs);
-        BetterLogger.processInputs("Drive/" + index.name(), inputs);
+        Logger.processInputs("Drive/" + index.name(), inputs);
 
         // On first cycle, reset relative turn encoder.
         // Wait until absolute angle is nonzero in case it wasn't initialized yet.

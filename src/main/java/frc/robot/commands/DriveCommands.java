@@ -6,7 +6,7 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import org.littletonrobotics.junction.BetterLogger;
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -150,13 +150,13 @@ public class DriveCommands {
                 // TODO: Add Turning LEDs to Green, when close enough to shoot.
 
                 // Log Calculated Values.
-                BetterLogger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/degreesToTarget",
+                Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/degreesToTarget",
                         degreesToTarget);
-                BetterLogger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/vxMetersPerSecond",
+                Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/vxMetersPerSecond",
                         scaledXVelocity);
-                BetterLogger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/vyMetersPerSecond",
+                Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/vyMetersPerSecond",
                         scaledYVelocity);
-                BetterLogger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/omegaRadiansPerSecond", omega);
+                Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/omegaRadiansPerSecond", omega);
             }
 
             @Override
@@ -230,9 +230,9 @@ public class DriveCommands {
 
                 swerveBase.runVelocity(new ChassisSpeeds(0, 0, omega));
 
-                BetterLogger.recordOutput("DriveCommands/spinCommand/delta", delta);
-                BetterLogger.recordOutput("DriveCommands/spinCommand/rampOmega", rampOmega);
-                BetterLogger.recordOutput("DriveCommands/spinCommand/omega", omega);
+                Logger.recordOutput("DriveCommands/spinCommand/delta", delta);
+                Logger.recordOutput("DriveCommands/spinCommand/rampOmega", rampOmega);
+                Logger.recordOutput("DriveCommands/spinCommand/omega", omega);
             }
 
             @Override
