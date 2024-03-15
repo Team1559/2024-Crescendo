@@ -1,26 +1,19 @@
 package frc.robot.subsystems.shooter;
 
-import com.ctre.phoenix6.signals.NeutralModeValue;
-
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import frc.robot.Constants;
-import frc.robot.io.motor.talon_fx.MotorIoFalcon500;
+import frc.robot.io.motor.MotorIo;
 import frc.robot.subsystems.abstract_interface.DualMotorSubsystem;
 
 public class Flywheel extends DualMotorSubsystem {
 
     // ========================= Constructors ==================================
 
-    public Flywheel() {
-        super(
-                new MotorIoFalcon500(Constants.getFlywheelMotorIdLeft(), false, NeutralModeValue.Coast,
-                        Rotation2d.fromRotations(0), null),
-                new MotorIoFalcon500(Constants.getFlywheelMotorIdRight(), true, NeutralModeValue.Coast,
-                        Rotation2d.fromRotations(0), null),
+    public Flywheel(MotorIo leftMotorIo, MotorIo rightMotorIo) {
+        super(leftMotorIo, rightMotorIo,
                 Constants.getFlywheelForwardVoltage(), Constants.getFlywheelReverseVoltage());
     }
 

@@ -22,6 +22,8 @@ public class MotorIoReplay implements MotorIo {
         // No functionality.
     }
 
+    // ========================= Functions =========================
+
     @Override
     public Measure<Temperature> getMaxSafeTemperature() {
         return Celsius.of(Double.MAX_VALUE);

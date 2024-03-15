@@ -1,6 +1,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -10,6 +11,7 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.revrobotics.CANSparkBase.IdleMode;
@@ -30,7 +32,9 @@ import frc.robot.commands.ShooterCommands;
 import frc.robot.io.gyro.GyroIoPigeon2;
 import frc.robot.io.gyro.GyroIoSimAndReplay;
 import frc.robot.io.motor.MotorIoReplay;
+import frc.robot.io.motor.MotorIoSimulation;
 import frc.robot.io.motor.can_spark_max.MotorIoNeo550Brushless;
+import frc.robot.io.motor.talon_fx.MotorIoFalcon500;
 import frc.robot.io.swerve_module.SwerveModuleIoReplay;
 import frc.robot.io.swerve_module.SwerveModuleIoSim;
 import frc.robot.io.swerve_module.SwerveModuleIoTalonFx;
@@ -129,7 +133,7 @@ public class Robot extends LoggedRobot {
 
         // ==================== Initialize Subsystems ==========================
 
-        // #region: Initialize DriveBase Subsystem.
+        // #region: Subsystems with Simulation & Log Replay.
         switch (Constants.getCurrentOperatingMode()) {
             case REAL_WORLD:
                 swerveBase = new SwerveBase(
@@ -138,29 +142,16 @@ public class Robot extends LoggedRobot {
                         new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_RIGHT),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_LEFT),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
-                break;
-            case SIMULATION:
-                swerveBase = SwerveBase.createSimOrReplaySwerveBase(new GyroIoSimAndReplay(),
-                        new SwerveModuleIoSim(DCMotor.getKrakenX60(1), DCMotor.getFalcon500(1)));
-                break;
-            case LOG_REPLAY:
-                swerveBase = SwerveBase.createSimOrReplaySwerveBase(new GyroIoSimAndReplay(),
-                        new SwerveModuleIoReplay());
-                break;
-            default:
-                throw new RuntimeException("Unknown Run Mode: " + Constants.getCurrentOperatingMode());
-        }
-
-        // #endregion
-
-        // #region: Initialize SingleMotorSubsystems.
-        switch (Constants.getCurrentOperatingMode()) {
-            case REAL_WORLD:
-            case SIMULATION:
                 feeder = Constants.hasFeederSubsystem()
                         ? new Feeder(new MotorIoNeo550Brushless(Constants.getFeederMotorId(),
                                 Constants.isFeederMotorInverted(), IdleMode.kBrake, Rotation2d.fromRotations(0), // TODO
                                 Constants.getFeederPidValues()))
+                        : null;
+                flywheel = Constants.hasFlywheelSubsystem() ? new Flywheel(
+                        new MotorIoFalcon500(Constants.getFlywheelMotorIdLeft(), false, NeutralModeValue.Coast,
+                                Rotation2d.fromRotations(0), null),
+                        new MotorIoFalcon500(Constants.getFlywheelMotorIdRight(), true, NeutralModeValue.Coast,
+                                Rotation2d.fromRotations(0), null))
                         : null;
                 intake = Constants.hasIntakeSubsystem()
                         ? new Intake(new MotorIoNeo550Brushless(Constants.getIntakeMotorId(),
@@ -173,8 +164,32 @@ public class Robot extends LoggedRobot {
                                 Constants.getTraverserPidValues()))
                         : null;
                 break;
+            case SIMULATION:
+                swerveBase = SwerveBase.createSimOrReplaySwerveBase(new GyroIoSimAndReplay(),
+                        new SwerveModuleIoSim(DCMotor.getKrakenX60(1), DCMotor.getFalcon500(1)));
+                feeder = Constants.hasFeederSubsystem()
+                        ? new Feeder(new MotorIoSimulation(DCMotor.getNeo550(1), 1 /* TODO */,
+                                MetersPerSecond.zero() /* TODO */))
+                        : null;
+                flywheel = Constants.hasFlywheelSubsystem() ? new Flywheel(
+                        new MotorIoSimulation(DCMotor.getNeo550(1), 1 /* TODO */, MetersPerSecond.zero() /* TODO */),
+                        new MotorIoSimulation(DCMotor.getNeo550(1), 1 /* TODO */, MetersPerSecond.zero() /* TODO */))
+                        : null;
+                intake = Constants.hasIntakeSubsystem()
+                        ? new Intake(new MotorIoSimulation(DCMotor.getNeo550(1), 1 /* TODO */,
+                                MetersPerSecond.zero() /* TODO */))
+                        : null;
+                traverser = Constants.hasTraverserSubsystem()
+                        ? new Traverser(new MotorIoSimulation(DCMotor.getNeo550(1), 1 /* TODO */,
+                                MetersPerSecond.zero() /* TODO */))
+                        : null;
+                break;
             case LOG_REPLAY:
+                swerveBase = SwerveBase.createSimOrReplaySwerveBase(new GyroIoSimAndReplay(),
+                        new SwerveModuleIoReplay());
                 feeder = Constants.hasFeederSubsystem() ? new Feeder(new MotorIoReplay()) : null;
+                flywheel = Constants.hasFlywheelSubsystem() ? new Flywheel(new MotorIoReplay(), new MotorIoReplay())
+                        : null;
                 intake = Constants.hasIntakeSubsystem() ? new Intake(new MotorIoReplay()) : null;
                 traverser = Constants.hasTraverserSubsystem() ? new Traverser(new MotorIoReplay()) : null;
                 break;
@@ -204,10 +219,9 @@ public class Robot extends LoggedRobot {
 
         // #endregion
 
-        // #region: Initialize Dual Motor Subsystems.
+        // #region: Subsystems without Simulation & Log Replay.
         aimer = Constants.hasAimerSubsystem() ? new Aimer() : null;
         climber = Constants.hasClimberSubsystem() ? new Climber() : null;
-        flywheel = Constants.hasFlywheelSubsystem() ? new Flywheel() : null;
 
         // #endregion
 
