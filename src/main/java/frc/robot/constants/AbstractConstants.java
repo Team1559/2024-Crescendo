@@ -77,7 +77,7 @@ public abstract class AbstractConstants {
     }
 
     // ========================= Static CONSTANTS ==============================
-    private static final boolean FORCE_GAME_ROBOT_CONSTANTS = false;
+    private static final boolean FORCE_GAME_ROBOT_CONSTANTS = true;
     private static final AbstractConstants GAME_ROBOT_CONSTANTS = new GameRobotConstants();
     private static final AbstractConstants TEST_ROBOT_CONSTANTS = new TestRobotConstants();
 
