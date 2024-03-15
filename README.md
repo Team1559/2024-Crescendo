@@ -10,7 +10,7 @@
 
 # Game Documentation
 * ### [Game Commands](docs/Game%20Commands.md)
-* ### [Autonomous Routs](docs/Autonomous%20Routs.md)
+* ### [Autonomous Routes](docs/Autonomous%20Routes.md)
 * ### [Technician Documentation](docs/Technician%20Documentation.md)
 
 <br/>
