@@ -29,6 +29,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.LedCommands;
 import frc.robot.commands.ShooterCommands;
+import frc.robot.io.encoder.EncoderIoGenericPmw;
+import frc.robot.io.encoder.EncoderIoReplay;
+import frc.robot.io.encoder.EncoderIoSimulation;
 import frc.robot.io.gyro.GyroIoPigeon2;
 import frc.robot.io.gyro.GyroIoSimAndReplay;
 import frc.robot.io.motor.MotorIoReplay;
@@ -56,29 +59,24 @@ import frc.robot.util.ReflectionUtils;
 
 public class Robot extends LoggedRobot {
 
-    private SwerveBase swerveBase;
+    private final SwerveBase swerveBase;
 
-    private Aimer aimer;
-    private Climber climber;
-    private Feeder feeder;
-    private Flywheel flywheel;
-    private Intake intake;
-    private Leds leds;
-    private NoteSensor noteSensor;
-    private Traverser traverser;
+    private final Aimer aimer;
+    private final Climber climber;
+    private final Feeder feeder;
+    private final Flywheel flywheel;
+    private final Intake intake;
+    private final Leds leds;
+    private final NoteSensor noteSensor;
+    private final Traverser traverser;
 
     /** Is used indirectly when its periodic method gets called. */
     @SuppressWarnings("unused")
-    private Vision vision;
+    private final Vision vision;
 
     private Command autonomousCommand;
 
-    /**
-     * This function is run when the robot is first started up and should be used
-     * for any initialization code.
-     */
-    @Override
-    public void robotInit() {
+    public Robot() {
 
         // #region: =========== Set Base Units =================================
         // Change Temperature Base Unit from Kelvin to Celsius.
@@ -142,6 +140,19 @@ public class Robot extends LoggedRobot {
                         new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_RIGHT),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_LEFT),
                         new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
+                aimer = Constants.hasAimerSubsystem() ? new Aimer(
+                        new MotorIoNeo550Brushless(Constants.getAimerMotorIdLeft(), false, IdleMode.kBrake,
+                                Rotation2d.fromRotations(0), null),
+                        new MotorIoNeo550Brushless(Constants.getAimerMotorIdRight(), true, IdleMode.kBrake,
+                                Rotation2d.fromRotations(0), null),
+                        new EncoderIoGenericPmw(Constants.getAimerEncoderPort(), true, Rotation2d.fromRadians(0)))
+                        : null;
+                climber = Constants.hasClimberSubsystem() ? new Climber(
+                        new MotorIoNeo550Brushless(Constants.getClimberMotorIdLeft(), true, IdleMode.kBrake,
+                                Rotation2d.fromRotations(0), Constants.getClimberPid()),
+                        new MotorIoNeo550Brushless(Constants.getClimberMotorIdRight(), false, IdleMode.kBrake,
+                                Rotation2d.fromRotations(0), Constants.getClimberPid()))
+                        : null;
                 feeder = Constants.hasFeederSubsystem()
                         ? new Feeder(new MotorIoNeo550Brushless(Constants.getFeederMotorId(),
                                 Constants.isFeederMotorInverted(), IdleMode.kBrake, Rotation2d.fromRotations(0), // TODO
@@ -163,17 +174,32 @@ public class Robot extends LoggedRobot {
                                 Constants.isTraverserInverted(), IdleMode.kBrake, Rotation2d.fromRotations(0), // TODO
                                 Constants.getTraverserPidValues()))
                         : null;
+                vision = Constants.hasVisionSubsystem()
+                        ? new Vision(swerveBase.poseEstimator, new VisionIoLimelight(Constants.getCameraNameFront()),
+                                new VisionIoLimelight(Constants.getCameraNameBack()))
+                        : null;
                 break;
             case SIMULATION:
+                MotorIoSimulation simulatedMotor;
                 swerveBase = SwerveBase.createSimOrReplaySwerveBase(new GyroIoSimAndReplay(),
                         new SwerveModuleIoSim(DCMotor.getKrakenX60(1), DCMotor.getFalcon500(1)));
+                aimer = Constants.hasAimerSubsystem() ? new Aimer(
+                        new MotorIoSimulation(DCMotor.getNeo550(1), 1 /* TODO */, MetersPerSecond.zero() /* TODO */),
+                        (simulatedMotor = new MotorIoSimulation(DCMotor.getNeo550(1), 1 /* TODO */,
+                                MetersPerSecond.zero() /* TODO */)),
+                        new EncoderIoSimulation(simulatedMotor))
+                        : null;
+                climber = Constants.hasClimberSubsystem() ? new Climber(
+                        new MotorIoSimulation(DCMotor.getNeo550(1), 1 /* TODO */, MetersPerSecond.zero() /* TODO */),
+                        new MotorIoSimulation(DCMotor.getNeo550(1), 1 /* TODO */, MetersPerSecond.zero() /* TODO */))
+                        : null;
                 feeder = Constants.hasFeederSubsystem()
                         ? new Feeder(new MotorIoSimulation(DCMotor.getNeo550(1), 1 /* TODO */,
                                 MetersPerSecond.zero() /* TODO */))
                         : null;
                 flywheel = Constants.hasFlywheelSubsystem() ? new Flywheel(
-                        new MotorIoSimulation(DCMotor.getNeo550(1), 1 /* TODO */, MetersPerSecond.zero() /* TODO */),
-                        new MotorIoSimulation(DCMotor.getNeo550(1), 1 /* TODO */, MetersPerSecond.zero() /* TODO */))
+                        new MotorIoSimulation(DCMotor.getFalcon500(1), 1, MetersPerSecond.zero() /* TODO */),
+                        new MotorIoSimulation(DCMotor.getFalcon500(1), 1, MetersPerSecond.zero() /* TODO */))
                         : null;
                 intake = Constants.hasIntakeSubsystem()
                         ? new Intake(new MotorIoSimulation(DCMotor.getNeo550(1), 1 /* TODO */,
@@ -183,32 +209,23 @@ public class Robot extends LoggedRobot {
                         ? new Traverser(new MotorIoSimulation(DCMotor.getNeo550(1), 1 /* TODO */,
                                 MetersPerSecond.zero() /* TODO */))
                         : null;
+                vision = Constants.hasVisionSubsystem()
+                        ? new Vision(swerveBase.poseEstimator, new VisionIoSimAndReplay())
+                        : null;
                 break;
             case LOG_REPLAY:
                 swerveBase = SwerveBase.createSimOrReplaySwerveBase(new GyroIoSimAndReplay(),
                         new SwerveModuleIoReplay());
+                aimer = Constants.hasAimerSubsystem()
+                        ? new Aimer(new MotorIoReplay(), new MotorIoReplay(), new EncoderIoReplay())
+                        : null;
+                climber = Constants.hasClimberSubsystem() ? new Climber(new MotorIoReplay(), new MotorIoReplay())
+                        : null;
                 feeder = Constants.hasFeederSubsystem() ? new Feeder(new MotorIoReplay()) : null;
                 flywheel = Constants.hasFlywheelSubsystem() ? new Flywheel(new MotorIoReplay(), new MotorIoReplay())
                         : null;
                 intake = Constants.hasIntakeSubsystem() ? new Intake(new MotorIoReplay()) : null;
                 traverser = Constants.hasTraverserSubsystem() ? new Traverser(new MotorIoReplay()) : null;
-                break;
-            default:
-                throw new RuntimeException("Unknown Run Mode: " + Constants.getCurrentOperatingMode());
-        }
-
-        // #endregion
-
-        // #region: Initialize Vision Subsystem.
-        switch (Constants.getCurrentOperatingMode()) {
-            case REAL_WORLD:
-                vision = Constants.hasVisionSubsystem()
-                        ? new Vision(swerveBase.poseEstimator, new VisionIoLimelight(Constants.getCameraNameFront()),
-                                new VisionIoLimelight(Constants.getCameraNameBack()))
-                        : null;
-                break;
-            case SIMULATION:
-            case LOG_REPLAY:
                 vision = Constants.hasVisionSubsystem()
                         ? new Vision(swerveBase.poseEstimator, new VisionIoSimAndReplay())
                         : null;
@@ -220,20 +237,25 @@ public class Robot extends LoggedRobot {
         // #endregion
 
         // #region: Subsystems without Simulation & Log Replay.
-        aimer = Constants.hasAimerSubsystem() ? new Aimer() : null;
-        climber = Constants.hasClimberSubsystem() ? new Climber() : null;
-
-        // #endregion
-
-        // #region: Initialize Lights & Sensors.
         /*
          * We can safely set LEDs even if there are no LEDs.
          * (LED hardware is built into the RoboRio and therefore always "exists".)
          */
         leds = new Leds();
+
+        // TODO: Find a way to Simulate.
         noteSensor = Constants.hasNoteSensorSubsystem() ? new NoteSensor(Constants.getNoteSensorChannel()) : null;
 
         // #endregion
+
+    }
+
+    /**
+     * This function is run when the robot is first started up and should be used
+     * for any initialization code.
+     */
+    @Override
+    public void robotInit() {
 
         // #region: =========== Default Commands & Triggers ====================
 

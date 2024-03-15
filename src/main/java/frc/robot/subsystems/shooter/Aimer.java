@@ -8,8 +8,6 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
-import com.revrobotics.CANSparkBase.IdleMode;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,8 +21,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
 import frc.robot.io.encoder.EncoderIo;
-import frc.robot.io.encoder.EncoderIoGenericPmw;
-import frc.robot.io.motor.can_spark_max.MotorIoNeo550Brushless;
+import frc.robot.io.motor.MotorIo;
 import frc.robot.subsystems.abstract_interface.DualMotorSubsystem;
 import frc.robot.util.CommandUtils;
 import frc.robot.util.MathUtils;
@@ -55,14 +52,11 @@ public class Aimer extends DualMotorSubsystem {
 
     // ========================= Constructors ==================================
 
-    public Aimer() {
-        super(
-                new MotorIoNeo550Brushless(Constants.getAimerMotorIdLeft(), false, IdleMode.kBrake,
-                        Rotation2d.fromRotations(0), null),
-                new MotorIoNeo550Brushless(Constants.getAimerMotorIdRight(), true, IdleMode.kBrake,
-                        Rotation2d.fromRotations(0), null));
+    public Aimer(MotorIo leftMotorIo, MotorIo rightMotorIo, EncoderIo encoderIo) {
 
-        encoder = new EncoderIoGenericPmw(Constants.getAimerEncoderPort(), true, Rotation2d.fromRadians(0));
+        super(leftMotorIo, rightMotorIo);
+
+        this.encoder = encoderIo;
 
         pidController = Constants.getAimerPid().createController();
     }

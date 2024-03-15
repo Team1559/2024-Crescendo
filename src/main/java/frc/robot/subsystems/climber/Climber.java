@@ -2,15 +2,13 @@ package frc.robot.subsystems.climber;
 
 import static edu.wpi.first.units.Units.Inches;
 
-import com.revrobotics.CANSparkBase.IdleMode;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants;
-import frc.robot.io.motor.can_spark_max.MotorIoNeo550Brushless;
+import frc.robot.io.motor.MotorIo;
 import frc.robot.subsystems.abstract_interface.DualMotorSubsystem;
 import frc.robot.util.CommandUtils;
 import frc.robot.util.MathUtils;
@@ -19,12 +17,8 @@ public class Climber extends DualMotorSubsystem {
 
     // ========================= Constructors ==================================
 
-    public Climber() {
-        super(
-                new MotorIoNeo550Brushless(Constants.getClimberMotorIdLeft(), true, IdleMode.kBrake,
-                        Rotation2d.fromRotations(0), Constants.getClimberPid()),
-                new MotorIoNeo550Brushless(Constants.getClimberMotorIdRight(), false, IdleMode.kBrake,
-                        Rotation2d.fromRotations(0), Constants.getClimberPid()));
+    public Climber(MotorIo leftMotorIo, MotorIo rightMotorIo) {
+        super(leftMotorIo, rightMotorIo);
 
         // TODO: Clamp height.
         // setMinAndMaxPositions(, );
