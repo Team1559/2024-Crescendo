@@ -199,7 +199,7 @@ public class RobotContainer {
             new Trigger(noteSensor::isObjectDetectedSwitch).and(SupplierUtil.not(aimed))
                     .whileTrue(leds.setColorCommand(Color.kGreen));
             if (CONSTANTS.hasFlywheelSubsystem() && CONSTANTS.hasAimerSubsystem()) {
-                aimed.whileTrue(leds.setDynamicPatternCommand(CONSTANTS.AIMING_PATTERN, true));
+                aimed.whileTrue(leds.setColorCommand(Color.kBlack));
             }
         }
         // TODO: Add LED Trigger for Ready to Shoot.
@@ -272,10 +272,11 @@ public class RobotContainer {
                 pilot::getLeftY,
                 pilot::getLeftX,
                 CONSTANTS::getSpeakerLocation));
-        pilot.rightTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel, aimer,
-                pilot::getLeftY,
-                pilot::getLeftX,
-                CONSTANTS::getAmpLocation));
+        // pilot.rightTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase,
+        // flywheel, aimer,
+        // pilot::getLeftY,
+        // pilot::getLeftX,
+        // CONSTANTS::getAmpLocation));
         pilot.leftTrigger().onFalse(flywheel.stopCommand().andThen(new WaitUntilCommand(1))
                 .andThen(aimer.setTargetAngleCommand(CONSTANTS.getAimerAngleRange().get_0())));
         pilot.y().onTrue(driveBase.resetFieldOrientationCommand());
