@@ -199,7 +199,7 @@ public class RobotContainer {
             new Trigger(noteSensor::isObjectDetectedSwitch).and(SupplierUtil.not(aimed))
                     .whileTrue(leds.setColorCommand(Color.kGreen));
             if (CONSTANTS.hasFlywheelSubsystem() && CONSTANTS.hasAimerSubsystem()) {
-                aimed.whileTrue(leds.setColorCommand(Color.kDarkViolet));
+                aimed.whileTrue(leds.setDynamicPatternCommand(CONSTANTS.AIMING_PATTERN, true));
             }
         }
         // TODO: Add LED Trigger for Ready to Shoot.
