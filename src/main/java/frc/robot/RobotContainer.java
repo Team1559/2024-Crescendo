@@ -43,6 +43,7 @@ import frc.robot.subsystems.swerve_module.SwerveModuleIoTalonFx;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIoLimelight;
 import frc.robot.subsystems.vision.VisionIoSimAndReplay;
+import frc.robot.util.SupplierUtil;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -193,8 +194,13 @@ public class RobotContainer {
         // #endregion
 
         // #region: ---------- Configure Command Triggers ----------
+        Trigger aimed = new Trigger(aimer::atTarget).and(flywheel::atSpeed);
         if (CONSTANTS.hasNoteSensorSubsystem()) {
-            new Trigger((noteSensor::isObjectDetectedSwitch)).whileTrue(leds.setColorCommand(Color.kGreen));
+            new Trigger(noteSensor::isObjectDetectedSwitch).and(SupplierUtil.not(aimed))
+                    .whileTrue(leds.setColorCommand(Color.kGreen));
+            if (CONSTANTS.hasFlywheelSubsystem() && CONSTANTS.hasAimerSubsystem()) {
+                aimed.whileTrue(leds.setColorCommand(Color.kDarkViolet));
+            }
         }
         // TODO: Add LED Trigger for Ready to Shoot.
         // #endregion

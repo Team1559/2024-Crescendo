@@ -204,6 +204,10 @@ public class Flywheel extends SubsystemBase {
         start(CONSTANTS.getFlywheelReverseVoltage());
     }
 
+    public boolean atSpeed() {
+        return flywheelLVelocity.getValueAsDouble() > 75 && flywheelRVelocity.getValueAsDouble() > 75;
+    }
+
     // ========================= Commands =========================
     public Command startCommand() {
         return new InstantCommand(this::start, this);
