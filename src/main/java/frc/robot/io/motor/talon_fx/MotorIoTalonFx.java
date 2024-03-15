@@ -5,13 +5,9 @@ import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -34,6 +30,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.PidValues;
 import frc.robot.io.motor.MotorIo;
 import frc.robot.util.MathUtils;
+import frc.robot.util.Phoenix6Helper;
 
 public abstract class MotorIoTalonFx implements MotorIo {
 
@@ -96,17 +93,17 @@ public abstract class MotorIoTalonFx implements MotorIo {
         this.absoluteEncoderOffset = absoluteEncoderOffset;
 
         // ---------- Define Loggable Fields ----------
-        faults = getAllGetFaultStatusSignalMethods(motor);
+        faults = Phoenix6Helper.getAllGetFaultStatusSignalMethods(motor);
         statusSignals.addAll(faults.values());
 
-        deviceTemp = motor.getDeviceTemp(); // Updated on Call & Log.
+        statusSignals.add(deviceTemp = motor.getDeviceTemp());
         statusSignals.add(dutyCycle = motor.getDutyCycle());
-        motorVoltage = motor.getMotorVoltage(); // Updated on Call & Log.
-        position = motor.getPosition(); // Updated on Call & Log.
+        statusSignals.add(motorVoltage = motor.getMotorVoltage());
+        statusSignals.add(position = motor.getPosition());
         statusSignals.add(supplyCurrent = motor.getSupplyCurrent());
         statusSignals.add(supplyVoltage = motor.getSupplyVoltage());
         statusSignals.add(torqueCurrent = motor.getTorqueCurrent());
-        velocity = motor.getVelocity(); // Updated on Call & Log.
+        statusSignals.add(velocity = motor.getVelocity());
 
         // ---------- Optimize Bus Utilization ----------
         statusSignalArray = statusSignals.toArray(new StatusSignal[0]);
@@ -123,7 +120,7 @@ public abstract class MotorIoTalonFx implements MotorIo {
         inputs.currentActual = Amps.of(torqueCurrent.getValue());
         inputs.currentAvailable = Amps.of(supplyCurrent.getValue());
 
-        inputs.faults = getFaults(faults);
+        inputs.faults = Phoenix6Helper.getFaults(faults);
 
         inputs.temperature = getTemperature();
 
@@ -213,38 +210,4 @@ public abstract class MotorIoTalonFx implements MotorIo {
         targetVelocity = null;
         targetVoltage = null;
     }
-
-    // ========================= Static Helper Methods =========================
-
-    @SuppressWarnings("unchecked")
-    public static Map<String, StatusSignal<Boolean>> getAllGetFaultStatusSignalMethods(TalonFX motor) {
-        Map<String, StatusSignal<Boolean>> faults = new HashMap<>();
-        Class<?> c = motor.getClass();
-        Method[] publicMethods = c.getMethods();
-        for (int i = 0; i < publicMethods.length; i++) {
-            Method method = publicMethods[i];
-            String[] parts = method.toString().split("_");
-            if (parts.length == 2 && parts[0].equals("public static StatusSignal<Boolean> getFault")) {
-                try {
-                    faults.put(parts[1].split("(")[0], (StatusSignal<Boolean>) method.invoke(motor));
-                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                    // Ignore.
-                    e.printStackTrace();
-                }
-            }
-        }
-        return faults;
-    }
-
-    public static String[] getFaults(Map<String, StatusSignal<Boolean>> faultStatusSignals) {
-
-        List<String> faults = new LinkedList<>();
-        for (Entry<String, StatusSignal<Boolean>> entry : faultStatusSignals.entrySet()) {
-            if (entry.getValue().getValue()) {
-                faults.add(entry.getKey());
-            }
-        }
-        return faults.toArray(new String[0]);
-    }
-
 }

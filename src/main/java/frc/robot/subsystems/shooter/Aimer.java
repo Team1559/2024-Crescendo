@@ -18,11 +18,12 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
+import frc.robot.io.encoder.EncoderIo;
+import frc.robot.io.encoder.EncoderIoGenericPmw;
 import frc.robot.io.motor.can_spark_max.MotorIoNeo550Brushless;
 import frc.robot.subsystems.abstract_interface.DualMotorSubsystem;
 import frc.robot.util.CommandUtils;
@@ -34,10 +35,9 @@ public class Aimer extends DualMotorSubsystem {
     static class AimerInputs {
 
         // ---------- Encoder ----------
-        public Rotation2d angleCurrent;
-        public Rotation2d angleTarget;
-        public Rotation2d angleTargetClamped;
-        public Rotation2d angelCurrentVsTargetClamped;
+        public Rotation2d targetAngle;
+        public Rotation2d targetAngleClamped;
+        public Rotation2d TargetAngleClampedVsCurrent;
 
         // ---------- Target ----------
         public boolean atTarget = false;
@@ -45,7 +45,7 @@ public class Aimer extends DualMotorSubsystem {
     }
 
     // TODO: Wire Encoder to Motors.
-    private final DutyCycleEncoder encoder;
+    private final EncoderIo encoder;
     private final PIDController pidController;
 
     private final AimerInputsAutoLogged inputs = new AimerInputsAutoLogged();
@@ -62,7 +62,7 @@ public class Aimer extends DualMotorSubsystem {
                 new MotorIoNeo550Brushless(Constants.getAimerMotorIdRight(), true, IdleMode.kBrake,
                         Rotation2d.fromRotations(0), null));
 
-        encoder = new DutyCycleEncoder(Constants.getAimerEncoderPort());
+        encoder = new EncoderIoGenericPmw(Constants.getAimerEncoderPort(), true, Rotation2d.fromRadians(0));
 
         pidController = Constants.getAimerPid().createController();
     }
@@ -82,7 +82,7 @@ public class Aimer extends DualMotorSubsystem {
             double ff = Constants.getAimerPid().FF * targetAngleClamped.getCos();
 
             pidController.setSetpoint(targetAngleClamped.getDegrees());
-            double output = pidController.calculate(inputs.angleCurrent.getDegrees());
+            double output = pidController.calculate(encoder.getAbsolutePosition().getDegrees());
 
             double volts = MathUtil.clamp(ff + output, -1, 2);
             Measure<Voltage> voltage = Volts.of(volts);
@@ -95,10 +95,9 @@ public class Aimer extends DualMotorSubsystem {
     private void updateInputs() {
 
         // ---------- Encoder ----------
-        inputs.angleCurrent = getEncoderAbsolutePosition();
-        inputs.angleTarget = targetAngle;
-        inputs.angleTargetClamped = targetAngleClamped;
-        inputs.angelCurrentVsTargetClamped = targetAngleClamped.minus(inputs.angleCurrent);
+        inputs.targetAngle = targetAngle;
+        inputs.targetAngleClamped = targetAngleClamped;
+        inputs.TargetAngleClampedVsCurrent = targetAngleClamped.minus(encoder.getAbsolutePosition());
 
         // ---------- Motor ----------
         inputs.atTarget = isAtTarget();
@@ -122,16 +121,11 @@ public class Aimer extends DualMotorSubsystem {
 
     // -------------------- Getters --------------------
 
-    public Rotation2d getEncoderAbsolutePosition() {
-        // Invert angle as encoder is mounted "backwards".
-        return Rotation2d.fromRotations(-encoder.getAbsolutePosition()).plus(Constants.getAimerEncoderOffset());
-    }
-
     /**
      * @return {@code true} if within error margin of target.
      */
     public boolean isAtTarget() {
-        return Math.abs(targetAngleClamped.minus(getEncoderAbsolutePosition()).getDegrees()) <= Math
+        return Math.abs(targetAngleClamped.minus(encoder.getAbsolutePosition()).getDegrees()) <= Math
                 .abs(Constants.getAimerErrorThreshold().getDegrees());
     }
 
@@ -141,7 +135,7 @@ public class Aimer extends DualMotorSubsystem {
         if (targetAngle == null) {
             setAngle(change);
         } else {
-            setAngle(getEncoderAbsolutePosition().plus(change));
+            setAngle(encoder.getAbsolutePosition().plus(change));
         }
     }
 
