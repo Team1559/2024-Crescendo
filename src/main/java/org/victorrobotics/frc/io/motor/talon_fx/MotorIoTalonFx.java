@@ -108,7 +108,8 @@ public abstract class MotorIoTalonFx implements MotorIo {
         slot0Configs.kP = pidValues.P;
         slot0Configs.kI = pidValues.I;
         slot0Configs.kD = pidValues.D;
-        // slot0Configs. = pidValues.FF; // TODO.
+        slot0Configs.kS = pidValues.FF_S;
+        slot0Configs.kV = pidValues.FF_V;
 
         // Only set the Motor Configuration once, to avoid accidentally overriding
         // configs with defaults.
