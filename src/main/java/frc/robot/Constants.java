@@ -63,20 +63,21 @@ public class Constants {
      */
     public static class PidValues {
 
-        public final double P, I, D, FF;
+        public final double P, I, D, FF_S, FF_V;
 
         /**
          * Constructs this PID object with a FF value of 0.
          */
         public PidValues(double p, double i, double d) {
-            this(p, i, d, 0);
+            this(p, i, d, 0, 0);
         }
 
-        public PidValues(double p, double i, double d, double ff) {
+        public PidValues(double p, double i, double d, double ffS, double ffV) {
             P = p;
             I = i;
             D = d;
-            FF = ff;
+            FF_S = ffS;
+            FF_V = ffV;
         }
 
         /**
@@ -363,7 +364,7 @@ public class Constants {
     }
 
     public static PidValues getAimerPid() {
-        return new PidValues(.6, 0, 0, 0.7);
+        return new PidValues(.6, 0, 0, 0.7, 0);
     }
 
     // #endregion
@@ -429,7 +430,8 @@ public class Constants {
     }
 
     public static PidValues getFeederPidValues() {
-        return new PidValues(0.33 / Constants.getFeederVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000);
+        return new PidValues(0.33 / Constants.getFeederVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000,
+                0);
     }
 
     public static Measure<Velocity<Angle>> getFeederVelocityForward() {
@@ -488,7 +490,8 @@ public class Constants {
     }
 
     public static PidValues getIntakePidValues() {
-        return new PidValues(0.33 / Constants.getIntakeVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000);
+        return new PidValues(0.33 / Constants.getIntakeVelocityForward().in(RevolutionsPerSecond), 0, 0, 1.0 / 11000,
+                0);
     }
 
     public static Measure<Velocity<Angle>> getIntakeVelocityForward() {
@@ -532,6 +535,50 @@ public class Constants {
     // #endregion
 
     // #region: ----- Swerve --------
+    public static PidValues getDriveMotorPidValues() {
+
+        PidValues pidValues;
+
+        // The physics simulator is treated as a separate robot with different tuning.
+        switch (getCurrentOperatingMode()) {
+            case REAL_WORLD:
+            case LOG_REPLAY:
+                // TODO: Tune.
+                pidValues = new PidValues(0.05, 0.0, 0.0, 0.1, 0.13);
+                break;
+            case SIMULATION:
+                // TODO: Tune.
+                pidValues = new PidValues(0.1, 0.0, 0.0, 0.0, 0.13);
+                break;
+            default:
+                throw new RuntimeException("Unknown Run Mode: " + Constants.getCurrentOperatingMode());
+        }
+
+        return pidValues;
+    }
+
+    public static PidValues getSteerMotorPidValues() {
+
+        PidValues pidValues;
+
+        // The physics simulator is treated as a separate robot with different tuning.
+        switch (getCurrentOperatingMode()) {
+            case REAL_WORLD:
+            case LOG_REPLAY:
+                // TODO: Tune.
+                pidValues = new PidValues(7.0, 0.0, 0.0);
+                break;
+            case SIMULATION:
+                // TODO: Tune.
+                pidValues = new PidValues(10.0, 0.0, 0.0);
+                break;
+            default:
+                throw new RuntimeException("Unknown Run Mode: " + Constants.getCurrentOperatingMode());
+        }
+
+        return pidValues;
+    }
+
     public static Map<WheelModuleIndex, Rotation2d> getSwerveModuleEncoderOffsets() {
         if (isGameRobot()) {
             return new HashMap<>() {
@@ -589,7 +636,7 @@ public class Constants {
     }
 
     public static PidValues getTraverserPidValues() {
-        return new PidValues(0.33 / Constants.getTraverserVelocity().in(RevolutionsPerSecond), 0, 0, 11.0 / 11000);
+        return new PidValues(0.33 / Constants.getTraverserVelocity().in(RevolutionsPerSecond), 0, 0, 11.0 / 11000, 0);
     }
 
     public static Measure<Velocity<Angle>> getTraverserVelocity() {

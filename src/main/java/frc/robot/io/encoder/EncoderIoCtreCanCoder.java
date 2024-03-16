@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -27,6 +28,7 @@ public class EncoderIoCtreCanCoder implements EncoderIo {
 
         // ---------- Create & Configure Encoder ----------
         canCoder = new CANcoder(id, canbus);
+        canCoder.getConfigurator().apply(new CANcoderConfiguration());
         this.isInverted = isInverted;
         setOffset(offset);
 
@@ -63,7 +65,7 @@ public class EncoderIoCtreCanCoder implements EncoderIo {
         absolutePosition.refresh();
         Rotation2d position = Rotation2d.fromRotations(absolutePosition.getValueAsDouble());
 
-        if(isInverted) {
+        if (isInverted) {
             position = position.unaryMinus();
         }
 

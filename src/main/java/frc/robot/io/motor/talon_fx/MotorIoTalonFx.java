@@ -67,7 +67,8 @@ public abstract class MotorIoTalonFx implements MotorIo {
      *                  will be used.)
      *                  </p>
      */
-    public MotorIoTalonFx(int motorId, boolean inverted, NeutralModeValue idleMode, Rotation2d absoluteEncoderOffset,
+    public MotorIoTalonFx(int motorId, String canivoreId, boolean inverted, NeutralModeValue idleMode,
+            Rotation2d absoluteEncoderOffset,
             PidValues pidValues) {
 
         // ---------- Create & Configure Motors ----------
@@ -86,7 +87,7 @@ public abstract class MotorIoTalonFx implements MotorIo {
         talonFXConfiguration.withSlot0(slot0Configs);
 
         // Create & Configure Motor.
-        motor = new TalonFX(motorId);
+        motor = new TalonFX(motorId, canivoreId);
         motor.getConfigurator().apply(talonFXConfiguration);
 
         // Configure Encoder.
@@ -175,7 +176,7 @@ public abstract class MotorIoTalonFx implements MotorIo {
         targetVoltage = null;
         targetVoltageClamped = null;
 
-        motor.setControl(new PositionDutyCycle(position.getRotations()).withFeedForward(pidValues.FF));
+        motor.setControl(new PositionDutyCycle(position.getRotations()).withFeedForward(pidValues.FF_S));
     }
 
     @Override
@@ -188,7 +189,7 @@ public abstract class MotorIoTalonFx implements MotorIo {
         targetVoltageClamped = null;
 
         motor.setControl(
-                new VelocityVoltage(targetVelocityClamped.in(RotationsPerSecond)).withFeedForward(pidValues.FF));
+                new VelocityVoltage(targetVelocityClamped.in(RotationsPerSecond)).withFeedForward(pidValues.FF_S));
     }
 
     @Override

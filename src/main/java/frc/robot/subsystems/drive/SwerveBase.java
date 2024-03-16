@@ -37,7 +37,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.io.gyro.GyroIo;
 import frc.robot.io.gyro.GyroIoInputsAutoLogged;
-import frc.robot.io.swerve_module.SwerveModuleIo;
 import frc.robot.subsystems.drive.SwerveModule.WheelModuleIndex;
 import frc.robot.util.CommandUtils;
 import frc.robot.util.LocalAdStarAk;
@@ -50,19 +49,6 @@ public class SwerveBase extends SubsystemBase {
     static class DriveBaseInputs {
         public Pose2d estimatedPosition;
         public Measure<Velocity<Distance>> estimatedSpeed;
-    }
-
-    public static SwerveBase createSimOrReplaySwerveBase(GyroIo gyroIo, SwerveModuleIo swerveModuleIo) {
-        switch (Constants.getCurrentOperatingMode()) {
-            case SIMULATION:
-            case LOG_REPLAY:
-                break;
-            default:
-                throw new RuntimeException("Invalid Operating Mode: " + Constants.getCurrentOperatingMode() + "!");
-        }
-
-        return new SwerveBase(gyroIo, swerveModuleIo, swerveModuleIo.clone(), swerveModuleIo.clone(),
-                swerveModuleIo.clone());
     }
 
     /**
@@ -101,15 +87,15 @@ public class SwerveBase extends SubsystemBase {
 
     private final DriveBaseInputsAutoLogged inputs = new DriveBaseInputsAutoLogged();
 
-    public SwerveBase(GyroIo gyroIo, SwerveModuleIo flModuleI, SwerveModuleIo frModuleIo, SwerveModuleIo blModuleIo,
-            SwerveModuleIo brModuleIo) {
+    public SwerveBase(GyroIo gyroIo, SwerveModule flModule, SwerveModule frModule, SwerveModule blModule,
+            SwerveModule brModule) {
 
         // -------------------- Instantiate Hardware --------------------
         this.gyroIO = gyroIo;
-        modules[WheelModuleIndex.FRONT_LEFT.value] = new SwerveModule(flModuleI, WheelModuleIndex.FRONT_LEFT);
-        modules[WheelModuleIndex.FRONT_RIGHT.value] = new SwerveModule(frModuleIo, WheelModuleIndex.FRONT_RIGHT);
-        modules[WheelModuleIndex.BACK_LEFT.value] = new SwerveModule(blModuleIo, WheelModuleIndex.BACK_LEFT);
-        modules[WheelModuleIndex.BACK_RIGHT.value] = new SwerveModule(brModuleIo, WheelModuleIndex.BACK_RIGHT);
+        modules[WheelModuleIndex.FRONT_LEFT.value] = flModule;
+        modules[WheelModuleIndex.FRONT_RIGHT.value] = frModule;
+        modules[WheelModuleIndex.BACK_LEFT.value] = blModule;
+        modules[WheelModuleIndex.BACK_RIGHT.value] = brModule;
 
         // -------------------- Create Position Estimator --------------------
         kinematics = new SwerveDriveKinematics(new Translation2d[] {

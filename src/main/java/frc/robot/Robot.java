@@ -38,15 +38,13 @@ import frc.robot.io.motor.MotorIoReplay;
 import frc.robot.io.motor.MotorIoSimulation;
 import frc.robot.io.motor.can_spark_max.MotorIoNeo550Brushless;
 import frc.robot.io.motor.talon_fx.MotorIoFalcon500;
-import frc.robot.io.swerve_module.SwerveModuleIoReplay;
-import frc.robot.io.swerve_module.SwerveModuleIoSim;
-import frc.robot.io.swerve_module.SwerveModuleIoTalonFx;
 import frc.robot.io.vision.VisionIoLimelight;
 import frc.robot.io.vision.VisionIoSimAndReplay;
 import frc.robot.subsystems.abstract_interface.MotorSubsystem;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.Traverser;
 import frc.robot.subsystems.drive.SwerveBase;
+import frc.robot.subsystems.drive.SwerveModule;
 import frc.robot.subsystems.drive.SwerveModule.WheelModuleIndex;
 import frc.robot.subsystems.led.Leds;
 import frc.robot.subsystems.shooter.Aimer;
@@ -136,10 +134,10 @@ public class Robot extends LoggedRobot {
             case REAL_WORLD:
                 swerveBase = new SwerveBase(
                         new GyroIoPigeon2(Constants.getGyroId(), Constants.getCanivoreId()),
-                        new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_LEFT),
-                        new SwerveModuleIoTalonFx(WheelModuleIndex.FRONT_RIGHT),
-                        new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_LEFT),
-                        new SwerveModuleIoTalonFx(WheelModuleIndex.BACK_RIGHT));
+                        SwerveModule.createRealSwerveModule(WheelModuleIndex.FRONT_LEFT),
+                        SwerveModule.createRealSwerveModule(WheelModuleIndex.FRONT_RIGHT),
+                        SwerveModule.createRealSwerveModule(WheelModuleIndex.BACK_LEFT),
+                        SwerveModule.createRealSwerveModule(WheelModuleIndex.BACK_RIGHT));
                 aimer = Constants.hasAimerSubsystem() ? new Aimer(
                         new MotorIoNeo550Brushless(Constants.getAimerMotorIdLeft(), false, IdleMode.kBrake,
                                 Rotation2d.fromRotations(0), null),
@@ -159,9 +157,9 @@ public class Robot extends LoggedRobot {
                                 Constants.getFeederPidValues()))
                         : null;
                 flywheel = Constants.hasFlywheelSubsystem() ? new Flywheel(
-                        new MotorIoFalcon500(Constants.getFlywheelMotorIdLeft(), false, NeutralModeValue.Coast,
+                        new MotorIoFalcon500(Constants.getFlywheelMotorIdLeft(), null, false, NeutralModeValue.Coast,
                                 Rotation2d.fromRotations(0), null),
-                        new MotorIoFalcon500(Constants.getFlywheelMotorIdRight(), true, NeutralModeValue.Coast,
+                        new MotorIoFalcon500(Constants.getFlywheelMotorIdRight(), null, true, NeutralModeValue.Coast,
                                 Rotation2d.fromRotations(0), null))
                         : null;
                 intake = Constants.hasIntakeSubsystem()
@@ -181,8 +179,11 @@ public class Robot extends LoggedRobot {
                 break;
             case SIMULATION:
                 MotorIoSimulation simulatedMotor;
-                swerveBase = SwerveBase.createSimOrReplaySwerveBase(new GyroIoSimAndReplay(),
-                        new SwerveModuleIoSim(DCMotor.getKrakenX60(1), DCMotor.getFalcon500(1)));
+                swerveBase = new SwerveBase(new GyroIoSimAndReplay(),
+                        SwerveModule.createSimulationSwerveModule(WheelModuleIndex.FRONT_LEFT),
+                        SwerveModule.createSimulationSwerveModule(WheelModuleIndex.FRONT_RIGHT),
+                        SwerveModule.createSimulationSwerveModule(WheelModuleIndex.BACK_LEFT),
+                        SwerveModule.createSimulationSwerveModule(WheelModuleIndex.BACK_RIGHT));
                 aimer = Constants.hasAimerSubsystem() ? new Aimer(
                         new MotorIoSimulation(DCMotor.getNeo550(1), 1 /* TODO */, MetersPerSecond.zero() /* TODO */),
                         (simulatedMotor = new MotorIoSimulation(DCMotor.getNeo550(1), 1 /* TODO */,
@@ -214,8 +215,11 @@ public class Robot extends LoggedRobot {
                         : null;
                 break;
             case LOG_REPLAY:
-                swerveBase = SwerveBase.createSimOrReplaySwerveBase(new GyroIoSimAndReplay(),
-                        new SwerveModuleIoReplay());
+                swerveBase = new SwerveBase(new GyroIoSimAndReplay(),
+                        SwerveModule.createReplaySwerveModule(WheelModuleIndex.FRONT_LEFT),
+                        SwerveModule.createReplaySwerveModule(WheelModuleIndex.FRONT_RIGHT),
+                        SwerveModule.createReplaySwerveModule(WheelModuleIndex.BACK_LEFT),
+                        SwerveModule.createReplaySwerveModule(WheelModuleIndex.BACK_RIGHT));
                 aimer = Constants.hasAimerSubsystem()
                         ? new Aimer(new MotorIoReplay(), new MotorIoReplay(), new EncoderIoReplay())
                         : null;

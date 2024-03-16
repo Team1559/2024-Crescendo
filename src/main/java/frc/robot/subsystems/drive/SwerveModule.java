@@ -8,18 +8,29 @@ import static edu.wpi.first.units.Units.Volts;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Velocity;
 import frc.robot.Constants;
-import frc.robot.io.swerve_module.SwerveModuleIo;
-import frc.robot.io.swerve_module.SwerveModuleIoInputsAutoLogged;
+import frc.robot.io.encoder.EncoderIo;
+import frc.robot.io.encoder.EncoderIoCtreCanCoder;
+import frc.robot.io.encoder.EncoderIoInputsAutoLogged;
+import frc.robot.io.encoder.EncoderIoReplay;
+import frc.robot.io.encoder.EncoderIoSimulation;
+import frc.robot.io.motor.MotorIo;
+import frc.robot.io.motor.MotorIoInputsAutoLogged;
+import frc.robot.io.motor.MotorIoReplay;
+import frc.robot.io.motor.MotorIoSimulation;
+import frc.robot.io.motor.talon_fx.MotorIoFalcon500;
+import frc.robot.io.motor.talon_fx.MotorIoKrakenX60;
 
 public class SwerveModule {
 
@@ -40,63 +51,85 @@ public class SwerveModule {
         }
     }
 
-    private final SwerveModuleIo io;
-    private final SwerveModuleIoInputsAutoLogged inputs = new SwerveModuleIoInputsAutoLogged();
-    private final WheelModuleIndex index;
+    public final MotorIo driveMotor;
+    private final MotorIoInputsAutoLogged driveMotorInputs = new MotorIoInputsAutoLogged();
 
-    private final SimpleMotorFeedforward driveFeedForward;
+    public final MotorIo steerMotor;
+    private final MotorIoInputsAutoLogged steerMotorInputs = new MotorIoInputsAutoLogged();
 
-    private final PIDController driveFeedback;
-    private final PIDController turnFeedback;
+    public final EncoderIo encoder;
+    private final EncoderIoInputsAutoLogged encoderInputs = new EncoderIoInputsAutoLogged();
+
+    private final String moduleName;
+
+    private final PIDController drivePidController, steerPidController;
+    private final SimpleMotorFeedforward driveFeedForwardController;
 
     private Rotation2d angleSetpoint; // Setpoint for closed loop control, null for open loop.
     private Double speedSetpoint; // Setpoint for closed loop control, null for open loop.
 
     private Rotation2d turnRelativeOffset; // Relative + Offset = Absolute.
 
-    public SwerveModule(SwerveModuleIo io, WheelModuleIndex index) {
+    public static SwerveModule createRealSwerveModule(WheelModuleIndex index) {
+        return new SwerveModule(index,
+                new MotorIoKrakenX60(Constants.getSwerveModuleHardwareIds().get(index).DRIVE_MOTOR_ID,
+                        Constants.getCanivoreId(), true, NeutralModeValue.Brake, Rotation2d.fromRadians(0), null),
+                new MotorIoFalcon500(Constants.getSwerveModuleHardwareIds().get(index).STEER_MOTOR_ID,
+                        Constants.getCanivoreId(), false, NeutralModeValue.Brake, Rotation2d.fromRadians(0), null),
+                new EncoderIoCtreCanCoder(Constants.getSwerveModuleHardwareIds().get(index).CANCODER_ID,
+                        Constants.getCanivoreId(), false, Constants.getSwerveModuleEncoderOffsets().get(index)));
+    }
 
-        this.io = io;
-        this.index = index;
+    public static SwerveModule createReplaySwerveModule(WheelModuleIndex index) {
+        return new SwerveModule(index, new MotorIoReplay(), new MotorIoReplay(), new EncoderIoReplay());
+    }
 
-        // Switch constants based on mode (the physics simulator is treated as a
-        // separate robot with different tuning)
-        switch (Constants.getCurrentOperatingMode()) {
-            case REAL_WORLD:
-            case LOG_REPLAY:
-                // TODO: Move to Constants and Tune.
-                driveFeedForward = new SimpleMotorFeedforward(0.1, 0.13);
-                driveFeedback = new PIDController(0.05, 0.0, 0.0);
-                turnFeedback = new PIDController(7.0, 0.0, 0.0);
-                break;
-            case SIMULATION:
-                // TODO: Move to Constants and Tune.
-                driveFeedForward = new SimpleMotorFeedforward(0.0, 0.13);
-                driveFeedback = new PIDController(0.1, 0.0, 0.0);
-                turnFeedback = new PIDController(10.0, 0.0, 0.0);
-                break;
-            default:
-                throw new RuntimeException("Unknown Run Mode: " + Constants.getCurrentOperatingMode());
-        }
+    public static SwerveModule createSimulationSwerveModule(WheelModuleIndex index) {
+        MotorIoSimulation mis;
+        return new SwerveModule(index,
+                new MotorIoSimulation(DCMotor.getKrakenX60(1), 6.75, MetersPerSecond.of(0.025)),
+                mis = new MotorIoSimulation(DCMotor.getFalcon500(1), 150.0 / 7.0, MetersPerSecond.of(0.004)),
+                new EncoderIoSimulation(mis));
+    }
 
-        turnFeedback.enableContinuousInput(-Math.PI, Math.PI);
+    private SwerveModule(WheelModuleIndex index, MotorIo driveMotor, MotorIo steerMotor, EncoderIo encoder) {
+
+        this.driveMotor = driveMotor;
+        this.steerMotor = steerMotor;
+        this.encoder = encoder;
+
+        driveFeedForwardController = new SimpleMotorFeedforward(Constants.getDriveMotorPidValues().FF_S,
+                Constants.getDriveMotorPidValues().FF_V);
+        drivePidController = Constants.getDriveMotorPidValues().createController();
+        steerPidController = Constants.getSteerMotorPidValues().createController();
+        steerPidController.enableContinuousInput(-Math.PI, Math.PI);
+
+        moduleName = "SwerveModule" + index.name();
     }
 
     public void periodic() {
 
-        io.updateInputs(inputs);
-        Logger.processInputs("Drive/" + index.name(), inputs);
+        driveMotor.updateInputs(driveMotorInputs);
+        Logger.processInputs(moduleName, driveMotorInputs);
+
+        steerMotor.updateInputs(steerMotorInputs);
+        Logger.processInputs(moduleName, steerMotorInputs);
+
+        encoder.updateInputs(encoderInputs);
+        Logger.processInputs(moduleName, encoderInputs);
 
         // On first cycle, reset relative turn encoder.
         // Wait until absolute angle is nonzero in case it wasn't initialized yet.
-        if (turnRelativeOffset == null && inputs.cancoderOffsetPosition.getRadians() != 0.0) {
-            turnRelativeOffset = inputs.cancoderOffsetPosition.minus(inputs.steerMotorPositionAbsolute);
+        if (turnRelativeOffset == null && encoderInputs.positionAbsolute.getRadians() != 0.0) {
+            turnRelativeOffset = encoderInputs.positionAbsolute.minus(steerMotorInputs.positionAbsolute);
         }
 
         // Run closed loop turn control.
         if (angleSetpoint != null) {
 
-            io.setTurnVoltage(Volts.of(turnFeedback.calculate(getAngle().getRadians(), angleSetpoint.getRadians())));
+            steerMotor
+                    .setVoltage(Volts
+                            .of(steerPidController.calculate(getAngle().getRadians(), angleSetpoint.getRadians())));
 
             // Run closed loop drive control.
             // Only allowed if closed loop turn control is running.
@@ -106,13 +139,13 @@ public class SwerveModule {
                 // When the error is 90°, the velocity setpoint should be 0. As the wheel turns
                 // towards the setpoint, its velocity should increase. This is achieved by
                 // taking the component of the velocity in the direction of the setpoint.
-                double adjustSpeedSetpoint = speedSetpoint * Math.cos(turnFeedback.getPositionError());
+                double adjustSpeedSetpoint = speedSetpoint * Math.cos(steerPidController.getPositionError());
                 double velocityRadPerSec = adjustSpeedSetpoint / Constants.getWheelRadius().in(Meters);
 
                 // Run drive controller.
-                io.setDriveVoltage(Volts.of(driveFeedForward.calculate(velocityRadPerSec) +
-                        driveFeedback.calculate(inputs.driveMotorVelocityActual.in(RadiansPerSecond),
-                                velocityRadPerSec)));
+                driveMotor.setVoltage(
+                        Volts.of(driveFeedForwardController.calculate(velocityRadPerSec) + drivePidController
+                                .calculate(driveMotorInputs.velocityActual.in(RadiansPerSecond), velocityRadPerSec)));
             }
         }
     }
@@ -138,8 +171,8 @@ public class SwerveModule {
 
     /** Disables all outputs to motors. */
     public void stop() {
-        io.setTurnVoltage(Volts.zero());
-        io.setDriveVoltage(Volts.zero());
+        steerMotor.setVoltage(Volts.zero());
+        driveMotor.setVoltage(Volts.zero());
 
         // Disable closed loop control for turn and drive
         angleSetpoint = null;
@@ -148,24 +181,19 @@ public class SwerveModule {
 
     /** @return The current turn angle of the module. */
     public Rotation2d getAngle() {
-        return inputs.steerMotorPositionAbsolute
+        return steerMotorInputs.positionAbsolute
                 .plus(turnRelativeOffset == null ? Rotation2d.fromRotations(0) : turnRelativeOffset);
-    }
-
-    /** @return The Temperature of the hottest motor. */
-    public Measure<Temperature> getMaxTemperature() {
-        return inputs.driveMotorTemp.gt(inputs.steerMotorTemp) ? inputs.driveMotorTemp : inputs.steerMotorTemp;
     }
 
     /** @return The current drive position of the module. */
     public Measure<Distance> getPosition() {
-        return Meters.of(inputs.driveMotorPositionAbsolute.getRotations() * Constants.getWheelRadius().in(Meters));
+        return Meters.of(driveMotorInputs.positionAbsolute.getRotations() * Constants.getWheelRadius().in(Meters));
     }
 
     /** @return The current drive velocity of the module. */
     public Measure<Velocity<Distance>> getVelocity() {
         return MetersPerSecond
-                .of(inputs.driveMotorVelocityActual.in(RotationsPerSecond) * Constants.getWheelRadius().in(Meters));
+                .of(driveMotorInputs.velocityActual.in(RotationsPerSecond) * Constants.getWheelRadius().in(Meters));
     }
 
     /** @return The module position. */
@@ -179,6 +207,9 @@ public class SwerveModule {
     }
 
     public boolean isTemperatureTooHigh() {
-        return getMaxTemperature().gt(io.getMaxSafeMotorTemperature().times(Constants.getMotorSafeTemperatureBuffer()));
+        return driveMotor.getTemperature()
+                .gt(driveMotor.getMaxSafeTemperature().times(Constants.getMotorSafeTemperatureBuffer()))
+                || steerMotor.getTemperature()
+                        .gt(steerMotor.getMaxSafeTemperature().times(Constants.getMotorSafeTemperatureBuffer()));
     }
 }

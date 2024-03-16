@@ -24,7 +24,7 @@ public interface MotorIo {
      * <li><b>FF:</b> {@code 0}</li>
      * </ul>
      */
-    public static PidValues DEFAULT_PID_VALUES = new PidValues(1, 0, 0, 0);
+    public static PidValues DEFAULT_PID_VALUES = new PidValues(1, 0, 0, 0, 0);
 
     @AutoLog
     static class MotorIoInputs {

@@ -14,29 +14,28 @@ import edu.wpi.first.units.Voltage;
 import frc.robot.Constants;
 import frc.robot.Constants.PidValues;
 
-public class MotorIoFalcon500 extends MotorIoTalonFx {
+public class MotorIoKrakenX60 extends MotorIoTalonFx {
 
-    public MotorIoFalcon500(int motorId, String canivoreId, boolean inverted, NeutralModeValue idleMode,
+    public MotorIoKrakenX60(int motorId, String canivoreId, boolean inverted, NeutralModeValue idleMode,
             Rotation2d absoluteEncoderOffset, PidValues pidValues) {
         super(motorId, canivoreId, inverted, idleMode, absoluteEncoderOffset, pidValues);
     }
 
     @Override
     public Measure<Temperature> getMaxSafeTemperature() {
-        // https://www.chiefdelphi.com/uploads/short-url/eVYO5tVOYZecwq6Tl2kURlFZFgq.pdf
+        // TODO: No data was found.
         return Constants.getFalcon500MaxTemperature();
     }
 
     @Override
     public Measure<Velocity<Angle>> getMaxSafeVelocity() {
-        // https://www.vexrobotics.com/217-6515.html#attr-vex_other_info
-        // Could not find any max speed, but. But Free Speed is 6,380 +/- 10%.
-        return RevolutionsPerSecond.of(6_380 * 1.1);
+        // https://store.ctr-electronics.com/announcing-kraken-x60
+        return RevolutionsPerSecond.of(6_000);
     }
 
     @Override
     public Measure<Voltage> getMaxSafeVoltage() {
-        // https://www.vexrobotics.com/217-6515.html#attr-vex_other_info
-        return Volts.of(16);
+        // https://store.ctr-electronics.com/announcing-kraken-x60
+        return Volts.of(24);
     }
 }

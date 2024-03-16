@@ -73,7 +73,7 @@ public class Aimer extends DualMotorSubsystem {
         // Set Voltages.
         if (targetAngleClamped != null) {
 
-            double ff = Constants.getAimerPid().FF * targetAngleClamped.getCos();
+            double ff = Constants.getAimerPid().FF_S * targetAngleClamped.getCos();
 
             pidController.setSetpoint(targetAngleClamped.getDegrees());
             double output = pidController.calculate(encoder.getAbsolutePosition().getDegrees());

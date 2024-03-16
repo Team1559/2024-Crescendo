@@ -68,7 +68,7 @@ public abstract class MotorIoCanSparkMax implements MotorIo {
         motor.getPIDController().setP(pidValues.P);
         motor.getPIDController().setI(pidValues.I);
         motor.getPIDController().setD(pidValues.D);
-        motor.getPIDController().setFF(pidValues.FF);
+        motor.getPIDController().setFF(pidValues.FF_S);
     }
 
     @Override
