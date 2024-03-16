@@ -18,7 +18,7 @@
 # New Coder Onboarding
 * ### [Java Training](docs/Java%20Training.md)
 * ### [WPI Library Training](docs/WPI%20Library%20Training.md)
-* ### Robot Code Structure **(TODO)**
+* ### [Robot Code Structure](docs/Code%20Structure.md)
 * ### [WPI Lib Commands](docs/WPILib%20Commands.md)
 * ### PID Controller
     * [PID Control in WPILib](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/controllers/pidcontroller.html)
