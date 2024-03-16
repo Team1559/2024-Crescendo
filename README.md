@@ -29,5 +29,12 @@
 
 <br/>
 
+# Rah Cha Cha Ruckus Instructions
+This is done in a new Pre-Season.
+* ### [Update Instructions](docs/Update%20Instructions.md)
+
+<br/>
+
 # New Season Instructions
-* ### [Install, Fork, & Update Instructions](docs/New%20Season%20Instructions.md)
+This is done after the New Season Game is announced.
+* ### [Fork & Update Instructions](docs/New%20Season%20Instructions.md)
