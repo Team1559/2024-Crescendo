@@ -8,6 +8,7 @@ import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 import org.victorrobotics.frc.Constants;
 import org.victorrobotics.frc.io.motor.MotorIo;
+import org.victorrobotics.frc.util.CommandUtils;
 import org.victorrobotics.frc.util.MathUtils;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,6 +16,8 @@ import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -598,5 +601,43 @@ public abstract class DualMotorSubsystem extends SubsystemBase implements MotorS
      */
     public void setVoltageRight(Measure<Voltage> voltage) {
         rightMotor.setVoltage(voltage);
+    }
+
+    // ========================= Commands ======================================
+
+    /**
+     * @return A {@link Command} that calls {@link #forwardLeftMotor} on
+     *         {@link Command#initialize()} and {@link #stop()} on
+     *         {@link Command#end()}.
+     */
+    public Command forwardLeftMotorThenStopCommand() {
+        return CommandUtils.addName(getName(), new StartEndCommand(this::forwardLeftMotor, this::stop, this));
+    }
+
+    /**
+     * @return A {@link Command} that calls {@link #forwardRightMotor} on
+     *         {@link Command#initialize()} and {@link #stop()} on
+     *         {@link Command#end()}.
+     */
+    public Command forwardRightMotorThenStopCommand() {
+        return CommandUtils.addName(getName(), new StartEndCommand(this::forwardRightMotor, this::stop, this));
+    }
+
+    /**
+     * @return A {@link Command} that calls {@link #reverseLeftMotor} on
+     *         {@link Command#initialize()} and {@link #stop()} on
+     *         {@link Command#end()}.
+     */
+    public Command reverseLeftMotorThenStopCommand() {
+        return CommandUtils.addName(getName(), new StartEndCommand(this::reverseLeftMotor, this::stop, this));
+    }
+
+    /**
+     * @return A {@link Command} that calls {@link #reverseRightMotor} on
+     *         {@link Command#initialize()} and {@link #stop()} on
+     *         {@link Command#end()}.
+     */
+    public Command reverseRightMotorThenStopMotorCommand() {
+        return CommandUtils.addName(getName(), new StartEndCommand(this::reverseRightMotor, this::stop, this));
     }
 }

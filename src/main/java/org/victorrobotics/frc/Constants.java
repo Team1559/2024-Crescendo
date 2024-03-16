@@ -154,14 +154,14 @@ public class Constants {
     // #region: --------------- Game Robot / Technician ------------------------
     private static final boolean FORCE_GAME_ROBOT_CONSTANTS = true;
 
+    public static final boolean TECHNICIAN_CONTROLLER_ENABLED = false && !FORCE_GAME_ROBOT_CONSTANTS;
+
     @SuppressWarnings("unused")
     private static boolean isGameRobot() {
         String roboRioSerialNumber = System.getenv("serialnum");
         roboRioSerialNumber = roboRioSerialNumber == null ? "" : roboRioSerialNumber.trim();
 
-        return FORCE_GAME_ROBOT_CONSTANTS
-                || roboRioSerialNumber.equalsIgnoreCase("03282B9F" /* Game Robot */)
-                || !roboRioSerialNumber.equalsIgnoreCase("03282BB6" /* Test Robot */);
+        return FORCE_GAME_ROBOT_CONSTANTS || !roboRioSerialNumber.equalsIgnoreCase("03282BB6" /* Test Robot */);
     }
 
     // #endregion
@@ -258,14 +258,6 @@ public class Constants {
             return true;
         } else {
             return true;
-        }
-    }
-
-    public static boolean hasTraverserSubsystem() {
-        if (isGameRobot()) {
-            return false;
-        } else {
-            return false;
         }
     }
 
@@ -614,28 +606,6 @@ public class Constants {
 
     public static Map<WheelModuleIndex, SwerveModuleHardwareIds> getSwerveModuleHardwareIds() {
         return swerveModuleHardwareIds;
-    }
-
-    // #endregion
-
-    // #region: ----- Traverser -----
-
-    public static int getTraverserMotorId() {
-        // TODO: Add ID
-        throw new UnsupportedOperationException("No Motor ID for Traverser");
-    }
-
-    public static boolean isTraverserInverted() {
-        return true;
-    }
-
-    public static PidValues getTraverserPidValues() {
-        return new PidValues(0.33 / Constants.getTraverserVelocity().in(RevolutionsPerSecond), 0, 0, 11.0 / 11000, 0);
-    }
-
-    public static Measure<Velocity<Angle>> getTraverserVelocity() {
-        // TODO: Tune.
-        return RevolutionsPerSecond.of(5000);
     }
 
     // #endregion

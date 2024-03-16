@@ -3,14 +3,15 @@ package org.victorrobotics.frc.subsystems.led;
 import java.time.Duration;
 import java.time.LocalTime;
 
+import org.victorrobotics.frc.Constants;
+import org.victorrobotics.frc.util.CommandUtils;
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import org.victorrobotics.frc.Constants;
-import org.victorrobotics.frc.util.CommandUtils;
 
 public class Leds extends SubsystemBase {
 
@@ -227,8 +228,22 @@ public class Leds extends SubsystemBase {
         return CommandUtils.addName(blinkCommand);
     }
 
+    public Command changeBrightnessCommand(boolean isDimming) {
+        return CommandUtils.addName(getName(), new InstantCommand(() -> changeBrightness(isDimming), this));
+    }
+
     public Command setAllianceColorCommand() {
         return new InstantCommand(this::setAllianceColor);
+    }
+
+    /**
+     * Set color of the LEDs
+     * 
+     * @param color Color LEDs are being set to
+     * @return
+     */
+    public Command setColorCommand(Color color) {
+        return CommandUtils.addName(getName(), new InstantCommand(() -> setColor(color), this));
     }
 
     /**
@@ -245,12 +260,16 @@ public class Leds extends SubsystemBase {
     }
 
     /**
-     * Set color of the LEDs
+     * Set the lights to a scrolling pattern
      * 
-     * @param color Color LEDs are being set to
+     * @param pattern Pattern the LEDs are being set to
      * @return
      */
-    public Command setColorCommand(Color color) {
-        return CommandUtils.addName(getName(), new InstantCommand(() -> setColor(color), this));
+    public Command setStaticPatternCommand(Color[] pattern) {
+        return CommandUtils.addName(getName(), new InstantCommand(() -> setStaticPattern(pattern), this));
+    }
+
+    public Command turnOffCommand() {
+        return CommandUtils.addName(getName(), new InstantCommand(this::turnOff, this));
     }
 }

@@ -23,7 +23,6 @@ import org.victorrobotics.frc.io.vision.VisionIoLimelight;
 import org.victorrobotics.frc.io.vision.VisionIoSimAndReplay;
 import org.victorrobotics.frc.subsystems.abstract_interface.MotorSubsystem;
 import org.victorrobotics.frc.subsystems.climber.Climber;
-import org.victorrobotics.frc.subsystems.climber.Traverser;
 import org.victorrobotics.frc.subsystems.drive.SwerveBase;
 import org.victorrobotics.frc.subsystems.drive.SwerveModule;
 import org.victorrobotics.frc.subsystems.drive.SwerveModule.WheelModuleIndex;
@@ -42,6 +41,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.BaseUnits;
 import edu.wpi.first.units.PublicTemperature;
@@ -63,7 +63,6 @@ public class Robot extends LoggedRobot {
     private final Intake intake;
     private final Leds leds;
     private final NoteSensor noteSensor;
-    private final Traverser traverser;
 
     /** Is used indirectly when its periodic method gets called. */
     @SuppressWarnings("unused")
@@ -164,11 +163,6 @@ public class Robot extends LoggedRobot {
                                 Constants.isIntakeMotorInverted(), IdleMode.kBrake, Rotation2d.fromRotations(0), // TODO
                                 Constants.getIntakePidValues()))
                         : null;
-                traverser = Constants.hasTraverserSubsystem()
-                        ? new Traverser(new MotorIoNeo550Brushless(Constants.getTraverserMotorId(),
-                                Constants.isTraverserInverted(), IdleMode.kBrake, Rotation2d.fromRotations(0), // TODO
-                                Constants.getTraverserPidValues()))
-                        : null;
                 vision = Constants.hasVisionSubsystem()
                         ? new Vision(swerveBase.poseEstimator, new VisionIoLimelight(Constants.getCameraNameFront()),
                                 new VisionIoLimelight(Constants.getCameraNameBack()))
@@ -203,10 +197,6 @@ public class Robot extends LoggedRobot {
                         ? new Intake(new MotorIoSimulation(DCMotor.getNeo550(1), 1 /* TODO */,
                                 MetersPerSecond.zero() /* TODO */))
                         : null;
-                traverser = Constants.hasTraverserSubsystem()
-                        ? new Traverser(new MotorIoSimulation(DCMotor.getNeo550(1), 1 /* TODO */,
-                                MetersPerSecond.zero() /* TODO */))
-                        : null;
                 vision = Constants.hasVisionSubsystem()
                         ? new Vision(swerveBase.poseEstimator, new VisionIoSimAndReplay())
                         : null;
@@ -226,7 +216,6 @@ public class Robot extends LoggedRobot {
                 flywheel = Constants.hasFlywheelSubsystem() ? new Flywheel(new MotorIoReplay(), new MotorIoReplay())
                         : null;
                 intake = Constants.hasIntakeSubsystem() ? new Intake(new MotorIoReplay()) : null;
-                traverser = Constants.hasTraverserSubsystem() ? new Traverser(new MotorIoReplay()) : null;
                 vision = Constants.hasVisionSubsystem()
                         ? new Vision(swerveBase.poseEstimator, new VisionIoSimAndReplay())
                         : null;
@@ -404,13 +393,23 @@ public class Robot extends LoggedRobot {
 
         // #region: ---------- Configure Controller 0 for Pilot ----------
 
-        pilot.leftTrigger().whileTrue(CompoundCommands.autoAimAndManuallyDriveCommand(swerveBase, aimer, flywheel,
-                pilot::getLeftY, pilot::getLeftX,
-                Constants::getSpeakerLocation));
-        pilot.rightTrigger().whileTrue(CompoundCommands.autoAimAndManuallyDriveCommand(swerveBase, aimer, flywheel,
-                pilot::getLeftY, pilot::getLeftX,
-                Constants::getAmpLocation));
-        pilot.leftTrigger().onFalse(aimer.setAngleCommand(Rotation2d.fromDegrees(2)));
+        if (Constants.hasAimerSubsystem() && Constants.hasFlywheelSubsystem()) {
+            pilot.leftTrigger().whileTrue(CompoundCommands.autoAimAndManuallyDriveCommand(swerveBase, aimer, flywheel,
+                    pilot::getLeftY, pilot::getLeftX,
+                    Constants::getSpeakerLocation));
+        }
+
+        // Robot is not Capable
+        // if (Constants.hasAimerSubsystem() && Constants.hasFlywheelSubsystem()) {
+        // pilot.rightTrigger().whileTrue(CompoundCommands.autoAimAndManuallyDriveCommand(swerveBase,
+        // aimer, flywheel, pilot::getLeftY, pilot::getLeftX,
+        // Constants::getAmpLocation));
+        // }
+
+        if (Constants.hasAimerSubsystem()) {
+            pilot.leftTrigger().onFalse(aimer.setAngleCommand(Rotation2d.fromDegrees(2)));
+        }
+
         pilot.y().onTrue(swerveBase.resetFieldOrientationCommand());
 
         // #endregion
@@ -449,14 +448,142 @@ public class Robot extends LoggedRobot {
             coPilot.povDown().and(coPilot.b()).whileTrue(climber.modifyHeightRightCommand(Inches.of(-.1)).repeatedly());
         }
 
-        if (Constants.hasTraverserSubsystem()) {
-            coPilot.povRight().whileTrue(traverser.traverserRightThenStopCommand());
-            coPilot.povLeft().whileTrue(traverser.traverserLeftThenStopCommand());
-        }
-
         if (Constants.hasAimerSubsystem()) {
             coPilot.rightBumper().whileTrue(aimer.modifyAngleCommand(Rotation2d.fromDegrees(0.5)));
             coPilot.leftBumper().whileTrue(aimer.modifyAngleCommand(Rotation2d.fromDegrees(-0.5)));
+        }
+
+        // #endregion
+
+        // #region: ---------- Configure Controller 2 for Technician ----------
+        if (Constants.TECHNICIAN_CONTROLLER_ENABLED) {
+
+            CommandXboxController technicianTestController = new CommandXboxController(1);
+
+            // #region: ----- Drive Commands -----
+
+            technicianTestController.povUp()
+                    .and(technicianTestController.back().negate()).and(technicianTestController.start().negate())
+                    .whileTrue(swerveBase.runVelocityCommand(new ChassisSpeeds(1, 0, 0)));
+            technicianTestController.povDown()
+                    .and(technicianTestController.back().negate()).and(technicianTestController.start().negate())
+                    .whileTrue(swerveBase.runVelocityCommand(new ChassisSpeeds(-1, 0, 0)));
+            technicianTestController.povRight()
+                    .and(technicianTestController.back().negate()).and(technicianTestController.start().negate())
+                    .whileTrue(swerveBase.runVelocityCommand(new ChassisSpeeds(0, -1, 0)));
+            technicianTestController.povLeft()
+                    .and(technicianTestController.back().negate()).and(technicianTestController.start().negate())
+                    .whileTrue(swerveBase.runVelocityCommand(new ChassisSpeeds(0, 1, 0)));
+
+            // #endregion
+
+            // #region: ----- Aimer Commands -----
+
+            if (Constants.hasAimerSubsystem()) {
+
+                technicianTestController.leftBumper()
+                        .and(technicianTestController.back().negate()).and(technicianTestController.start().negate())
+                        .onTrue(aimer.modifyTargetAngleCommand(Rotation2d.fromDegrees(-1)));
+                technicianTestController.rightBumper()
+                        .and(technicianTestController.back().negate()).and(technicianTestController.start().negate())
+                        .onTrue(aimer.modifyTargetAngleCommand(Rotation2d.fromDegrees(1)));
+
+                technicianTestController.leftBumper()
+                        .and(technicianTestController.back()).and(technicianTestController.start().negate())
+                        .onTrue(aimer.modifyTargetAngleCommand(Rotation2d.fromDegrees(-0.1)));
+                technicianTestController.rightBumper()
+                        .and(technicianTestController.back()).and(technicianTestController.start().negate())
+                        .onTrue(aimer.modifyTargetAngleCommand(Rotation2d.fromDegrees(0.1)));
+            }
+
+            // #endregion
+
+            // #region: ----- Climber Commands -----
+
+            if (Constants.hasClimberSubsystem()) {
+
+                technicianTestController.povUp()
+                        .and(technicianTestController.back()).and(technicianTestController.start().negate())
+                        .whileTrue(climber.forwardLeftMotorThenStopCommand());
+                technicianTestController.povUp()
+                        .and(technicianTestController.back().negate()).and(technicianTestController.start())
+                        .whileTrue(climber.forwardRightMotorThenStopCommand());
+
+                technicianTestController.povDown()
+                        .and(technicianTestController.back()).and(technicianTestController.start().negate())
+                        .whileTrue(climber.reverseLeftMotorThenStopCommand());
+                technicianTestController.povDown()
+                        .and(technicianTestController.back().negate()).and(technicianTestController.start())
+                        .whileTrue(climber.reverseRightMotorThenStopMotorCommand());
+            }
+
+            // #endregion
+
+            // --------------- Feeder Commands -----
+            // Nothing Needed.
+
+            // #region: ----- Flywheel Commands -----
+
+            if (Constants.hasFlywheelSubsystem()) {
+
+                technicianTestController.leftBumper()
+                        .and(technicianTestController.back().negate()).and(technicianTestController.start().negate())
+                        .whileTrue(flywheel.forwardLeftMotorThenStopCommand());
+                technicianTestController.rightBumper()
+                        .and(technicianTestController.back().negate()).and(technicianTestController.start().negate())
+                        .whileTrue(flywheel.forwardRightMotorThenStopCommand());
+
+                technicianTestController.leftBumper()
+                        .and(technicianTestController.back().negate()).and(technicianTestController.start())
+                        .whileTrue(flywheel.reverseLeftMotorThenStopCommand());
+                technicianTestController.rightBumper()
+                        .and(technicianTestController.back().negate()).and(technicianTestController.start())
+                        .whileTrue(flywheel.reverseRightMotorThenStopMotorCommand());
+            }
+
+            // #endregion
+
+            // --------------- Intake Commands -----
+            // Nothing Needed.
+
+            // #region: ----- LED Commands -----
+
+            technicianTestController.a()
+                    .and(technicianTestController.back()).and(technicianTestController.start().negate())
+                    .onTrue(leds.setColorCommand(Color.kDarkGreen));
+
+            technicianTestController.b()
+                    .and(technicianTestController.back()).and(technicianTestController.start().negate())
+                    .onTrue(leds.setStaticPatternCommand(
+                            new Color[] { Color.kDarkRed, Color.kDarkRed, Color.kBlack, Color.kBlack }));
+
+            technicianTestController.x()
+                    .and(technicianTestController.back()).and(technicianTestController.start().negate())
+                    .onTrue(leds.setDynamicPatternCommand(new Color[] {
+                            Color.kDarkBlue, Color.kDarkBlue, Color.kDarkBlue,
+                            Color.kDarkViolet, Color.kDarkViolet, Color.kDarkViolet },
+                            true));
+
+            technicianTestController.y()
+                    .and(technicianTestController.back()).and(technicianTestController.start().negate())
+                    .onTrue(leds.setDynamicPatternCommand(new Color[] {
+                            Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kBlack,
+                            Color.kOrange, Color.kOrange, Color.kOrange, Color.kBlack, Color.kBlack, Color.kBlack },
+                            false));
+
+            technicianTestController.leftBumper()
+                    .and(technicianTestController.back()).and(technicianTestController.start().negate())
+                    .onTrue(leds.changeBrightnessCommand(true));
+            technicianTestController.rightBumper()
+                    .and(technicianTestController.back()).and(technicianTestController.start().negate())
+                    .onTrue(leds.changeBrightnessCommand(false));
+
+            technicianTestController.back().and(technicianTestController.start()).onTrue(leds.turnOffCommand());
+
+            // #endregion
+
+            // --------------- Note Sensor Commands -----
+            // Nothing Needed.
         }
 
         // #endregion

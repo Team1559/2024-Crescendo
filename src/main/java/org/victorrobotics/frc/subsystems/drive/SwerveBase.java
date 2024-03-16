@@ -45,6 +45,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveBase extends SubsystemBase {
@@ -325,13 +326,17 @@ public class SwerveBase extends SubsystemBase {
         Command command = stopCommand()
                 .alongWith(leds.setDynamicPatternCommand(Constants.getMotorOverheatEmergencyPattern(), false));
 
-        return CommandUtils.addName(command);
+        return CommandUtils.addName(getName(), command);
     }
 
     // ========================= Function Commands =============================
 
     public Command resetFieldOrientationCommand() {
         return CommandUtils.addName(getName(), new InstantCommand(this::resetFieldOrientation));
+    }
+
+    public Command runVelocityCommand(ChassisSpeeds speeds) {
+        return CommandUtils.addName(getName(), new RunCommand(() -> runVelocity(speeds)));
     }
 
     /**
@@ -392,7 +397,7 @@ public class SwerveBase extends SubsystemBase {
 
         spinCommand.addRequirements(this);
 
-        return spinCommand;
+        return CommandUtils.addName(getName(), spinCommand);
     }
 
     public Command stopCommand() {
@@ -432,6 +437,6 @@ public class SwerveBase extends SubsystemBase {
 
         spinCommand.addRequirements(this);
 
-        return CommandUtils.addName(spinCommand);
+        return CommandUtils.addName(getName(), spinCommand);
     }
 }
