@@ -99,7 +99,7 @@ public class Aimer extends SubsystemBase {
         if (Double.isFinite(distanceMeters)) {
             Logger.recordOutput("Shooter/Aimer/DistanceToTarget", distanceMeters);
             Rotation2d angle = Rotation2d
-                    .fromDegrees(1.42 * distanceMeters * distanceMeters - 15.8 * distanceMeters + 55.3);
+                    .fromDegrees(1.42 * distanceMeters * distanceMeters - 15.8 * distanceMeters + 55.6);
             Logger.recordOutput("Shooter/Aimer/CalculatedTargetAngleInDegrees", angle.getDegrees());
             setTargetAngle(angle);
         }
