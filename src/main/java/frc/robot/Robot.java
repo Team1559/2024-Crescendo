@@ -26,9 +26,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.DriveCommands;
-import frc.robot.commands.LedCommands;
-import frc.robot.commands.ShooterCommands;
 import frc.robot.io.encoder.EncoderIoGenericPmw;
 import frc.robot.io.encoder.EncoderIoReplay;
 import frc.robot.io.encoder.EncoderIoSimulation;
@@ -265,17 +262,17 @@ public class Robot extends LoggedRobot {
 
         // #region: ---------- Configure Default Commands ----------
 
-        leds.setDefaultCommand(LedCommands.defaultLedCommand(leds));
+        leds.setDefaultCommand(leds.setAllianceColorCommand());
 
         // #endregion
 
         // #region: ---------- Motor Overheat Triggers ----------
         new Trigger(swerveBase::isTemperatureTooHigh)
-                .whileTrue(DriveCommands.overheatedMotorShutdownCommand(swerveBase, leds));
+                .whileTrue(swerveBase.overheatedMotorShutdownCommand(leds));
 
         for (MotorSubsystem motorSubsystem : MotorSubsystem.instantiatedSubsystems) {
             new Trigger(motorSubsystem::isTemperatureTooHigh)
-                    .whileTrue(ShooterCommands.overheatedMotorShutdownCommand(motorSubsystem, leds));
+                    .whileTrue(CompoundCommands.overheatedMotorShutdownCommand(motorSubsystem, leds));
         }
 
         // #endregion
@@ -315,27 +312,27 @@ public class Robot extends LoggedRobot {
         // #region: ---------- Create Named Commands for use by Path Planner ----------
 
         NamedCommands.registerCommand("Spin 180",
-                DriveCommands.spinCommand(swerveBase, Rotation2d.fromDegrees(180), 1));
+                swerveBase.spinCommand(Rotation2d.fromDegrees(180), 1));
 
         if (Constants.hasFeederSubsystem() && Constants.hasIntakeSubsystem()) {
-            NamedCommands.registerCommand("StartIntake", ShooterCommands.intakeStartStopCommand(feeder, intake));
+            NamedCommands.registerCommand("StartIntake", CompoundCommands.intakeStartStopCommand(feeder, intake));
         }
 
         if (Constants.hasFlywheelSubsystem()) {
-            NamedCommands.registerCommand("Spin Up Flywheel", ShooterCommands.spinUpFlywheelCommand(flywheel));
+            NamedCommands.registerCommand("Spin Up Flywheel", flywheel.spinUpFlywheelCommand());
         }
 
         if (Constants.hasAimerSubsystem() && Constants.hasFeederSubsystem() && Constants.hasIntakeSubsystem()
                 && Constants.hasNoteSensorSubsystem()) {
 
             NamedCommands.registerCommand("Auto Shoot",
-                    DriveCommands.autoShootCommand(swerveBase, aimer, feeder, intake, noteSensor));
+                    CompoundCommands.autoShootCommand(swerveBase, aimer, feeder, intake, noteSensor));
 
             NamedCommands.registerCommand("Initial Shoot",
-                    ShooterCommands.autoJustShootCommand(aimer, feeder, intake, noteSensor));
+                    CompoundCommands.autoJustShootCommand(aimer, feeder, intake, noteSensor));
 
             NamedCommands.registerCommand("Delayed Manual Shot",
-                    ShooterCommands.autoDelayedManualShotCommand(aimer, feeder, intake, noteSensor));
+                    CompoundCommands.autoDelayedManualShotCommand(aimer, feeder, intake, noteSensor));
         }
 
         // #endregion
@@ -386,11 +383,11 @@ public class Robot extends LoggedRobot {
 
         // #region: ---------- Configure Default Commands ----------
 
-        swerveBase.setDefaultCommand(DriveCommands.manualDriveDefaultCommand(swerveBase,
-                pilot::getLeftY, pilot::getLeftX, pilot::getRightX));
+        swerveBase.setDefaultCommand(
+                swerveBase.manualDriveDefaultCommand(pilot::getLeftY, pilot::getLeftX, pilot::getRightX));
 
         if (Constants.hasFlywheelSubsystem()) {
-            flywheel.setDefaultCommand(ShooterCommands.defaultFlywheelCommand(flywheel));
+            flywheel.setDefaultCommand(flywheel.defaultFlywheelCommand());
         }
 
         // #endregion
@@ -407,10 +404,10 @@ public class Robot extends LoggedRobot {
 
         // #region: ---------- Configure Controller 0 for Pilot ----------
 
-        pilot.leftTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(swerveBase, aimer, flywheel,
+        pilot.leftTrigger().whileTrue(CompoundCommands.autoAimAndManuallyDriveCommand(swerveBase, aimer, flywheel,
                 pilot::getLeftY, pilot::getLeftX,
                 Constants::getSpeakerLocation));
-        pilot.rightTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(swerveBase, aimer, flywheel,
+        pilot.rightTrigger().whileTrue(CompoundCommands.autoAimAndManuallyDriveCommand(swerveBase, aimer, flywheel,
                 pilot::getLeftY, pilot::getLeftX,
                 Constants::getAmpLocation));
         pilot.leftTrigger().onFalse(aimer.setAngleCommand(Rotation2d.fromDegrees(2)));
@@ -424,18 +421,19 @@ public class Robot extends LoggedRobot {
 
             if (Constants.hasNoteSensorSubsystem()) {
                 coPilot.leftTrigger().and(noteSensor::isObjectNotDetectedSwitch)
-                        .whileTrue(ShooterCommands.runIntakeCommand(feeder, flywheel, intake));
+                        .whileTrue(CompoundCommands.runIntakeCommand(feeder, flywheel, intake));
 
             }
-            coPilot.x().whileTrue(ShooterCommands.reverseShooterAndIntakeCommand(feeder, flywheel, intake));
+            coPilot.x().whileTrue(CompoundCommands.reverseShooterAndIntakeCommand(feeder, flywheel, intake));
         }
 
         if (Constants.hasFeederSubsystem() && Constants.hasFlywheelSubsystem()) {
 
             if (Constants.hasIntakeSubsystem() && Constants.hasNoteSensorSubsystem()) {
-                coPilot.rightTrigger().onTrue(ShooterCommands.shootTeleopCommand(feeder, flywheel, intake, noteSensor));
+                coPilot.rightTrigger()
+                        .onTrue(CompoundCommands.shootTeleopCommand(feeder, flywheel, intake, noteSensor));
             }
-            coPilot.a().whileTrue(ShooterCommands.reverseShooterCommand(feeder, flywheel, leds));
+            coPilot.a().whileTrue(CompoundCommands.reverseShooterCommand(feeder, flywheel, leds));
         }
 
         if (Constants.hasClimberSubsystem()) {

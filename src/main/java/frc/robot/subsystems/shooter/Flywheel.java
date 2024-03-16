@@ -4,9 +4,13 @@ import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.io.motor.MotorIo;
 import frc.robot.subsystems.abstract_interface.DualMotorSubsystem;
+import frc.robot.util.CommandUtils;
 
 public class Flywheel extends DualMotorSubsystem {
 
@@ -53,4 +57,24 @@ public class Flywheel extends DualMotorSubsystem {
             super.setVoltage(voltage);
         }
     }
+
+    // ========================= Default Commands =========================
+
+    public Command defaultFlywheelCommand() {
+        Command command = new SequentialCommandGroup(new WaitCommand(.5), this.stopCommand());
+        return CommandUtils.addName(command);
+    }
+
+    // ========================= Other Commands =========================
+
+    public Command spinUpFlywheelCommand() {
+
+        Command command = new SequentialCommandGroup(
+                forwardCommand(),
+                new WaitCommand(1) // TODO: Tune.
+        );
+
+        return CommandUtils.addName(command);
+    }
+
 }

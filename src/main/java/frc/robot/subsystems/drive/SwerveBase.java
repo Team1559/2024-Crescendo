@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
@@ -20,11 +21,14 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
@@ -32,12 +36,14 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.io.gyro.GyroIo;
 import frc.robot.io.gyro.GyroIoInputsAutoLogged;
 import frc.robot.subsystems.drive.SwerveModule.WheelModuleIndex;
+import frc.robot.subsystems.led.Leds;
 import frc.robot.util.CommandUtils;
 import frc.robot.util.LocalAdStarAk;
 
@@ -276,13 +282,156 @@ public class SwerveBase extends SubsystemBase {
         }
     }
 
+    // ========================= Default Commands ==============================
+
+    public Command manualDriveDefaultCommand(DoubleSupplier xSupplier, DoubleSupplier ySupplier,
+            DoubleSupplier omegaSupplier) {
+
+        Command command = Commands.run(
+                () -> {
+                    double linearMagnitude = SwerveBase.calculateLinearMagnitude(xSupplier, ySupplier);
+                    double omega = MathUtil.applyDeadband(-omegaSupplier.getAsDouble(),
+                            Constants.getJoystickDeadband());
+                    omega = Math.copySign(omega * omega, omega);
+
+                    // Calculate new linear velocity.
+                    Rotation2d linearDirection = SwerveBase.calculateLinearDirection(xSupplier, ySupplier);
+                    Translation2d linearVelocity = new Pose2d(new Translation2d(), linearDirection)
+                            .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d())).getTranslation();
+
+                    // Scale Velocities to between 0 and Max.
+                    Measure<Velocity<Distance>> scaledXVelocity = Constants.getMaxLinearSpeed()
+                            .times(linearVelocity.getX());
+                    Measure<Velocity<Distance>> scaledYVelocity = Constants.getMaxLinearSpeed()
+                            .times(linearVelocity.getY());
+                    Measure<Velocity<Angle>> scaledOmegaVelocity = Constants.getMaxAngularSpeed().times(omega);
+
+                    // Run Velocities.
+                    if (Constants.isDrivingModeFieldRelative()) {
+                        runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(scaledXVelocity, scaledYVelocity,
+                                scaledOmegaVelocity, getRotation()));
+                    } else {
+                        runVelocity(new ChassisSpeeds(scaledXVelocity, scaledYVelocity, scaledOmegaVelocity));
+                    }
+                },
+                this);
+
+        return CommandUtils.addName(command);
+    }
+
+    // ========================= Trigger Commands ==============================
+
+    public Command overheatedMotorShutdownCommand(Leds leds) {
+        Command command = stopCommand()
+                .alongWith(leds.setDynamicPatternCommand(Constants.getMotorOverheatEmergencyPattern(), false));
+
+        return CommandUtils.addName(command);
+    }
+
     // ========================= Function Commands =============================
 
     public Command resetFieldOrientationCommand() {
         return CommandUtils.addName(getName(), new InstantCommand(this::resetFieldOrientation));
     }
 
+    /**
+     * This method will create a command to spin the robot the specified amount at a
+     * given speed. The robot
+     * will always take the shortest path.
+     * 
+     * @param rotationAmount The amount the robot rotates.
+     * @param speed          The speed to spin at. (must be a positive number
+     *                       greater
+     *                       than 0).
+     * @return The created command.
+     */
+    public Command spinCommand(Rotation2d rotationAmount, double speed) {
+
+        if (speed <= 0) {
+            throw new RuntimeException("Robot cannot spin because velocity is negative or zero:  " + speed);
+        }
+
+        Command spinCommand = new Command() {
+
+            private Rotation2d targetRotation;
+
+            @Override
+            public void initialize() {
+                Rotation2d startingRotation = getRotation();
+                targetRotation = startingRotation.plus(rotationAmount);
+            }
+
+            @Override
+            public void execute() {
+
+                Rotation2d current = getRotation();
+                double delta = targetRotation.minus(current).getDegrees();
+
+                double rampOmega = Math.max(Math.min(Math.abs(delta) / 50 /* degrees */, 1.0), .01);
+                double omega = Math.copySign(speed, delta) * rampOmega;
+
+                runVelocity(new ChassisSpeeds(0, 0, omega));
+
+                Logger.recordOutput("DriveCommands/spinCommand/delta", delta);
+                Logger.recordOutput("DriveCommands/spinCommand/rampOmega", rampOmega);
+                Logger.recordOutput("DriveCommands/spinCommand/omega", omega);
+            }
+
+            @Override
+            public boolean isFinished() {
+                Rotation2d current = getRotation();
+                double delta = targetRotation.minus(current).getDegrees();
+                return Math.abs(delta) < .5 /* degrees */;
+            }
+
+            @Override
+            public void end(boolean interrupted) {
+                stop();
+            }
+        };
+
+        spinCommand.addRequirements(this);
+
+        return spinCommand;
+    }
+
     public Command stopCommand() {
         return CommandUtils.addName(getName(), new InstantCommand(this::stop));
+    }
+
+    public Command turnToTargetCommand(Supplier<Translation3d> target, double speed) {
+
+        Command spinCommand = new Command() {
+
+            private Command spinCommand;
+
+            @Override
+            public void initialize() {
+                // Rotating plus 180 degrees to position the back of the robot to the target.
+                Rotation2d rotation = getRotationToTarget(target.get().toTranslation2d())
+                        .plus(Rotation2d.fromDegrees(180));
+                spinCommand = spinCommand(rotation, speed);
+                spinCommand.initialize();
+            }
+
+            @Override
+            public void execute() {
+                spinCommand.execute();
+            }
+
+            @Override
+            public boolean isFinished() {
+                return spinCommand.isFinished();
+            }
+
+            @Override
+            public void end(boolean interrupted) {
+                spinCommand.end(interrupted);
+            }
+        };
+
+        spinCommand.addRequirements(this);
+
+        return CommandUtils.addName(spinCommand);
     }
 }

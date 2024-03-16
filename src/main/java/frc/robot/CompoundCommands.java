@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -16,15 +16,17 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Velocity;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Constants;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.subsystems.abstract_interface.MotorSubsystem;
 import frc.robot.subsystems.drive.SwerveBase;
 import frc.robot.subsystems.led.Leds;
 import frc.robot.subsystems.shooter.Aimer;
@@ -34,61 +36,28 @@ import frc.robot.subsystems.shooter.Intake;
 import frc.robot.subsystems.shooter.NoteSensor;
 import frc.robot.util.CommandUtils;
 
-public class DriveCommands {
+/**
+ * Only used for commands that use multiple subsystems.
+ * <p>
+ * Single subsystem commands should be in their subsystem class.
+ * </p>
+ */
+public class CompoundCommands {
 
     /** Makes Class non-instantiable */
-    private DriveCommands() {
-    }
-
-    // ========================= Default Commands ==============================
-
-    public static Command manualDriveDefaultCommand(SwerveBase swerveBase, DoubleSupplier xSupplier,
-            DoubleSupplier ySupplier,
-            DoubleSupplier omegaSupplier) {
-
-        Command command = Commands.run(
-                () -> {
-                    double linearMagnitude = SwerveBase.calculateLinearMagnitude(xSupplier, ySupplier);
-                    double omega = MathUtil.applyDeadband(-omegaSupplier.getAsDouble(),
-                            Constants.getJoystickDeadband());
-                    omega = Math.copySign(omega * omega, omega);
-
-                    // Calculate new linear velocity.
-                    Rotation2d linearDirection = SwerveBase.calculateLinearDirection(xSupplier, ySupplier);
-                    Translation2d linearVelocity = new Pose2d(new Translation2d(), linearDirection)
-                            .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d())).getTranslation();
-
-                    // Scale Velocities to between 0 and Max.
-                    Measure<Velocity<Distance>> scaledXVelocity = Constants.getMaxLinearSpeed()
-                            .times(linearVelocity.getX());
-                    Measure<Velocity<Distance>> scaledYVelocity = Constants.getMaxLinearSpeed()
-                            .times(linearVelocity.getY());
-                    Measure<Velocity<Angle>> scaledOmegaVelocity = Constants.getMaxAngularSpeed().times(omega);
-
-                    // Run Velocities.
-                    if (Constants.isDrivingModeFieldRelative()) {
-                        swerveBase.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(scaledXVelocity, scaledYVelocity,
-                                scaledOmegaVelocity, swerveBase.getRotation()));
-                    } else {
-                        swerveBase
-                                .runVelocity(new ChassisSpeeds(scaledXVelocity, scaledYVelocity, scaledOmegaVelocity));
-                    }
-                },
-                swerveBase);
-
-        return CommandUtils.addName(command);
+    private CompoundCommands() {
     }
 
     // ========================= Trigger Commands ==============================
 
-    public static Command overheatedMotorShutdownCommand(SwerveBase swerveBase, Leds leds) {
-        Command command = swerveBase.stopCommand()
+    public static Command overheatedMotorShutdownCommand(MotorSubsystem motorSubsystem, Leds leds) {
+        Command command = motorSubsystem.stopCommand()
                 .alongWith(leds.setDynamicPatternCommand(Constants.getMotorOverheatEmergencyPattern(), false));
 
         return CommandUtils.addName(command);
     }
 
-    // ========================= Other Commands ================================
+    // ========================= Other Commands =========================
 
     public static Command autoAimAndManuallyDriveCommand(SwerveBase swerveBase, Aimer aimer, Flywheel flywheel,
             DoubleSupplier xSupplier, DoubleSupplier ySupplier, Supplier<Translation3d> target) {
@@ -179,113 +148,123 @@ public class DriveCommands {
         return CommandUtils.addName(aimingDrive);
     }
 
-    public static Command autoShootCommand(SwerveBase swerveBase, Aimer aimer, Feeder feeder, Intake intake,
+    public static Command autoDelayedManualShotCommand(Aimer aimer, Feeder feeder, Intake intake,
             NoteSensor noteSensor) {
-        Command command = new SequentialCommandGroup(
-                new ParallelCommandGroup(
-                        DriveCommands.turnToTargetCommand(swerveBase, Constants::getSpeakerLocation, 4.5),
-                        aimer.aimAtTargetCommand(Constants::getSpeakerLocation, swerveBase::getTranslation)
-                                .andThen(aimer.waitUntilAtTargetCommand())),
-                ShooterCommands.shootAutonomousCommand(feeder, intake, noteSensor));
+
+        Command command = new ParallelDeadlineGroup(
+                new WaitCommand(12),
+                aimer.setAngleCommand(Rotation2d.fromDegrees(36.7)).andThen(new WaitUntilCommand(aimer::isAtTarget))
+                        .andThen(CompoundCommands.shootAutonomousCommand(feeder, intake, noteSensor)));
 
         return CommandUtils.addName(command);
     }
 
-    /**
-     * This method will create a command to spin the robot the specified amount at a
-     * given speed. The robot
-     * will always take the shortest path.
-     * 
-     * @param driveBase      The robot to spin.
-     * @param rotationAmount The amount the robot rotates.
-     * @param speed          The speed to spin at. (must be a positive number
-     *                       greater
-     *                       than 0).
-     * @return The created command.
-     */
-    public static Command spinCommand(SwerveBase swerveBase, Rotation2d rotationAmount, double speed) {
+    public static Command autoIntakeStartCommand(Feeder feeder, Intake intake) {
 
-        if (speed <= 0) {
-            throw new RuntimeException("Robot cannot spin because velocity is negative or zero:  " + speed);
-        }
+        Command command = new InstantCommand(() -> {
+            intake.forward();
+            feeder.forward();
+        });
 
-        Command spinCommand = new Command() {
-
-            private Rotation2d targetRotation;
-
-            @Override
-            public void initialize() {
-                Rotation2d startingRotation = swerveBase.getRotation();
-                targetRotation = startingRotation.plus(rotationAmount);
-            }
-
-            @Override
-            public void execute() {
-
-                Rotation2d current = swerveBase.getRotation();
-                double delta = targetRotation.minus(current).getDegrees();
-
-                double rampOmega = Math.max(Math.min(Math.abs(delta) / 50 /* degrees */, 1.0), .01);
-                double omega = Math.copySign(speed, delta) * rampOmega;
-
-                swerveBase.runVelocity(new ChassisSpeeds(0, 0, omega));
-
-                Logger.recordOutput("DriveCommands/spinCommand/delta", delta);
-                Logger.recordOutput("DriveCommands/spinCommand/rampOmega", rampOmega);
-                Logger.recordOutput("DriveCommands/spinCommand/omega", omega);
-            }
-
-            @Override
-            public boolean isFinished() {
-                Rotation2d current = swerveBase.getRotation();
-                double delta = targetRotation.minus(current).getDegrees();
-                return Math.abs(delta) < .5 /* degrees */;
-            }
-
-            @Override
-            public void end(boolean interrupted) {
-                swerveBase.stop();
-            }
-        };
-
-        spinCommand.addRequirements(swerveBase);
-
-        return spinCommand;
+        return CommandUtils.addName(command);
     }
 
-    public static Command turnToTargetCommand(SwerveBase swerveBase, Supplier<Translation3d> target, double speed) {
+    public static Command autoShootCommand(SwerveBase swerveBase, Aimer aimer, Feeder feeder, Intake intake,
+            NoteSensor noteSensor) {
+        Command command = new SequentialCommandGroup(
+                new ParallelCommandGroup(
+                        swerveBase.turnToTargetCommand(Constants::getSpeakerLocation, 4.5),
+                        aimer.aimAtTargetCommand(Constants::getSpeakerLocation, swerveBase::getTranslation)
+                                .andThen(aimer.waitUntilAtTargetCommand())),
+                CompoundCommands.shootAutonomousCommand(feeder, intake, noteSensor));
 
-        Command spinCommand = new Command() {
+        return CommandUtils.addName(command);
+    }
 
-            private Command spinCommand;
+    public static Command autoJustShootCommand(Aimer aimer, Feeder feeder, Intake intake, NoteSensor noteSensor) {
 
-            @Override
-            public void initialize() {
-                // Rotating plus 180 degrees to position the back of the robot to the target.
-                Rotation2d rotation = swerveBase.getRotationToTarget(target.get().toTranslation2d())
-                        .plus(Rotation2d.fromDegrees(180));
-                spinCommand = spinCommand(swerveBase, rotation, speed);
-                spinCommand.initialize();
-            }
+        Command command = aimer.setAngleCommand(Rotation2d.fromDegrees(36.7))
+                .andThen(new WaitUntilCommand(aimer::isAtTarget))
+                .andThen(CompoundCommands.shootAutonomousCommand(feeder, intake, noteSensor));
 
+        return CommandUtils.addName(command);
+    }
+
+    public static Command intakeStartStopCommand(Feeder feeder, Intake intake) {
+        Command command = new StartEndCommand(
+                () -> {
+                    intake.forward();
+                    feeder.forward();
+                },
+                () -> {
+                    intake.stop();
+                    feeder.stop();
+                },
+                intake, feeder);
+
+        return CommandUtils.addName(command);
+    }
+
+    public static Command reverseShooterAndIntakeCommand(Feeder feeder, Flywheel flywheel, Intake intake) {
+        Command command = new ParallelCommandGroup(new StartEndCommand(flywheel::reverse, flywheel::stop, flywheel),
+                new StartEndCommand(feeder::reverse, feeder::stop, feeder),
+                new StartEndCommand(intake::reverse, intake::stop, intake));
+
+        return CommandUtils.addName(command);
+    }
+
+    public static Command reverseShooterCommand(Feeder feeder, Flywheel flywheel, Leds leds) {
+        Command reverseShooterCommand = new Command() {
             @Override
             public void execute() {
-                spinCommand.execute();
-            }
-
-            @Override
-            public boolean isFinished() {
-                return spinCommand.isFinished();
+                flywheel.reverse();
+                feeder.reverse();
+                leds.setDynamicPattern(new Color[] { Color.kRed, Color.kRed, Color.kBlack, Color.kBlack }, true);
             }
 
             @Override
             public void end(boolean interrupted) {
-                spinCommand.end(interrupted);
+                flywheel.stop();
+                feeder.stop();
+                leds.setAllianceColor();
             }
         };
+        reverseShooterCommand.addRequirements(flywheel, feeder, leds);
 
-        spinCommand.addRequirements(swerveBase);
+        return CommandUtils.addName(reverseShooterCommand);
+    }
 
-        return CommandUtils.addName(spinCommand);
+    public static Command runIntakeCommand(Feeder feeder, Flywheel flywheel, Intake intake) {
+
+        Command command = new ParallelCommandGroup(CompoundCommands.intakeStartStopCommand(feeder, intake),
+                flywheel.stopCommand());
+
+        return CommandUtils.addName(command);
+    }
+
+    public static Command shootAutonomousCommand(Feeder feeder, Intake intake, NoteSensor noteSensor) {
+
+        ParallelRaceGroup group = new ParallelRaceGroup(
+                feeder.forwardThenStopCommand(),
+                intake.forwardThenStopCommand(),
+                // TODO: May want to wait a little after the note is no longer sensed.
+                noteSensor.waitForNoObjectOnSwitchCommand(),
+                new WaitCommand(5));
+
+        return CommandUtils.addName(group);
+    }
+
+    public static Command shootTeleopCommand(Feeder feeder, Flywheel flywheel, Intake intake, NoteSensor noteSensor) {
+
+        // TODO: Have this run until the Co-Pilot stops pushing the button.
+        ParallelRaceGroup group = new ParallelRaceGroup(
+                new StartEndCommand(intake::forward, intake::stop, intake),
+                feeder.forwardMaxVelocityThenStopCommand(),
+                noteSensor.waitForNoObjectOnSwitchCommand(),
+                new WaitCommand(5));
+
+        // TODO: Spin up flywheel if not already spinning.
+
+        return CommandUtils.addName(group);
     }
 }
