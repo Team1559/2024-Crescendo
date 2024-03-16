@@ -106,8 +106,9 @@ public class RobotContainer {
                                 1.0 / 11000)) // TODO - Constants
                         : null;
                 vision = CONSTANTS.hasVisionSubsystem()
-                        ? new Vision(driveBase.poseEstimator, new VisionIoLimelight(CONSTANTS.getCameraName()),
-                                new VisionIoLimelight("limelight-back"))
+                        ? new Vision(driveBase.poseEstimator,
+                                new VisionIoLimelight(CONSTANTS.getCameraName(), driveBase::getSpeed),
+                                new VisionIoLimelight("limelight-back", driveBase::getSpeed))
                         : null;
                 traverser = CONSTANTS.hasTraverserSubsystem()
                         ? new Traverser(new SingleMotorIoNeo550Brushless(CONSTANTS.getTraverserMotorId(),
@@ -272,14 +273,13 @@ public class RobotContainer {
                 pilot::getLeftY,
                 pilot::getLeftX,
                 CONSTANTS::getSpeakerLocation));
-        // pilot.rightTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase,
-        // flywheel, aimer,
+        // pilot.rightTrigger().whileTrue(DriveCommands.pointToCommand(driveBase,
         // pilot::getLeftY,
         // pilot::getLeftX,
         // CONSTANTS::getAmpLocation));
         pilot.leftTrigger().onFalse(flywheel.stopCommand().andThen(new WaitUntilCommand(1))
                 .andThen(aimer.setTargetAngleCommand(CONSTANTS.getAimerAngleRange().get_0())));
-        pilot.y().onTrue(driveBase.resetFieldOrientationCommand());
+        // pilot.y().onTrue(driveBase.resetFieldOrientationCommand());
         // #endregion
 
         // #region: ---------- Configure Controller 1 for Co-Pilot ----------

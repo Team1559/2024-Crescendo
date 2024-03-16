@@ -150,6 +150,99 @@ public class DriveCommands {
         }
     }
 
+    // public static Command pointToCommand(DriveBase driveBase, DoubleSupplier
+    // xSupplier,
+    // DoubleSupplier ySupplier,
+    // Supplier<Translation3d> target) {
+
+    // Command aimingDrive = new Command() {
+
+    // PIDController pid;
+
+    // @Override
+    // public void initialize() {
+    // // TODO: Use same units when calculating KP.
+    // pid = new PIDController(CONSTANTS.getMaxAngularSpeed().in(RadiansPerSecond) /
+    // 90 /* degrees */, 0, 0);
+    // pid.setSetpoint(0); // Degrees from target.
+    // pid.setTolerance(1/* degree(s) */);
+    // pid.enableContinuousInput(-180, 180); // Degrees.
+    // }
+
+    // @Override
+    // public void execute() {
+    // double linearMagnitude = calculateLinearMagnitude(xSupplier, ySupplier);
+    // // Calcaulate new linear velocity.
+    // Rotation2d linearDirection = calculateLinearDirection(xSupplier, ySupplier);
+    // Translation2d linearVelocity = new Pose2d(new Translation2d(),
+    // linearDirection)
+    // .transformBy(new Transform2d(linearMagnitude, 0.0, new
+    // Rotation2d())).getTranslation();
+
+    // // Calculate omega velocity.
+    // double degreesToTarget =
+    // driveBase.getRotationToTarget(target.get().toTranslation2d())
+    // .plus(Rotation2d.fromDegrees(180))
+    // .getDegrees();
+    // /*
+    // * Range:
+    // * - If kd = 0: minimumInput * kp - ki <-> maximumInput * kp + ki.
+    // * - If kd != 0: -Double.MAX_VALUE <-> Double.MAX_VALUE.
+    // */
+    // // We are inverting the direction because degreesToTarget is our
+    // "correction",
+    // // but the PIDController wants our "position".
+    // double omega = pid.calculate(-degreesToTarget);
+
+    // omega = MathUtil.clamp(omega, // TODO: Use same units when calculating KP.
+    // -CONSTANTS.getMaxAngularSpeed().in(RadiansPerSecond),
+    // CONSTANTS.getMaxAngularSpeed().in(RadiansPerSecond));
+
+    // // Scale Velocities to between 0 and Max.
+    // double scaledXVelocity = linearVelocity.getX() *
+    // CONSTANTS.getMaxLinearSpeed().in(MetersPerSecond),
+    // scaledYVelocity = linearVelocity.getY() *
+    // CONSTANTS.getMaxLinearSpeed().in(MetersPerSecond);
+
+    // // Run Velocities.
+    // if (CONSTANTS.isDrivingModeFieldRelative()) {
+    // driveBase.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(scaledXVelocity,
+    // scaledYVelocity,
+    // omega, driveBase.getRotation()));
+    // } else {
+    // driveBase.runVelocity(new ChassisSpeeds(scaledXVelocity, scaledYVelocity,
+    // omega));
+    // }
+    // // Log Calculated Values.
+    // Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/degreesToTarget",
+    // degreesToTarget);
+    // Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/vxMetersPerSecond",
+    // scaledXVelocity);
+    // Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/vyMetersPerSecond",
+    // scaledYVelocity);
+    // Logger.recordOutput("DriveCommands/autoAimAndManuallyDriveCommand/omegaRadiansPerSecond",
+    // omega);
+    // }
+
+    // @Override
+    // public boolean isFinished() {
+    // // Never stop, because this command will be used as a While True command.
+    // return false;
+    // }
+
+    // @Override
+    // public void end(boolean interrupted) {
+    // // No need to tell the motors to stop, because the default command will kick
+    // in.
+    // // if it has not been given a command for a X second(s).
+    // pid.close();
+    // }
+
+    // };
+    // aimingDrive.addRequirements(driveBase);
+    // return aimingDrive;
+    // }
+
     public static Command autoAimAndManuallyDriveCommand(DriveBase driveBase,
             Flywheel flywheel,
             Aimer aimer,

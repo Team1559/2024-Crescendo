@@ -4,6 +4,8 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.constants.AbstractConstants.CONSTANTS;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -27,8 +29,12 @@ public class VisionIoLimelight implements VisionIo {
     private Pose2d lastPose;
     private double lastPoseTime;
 
-    public VisionIoLimelight(String cameraName) {
+    private final DoubleSupplier speedSupplier;
+
+    public VisionIoLimelight(String cameraName, DoubleSupplier speedSupplier) {
         this.cameraName = cameraName;
+        this.speedSupplier = speedSupplier;
+
     }
 
     public String name() {
@@ -83,8 +89,9 @@ public class VisionIoLimelight implements VisionIo {
 
             double[] targetdata = LimelightHelpers.getTargetPose_CameraSpace(cameraName);
             inputs.distanceToTarget = Math.hypot(targetdata[0], targetdata[1]);
-            double translationStdDev = inputs.distanceToTarget * LINEAR_STD_DEV_RATIO
-                    / results.targetingResults.targets_Fiducials.length;
+            double translationStdDev = (inputs.distanceToTarget * LINEAR_STD_DEV_RATIO
+                    / Math.max(1, results.targetingResults.targets_Fiducials.length))
+                    / Math.max(.5, speedSupplier.getAsDouble()) / 2;
             inputs.estimateStdDevs[0] = translationStdDev;
             inputs.estimateStdDevs[1] = translationStdDev;
             inputs.estimateStdDevs[2] = ROTATION_STD_DEV;

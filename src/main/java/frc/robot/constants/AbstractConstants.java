@@ -96,6 +96,12 @@ public abstract class AbstractConstants {
     private static final Translation3d AMP_LOCATION_BLUE = new Translation3d(Units.inchesToMeters(578.77),
             Units.inchesToMeters(323.00),
             Units.inchesToMeters(44));
+    // private static final Translation3d SOURCE_LOCATION_RED = new
+    // Translation3d(Units.inchesToMeters(),
+    // Units.inchesToMeters(), Units.inchesToMeters());
+    // private static final Translation3d SOURCE_LOCATION_BLUE = new
+    // Translation3d(Units.inchesToMeters(),
+    // Units.inchesToMeters(), Units.inchesToMeters(), Units.inchesToMeters()); KYLE
     // ========================= Static Variables ==============================
     private static Map<String, Set<Integer>> uniqueCanBusIds;
     private static Map<RoboRioPortArrays, Set<Integer>> uniqueRoboRioPorts;
@@ -209,6 +215,14 @@ public abstract class AbstractConstants {
     }
 
     public Translation3d getAmpLocation() {
+        if (getAlliance() == Alliance.Blue) {
+            return CONSTANTS.AMP_LOCATION_RED;
+        } else {
+            return CONSTANTS.AMP_LOCATION_BLUE;
+        }
+    }
+
+    public Translation3d getSourceLocation() {
         if (getAlliance() == Alliance.Blue) {
             return CONSTANTS.AMP_LOCATION_RED;
         } else {

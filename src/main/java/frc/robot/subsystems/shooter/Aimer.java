@@ -96,11 +96,13 @@ public class Aimer extends SubsystemBase {
     // ========================= Functions =====================================
     public void aimAtTarget(Translation3d target, Translation2d currentPosition) {
         double distanceMeters = currentPosition.getDistance(target.toTranslation2d());
-        Logger.recordOutput("Shooter/Aimer/DistanceToTarget", distanceMeters);
-        Rotation2d angle = Rotation2d
-                .fromDegrees(1.42 * distanceMeters * distanceMeters - 15.8 * distanceMeters + 55.3);
-        Logger.recordOutput("Shooter/Aimer/CalculatedTargetAngleInDegrees", angle.getDegrees());
-        setTargetAngle(angle);
+        if (Double.isFinite(distanceMeters)) {
+            Logger.recordOutput("Shooter/Aimer/DistanceToTarget", distanceMeters);
+            Rotation2d angle = Rotation2d
+                    .fromDegrees(1.42 * distanceMeters * distanceMeters - 15.8 * distanceMeters + 55.3);
+            Logger.recordOutput("Shooter/Aimer/CalculatedTargetAngleInDegrees", angle.getDegrees());
+            setTargetAngle(angle);
+        }
     }
 
     public void setTargetAngle(Rotation2d angle) {
