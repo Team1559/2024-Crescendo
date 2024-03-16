@@ -98,6 +98,7 @@ public class SwerveModule {
         this.steerMotor = steerMotor;
         this.encoder = encoder;
 
+        // Create Controllers. TODO: Use Motor Controllers instead.
         driveFeedForwardController = new SimpleMotorFeedforward(Constants.getDriveMotorPidValues().FF_S,
                 Constants.getDriveMotorPidValues().FF_V);
         drivePidController = Constants.getDriveMotorPidValues().createController();
