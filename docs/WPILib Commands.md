@@ -51,27 +51,45 @@ Class|Description
 [WaitCommand](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/WaitCommand.html)                        |Waits until the specified number of seconds has elapsed.
 [WaitUntilCommand](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/WaitUntilCommand.html)              |Has two use cases: <ul><li>Wait until the Match Timer is >= given seconds</li><li>Wait for a given BooleanSupplier to return true</li></ul>
 
-## Command Methods
+## Command Key Methods
+These are some key methods that you can call on a command
+
+[Command](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/Command.html) Method|Description
+--------------------------------------------------------------------------------------------------------------------|-----------
+_#addRequirements_	|Adds the specified subsystems to the requirements of the command.
+_#cancel_			|Cancels this command, before it runs.
+_#isScheduled_		|Returns whether the command is currently scheduled.
+_#runsWhenDisabled_	|Returns whether the given command should run when the robot is disabled.
+_#setName_			|Sets the name of this Command.
+
+## Command Transformation Methods
+These are actions that you can do on an existing command to turn into into a new command.
+
+[Command](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/Command.html) Method|Description|Equivalence
+-------------------------------------------------------------------------------------------------------------------|-----------|-----------
+_#alongWith_              	|Creates a ParallelCommandGroup containing Command and the supplied commands.																							|`ParallelCommandGroup`
+_#andThen_              	|Creates a SequentialCommandGroup that will run Command and then the provided Commands or function.																		|`SequentialCommandGroup`
+_#asProxy_					|Returns Command wrapped in a ProxyCommand.																																|`ProxyCommand`
+_#beforeStarting_			|Creates a SequentialCommandGroup that will run the provided Commands or function and then Command.																		|`SequentialCommandGroup`
+_#deadlineWith_				|Creates a ParallelDeadlineCommandGroup containing Command and the supplied commands, where Command is the deadline.													|`ParallelDeadlineGroup`
+_#finallyDo_				|Returns a version of Command that runs the provided function when the command ends. The function will receive a boolean interrupted parameter, like the `end` method.	|`WrapperCommand`
+_#handleInterrupt_			|Returns a version of this command that will call the provided function when the command is interrupted.																|`WrapperCommand`
+_#ignoringDisable_			|Returns a version of this command that will run or stop even when when disabled.																						|`WrapperCommand`
+_#onlyIf_					|Returns a version of Command that will only run if provided boolean supplier returns true.																				|`ConditionalCommand`
+_#onlyWhile_				|Creates a ParallelRaceCommandGroup containing Command and the supplied commands.																						|`ParallelRaceGroup`
+_#raceWith_					|Decorates this command with a set of commands to run parallel to it, ending when the first command ends.																|`ParallelRaceGroup`
+_#repeatedly_				|Returns a version of Command that will be run repeatedly, forever.																										|`RepeatCommand`
+_#unless_					|Returns a version of Command that will not run if provided boolean supplier returns true.																				|`ConditionalCommand`
+_#until_					|Returns a version of Command that is interrupted when the boolean supplier returns true.																				|`ParallelRaceGroup`
+_#withInterruptBehavior_	|Returns a version of Command with the specified interruption behavior. (Call with `kCancelIncoming` to make command non-interruptible.)								|`WrapperCommand`
+_#withName_					|Returns a version of this command with the new name.																													|`WrapperCommand`
+_#withTimeout_				|Decorates this command with a timeout.																																	|`ParallelRaceGroup`
+
+## Commands Shortcut Methods
 We generally don't use these; instead, instantiate one of the command classes directly, as this makes reading the code more clear and learning the command types easier.
 
-[Command](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/Command.html) Methods|Description
---------------------------------------------------------------------------------------------------------------------|-----------
-withTimeout             |Returns a version of Command that is interrupted after the specified number of seconds.
-until or withInterrupt  |Returns a version of Command that is interrupted when the boolean supplier returns true.
-beforeStarting          |Creates a SequentialCommandGroup that will run the provided Commands or function and then Command.
-andThen                 |Creates a SequentialCommandGroup that will run Command and then the provided Commands or function.
-alongWith               |Creates a ParallelCommandGroup containing Command and the supplied commands.
-raceWith                |Creates a ParallelRaceCommandGroup containing Command and the supplied commands.
-deadlineWith            |Creates a ParallelDeadlineCommandGroup containing Command and the supplied commands, where Command is the deadline.
-repeatedly              |Returns a version of Command that will be run repeatedly, forever.
-asProxy                 |Returns Command wrapped in a ProxyCommand.
-unless                  |Returns a version of Command that will not run if provided boolean supplier returns true.
-withInterruptBehavior   |Returns a version of Command with the specified interruption behavior. Call with `kCancelIncoming` to make this command non-interruptible.
-finallyDo               |Returns a version of Command that runs the provided function when the command ends. The function will receive a boolean interrupted parameter, like the `end` method.
-handleInterrupt         |Returns a version of this command that will call the provided function when the command is interrupted.
-
-[Commands](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/Commands.html) Methods|Preferred Equivalence
-------|---------------------
+[Commands](https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/Commands.html) Method|Preferred Equivalence
+---------------------------------------------------------------------------------------------------------------------|---------------------
 deadline            |`ParallelDeadlineGroup`
 defer               |`DeferredCommand`
 deferredProxy       |`ProxyCommand`
