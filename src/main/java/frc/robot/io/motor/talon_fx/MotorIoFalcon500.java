@@ -1,5 +1,6 @@
 package frc.robot.io.motor.talon_fx;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -7,6 +8,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Current;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Velocity;
@@ -18,7 +20,19 @@ public class MotorIoFalcon500 extends MotorIoTalonFx {
 
     public MotorIoFalcon500(int motorId, String canivoreId, boolean inverted, NeutralModeValue idleMode,
             Rotation2d absoluteEncoderOffset, PidValues pidValues) {
-        super(motorId, canivoreId, inverted, idleMode, absoluteEncoderOffset, pidValues);
+        super(motorId, canivoreId, inverted, idleMode, absoluteEncoderOffset, pidValues, null);
+    }
+
+    public MotorIoFalcon500(int motorId, String canivoreId, boolean inverted, NeutralModeValue idleMode,
+            Rotation2d absoluteEncoderOffset, PidValues pidValues, Measure<Current> currentLimit) {
+        super(motorId, canivoreId, inverted, idleMode, absoluteEncoderOffset, pidValues, currentLimit);
+    }
+
+    @Override
+    public Measure<Current> getMaxSafeCurrent() {
+        // https://store.ctr-electronics.com/announcing-kraken-x60
+        // Stall Current is 257.
+        return Amps.of(256);
     }
 
     @Override

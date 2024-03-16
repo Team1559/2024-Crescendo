@@ -11,6 +11,8 @@ import java.util.Map;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
@@ -22,6 +24,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Current;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Velocity;
@@ -33,6 +36,33 @@ import frc.robot.util.MathUtils;
 import frc.robot.util.Phoenix6Helper;
 
 public abstract class MotorIoTalonFx implements MotorIo {
+
+    public static TalonFXConfiguration getDefaultTalonFXConfiguration(InvertedValue invertedValue,
+            NeutralModeValue breakingMode, Measure<Current> currentLimit) {
+
+        TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration();
+
+        // https://api.ctr-electronics.com/phoenix6/release/java/com/ctre/phoenix6/configs/CurrentLimitsConfigs.html
+        CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs();
+
+        currentLimitsConfigs.SupplyCurrentLimitEnable = true;
+        currentLimitsConfigs.SupplyCurrentLimit = currentLimit.in(Amps);
+
+        // TODO: Determine if needed.
+        // currentLimitsConfigs.SupplyCurrentThreshold = 60.0;
+        // currentLimitsConfigs.SupplyTimeThreshold = 0.5;
+
+        talonFXConfiguration.CurrentLimits = currentLimitsConfigs;
+
+        MotorOutputConfigs driveMotorOutputConfigs = new MotorOutputConfigs();
+        talonFXConfiguration.withMotorOutput(driveMotorOutputConfigs);
+
+        driveMotorOutputConfigs.Inverted = invertedValue;
+
+        driveMotorOutputConfigs.NeutralMode = breakingMode;
+
+        return talonFXConfiguration;
+    }
 
     protected final TalonFX motor;
     protected final Rotation2d absoluteEncoderOffset;
@@ -68,8 +98,7 @@ public abstract class MotorIoTalonFx implements MotorIo {
      *                  </p>
      */
     public MotorIoTalonFx(int motorId, String canivoreId, boolean inverted, NeutralModeValue idleMode,
-            Rotation2d absoluteEncoderOffset,
-            PidValues pidValues) {
+            Rotation2d absoluteEncoderOffset, PidValues pidValues, Measure<Current> currentLimit) {
 
         // ---------- Create & Configure Motors ----------
         // Configure piD Controller.
@@ -82,8 +111,12 @@ public abstract class MotorIoTalonFx implements MotorIo {
 
         // Only set the Motor Configuration once, to avoid accidentally overriding
         // configs with defaults.
-        TalonFXConfiguration talonFXConfiguration = Constants.getDefaultTalonFXConfiguration(
-                inverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive, idleMode);
+        currentLimit = currentLimit == null || currentLimit.gt(getMaxSafeCurrent()) ? getMaxSafeCurrent()
+                : currentLimit;
+        TalonFXConfiguration talonFXConfiguration = getDefaultTalonFXConfiguration(
+                inverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive,
+                idleMode,
+                currentLimit);
         talonFXConfiguration.withSlot0(slot0Configs);
 
         // Create & Configure Motor.

@@ -108,7 +108,7 @@ public class Aimer extends DualMotorSubsystem {
         distanceToTarget = Meters.of(distanceToTargetInMeters);
 
         calculatedTargetAngle = Rotation2d.fromDegrees(
-                1.42 * distanceToTargetInMeters * distanceToTargetInMeters - 15.8 * distanceToTargetInMeters + 55.3);
+                1.42 * distanceToTargetInMeters * distanceToTargetInMeters - 15.8 * distanceToTargetInMeters + 55.8);
 
         setAnglePrivate(calculatedTargetAngle);
     }

@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Current;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
@@ -58,6 +59,11 @@ public class MotorIoSimulation implements MotorIo {
     }
 
     // ========================= Functions =========================
+
+    @Override
+    public Measure<Current> getMaxSafeCurrent() {
+        return Amps.of(Double.MAX_VALUE);
+    }
 
     @Override
     public Measure<Temperature> getMaxSafeTemperature() {

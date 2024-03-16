@@ -55,6 +55,8 @@ public interface MotorIo {
 
     public void updateInputs(MotorIoInputs inputs);
 
+    public Measure<Current> getMaxSafeCurrent();
+
     public Measure<Temperature> getMaxSafeTemperature();
 
     public Measure<Velocity<Angle>> getMaxSafeVelocity();

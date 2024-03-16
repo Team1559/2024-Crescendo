@@ -9,6 +9,7 @@ import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Current;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Velocity;
@@ -20,10 +21,25 @@ public class MotorIoNeo550Brushless extends MotorIoCanSparkMax {
 
     public MotorIoNeo550Brushless(int motorId, boolean inverted, IdleMode idleMode, Rotation2d absoluteEncoderOffset,
             PidValues pidValues) {
+
         super(motorId, inverted, idleMode, absoluteEncoderOffset, pidValues);
 
-        motor.setSmartCurrentLimit((int) Constants.getNeo550BrushlessCurrentLimit().in(Amps));
-        motor.setSecondaryCurrentLimit(Constants.getNeo550BrushlessCurrentSecondaryLimit().in(Amps));
+        Measure<Current> currentLimit = Constants.getNeo550BrushlessCurrentLimit().gt(getMaxSafeCurrent())
+                ? getMaxSafeCurrent()
+                : Constants.getNeo550BrushlessCurrentLimit();
+        Measure<Current> secondaryCurrentLimit = currentLimit.times(1.1);
+        secondaryCurrentLimit = secondaryCurrentLimit.gt(getMaxSafeCurrent()) ? getMaxSafeCurrent()
+                : secondaryCurrentLimit;
+
+        motor.setSmartCurrentLimit((int) currentLimit.in(Amps));
+        motor.setSecondaryCurrentLimit(secondaryCurrentLimit.in(Amps));
+    }
+
+    @Override
+    public Measure<Current> getMaxSafeCurrent() {
+        // https://www.revrobotics.com/rev-21-1651
+        // Stall Current: 100 A.
+        return Amps.of(99);
     }
 
     @Override

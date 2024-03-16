@@ -1,5 +1,6 @@
 package frc.robot.io.motor.talon_fx;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -7,6 +8,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Current;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Velocity;
@@ -18,7 +20,18 @@ public class MotorIoKrakenX60 extends MotorIoTalonFx {
 
     public MotorIoKrakenX60(int motorId, String canivoreId, boolean inverted, NeutralModeValue idleMode,
             Rotation2d absoluteEncoderOffset, PidValues pidValues) {
-        super(motorId, canivoreId, inverted, idleMode, absoluteEncoderOffset, pidValues);
+        this(motorId, canivoreId, inverted, idleMode, absoluteEncoderOffset, pidValues, null);
+    }
+
+    public MotorIoKrakenX60(int motorId, String canivoreId, boolean inverted, NeutralModeValue idleMode,
+            Rotation2d absoluteEncoderOffset, PidValues pidValues, Measure<Current> currentLimit) {
+        super(motorId, canivoreId, inverted, idleMode, absoluteEncoderOffset, pidValues, currentLimit);
+    }
+
+    @Override
+    public Measure<Current> getMaxSafeCurrent() {
+        // https://store.ctr-electronics.com/announcing-kraken-x60
+        return Amps.of(40);
     }
 
     @Override
@@ -30,6 +43,7 @@ public class MotorIoKrakenX60 extends MotorIoTalonFx {
     @Override
     public Measure<Velocity<Angle>> getMaxSafeVelocity() {
         // https://store.ctr-electronics.com/announcing-kraken-x60
+        // Max Velocity not defined. This is free RPM.
         return RevolutionsPerSecond.of(6_000);
     }
 

@@ -19,12 +19,6 @@ import java.util.Set;
 
 import org.opencv.core.Mat.Tuple2;
 
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -658,10 +652,6 @@ public class Constants {
         return Amps.of(24);
     }
 
-    public static Measure<Current> getNeo550BrushlessCurrentSecondaryLimit() {
-        return Amps.of(24);
-    }
-
     // #endregion
 
     // #region: ----- Falcon 500 Motor -----
@@ -675,32 +665,6 @@ public class Constants {
      */
     public static Measure<Temperature> getFalcon500MaxTemperature() {
         return Celsius.of(109);
-    }
-
-    // #endregion
-
-    // #region: ----- TalonFX Motor -----
-
-    public static TalonFXConfiguration getDefaultTalonFXConfiguration(InvertedValue invertedValue,
-            NeutralModeValue breakingMode) {
-
-        TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration();
-
-        // https://api.ctr-electronics.com/phoenix6/release/java/com/ctre/phoenix6/configs/CurrentLimitsConfigs.html
-        CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs();
-        currentLimitsConfigs.SupplyCurrentLimitEnable = true;
-        currentLimitsConfigs.SupplyCurrentLimit = 40.0;
-        // TODO: Determine if needed.
-        // currentLimitsConfigs.SupplyCurrentThreshold = 60.0;
-        // currentLimitsConfigs.SupplyTimeThreshold = 0.5;
-        talonFXConfiguration.CurrentLimits = currentLimitsConfigs;
-
-        MotorOutputConfigs driveMotorOutputConfigs = new MotorOutputConfigs();
-        driveMotorOutputConfigs.Inverted = invertedValue;
-        driveMotorOutputConfigs.NeutralMode = breakingMode;
-        talonFXConfiguration.withMotorOutput(driveMotorOutputConfigs);
-
-        return talonFXConfiguration;
     }
 
     // #endregion

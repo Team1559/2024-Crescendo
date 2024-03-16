@@ -1,11 +1,13 @@
 package frc.robot.io.motor;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Current;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Temperature;
 import edu.wpi.first.units.Velocity;
@@ -23,6 +25,11 @@ public class MotorIoReplay implements MotorIo {
     }
 
     // ========================= Functions =========================
+
+    @Override
+    public Measure<Current> getMaxSafeCurrent() {
+        return Amps.of(Double.MAX_VALUE);
+    }
 
     @Override
     public Measure<Temperature> getMaxSafeTemperature() {
