@@ -277,7 +277,11 @@ public abstract class AbstractConstants {
     // #endregion
 
     // #region: ----- Limit Switch -----
-    public static int getLimitSwitchChannel() {
+    public static int getLeftLimitSwitchChannel() {
+        return 9;
+    }
+
+    public static int getRightLimitSwitchChannel() {
         return 5;
     }
     // #endregion

@@ -51,7 +51,7 @@ public class ShooterCommands {
     // ========================= Default Commands =========================
     public static Command defaultIntakeCommand(Intake intake, NoteSensor sensor) {
         return Commands.run(() -> {
-            if (sensor.isObjectDetectedSwitch()) {
+            if (sensor.isObjectDetected()) {
                 intake.stop();
             } else {
                 intake.start();
@@ -61,7 +61,7 @@ public class ShooterCommands {
 
     public static Command defaultFeederCommand(Feeder feeder, NoteSensor sensor) {
         return Commands.run(() -> {
-            if (sensor.isObjectDetectedSwitch()) {
+            if (sensor.isObjectDetected()) {
                 feeder.stop();
             } else {
                 feeder.start();
