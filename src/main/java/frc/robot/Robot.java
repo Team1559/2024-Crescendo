@@ -9,7 +9,6 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -105,10 +104,6 @@ public class Robot extends LoggedRobot {
         // if (CONSTANTS.hasClimberSubsystem()) {
         // CommandScheduler.getInstance().schedule(robotContainer.climber.setTargetHeightCommand(.5));
         // }
-        if (CONSTANTS.hasAimerSubsystem()) {
-            CommandScheduler.getInstance()
-                    .schedule(robotContainer.aimer.setTargetAngleCommand(Rotation2d.fromDegrees(2)));
-        }
         // schedule the autonomous command (example)
         if (autonomousCommand != null) {
             autonomousCommand.schedule();

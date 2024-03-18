@@ -12,24 +12,30 @@ public class NoteSensor extends SubsystemBase {
 
     @AutoLog
     static class NoteSensorInputs {
-        public boolean isObjectDetectedSwitch;
+        public boolean isObjectDetected;
+        public boolean isSwitchLeftPressed;
+        public boolean isSwitchRightPressed;
     }
 
     private NoteSensorInputsAutoLogged inputs = new NoteSensorInputsAutoLogged();
-    private final DigitalInput limitSwitch;
+    private final DigitalInput limitSwitchLeft;
+    private final DigitalInput limitSwitchRight;
 
-    public NoteSensor(int channel) {
-        limitSwitch = new DigitalInput(channel);
+    public NoteSensor(int leftChannel, int rightChannel) {
+        limitSwitchLeft = new DigitalInput(leftChannel);
+        limitSwitchRight = new DigitalInput(rightChannel);
     }
 
     @Override
     public void periodic() {
         updateInputs();
-        Logger.processInputs("Shooter/Color Sensor", inputs);
+        Logger.processInputs("Shooter/NoteSensor", inputs);
     }
 
     private void updateInputs() {
-        inputs.isObjectDetectedSwitch = !limitSwitch.get();
+        inputs.isSwitchLeftPressed = !limitSwitchLeft.get();
+        inputs.isSwitchRightPressed = !limitSwitchRight.get();
+        inputs.isObjectDetected = inputs.isSwitchLeftPressed || inputs.isSwitchRightPressed;
     }
 
     /**
@@ -37,20 +43,20 @@ public class NoteSensor extends SubsystemBase {
      * 
      * @return limit switch state;
      */
-    public boolean isObjectDetectedSwitch() {
-        return inputs.isObjectDetectedSwitch;
+    public boolean isObjectDetected() {
+        return inputs.isObjectDetected;
     }
 
-    public boolean isObjectNotDetectedSwitch() {
-        return !inputs.isObjectDetectedSwitch;
+    public boolean isObjectNotDetected() {
+        return !isObjectDetected();
     }
 
     // ========================= Commands =========================
     public Command waitForObjectCommandSwitch() {
-        return new WaitUntilCommand(this::isObjectDetectedSwitch);
+        return new WaitUntilCommand(this::isObjectDetected);
     }
 
     public Command waitForNoObjectCommandSwitch() {
-        return new WaitUntilCommand(() -> !isObjectDetectedSwitch());
+        return new WaitUntilCommand(this::isObjectNotDetected);
     }
 }

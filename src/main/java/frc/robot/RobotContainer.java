@@ -105,8 +105,9 @@ public class RobotContainer {
                                 1.0 / 11000)) // TODO - Constants
                         : null;
                 vision = CONSTANTS.hasVisionSubsystem()
-                        ? new Vision(driveBase.poseEstimator, new VisionIoLimelight(CONSTANTS.getCameraName()),
-                                new VisionIoLimelight("limelight-back"))
+                        ? new Vision(driveBase.poseEstimator,
+                                new VisionIoLimelight(CONSTANTS.getCameraName(), driveBase::getSpeed),
+                                new VisionIoLimelight("limelight-back", driveBase::getSpeed))
                         : null;
                 traverser = CONSTANTS.hasTraverserSubsystem()
                         ? new Traverser(new SingleMotorIoNeo550Brushless(CONSTANTS.getTraverserMotorId(),
@@ -170,7 +171,9 @@ public class RobotContainer {
 
         // #region: Initialize Subsystems without Simulation and/or Log Replay Mode
         aimer = CONSTANTS.hasAimerSubsystem() ? new Aimer() : null;
-        noteSensor = CONSTANTS.hasNoteSensorSubsystem() ? new NoteSensor(CONSTANTS.getLimitSwitchChannel()) : null;
+        noteSensor = CONSTANTS.hasNoteSensorSubsystem()
+                ? new NoteSensor(CONSTANTS.getLeftLimitSwitchChannel(), CONSTANTS.getRightLimitSwitchChannel())
+                : null;
         flywheel = CONSTANTS.hasFlywheelSubsystem() ? new Flywheel() : null;
         /*
          * We can safely set LEDs even if there are no LEDs.
@@ -193,8 +196,11 @@ public class RobotContainer {
         // #endregion
 
         // #region: ---------- Configure Command Triggers ----------
-        if (CONSTANTS.hasNoteSensorSubsystem()) {
-            new Trigger((noteSensor::isObjectDetectedSwitch)).whileTrue(leds.setColorCommand(Color.kGreen));
+        if (CONSTANTS.hasNoteSensorSubsystem() && CONSTANTS.hasFlywheelSubsystem() && CONSTANTS.hasAimerSubsystem()) {
+            Trigger aimed = new Trigger(aimer::atTarget).and(flywheel::atSpeed);
+            new Trigger(noteSensor::isObjectDetected).and(aimed.negate())
+                    .whileTrue(leds.setColorCommand(Color.kGreen));
+            aimed.whileTrue(leds.setColorCommand(Color.kBlack));
         }
         // TODO: Add LED Trigger for Ready to Shoot.
         // #endregion
@@ -202,7 +208,7 @@ public class RobotContainer {
         new Trigger(driveBase::isTemperatureTooHigh)
                 .whileTrue(driveBase.stopCommand()
                         .alongWith(leds.setDynamicPatternCommand(CONSTANTS.OVERHEAT_EMERGENCY_PATTERN, false)));
-        if (CONSTANTS.hasIntakeSubsystem()) {
+        if (CONSTANTS.hasIntakeSubsystem() && CONSTANTS.hasFlywheelSubsystem()) {
             new Trigger(flywheel::isTemperatureTooHigh).whileTrue(flywheel.stopCommand()
                     .alongWith(leds.setDynamicPatternCommand(CONSTANTS.OVERHEAT_EMERGENCY_PATTERN, false)));
         }
@@ -232,28 +238,29 @@ public class RobotContainer {
             NamedCommands.registerCommand("Spin Up Flywheel", ShooterCommands.spinUpFlywheelCommand(flywheel));
         }
 
-        Command aimAtSpeakerCommand = ShooterCommands.autoAimAtSpeakerCommand(driveBase, aimer);
-        Command autoShootCommand;
-        Command initialShootCommand;
-        if (CONSTANTS.hasFeederSubsystem() && CONSTANTS.hasNoteSensorSubsystem()) {
-            autoShootCommand = ShooterCommands.shootAutonomousCommand(feeder, noteSensor, intake);
-            initialShootCommand = ShooterCommands.shootAutonomousCommand(feeder, noteSensor, intake);
-            ShooterCommands.shootAutonomousCommand(feeder, noteSensor, intake);
-        } else {
-            autoShootCommand = LedCommands.blinkCommand(leds, Color.kOrange);
-            initialShootCommand = LedCommands.blinkCommand(leds, Color.kOrange);
+        if (CONSTANTS.hasAimerSubsystem() && CONSTANTS.hasFlywheelSubsystem()) {
+            Command aimAtSpeakerCommand = ShooterCommands.autoAimAtSpeakerCommand(driveBase, aimer);
+            Command autoShootCommand;
+            Command initialShootCommand;
+            if (CONSTANTS.hasFeederSubsystem() && CONSTANTS.hasNoteSensorSubsystem()) {
+                autoShootCommand = ShooterCommands.shootAutonomousCommand(feeder, noteSensor, intake);
+                initialShootCommand = ShooterCommands.shootAutonomousCommand(feeder, noteSensor, intake);
+                ShooterCommands.shootAutonomousCommand(feeder, noteSensor, intake);
+            } else {
+                autoShootCommand = LedCommands.blinkCommand(leds, Color.kOrange);
+                initialShootCommand = LedCommands.blinkCommand(leds, Color.kOrange);
+            }
+            NamedCommands.registerCommand("Auto Shoot",
+                    new SequentialCommandGroup(aimAtSpeakerCommand, autoShootCommand));
+            NamedCommands.registerCommand("Initial Shoot",
+                    aimer.setTargetAngleCommand(Rotation2d.fromDegrees(36.7))
+                            .andThen(new WaitUntilCommand(() -> aimer.atTarget())).andThen(initialShootCommand));
+            NamedCommands.registerCommand("Delayed Manual Shot",
+                    new ParallelDeadlineGroup(new WaitCommand(12),
+                            aimer.setTargetAngleCommand(Rotation2d.fromDegrees(36.7))
+                                    .andThen(new WaitUntilCommand(() -> aimer.atTarget()))
+                                    .andThen(ShooterCommands.shootAutonomousCommand(feeder, noteSensor, intake))));
         }
-        NamedCommands.registerCommand("Auto Shoot",
-                new SequentialCommandGroup(aimAtSpeakerCommand, autoShootCommand));
-        NamedCommands.registerCommand("Initial Shoot",
-                aimer.setTargetAngleCommand(Rotation2d.fromDegrees(36.7))
-                        .andThen(new WaitUntilCommand(() -> aimer.atTarget())).andThen(initialShootCommand));
-
-        NamedCommands.registerCommand("Delayed Manual Shot",
-                new ParallelDeadlineGroup(new WaitCommand(12),
-                        aimer.setTargetAngleCommand(Rotation2d.fromDegrees(36.7))
-                                .andThen(new WaitUntilCommand(() -> aimer.atTarget()))
-                                .andThen(ShooterCommands.shootAutonomousCommand(feeder, noteSensor, intake))));
 
         // ---------- Set-up Autonomous Choices ----------
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -266,22 +273,25 @@ public class RobotContainer {
                 pilot::getLeftY,
                 pilot::getLeftX,
                 CONSTANTS::getSpeakerLocation));
-        pilot.rightTrigger().whileTrue(DriveCommands.autoAimAndManuallyDriveCommand(driveBase, flywheel, aimer,
-                pilot::getLeftY,
-                pilot::getLeftX,
-                CONSTANTS::getAmpLocation));
-        pilot.leftTrigger().onFalse(aimer.setTargetAngleCommand(Rotation2d.fromDegrees(2)));
-        pilot.y().onTrue(driveBase.resetFieldOrientationCommand());
+        pilot.rightTrigger().whileTrue(DriveCommands.pointToAngleCommand(driveBase, pilot::getLeftY, pilot::getLeftX,
+                CONSTANTS.getSourceAngle()));
+        if (CONSTANTS.hasFlywheelSubsystem() && CONSTANTS.hasAimerSubsystem()) {
+            pilot.leftTrigger().onFalse(flywheel.stopCommand().andThen(new WaitUntilCommand(1))
+                    .andThen(aimer.setTargetAngleCommand(CONSTANTS.getAimerAngleRange().get_0())));
+        }
+        // pilot.y().onTrue(driveBase.resetFieldOrientationCommand());
         // #endregion
 
         // #region: ---------- Configure Controller 1 for Co-Pilot ----------
-        if (CONSTANTS.hasIntakeSubsystem() && CONSTANTS.hasFeederSubsystem()) {
-
+        if (CONSTANTS.hasIntakeSubsystem() && CONSTANTS.hasFeederSubsystem()/* && CONSTANTS.hasFlywheelSubsystem() */) {
             if (CONSTANTS.hasNoteSensorSubsystem()) {
-                coPilot.leftTrigger().and(noteSensor::isObjectNotDetectedSwitch)
-                        .whileTrue(new ParallelCommandGroup(new IntakeCommand(intake, feeder), flywheel.stopCommand()));
+                coPilot.leftTrigger().and(noteSensor::isObjectNotDetected)
+                        .whileTrue(new ParallelCommandGroup(new IntakeCommand(intake, feeder)/*
+                                                                                              * , flywheel.stopCommand()
+                                                                                              */));
             }
-            coPilot.x().whileTrue(ShooterCommands.reverseShooterAndIntakeCommand(intake, feeder, flywheel));
+            // coPilot.x().whileTrue(ShooterCommands.reverseShooterAndIntakeCommand(intake,
+            // feeder, flywheel));
         }
 
         if (CONSTANTS.hasFeederSubsystem() && CONSTANTS.hasFlywheelSubsystem()) {
@@ -295,14 +305,15 @@ public class RobotContainer {
 
         if (CONSTANTS.hasClimberSubsystem()) {
             Trigger noModifier = new Trigger(coPilot.y().or(coPilot.b()).negate());
+            // coPilot.povUp().whileTrue(climber.setVoltageUpCommand());
+            // coPilot.povDown().whileTrue(climber.setVoltageDownCommand());
+            coPilot.povUp().and(noModifier).whileTrue(climber.setVoltageUpCommand());
+            coPilot.povUp().and(coPilot.y()).whileTrue(climber.setLeftVoltageUpCommand());
+            coPilot.povUp().and(coPilot.b()).whileTrue(climber.setRightVoltageUpCommand());
 
-            coPilot.povUp().and(noModifier).whileTrue(climber.incrementTargetHeightCommand(.1).repeatedly());
-            coPilot.povUp().and(coPilot.y()).whileTrue(climber.incrementLeftHeightCommand(.1).repeatedly());
-            coPilot.povUp().and(coPilot.b()).whileTrue(climber.incrementRightHeightCommand(.1).repeatedly());
-
-            coPilot.povDown().and(noModifier).whileTrue(climber.incrementTargetHeightCommand(-.1).repeatedly());
-            coPilot.povDown().and(coPilot.y()).whileTrue(climber.incrementLeftHeightCommand(-.1).repeatedly());
-            coPilot.povDown().and(coPilot.b()).whileTrue(climber.incrementRightHeightCommand(-.1).repeatedly());
+            coPilot.povDown().and(noModifier).whileTrue(climber.setVoltageDownCommand());
+            coPilot.povDown().and(coPilot.y()).whileTrue(climber.setLeftVoltageDownCommand());
+            coPilot.povDown().and(coPilot.b()).whileTrue(climber.setRightVoltageDownCommand());
         }
 
         if (CONSTANTS.hasTraverserSubsystem()) {

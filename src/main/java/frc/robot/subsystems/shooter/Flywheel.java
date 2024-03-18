@@ -8,6 +8,9 @@ import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -18,7 +21,6 @@ import edu.wpi.first.units.Temperature;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.swerve_module.SwerveModuleIoTalonFx;
 
 public class Flywheel extends SubsystemBase {
     @AutoLog
@@ -64,14 +66,35 @@ public class Flywheel extends SubsystemBase {
      */
     private Boolean runOneWheelFlag;
 
+    public static TalonFXConfiguration getDefaultTalonFXConfiguration(InvertedValue invertedValue,
+            NeutralModeValue breakingMode) {
+
+        TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration();
+
+        // https://api.ctr-electronics.com/phoenix6/release/java/com/ctre/phoenix6/configs/CurrentLimitsConfigs.html
+        CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs();
+        currentLimitsConfigs.SupplyCurrentLimitEnable = true;
+        currentLimitsConfigs.SupplyCurrentLimit = 40;
+        // currentLimitsConfigs.SupplyCurrentThreshold = 60.0;
+        // currentLimitsConfigs.SupplyTimeThreshold = 0.5;
+        talonFXConfiguration.CurrentLimits = currentLimitsConfigs;
+
+        MotorOutputConfigs driveMotorOutputConfigs = new MotorOutputConfigs();
+        driveMotorOutputConfigs.Inverted = invertedValue;
+        driveMotorOutputConfigs.NeutralMode = breakingMode;
+        talonFXConfiguration.withMotorOutput(driveMotorOutputConfigs);
+
+        return talonFXConfiguration;
+    }
+
     public Flywheel() {
 
         // ---------- Configure Motors ----------
         // Only set the Motor Configuration once, to avoid accidentally overriding
         // configs with defaults.
-        flywheelMotorL.getConfigurator().apply(SwerveModuleIoTalonFx.getDefaultTalonFXConfiguration(
+        flywheelMotorL.getConfigurator().apply(getDefaultTalonFXConfiguration(
                 InvertedValue.CounterClockwise_Positive /* default */, NeutralModeValue.Coast));
-        flywheelMotorR.getConfigurator().apply(SwerveModuleIoTalonFx.getDefaultTalonFXConfiguration(
+        flywheelMotorR.getConfigurator().apply(getDefaultTalonFXConfiguration(
                 InvertedValue.Clockwise_Positive /* inverted */, NeutralModeValue.Coast));
 
         // ---------- Define Loggable Fields ----------
@@ -202,6 +225,10 @@ public class Flywheel extends SubsystemBase {
      */
     public void reverse() {
         start(CONSTANTS.getFlywheelReverseVoltage());
+    }
+
+    public boolean atSpeed() {
+        return flywheelLVelocity.getValueAsDouble() > 75 && flywheelRVelocity.getValueAsDouble() > 75;
     }
 
     // ========================= Commands =========================

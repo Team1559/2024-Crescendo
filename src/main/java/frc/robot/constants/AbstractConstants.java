@@ -216,6 +216,14 @@ public abstract class AbstractConstants {
         }
     }
 
+    public double getSourceAngle() {
+        if (getAlliance() == Alliance.Blue) {
+            return 120;
+        } else {
+            return 60;
+        }
+    }
+
     // #endregion
 
     // #region: --------------- Hardware ---------------------------------------
@@ -263,7 +271,11 @@ public abstract class AbstractConstants {
     // #endregion
 
     // #region: ----- Limit Switch -----
-    public static int getLimitSwitchChannel() {
+    public static int getLeftLimitSwitchChannel() {
+        return 9;
+    }
+
+    public static int getRightLimitSwitchChannel() {
         return 5;
     }
     // #endregion

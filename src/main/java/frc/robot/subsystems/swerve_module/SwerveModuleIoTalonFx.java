@@ -46,7 +46,7 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         // https://api.ctr-electronics.com/phoenix6/release/java/com/ctre/phoenix6/configs/CurrentLimitsConfigs.html
         CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs();
         currentLimitsConfigs.SupplyCurrentLimitEnable = true;
-        currentLimitsConfigs.SupplyCurrentLimit = 40.0;
+        currentLimitsConfigs.SupplyCurrentLimit = 25;
         // currentLimitsConfigs.SupplyCurrentThreshold = 60.0;
         // currentLimitsConfigs.SupplyTimeThreshold = 0.5;
         talonFXConfiguration.CurrentLimits = currentLimitsConfigs;
@@ -104,14 +104,14 @@ public class SwerveModuleIoTalonFx implements SwerveModuleIo {
         driveMotorPosition = driveMotor.getPosition();
         driveMotorVelocity = driveMotor.getVelocity();
         driveMotorAppliedVolts = driveMotor.getMotorVoltage();
-        driveMotorCurrent = driveMotor.getStatorCurrent();
+        driveMotorCurrent = driveMotor.getSupplyCurrent();
         driveMotorFaults = driveMotor.getFaultField();
         driveMotorTemp = driveMotor.getDeviceTemp();
 
         steerMotorPosition = steerMotor.getPosition();
         steerMotorVelocity = steerMotor.getVelocity();
         steerMotorAppliedVolts = steerMotor.getMotorVoltage();
-        steerMotorCurrent = steerMotor.getStatorCurrent();
+        steerMotorCurrent = steerMotor.getSupplyCurrent();
         steerMotorFaults = steerMotor.getFaultField();
         steerMotorTemp = steerMotor.getDeviceTemp();
 

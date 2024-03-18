@@ -6,9 +6,15 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "Initial Shoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "MoveDiagonally"
+            "pathName": "Leave Right"
           }
         }
       ]

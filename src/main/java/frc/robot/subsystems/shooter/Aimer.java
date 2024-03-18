@@ -55,6 +55,7 @@ public class Aimer extends SubsystemBase {
         motorR.setSmartCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentLimit());
         motorL.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
         motorR.setSecondaryCurrentLimit(CONSTANTS.getNeo550BrushlessCurrentSecondaryLimit());
+        setTargetAngle(Rotation2d.fromDegrees(12));
     }
 
     @Override
@@ -67,7 +68,7 @@ public class Aimer extends SubsystemBase {
             double kF = 0.7;
             double ff = kF * Rotation2d.fromDegrees(inputs.targetAngleDegrees).getCos();
             double output = ff + controller.calculate(inputs.currentAngleDegrees);
-            output = MathUtil.clamp(output, -1, 2);
+            output = MathUtil.clamp(output, -.5, 2);
             motorL.setVoltage(output);
             motorR.setVoltage(output);
         }
@@ -95,11 +96,13 @@ public class Aimer extends SubsystemBase {
     // ========================= Functions =====================================
     public void aimAtTarget(Translation3d target, Translation2d currentPosition) {
         double distanceMeters = currentPosition.getDistance(target.toTranslation2d());
-        Logger.recordOutput("Shooter/Aimer/DistanceToTarget", distanceMeters);
-        Rotation2d angle = Rotation2d
-                .fromDegrees(1.42 * distanceMeters * distanceMeters - 15.8 * distanceMeters + 55.3);
-        Logger.recordOutput("Shooter/Aimer/CalculatedTargetAngleInDegrees", angle.getDegrees());
-        setTargetAngle(angle);
+        if (Double.isFinite(distanceMeters)) {
+            Logger.recordOutput("Shooter/Aimer/DistanceToTarget", distanceMeters);
+            Rotation2d angle = Rotation2d
+                    .fromDegrees(1.42 * distanceMeters * distanceMeters - 15.8 * distanceMeters + 55.6);
+            Logger.recordOutput("Shooter/Aimer/CalculatedTargetAngleInDegrees", angle.getDegrees());
+            setTargetAngle(angle);
+        }
     }
 
     public void setTargetAngle(Rotation2d angle) {
