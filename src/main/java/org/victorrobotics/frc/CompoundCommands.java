@@ -27,7 +27,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
@@ -155,16 +154,6 @@ public class CompoundCommands {
                 new WaitCommand(12),
                 aimer.setAngleCommand(Rotation2d.fromDegrees(36.7)).andThen(new WaitUntilCommand(aimer::isAtTarget))
                         .andThen(CompoundCommands.shootAutonomousCommand(feeder, intake, noteSensor)));
-
-        return CommandUtils.addName(command);
-    }
-
-    public static Command autoIntakeStartCommand(Feeder feeder, Intake intake) {
-
-        Command command = new InstantCommand(() -> {
-            intake.forward();
-            feeder.forward();
-        });
 
         return CommandUtils.addName(command);
     }
