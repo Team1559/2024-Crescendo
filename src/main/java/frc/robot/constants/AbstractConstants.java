@@ -488,10 +488,5 @@ public abstract class AbstractConstants {
     // #region: --------------- LED Patterns --------------------------------
     public final Color[] OVERHEAT_EMERGENCY_PATTERN = new Color[] { Color.kYellow, Color.kYellow, Color.kRed,
             Color.kRed, Color.kBlack, Color.kBlack };
-    public final Color[] AIMING_PATTERN = new Color[] { Color.kBlack, Color.kBlack, Color.kBlack,
-            Color.kBlack, Color.kBlack, Color.kBlack, Color.kBlack, Color.kBlack, Color.kBlack,
-            Color.kBlack, Color.kBlack, Color.kBlack, Color.kGoldenrod, Color.kGoldenrod, Color.kGoldenrod,
-            Color.kGoldenrod, Color.kGoldenrod, Color.kGoldenrod, Color.kGoldenrod, Color.kGoldenrod,
-            Color.kGoldenrod, Color.kGoldenrod, Color.kGoldenrod, Color.kGoldenrod };
     // #endregion
 }
