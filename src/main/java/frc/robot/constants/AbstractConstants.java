@@ -77,7 +77,7 @@ public abstract class AbstractConstants {
     }
 
     // ========================= Static CONSTANTS ==============================
-    private static final boolean FORCE_GAME_ROBOT_CONSTANTS = true;
+    private static final boolean FORCE_GAME_ROBOT_CONSTANTS = false;
     private static final AbstractConstants GAME_ROBOT_CONSTANTS = new GameRobotConstants();
     private static final AbstractConstants TEST_ROBOT_CONSTANTS = new TestRobotConstants();
 
@@ -96,12 +96,6 @@ public abstract class AbstractConstants {
     private static final Translation3d AMP_LOCATION_BLUE = new Translation3d(Units.inchesToMeters(578.77),
             Units.inchesToMeters(323.00),
             Units.inchesToMeters(44));
-    // private static final Translation3d SOURCE_LOCATION_RED = new
-    // Translation3d(Units.inchesToMeters(),
-    // Units.inchesToMeters(), Units.inchesToMeters());
-    // private static final Translation3d SOURCE_LOCATION_BLUE = new
-    // Translation3d(Units.inchesToMeters(),
-    // Units.inchesToMeters(), Units.inchesToMeters(), Units.inchesToMeters()); KYLE
     // ========================= Static Variables ==============================
     private static Map<String, Set<Integer>> uniqueCanBusIds;
     private static Map<RoboRioPortArrays, Set<Integer>> uniqueRoboRioPorts;
@@ -222,11 +216,11 @@ public abstract class AbstractConstants {
         }
     }
 
-    public Translation3d getSourceLocation() {
+    public double getSourceAngle() {
         if (getAlliance() == Alliance.Blue) {
-            return CONSTANTS.AMP_LOCATION_RED;
+            return 120;
         } else {
-            return CONSTANTS.AMP_LOCATION_BLUE;
+            return 60;
         }
     }
 
